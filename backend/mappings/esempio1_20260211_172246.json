@@ -1,0 +1,32 @@
+{
+  "name": "esempio1",
+  "input_schema": "sample_input",
+  "output_schema": "sample_output",
+  "rules": [
+    {
+      "id": "conn_1770826873791",
+      "source": "E1EDK01.BELNR",
+      "target": "Invoice.ID",
+      "transformation": {
+        "type": "direct"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_1770826942895",
+      "source": "EDI_DC40.DOCNUM",
+      "target": "Invoice.ID",
+      "transformation": {
+        "type": "concat",
+        "params": {}
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    }
+  ],
+  "lookup_tables": {},
+  "metadata": {}
+}

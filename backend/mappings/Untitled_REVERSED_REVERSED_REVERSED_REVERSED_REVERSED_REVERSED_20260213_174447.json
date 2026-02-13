@@ -1,0 +1,64 @@
+{
+  "name": "Untitled_REVERSED_REVERSED_REVERSED_REVERSED_REVERSED_REVERSED",
+  "input_schema": "idoc_complete_input_updated_v3",
+  "output_schema": "output_UBLFR",
+  "rules": [
+    {
+      "id": "rev_rev_conn_1770971094127",
+      "source": "E1EDK01.BELNR",
+      "target": "Numéro de facture",
+      "transformation": {
+        "type": "direct"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_1770973030108",
+      "source": "E1EDK01.KUNDEUINR",
+      "target": "Numéro de facture",
+      "transformation": {
+        "type": "direct"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_1771000934346",
+      "source": "E1EDK01.CURCY",
+      "target": "Numéro de facture",
+      "transformation": {
+        "type": "direct"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_1771001067210",
+      "source": "E1EDK01.HWAER",
+      "target": "Code de type de facture",
+      "transformation": {
+        "type": "direct"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_1771001070073",
+      "source": "E1EDK01.ZTERM",
+      "target": "Code de devise de la facture",
+      "transformation": {
+        "type": "direct"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    }
+  ],
+  "lookup_tables": {},
+  "metadata": {}
+}

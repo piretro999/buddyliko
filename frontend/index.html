@@ -1,0 +1,4101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visual Mapping System - Complete</title>
+    
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f5f5f5;
+            overflow: hidden;
+        }
+        .app-container {
+            display: flex;
+            height: 100vh;
+        }
+        
+        /* Responsive Sidebar */
+        .sidebar {
+            width: 350px;
+            min-width: 280px;
+            background: white;
+            border-right: 2px solid #ddd;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar.collapsed {
+            width: 0 !important;
+            min-width: 0 !important;
+            overflow: hidden;
+            border: none;
+        }
+        
+        /* Toggle button for sidebar */
+        .sidebar-toggle {
+            position: fixed;
+            left: 10px;
+            bottom: 10px;
+            width: 28px;
+            height: 28px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            transition: all 0.2s;
+        }
+        
+        .sidebar-toggle:hover {
+            background: #5568d3;
+            transform: scale(1.1);
+        }
+        
+        .sidebar-header {
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .sidebar-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+        }
+        .main-canvas {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0; /* Important for flex shrinking */
+        }
+        
+        /* Responsive Toolbar */
+        .toolbar {
+            background: white;
+            border-bottom: 2px solid #ddd;
+            padding: 12px 15px;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap; /* Allow wrapping on small screens */
+            overflow-x: auto;
+        }
+        
+        .canvas-area {
+            flex: 1;
+            background: #fafafa;
+            overflow: auto;
+            padding: 20px;
+            position: relative;
+        }
+        
+        /* Responsive Properties Panel */
+        .properties-panel {
+            width: 350px;
+            min-width: 280px;
+            background: white;
+            border-left: 2px solid #ddd;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        
+        /* UNIFORM BUTTON SIZES */
+        .btn {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            white-space: nowrap;
+            min-width: 140px;        /* ALL BUTTONS SAME WIDTH */
+            height: 42px;            /* ALL BUTTONS SAME HEIGHT */
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            flex-shrink: 0;          /* Don't shrink */
+        }
+        
+        .btn:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .btn:active:not(:disabled) {
+            transform: translateY(0);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .btn-primary { 
+            background: #667eea; 
+            color: white; 
+        }
+        .btn-primary:hover:not(:disabled) { 
+            background: #5568d3; 
+        }
+        
+        .btn-secondary { 
+            background: #e0e0e0; 
+            color: #333; 
+        }
+        .btn-secondary:hover:not(:disabled) { 
+            background: #d0d0d0; 
+        }
+        
+        .btn-success { 
+            background: #4caf50; 
+            color: white; 
+        }
+        .btn-success:hover:not(:disabled) { 
+            background: #43a047; 
+        }
+        
+        .btn-danger { 
+            background: #f44336; 
+            color: white; 
+        }
+        .btn-danger:hover:not(:disabled) { 
+            background: #e53935; 
+        }
+        
+        /* Full width buttons (sidebar) */
+        .btn-full {
+            width: 100%;
+            min-width: 100%;
+            margin-bottom: 10px;
+        }
+        
+        /* Uniform input fields */
+        input[type="text"], select, textarea {
+            height: 42px;            /* SAME AS BUTTONS */
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            font-size: 13px;
+            transition: border-color 0.2s;
+        }
+        
+        input[type="text"]:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+        }
+        
+        /* Search input specific */
+        .search-input {
+            width: 280px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .field-box {
+            padding: 10px;
+            margin: 8px 0;
+            background: white;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            cursor: grab;
+            transition: all 0.2s;
+            position: relative;
+            /* Word wrap and dynamic height */
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            white-space: normal;
+            min-height: auto;
+            height: auto;
+        }
+        
+        /* Removed resize handle from cells */
+        .field-box:hover {
+            border-color: #667eea;
+            transform: translateX(3px);
+            box-shadow: 0 2px 8px rgba(102,126,234,0.2);
+        }
+        .field-box.dragging {
+            opacity: 0.5;
+            cursor: grabbing;
+        }
+        .field-box.selected {
+            border-color: #4caf50;
+            background: #e8f5e9;
+            border-width: 3px;
+        }
+        .field-box.required {
+            border-left: 4px solid #4caf50;
+        }
+        .field-box.calculated {
+            background: #fff3cd;
+            border-color: #ffc107;
+        }
+        
+        .field-box.highlighted {
+            background: #fffacd !important;  /* Light yellow */
+            border-color: #ffd700 !important;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+            animation: pulse-highlight 1s ease-in-out;
+        }
+        
+        @keyframes pulse-highlight {
+            0%, 100% { box-shadow: 0 0 10px rgba(255, 215, 0, 0.3); }
+            50% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.6); }
+        }
+        
+        .field-name {
+            font-weight: 700;
+            font-size: 13px;
+            margin-bottom: 4px;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            white-space: normal;
+        }
+        .field-business {
+            font-size: 11px;
+            color: #666;
+            font-style: italic;
+            margin-bottom: 4px;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+        .field-meta {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .field-badge {
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 3px;
+            background: #e0e0e0;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            max-width: 100%;
+        }
+        
+        .canvas-columns {
+            display: flex;
+            gap: 40px;
+            position: relative;
+            height: 100%;
+            justify-content: space-between;
+        }
+        .canvas-column {
+            flex: 1;
+            min-width: 300px;
+            max-height: 100%;
+            overflow-y: auto;
+            overflow-x: visible;      /* VISIBLE per mostrare handles! */
+            position: relative;
+        }
+        
+        /* Input handle - RIGHT side, slightly UP - MORE VISIBLE */
+        .resize-handle-input {
+            position: absolute;
+            right: -16px;              /* Closer to edge */
+            top: calc(50% - 50px);     /* Slightly UP */
+            width: 16px;               /* Wider */
+            height: 60px;              /* Taller */
+            background: #667eea;       /* Blue by default */
+            border: 2px solid white;
+            border-radius: 4px;
+            cursor: ew-resize;
+            z-index: 500;              /* Higher z-index */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: white;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            user-select: none;
+            transition: all 0.15s;
+        }
+        
+        .resize-handle-input:hover {
+            background: #5568d3;
+            transform: scale(1.1);
+            box-shadow: 0 3px 10px rgba(102, 126, 234, 0.5);
+        }
+        
+        /* Output handle - LEFT side, slightly DOWN - MORE VISIBLE */
+        .resize-handle-output {
+            position: absolute;
+            left: -16px;               /* Closer to edge */
+            top: calc(50% + 50px);     /* Slightly DOWN */
+            width: 16px;               /* Wider */
+            height: 60px;              /* Taller */
+            background: #667eea;       /* Blue by default */
+            border: 2px solid white;
+            border-radius: 4px;
+            cursor: ew-resize;
+            z-index: 500;              /* Higher z-index */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: white;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            user-select: none;
+            transition: all 0.15s;
+        }
+        
+        .resize-handle-output:hover {
+            background: #5568d3;
+            transform: scale(1.1);
+            box-shadow: 0 3px 10px rgba(102, 126, 234, 0.5);
+        }
+        .canvas-column h3 {
+            margin-bottom: 15px;
+            padding: 10px;
+            background: white;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            cursor: default;
+            user-select: none;
+        }
+        
+        /* Draggable area on right edge of headers */
+        .canvas-column h3::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            width: 20px;
+            cursor: ew-resize;
+            background: linear-gradient(to left, rgba(102, 126, 234, 0.1), transparent);
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        
+        .canvas-column h3:hover::after {
+            opacity: 1;
+        }
+        
+        svg.connections {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            overflow: visible;
+        }
+        svg.connections path {
+            pointer-events: stroke;
+            cursor: pointer;
+        }
+        .connection-line {
+            fill: none;
+            stroke: #667eea;
+            stroke-width: 3;
+            transition: none; /* Remove transition to avoid lag during scroll */
+        }
+        .connection-line:hover {
+            stroke: #4caf50;
+            stroke-width: 4;
+        }
+        .connection-line.selected {
+            stroke: #f44336;
+            stroke-width: 4;
+            stroke-dasharray: 5,5;
+            animation: dash 0.5s linear infinite;
+        }
+        @keyframes dash {
+            to { stroke-dashoffset: -10; }
+        }
+        .connection-arrow {
+            fill: #667eea;
+        }
+        
+        /* Hover Popup */
+        .hover-popup {
+            position: fixed;
+            background: white;
+            border: 2px solid black;
+            padding: 12px;
+            border-radius: 4px;
+            z-index: 2000;
+            max-width: 500px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            animation: fadeInPopup 0.2s;
+        }
+        @keyframes fadeInPopup {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .hover-popup-title {
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        .hover-popup-code {
+            background: black;
+            color: white;
+            padding: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            line-height: 1.6;
+            border-radius: 3px;
+            overflow-x: auto;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        .hover-popup-highlight {
+            background: white;
+            color: black;
+            padding: 2px 4px;
+            font-weight: bold;
+            border-radius: 2px;
+            display: inline;
+        }
+        
+        /* Formula Editor */
+        .formula-editor-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+        }
+        .formula-editor {
+            background: white;
+            border-radius: 8px;
+            width: 600px;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+        .formula-editor-header {
+            padding: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        .formula-editor-header h3 {
+            margin: 0;
+            color: #333;
+        }
+        .formula-editor-body {
+            padding: 20px;
+            flex: 1;
+            overflow-y: auto;
+        }
+        .formula-textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 12px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            resize: vertical;
+        }
+        .formula-textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+        }
+        .operator-buttons {
+            margin-top: 15px;
+        }
+        .operator-buttons-label {
+            font-size: 12px;
+            font-weight: bold;
+            color: #666;
+            margin-bottom: 8px;
+        }
+        .operator-buttons-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .operator-btn {
+            padding: 6px 12px;
+            background: #f0f0f0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            font-family: 'Courier New', monospace;
+            transition: all 0.2s;
+        }
+        .operator-btn:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        .formula-editor-footer {
+            padding: 20px;
+            border-top: 1px solid #ddd;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+        
+        .status-message {
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-size: 13px;
+        }
+        .status-success { background: #d4edda; color: #155724; }
+        .status-error { background: #f8d7da; color: #721c24; }
+        
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+        .modal {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .upload-area {
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+        }
+        .upload-area:hover {
+            border-color: #667eea;
+            background: #f5f5ff;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            font-size: 13px;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #eee;
+            margin-bottom: 15px;
+        }
+        .tab {
+            padding: 10px 16px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            font-weight: 600;
+        }
+        .tab.active {
+            border-bottom-color: #667eea;
+            color: #667eea;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+        .connection-list-item {
+            padding: 10px;
+            margin: 5px 0;
+            background: #f9f9f9;
+            border-radius: 6px;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        .connection-list-item:hover {
+            background: #f0f0f0;
+        }
+        .connection-list-item.selected {
+            border-color: #667eea;
+            background: #e3f2fd;
+        }
+        
+        /* ========================================
+           RESPONSIVE DESIGN
+           ======================================== */
+        
+        /* Large tablets and smaller desktops */
+        @media (max-width: 1200px) {
+            .btn {
+                min-width: 130px;
+                font-size: 12px;
+            }
+            .search-input {
+                width: 220px;
+            }
+        }
+        
+        /* Tablets */
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 280px;
+                min-width: 250px;
+            }
+            .properties-panel {
+                width: 280px;
+                min-width: 250px;
+            }
+            .btn {
+                min-width: 110px;
+                font-size: 12px;
+                padding: 8px 12px;
+                height: 38px;
+            }
+            input[type="text"], select {
+                height: 38px;
+            }
+            .toolbar {
+                gap: 6px;
+                padding: 10px 12px;
+            }
+            .search-input {
+                width: 180px;
+            }
+        }
+        
+        /* Mobile landscape and smaller tablets */
+        @media (max-width: 768px) {
+            .app-container {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                max-height: 35vh;
+                border-right: none;
+                border-bottom: 2px solid #ddd;
+            }
+            .properties-panel {
+                width: 100%;
+                max-height: 35vh;
+                border-left: none;
+                border-top: 2px solid #ddd;
+            }
+            .toolbar {
+                flex-wrap: wrap;
+                justify-content: flex-start;
+                padding: 8px;
+            }
+            .btn {
+                flex: 1 1 calc(50% - 4px); /* 2 buttons per row */
+                min-width: calc(50% - 4px);
+                max-width: calc(50% - 4px);
+                height: 40px;
+            }
+            .search-input {
+                flex: 1 1 100%;
+                width: 100%;
+                margin-bottom: 4px;
+            }
+            input[type="text"]:not(.search-input) {
+                flex: 1 1 100%;
+                width: 100%;
+                margin-bottom: 4px;
+            }
+            .canvas-area {
+                padding: 10px;
+            }
+        }
+        
+        /* Mobile portrait */
+        @media (max-width: 480px) {
+            .sidebar-header h2 {
+                font-size: 18px;
+            }
+            .btn {
+                flex: 1 1 100%; /* 1 button per row */
+                min-width: 100%;
+                max-width: 100%;
+            }
+            .field-box {
+                font-size: 12px;
+                padding: 8px;
+            }
+            .toolbar {
+                padding: 6px;
+            }
+        }
+        
+        /* Extra small phones */
+        @media (max-width: 360px) {
+            .sidebar-header {
+                padding: 15px;
+            }
+            .sidebar-header h2 {
+                font-size: 16px;
+            }
+            .btn {
+                font-size: 11px;
+                padding: 6px 10px;
+            }
+        }
+        
+        /* High DPI screens (Retina) */
+        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+            .field-box {
+                border-width: 1.5px;
+            }
+            .btn {
+                border-width: 0;
+            }
+        }
+        
+        /* Landscape orientation on mobile */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .sidebar, .properties-panel {
+                max-height: none;
+                height: auto;
+            }
+            .sidebar-content {
+                max-height: 60vh;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script>
+        const { useState, useEffect, useRef } = React;
+        const API_URL = 'http://localhost:8080/api';
+        
+        // Hover Popup Component
+        function HoverPopup({ popup, setPopupPinned, setHoverPopup }) {
+            if (!popup) return null;
+            
+            // Render line with character-level highlighting
+            const renderInputLine = (line, idx) => {
+                const isHighlighted = idx === popup.highlightIndex;
+                
+                if (isHighlighted && popup.highlightChar) {
+                    // Character-level highlighting for IDOC flat files
+                    const { start, end } = popup.highlightChar;
+                    const before = line.substring(0, start);
+                    const highlighted = line.substring(start, end);
+                    const after = line.substring(end);
+                    
+                    return React.createElement('div', { 
+                        key: idx,
+                        style: { 
+                            background: '#e0e0e0',  // GRIGIO CHIARO
+                            color: 'black',          // TESTO NERO
+                            padding: '2px 4px',
+                            fontFamily: 'monospace',
+                            whiteSpace: 'pre',
+                            fontSize: '11px'
+                        }
+                    },
+                        React.createElement('span', { style: { color: 'black' } }, before),
+                        React.createElement('span', { 
+                            style: { 
+                                background: 'black',  // VALORE: NERO
+                                color: 'white',       // TESTO BIANCO
+                                fontWeight: 'bold',
+                                padding: '0 2px'
+                            }
+                        }, highlighted),
+                        React.createElement('span', { style: { color: 'black' } }, after)
+                    );
+                } else {
+                    // Normal line (light gray background)
+                    return React.createElement('div', { 
+                        key: idx,
+                        style: { 
+                            background: '#e0e0e0',  // GRIGIO CHIARO
+                            color: 'black',          // TESTO NERO
+                            padding: '2px 4px',
+                            fontFamily: 'monospace',
+                            whiteSpace: 'pre',
+                            fontSize: '11px'
+                        }
+                    }, line);
+                }
+            };
+            
+            return React.createElement('div', {
+                className: 'hover-popup',
+                style: {
+                    left: popup.x + 'px',
+                    top: popup.y + 'px',
+                    maxWidth: popup.type === 'output' ? '500px' : '600px'
+                },
+                onDoubleClick: () => {
+                    setPopupPinned(false);
+                    setHoverPopup(null);
+                }
+            },
+                React.createElement('div', { className: 'hover-popup-title' },
+                    popup.type === 'input' ? '📥 Input Context' : '📤 Generated XML Code'
+                ),
+                React.createElement('div', { 
+                    className: 'hover-popup-code',
+                    style: {
+                        background: popup.type === 'input' ? '#f5f5f5' : 'black',
+                        padding: '8px',
+                        border: '1px solid #ccc'
+                    }
+                },
+                    popup.type === 'input' 
+                        ? popup.lines.map((line, idx) => renderInputLine(line, idx))
+                        : React.createElement('pre', { 
+                            style: { 
+                                margin: 0,
+                                color: '#0f0',
+                                fontFamily: 'monospace',
+                                fontSize: '12px',
+                                whiteSpace: 'pre-wrap'
+                            }
+                        }, popup.code)
+                )
+            );
+        }
+        
+        // Formula Editor Component
+        function FormulaEditor({ connection, onSave, onClose }) {
+            const [formula, setFormula] = useState(connection.transformation?.formula || '');
+            const textareaRef = useRef(null);
+            
+            const operators = ['+', '-', '*', '/', '&&', 'UPPERCASE', 'LOWERCASE', 'SUBSTRING', 'DATE_FORMAT', 'TRIM', 'CONCAT'];
+            
+            const insertOperator = (op) => {
+                const textarea = textareaRef.current;
+                if (textarea) {
+                    const start = textarea.selectionStart;
+                    const end = textarea.selectionEnd;
+                    const text = formula;
+                    const before = text.substring(0, start);
+                    const after = text.substring(end);
+                    const newFormula = before + op + ' ' + after;
+                    setFormula(newFormula);
+                    setTimeout(() => {
+                        textarea.focus();
+                        textarea.selectionStart = textarea.selectionEnd = start + op.length + 1;
+                    }, 0);
+                }
+            };
+            
+            return React.createElement('div', {
+                className: 'formula-editor-modal',
+                onClick: onClose
+            },
+                React.createElement('div', {
+                    className: 'formula-editor',
+                    onClick: (e) => e.stopPropagation()
+                },
+                    React.createElement('div', { className: 'formula-editor-header' },
+                        React.createElement('h3', null, '✏️ Edit Formula')
+                    ),
+                    React.createElement('div', { className: 'formula-editor-body' },
+                        React.createElement('div', { style: { marginBottom: '10px', fontSize: '12px', color: '#666' } },
+                            `Mapping: ${connection.source} → ${connection.target}`
+                        ),
+                        React.createElement('textarea', {
+                            ref: textareaRef,
+                            className: 'formula-textarea',
+                            value: formula,
+                            onChange: (e) => setFormula(e.target.value),
+                            placeholder: 'Enter formula, e.g.: UPPERCASE(field1) && field2'
+                        }),
+                        React.createElement('div', { className: 'operator-buttons' },
+                            React.createElement('div', { className: 'operator-buttons-label' }, 'Quick Insert:'),
+                            React.createElement('div', { className: 'operator-buttons-grid' },
+                                operators.map(op =>
+                                    React.createElement('button', {
+                                        key: op,
+                                        className: 'operator-btn',
+                                        onClick: () => insertOperator(op)
+                                    }, op)
+                                )
+                            )
+                        )
+                    ),
+                    React.createElement('div', { className: 'formula-editor-footer' },
+                        React.createElement('button', {
+                            className: 'btn btn-secondary',
+                            onClick: onClose
+                        }, 'Cancel'),
+                        React.createElement('button', {
+                            className: 'btn btn-success',
+                            onClick: () => onSave(formula)
+                        }, '✅ Save Formula')
+                    )
+                )
+            );
+        }
+        
+        // Settings Modal Component
+        function SettingsModal({ onClose }) {
+            return React.createElement('div', {
+                className: 'formula-editor-modal',
+                onClick: onClose
+            },
+                React.createElement('div', {
+                    className: 'formula-editor',
+                    onClick: (e) => e.stopPropagation()
+                },
+                    React.createElement('div', { className: 'formula-editor-header' },
+                        React.createElement('h3', null, '⚙️ AI Configuration')
+                    ),
+                    React.createElement('div', { className: 'formula-editor-body' },
+                        React.createElement('div', { style: { padding: '15px', background: '#f0f0f0', borderRadius: '6px', fontSize: '13px', marginBottom: '15px' } },
+                            React.createElement('strong', null, '🤖 How AI Auto-Map Works:'),
+                            React.createElement('ul', { style: { marginTop: '8px', paddingLeft: '20px', lineHeight: '1.6' } },
+                                React.createElement('li', null, 'AI analyzes your input and output schemas'),
+                                React.createElement('li', null, 'Considers field names, types, business terms, and data samples'),
+                                React.createElement('li', null, 'Suggests intelligent mappings with confidence scores'),
+                                React.createElement('li', null, 'Recommends transformation formulas when needed')
+                            )
+                        ),
+                        React.createElement('div', { style: { padding: '15px', background: '#fff3cd', borderRadius: '6px', fontSize: '12px', marginBottom: '15px' } },
+                            React.createElement('strong', { style: { display: 'block', marginBottom: '8px' } }, '🔑 API Keys Configuration:'),
+                            React.createElement('div', { style: { lineHeight: '1.6' } },
+                                'API keys are configured in the backend ',
+                                React.createElement('code', { style: { background: '#fff', padding: '2px 6px', borderRadius: '3px' } }, '.env'),
+                                ' file. Add your keys there:',
+                                React.createElement('pre', { style: { background: '#000', color: '#0f0', padding: '10px', borderRadius: '4px', marginTop: '8px', fontSize: '11px', overflow: 'auto' } },
+`ANTHROPIC_API_KEY=sk-ant-api03-...
+OPENAI_API_KEY=sk-...`
+                                )
+                            )
+                        ),
+                        React.createElement('div', { style: { fontSize: '12px' } },
+                            React.createElement('div', { style: { marginBottom: '10px' } },
+                                React.createElement('strong', null, '🤖 Get Claude API Key:'),
+                                React.createElement('br'),
+                                React.createElement('a', { 
+                                    href: 'https://console.anthropic.com/settings/keys', 
+                                    target: '_blank',
+                                    style: { color: '#667eea' }
+                                }, 'https://console.anthropic.com/settings/keys')
+                            ),
+                            React.createElement('div', null,
+                                React.createElement('strong', null, '🧠 Get OpenAI API Key:'),
+                                React.createElement('br'),
+                                React.createElement('a', { 
+                                    href: 'https://platform.openai.com/api-keys', 
+                                    target: '_blank',
+                                    style: { color: '#667eea' }
+                                }, 'https://platform.openai.com/api-keys')
+                            )
+                        )
+                    ),
+                    React.createElement('div', { className: 'formula-editor-footer' },
+                        React.createElement('button', {
+                            className: 'btn btn-primary',
+                            onClick: onClose
+                        }, '✅ Got It')
+                    )
+                )
+            );
+        }
+        
+        // ===========================================================================
+        // SCHEMA EDITOR MODAL COMPONENT
+        // ===========================================================================
+        
+        function SchemaEditorModal({ show, onClose, onSchemaSelect }) {
+            const [schemaId, setSchemaId] = useState(null);
+            const [schemaName, setSchemaName] = useState('');
+            const [schemaFormat, setSchemaFormat] = useState('xml');
+            const [schemaTree, setSchemaTree] = useState([]);
+            const [selectedField, setSelectedField] = useState(null);
+            const [status, setStatus] = useState('');
+            const [savedSchemas, setSavedSchemas] = useState([]);
+            const [showLoadPanel, setShowLoadPanel] = useState(false);
+            
+            // Load list of saved schemas on mount
+            useEffect(() => {
+                loadSavedSchemasList();
+            }, []);
+            
+            // Load list of saved schemas
+            const loadSavedSchemasList = async () => {
+                try {
+                    const res = await fetch(`${API_URL}/schema/list`);
+                    const data = await res.json();
+                    setSavedSchemas(data.schemas || []);
+                } catch (err) {
+                    console.error('Failed to load schemas list:', err);
+                }
+            };
+            
+            // Save current schema
+            const saveCurrentSchema = async () => {
+                if (!schemaId) {
+                    setStatus('❌ No schema to save');
+                    return;
+                }
+                
+                const name = prompt('Schema name:', schemaName);
+                if (!name) return;
+                
+                const description = prompt('Description (optional):');
+                
+                try {
+                    await fetch(`${API_URL}/schema/save`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            schema_id: schemaId,
+                            name,
+                            description: description || ''
+                        })
+                    });
+                    setStatus(`✅ Schema "${name}" saved!`);
+                    loadSavedSchemasList();
+                } catch (err) {
+                    setStatus(`❌ Save error: ${err.message}`);
+                }
+            };
+            
+            // Load saved schema
+            const loadSavedSchema = async (storedId) => {
+                try {
+                    const res = await fetch(`${API_URL}/schema/load/${storedId}`);
+                    const data = await res.json();
+                    setSchemaId(data.schema_id);
+                    setSchemaName(data.schema.name);
+                    setSchemaTree(data.tree);
+                    setStatus(`✅ Schema loaded!`);
+                    setShowLoadPanel(false);
+                } catch (err) {
+                    setStatus(`❌ Load error: ${err.message}`);
+                }
+            };
+            
+            // Delete saved schema
+            const deleteSavedSchema = async (storedId) => {
+                if (!confirm('Delete this saved schema?')) return;
+                
+                try {
+                    await fetch(`${API_URL}/schema/stored/${storedId}`, {
+                        method: 'DELETE'
+                    });
+                    setStatus('✅ Schema deleted');
+                    loadSavedSchemasList();
+                } catch (err) {
+                    setStatus(`❌ Delete error: ${err.message}`);
+                }
+            };
+            
+            // Create new schema
+            const createSchema = async () => {
+                try {
+                    const res = await fetch(`${API_URL}/schema/create`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            name: schemaName,
+                            format: schemaFormat
+                        })
+                    });
+                    const data = await res.json();
+                    setSchemaId(data.schema_id);
+                    setStatus(`✅ Schema "${schemaName}" created!`);
+                    loadSchema(data.schema_id);
+                } catch (err) {
+                    setStatus(`❌ Error: ${err.message}`);
+                }
+            };
+            
+            // Load schema tree
+            const loadSchema = async (id) => {
+                try {
+                    const res = await fetch(`${API_URL}/schema/${id}`);
+                    const data = await res.json();
+                    setSchemaTree(data.tree);
+                } catch (err) {
+                    setStatus(`❌ Load error: ${err.message}`);
+                }
+            };
+            
+            // Add field
+            const addField = async () => {
+                const name = prompt('Field name:');
+                if (!name) return;
+                
+                const type = prompt('Type (string/number/date/boolean/object/array):', 'string');
+                if (!type) return;
+                
+                const description = prompt('Description (optional):');
+                
+                try {
+                    await fetch(`${API_URL}/schema/${schemaId}/field/add`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            name,
+                            field_type: type,
+                            parent_path: selectedField?.path,
+                            description: description || '',
+                            required: false
+                        })
+                    });
+                    setStatus(`✅ Field "${name}" added`);
+                    loadSchema(schemaId);
+                } catch (err) {
+                    setStatus(`❌ Add field error: ${err.message}`);
+                }
+            };
+            
+            // Remove field
+            const removeField = async (fieldId) => {
+                if (!confirm('Remove this field and all its children?')) return;
+                
+                try {
+                    await fetch(`${API_URL}/schema/${schemaId}/field/${fieldId}`, {
+                        method: 'DELETE'
+                    });
+                    setStatus(`✅ Field removed`);
+                    setSelectedField(null);
+                    loadSchema(schemaId);
+                } catch (err) {
+                    setStatus(`❌ Remove error: ${err.message}`);
+                }
+            };
+            
+            // Update field
+            const updateField = async (fieldId, updates) => {
+                try {
+                    await fetch(`${API_URL}/schema/${schemaId}/field/update`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            field_id: fieldId,
+                            updates
+                        })
+                    });
+                    setStatus(`✅ Field updated`);
+                    loadSchema(schemaId);
+                } catch (err) {
+                    setStatus(`❌ Update error: ${err.message}`);
+                }
+            };
+            
+            // Export as CSV
+            const exportCSV = () => {
+                window.open(`${API_URL}/schema/${schemaId}/export/csv`);
+                setStatus('✅ Exporting CSV schema...');
+            };
+            
+            // Export sample
+            const exportSample = (format) => {
+                window.open(`${API_URL}/schema/${schemaId}/export/sample/${format}`);
+                setStatus(`✅ Exporting sample ${format.toUpperCase()}...`);
+            };
+            
+            // Import from CSV header
+            const importCSV = async () => {
+                const header = prompt('Enter CSV header (comma-separated):');
+                if (!header) return;
+                
+                try {
+                    await fetch(`${API_URL}/schema/${schemaId}/import`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            format: 'csv_header',
+                            content: header
+                        })
+                    });
+                    setStatus('✅ Imported from CSV header');
+                    loadSchema(schemaId);
+                } catch (err) {
+                    setStatus(`❌ Import error: ${err.message}`);
+                }
+            };
+            
+            // Render tree node
+            const renderTreeNode = (node, level = 0) => {
+                const indent = level * 20;
+                const isSelected = selectedField?.id === node.id;
+                
+                const getTypeIcon = (type) => {
+                    const icons = {
+                        string: '📝',
+                        number: '🔢',
+                        date: '📅',
+                        boolean: '☑️',
+                        array: '📋',
+                        object: '📦'
+                    };
+                    return icons[type] || '📄';
+                };
+                
+                return React.createElement('div', { key: node.id },
+                    React.createElement('div', {
+                        style: {
+                            paddingLeft: `${indent + 8}px`,
+                            padding: '8px',
+                            cursor: 'pointer',
+                            background: isSelected ? '#e3f2fd' : 'transparent',
+                            borderLeft: isSelected ? '3px solid #1976d2' : 'none',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            borderRadius: '4px'
+                        },
+                        onClick: () => setSelectedField(node)
+                    },
+                        React.createElement('span', null, getTypeIcon(node.type)),
+                        React.createElement('span', { 
+                            style: { fontWeight: 'bold', flex: 1 } 
+                        }, node.name),
+                        React.createElement('span', { 
+                            style: { fontSize: '11px', color: '#666' }
+                        }, node.type),
+                        node.required && React.createElement('span', {
+                            style: { color: 'red', fontSize: '11px', marginLeft: '4px' }
+                        }, '*'),
+                        React.createElement('button', {
+                            onClick: (e) => {
+                                e.stopPropagation();
+                                removeField(node.id);
+                            },
+                            style: { 
+                                marginLeft: '8px', 
+                                fontSize: '16px',
+                                background: 'none',
+                                border: 'none',
+                                cursor: 'pointer'
+                            }
+                        }, '🗑️')
+                    ),
+                    node.children?.map(child => renderTreeNode(child, level + 1))
+                );
+            };
+            
+            if (!show) return null;
+            
+            return React.createElement('div', {
+                className: 'modal-overlay',
+                onClick: onClose
+            },
+                React.createElement('div', {
+                    className: 'modal',
+                    style: { maxWidth: '1200px', width: '90%', maxHeight: '90vh' },
+                    onClick: (e) => e.stopPropagation()
+                },
+                    React.createElement('h2', null, '🏗️ Schema Editor'),
+                    
+                    // Status bar
+                    status && React.createElement('div', {
+                        style: {
+                            padding: '10px',
+                            marginTop: '10px',
+                            marginBottom: '10px',
+                            background: status.startsWith('✅') ? '#d4edda' : '#f8d7da',
+                            color: status.startsWith('✅') ? '#155724' : '#721c24',
+                            borderRadius: '6px'
+                        }
+                    }, status),
+                    
+                    // Header section - Create or Load schema
+                    !schemaId && React.createElement('div', { style: { marginBottom: '20px' } },
+                        React.createElement('div', { 
+                            style: { 
+                                display: 'flex', 
+                                gap: '10px', 
+                                alignItems: 'center',
+                                marginBottom: '15px'
+                            }
+                        },
+                            React.createElement('input', {
+                                type: 'text',
+                                placeholder: 'Schema name (e.g., Invoice, Customer)...',
+                                value: schemaName,
+                                onChange: (e) => setSchemaName(e.target.value),
+                                style: { width: '300px' }
+                            }),
+                            React.createElement('select', {
+                                value: schemaFormat,
+                                onChange: (e) => setSchemaFormat(e.target.value)
+                            },
+                                React.createElement('option', { value: 'csv' }, 'CSV'),
+                                React.createElement('option', { value: 'xml' }, 'XML'),
+                                React.createElement('option', { value: 'json' }, 'JSON'),
+                                React.createElement('option', { value: 'excel' }, 'Excel'),
+                                React.createElement('option', { value: 'flat' }, 'Fixed-width (IDOC)')
+                            ),
+                            React.createElement('button', {
+                                className: 'btn btn-primary',
+                                onClick: createSchema,
+                                disabled: !schemaName
+                            }, '✨ Create New'),
+                            React.createElement('button', {
+                                className: 'btn btn-secondary',
+                                onClick: () => setShowLoadPanel(!showLoadPanel)
+                            }, showLoadPanel ? '✖ Close' : '📂 Load Saved')
+                        ),
+                        
+                        // Load panel
+                        showLoadPanel && React.createElement('div', {
+                            style: {
+                                border: '2px solid #667eea',
+                                borderRadius: '8px',
+                                padding: '15px',
+                                background: '#f8f9ff',
+                                maxHeight: '300px',
+                                overflowY: 'auto'
+                            }
+                        },
+                            React.createElement('h4', { 
+                                style: { marginTop: 0, marginBottom: '10px' }
+                            }, '📚 Saved Schemas'),
+                            savedSchemas.length === 0 ? React.createElement('p', {
+                                style: { color: '#999', textAlign: 'center', padding: '20px' }
+                            }, 'No saved schemas yet. Create and save one first!') : null,
+                            savedSchemas.map(schema => 
+                                React.createElement('div', {
+                                    key: schema.id,
+                                    style: {
+                                        padding: '10px',
+                                        marginBottom: '8px',
+                                        background: 'white',
+                                        borderRadius: '6px',
+                                        border: '1px solid #ddd',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '10px'
+                                    }
+                                },
+                                    React.createElement('div', { style: { flex: 1 } },
+                                        React.createElement('div', { 
+                                            style: { fontWeight: 'bold', marginBottom: '4px' }
+                                        }, schema.name),
+                                        React.createElement('div', { 
+                                            style: { fontSize: '12px', color: '#666' }
+                                        }, `${schema.format.toUpperCase()} • ${schema.field_count} fields`),
+                                        schema.description && React.createElement('div', {
+                                            style: { fontSize: '11px', color: '#999', marginTop: '4px' }
+                                        }, schema.description)
+                                    ),
+                                    React.createElement('button', {
+                                        className: 'btn btn-sm btn-primary',
+                                        onClick: () => loadSavedSchema(schema.id)
+                                    }, '📥 Load'),
+                                    React.createElement('button', {
+                                        className: 'btn btn-sm btn-danger',
+                                        onClick: () => deleteSavedSchema(schema.id)
+                                    }, '🗑️')
+                                )
+                            )
+                        )
+                    ),
+                    
+                    // Main editor area
+                    schemaId && React.createElement('div', {
+                        style: { display: 'flex', gap: '20px', height: '500px' }
+                    },
+                        // Left - Tree view
+                        React.createElement('div', {
+                            style: {
+                                flex: 1,
+                                border: '1px solid #ddd',
+                                borderRadius: '6px',
+                                padding: '10px',
+                                overflowY: 'auto',
+                                background: '#fafafa'
+                            }
+                        },
+                            React.createElement('div', {
+                                style: { 
+                                    marginBottom: '10px',
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'center',
+                                    paddingBottom: '10px',
+                                    borderBottom: '2px solid #ddd'
+                                }
+                            },
+                                React.createElement('h3', { 
+                                    style: { margin: 0 }
+                                }, `📂 ${schemaName}`),
+                                React.createElement('div', { 
+                                    style: { display: 'flex', gap: '5px' } 
+                                },
+                                    React.createElement('button', {
+                                        className: 'btn btn-sm btn-primary',
+                                        onClick: addField
+                                    }, '➕ Add'),
+                                    React.createElement('button', {
+                                        className: 'btn btn-sm btn-secondary',
+                                        onClick: importCSV
+                                    }, '📥 Import')
+                                )
+                            ),
+                            schemaTree.length === 0 ? React.createElement('div', {
+                                style: { 
+                                    textAlign: 'center', 
+                                    padding: '40px', 
+                                    color: '#999' 
+                                }
+                            }, 'No fields yet. Click "Add" to start.') : null,
+                            schemaTree.map(node => renderTreeNode(node))
+                        ),
+                        
+                        // Right - Properties panel
+                        React.createElement('div', {
+                            style: {
+                                width: '350px',
+                                border: '1px solid #ddd',
+                                borderRadius: '6px',
+                                padding: '15px',
+                                overflowY: 'auto'
+                            }
+                        },
+                            React.createElement('h3', null, '⚙️ Properties'),
+                            selectedField ? React.createElement('div', null,
+                                React.createElement('div', { 
+                                    style: { marginBottom: '15px' } 
+                                },
+                                    React.createElement('label', { 
+                                        style: { 
+                                            display: 'block', 
+                                            fontWeight: 'bold', 
+                                            marginBottom: '5px',
+                                            fontSize: '11px',
+                                            color: '#666',
+                                            textTransform: 'uppercase'
+                                        } 
+                                    }, 'Name:'),
+                                    React.createElement('div', { 
+                                        style: { 
+                                            fontWeight: 'bold', 
+                                            fontSize: '18px' 
+                                        } 
+                                    }, selectedField.name)
+                                ),
+                                React.createElement('div', { 
+                                    style: { marginBottom: '15px' } 
+                                },
+                                    React.createElement('label', {
+                                        style: { 
+                                            display: 'block', 
+                                            fontWeight: 'bold', 
+                                            marginBottom: '5px',
+                                            fontSize: '11px',
+                                            color: '#666',
+                                            textTransform: 'uppercase'
+                                        }
+                                    }, 'Type:'),
+                                    React.createElement('div', { 
+                                        style: { 
+                                            padding: '8px',
+                                            background: '#f5f5f5',
+                                            borderRadius: '4px',
+                                            fontFamily: 'monospace'
+                                        }
+                                    }, selectedField.type)
+                                ),
+                                React.createElement('div', { 
+                                    style: { marginBottom: '15px' } 
+                                },
+                                    React.createElement('label', {
+                                        style: { 
+                                            display: 'block', 
+                                            fontWeight: 'bold', 
+                                            marginBottom: '5px',
+                                            fontSize: '11px',
+                                            color: '#666',
+                                            textTransform: 'uppercase'
+                                        }
+                                    }, 'Path:'),
+                                    React.createElement('div', { 
+                                        style: { 
+                                            fontSize: '12px', 
+                                            color: '#666',
+                                            fontFamily: 'monospace',
+                                            wordBreak: 'break-all'
+                                        }
+                                    }, selectedField.path)
+                                ),
+                                React.createElement('div', { 
+                                    style: { marginBottom: '15px' } 
+                                },
+                                    React.createElement('label', {
+                                        style: { 
+                                            display: 'block', 
+                                            fontWeight: 'bold', 
+                                            marginBottom: '5px',
+                                            fontSize: '11px',
+                                            color: '#666',
+                                            textTransform: 'uppercase'
+                                        }
+                                    }, 'Description:'),
+                                    React.createElement('textarea', {
+                                        value: selectedField.description || '',
+                                        onChange: (e) => updateField(selectedField.id, { 
+                                            description: e.target.value 
+                                        }),
+                                        style: { 
+                                            width: '100%', 
+                                            height: '80px',
+                                            padding: '8px',
+                                            border: '1px solid #ddd',
+                                            borderRadius: '4px'
+                                        },
+                                        placeholder: 'Enter field description...'
+                                    })
+                                ),
+                                React.createElement('div', { 
+                                    style: { marginBottom: '15px' } 
+                                },
+                                    React.createElement('label', {
+                                        style: { 
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            cursor: 'pointer'
+                                        }
+                                    },
+                                        React.createElement('input', {
+                                            type: 'checkbox',
+                                            checked: selectedField.required || false,
+                                            onChange: (e) => updateField(selectedField.id, {
+                                                required: e.target.checked
+                                            }),
+                                            style: { marginRight: '8px' }
+                                        }),
+                                        React.createElement('span', {
+                                            style: { fontWeight: 'bold' }
+                                        }, 'Required field')
+                                    )
+                                )
+                            ) : React.createElement('p', { 
+                                style: { 
+                                    color: '#999', 
+                                    textAlign: 'center',
+                                    padding: '40px 20px'
+                                } 
+                            }, 'Select a field from the tree to edit its properties')
+                        )
+                    ),
+                    
+                    // Footer - Export buttons
+                    schemaId && React.createElement('div', {
+                        style: {
+                            marginTop: '20px',
+                            paddingTop: '20px',
+                            borderTop: '2px solid #ddd',
+                            display: 'flex',
+                            gap: '10px',
+                            flexWrap: 'wrap'
+                        }
+                    },
+                        React.createElement('button', {
+                            className: 'btn btn-success',
+                            onClick: saveCurrentSchema,
+                            title: 'Save this schema for reuse in other projects'
+                        }, '💾 Save Schema'),
+                        React.createElement('button', {
+                            className: 'btn btn-success',
+                            onClick: exportCSV
+                        }, '📥 Export CSV Schema'),
+                        React.createElement('button', {
+                            className: 'btn btn-secondary',
+                            onClick: () => exportSample('xml')
+                        }, '📄 Sample XML'),
+                        React.createElement('button', {
+                            className: 'btn btn-secondary',
+                            onClick: () => exportSample('json')
+                        }, '📄 Sample JSON'),
+                        React.createElement('button', {
+                            className: 'btn btn-secondary',
+                            onClick: () => exportSample('csv')
+                        }, '📄 Sample CSV'),
+                        React.createElement('div', { 
+                            style: { flex: 1, borderRight: '2px solid #ddd', marginLeft: '10px' } 
+                        }),
+                        onSchemaSelect && React.createElement('button', {
+                            className: 'btn btn-success',
+                            onClick: async () => {
+                                // Export CSV and set as input schema
+                                try {
+                                    const res = await fetch(`${API_URL}/schema/${schemaId}/export/csv`);
+                                    const csvText = await res.text();
+                                    
+                                    // Parse CSV as schema
+                                    const formData = new FormData();
+                                    const blob = new Blob([csvText], { type: 'text/csv' });
+                                    formData.append('file', blob, 'schema.csv');
+                                    formData.append('type', 'csv');
+                                    
+                                    const uploadRes = await fetch(`${API_URL}/schemas/upload`, {
+                                        method: 'POST',
+                                        body: formData
+                                    });
+                                    const schema = await uploadRes.json();
+                                    onSchemaSelect(schema, 'input', { schema: schemaTree, schemaId });
+                                    onClose();
+                                } catch (err) {
+                                    setStatus(`❌ Error: ${err.message}`);
+                                }
+                            }
+                        }, '📥 Use as Input Schema'),
+                        onSchemaSelect && React.createElement('button', {
+                            className: 'btn btn-success',
+                            onClick: async () => {
+                                // Export CSV and set as output schema
+                                try {
+                                    const res = await fetch(`${API_URL}/schema/${schemaId}/export/csv`);
+                                    const csvText = await res.text();
+                                    
+                                    // Parse CSV as schema
+                                    const formData = new FormData();
+                                    const blob = new Blob([csvText], { type: 'text/csv' });
+                                    formData.append('file', blob, 'schema.csv');
+                                    formData.append('type', 'csv');
+                                    
+                                    const uploadRes = await fetch(`${API_URL}/schemas/upload`, {
+                                        method: 'POST',
+                                        body: formData
+                                    });
+                                    const schema = await uploadRes.json();
+                                    onSchemaSelect(schema, 'output', { schema: schemaTree, schemaId });
+                                    onClose();
+                                } catch (err) {
+                                    setStatus(`❌ Error: ${err.message}`);
+                                }
+                            }
+                        }, '📤 Use as Output Schema'),
+                        React.createElement('button', {
+                            className: 'btn btn-primary',
+                            onClick: () => {
+                                onClose();
+                            },
+                            style: { marginLeft: 'auto' }
+                        }, '✅ Done')
+                    ),
+                    
+                    React.createElement('button', {
+                        className: 'btn btn-secondary',
+                        onClick: onClose,
+                        style: { marginTop: '10px', width: '100%' }
+                    }, '❌ Close')
+                )
+            );
+        }
+        
+        // AI Suggestions Panel Component
+        function AISuggestionsPanel({ suggestions, onApprove, onReject, onClose, processing }) {
+            const [selectedIds, setSelectedIds] = useState(new Set());
+            const [selectAll, setSelectAll] = useState(false);
+            
+            const toggleSelection = (suggestion) => {
+                const key = `${suggestion.source_field}-${suggestion.target_field}`;
+                const newSelectedIds = new Set(selectedIds);
+                
+                if (newSelectedIds.has(key)) {
+                    newSelectedIds.delete(key);
+                } else {
+                    newSelectedIds.add(key);
+                }
+                
+                setSelectedIds(newSelectedIds);
+                setSelectAll(newSelectedIds.size === suggestions.length);
+            };
+            
+            const toggleSelectAll = () => {
+                if (selectAll) {
+                    setSelectedIds(new Set());
+                    setSelectAll(false);
+                } else {
+                    const allIds = new Set(
+                        suggestions.map(s => `${s.source_field}-${s.target_field}`)
+                    );
+                    setSelectedIds(allIds);
+                    setSelectAll(true);
+                }
+            };
+            
+            const isSelected = (suggestion) => {
+                const key = `${suggestion.source_field}-${suggestion.target_field}`;
+                return selectedIds.has(key);
+            };
+            
+            const approveSelected = () => {
+                console.log('🟢 APPROVE SELECTED clicked');
+                console.log('  Selected IDs:', selectedIds);
+                
+                const toApprove = suggestions.filter(s => isSelected(s));
+                console.log('  To approve count:', toApprove.length);
+                console.log('  To approve items:', toApprove.map(s => s.source_field + ' → ' + s.target_field));
+                
+                // Approve with small delay between each to ensure unique IDs
+                toApprove.forEach((s, index) => {
+                    setTimeout(() => {
+                        console.log(`  [${index}] Approving:`, s.source_field, '→', s.target_field);
+                        onApprove(s);
+                    }, index * 50);
+                });
+                
+                setSelectedIds(new Set());
+                setSelectAll(false);
+            };
+            
+            const approveAll = () => {
+                console.log('🟣 APPROVE ALL clicked');
+                console.log('  Total suggestions:', suggestions.length);
+                console.log('  Suggestions:', suggestions.map(s => s.source_field + ' → ' + s.target_field));
+                
+                // Approve with small delay between each to ensure unique IDs
+                suggestions.forEach((s, index) => {
+                    setTimeout(() => {
+                        console.log(`  [${index}] Approving:`, s.source_field, '→', s.target_field);
+                        onApprove(s);
+                    }, index * 50);
+                });
+                
+                setSelectedIds(new Set());
+                setSelectAll(false);
+            };
+            
+            return React.createElement('div', {
+                style: {
+                    position: 'fixed',
+                    right: '20px',
+                    top: '80px',
+                    width: '450px',
+                    maxHeight: 'calc(100vh - 100px)',
+                    background: 'white',
+                    borderRadius: '12px',
+                    boxShadow: '0 10px 40px rgba(0,0,0,0.2)',
+                    border: '2px solid #667eea',
+                    zIndex: 1000,
+                    display: 'flex',
+                    flexDirection: 'column'
+                }
+            },
+                React.createElement('div', {
+                    style: {
+                        padding: '20px',
+                        borderBottom: '1px solid #ddd',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                        color: 'white',
+                        borderRadius: '10px 10px 0 0'
+                    }
+                },
+                    React.createElement('h3', { style: { margin: 0, fontSize: '16px' } }, 
+                        processing ? '⏳ AI Analyzing...' : `🤖 Suggestions (${suggestions.length})`
+                    ),
+                    React.createElement('button', {
+                        onClick: onClose,
+                        style: {
+                            background: 'none',
+                            border: 'none',
+                            color: 'white',
+                            fontSize: '20px',
+                            cursor: 'pointer',
+                            padding: '0 5px'
+                        }
+                    }, '×')
+                ),
+                !processing && suggestions.length > 0 && React.createElement('div', {
+                    style: {
+                        padding: '10px 15px',
+                        background: '#f5f5f5',
+                        borderBottom: '1px solid #ddd',
+                        display: 'flex',
+                        gap: '10px',
+                        alignItems: 'center'
+                    }
+                },
+                    React.createElement('input', {
+                        type: 'checkbox',
+                        checked: selectAll,
+                        onChange: toggleSelectAll,
+                        style: { cursor: 'pointer' }
+                    }),
+                    React.createElement('span', { 
+                        style: { fontSize: '12px', fontWeight: 'bold', flex: 1 }
+                    }, `Select All (${selectedIds.size}/${suggestions.length})`),
+                    React.createElement('button', {
+                        className: 'btn btn-success',
+                        onClick: approveSelected,
+                        disabled: selectedIds.size === 0,
+                        style: { fontSize: '11px', padding: '5px 10px' }
+                    }, `✅ Approve Selected (${selectedIds.size})`),
+                    React.createElement('button', {
+                        className: 'btn btn-primary',
+                        onClick: approveAll,
+                        style: { fontSize: '11px', padding: '5px 10px' }
+                    }, '✅ Approve All')
+                ),
+                React.createElement('div', {
+                    style: {
+                        flex: 1,
+                        overflowY: 'auto',
+                        padding: '15px'
+                    }
+                },
+                    processing ? React.createElement('div', {
+                        style: { textAlign: 'center', padding: '40px', color: '#666' }
+                    },
+                        React.createElement('div', { style: { fontSize: '48px', marginBottom: '10px' } }, '🤖'),
+                        React.createElement('div', null, 'AI is analyzing your schemas...'),
+                        React.createElement('div', { style: { fontSize: '12px', marginTop: '5px' } }, 'This may take 10-30 seconds')
+                    ) : suggestions.length === 0 ? React.createElement('div', {
+                        style: { textAlign: 'center', padding: '40px', color: '#666' }
+                    },
+                        React.createElement('div', { style: { fontSize: '48px', marginBottom: '10px' } }, '🎉'),
+                        React.createElement('div', null, 'No suggestions remaining'),
+                        React.createElement('div', { style: { fontSize: '12px', marginTop: '5px' } }, 'All mappings reviewed!')
+                    ) : suggestions.map((suggestion, idx) =>
+                        React.createElement('div', {
+                            key: idx,
+                            style: {
+                                padding: '15px',
+                                background: isSelected(suggestion) ? '#e8f4ff' : '#f9f9f9',
+                                borderRadius: '8px',
+                                marginBottom: '10px',
+                                border: isSelected(suggestion) ? '2px solid #667eea' : '1px solid #ddd'
+                            }
+                        },
+                            React.createElement('div', {
+                                style: { display: 'flex', gap: '10px', alignItems: 'flex-start' }
+                            },
+                                React.createElement('input', {
+                                    type: 'checkbox',
+                                    checked: isSelected(suggestion),
+                                    onChange: () => toggleSelection(suggestion),
+                                    style: { 
+                                        cursor: 'pointer',
+                                        marginTop: '3px',
+                                        width: '16px',
+                                        height: '16px'
+                                    }
+                                }),
+                                React.createElement('div', { style: { flex: 1 } },
+                                    React.createElement('div', {
+                                        style: {
+                                            display: 'flex',
+                                            justifyContent: 'space-between',
+                                            marginBottom: '10px'
+                                        }
+                                    },
+                                        React.createElement('span', {
+                                            style: {
+                                                fontSize: '11px',
+                                                padding: '4px 8px',
+                                                borderRadius: '12px',
+                                                fontWeight: 'bold',
+                                                background: suggestion.confidence > 0.8 ? '#d4edda' : 
+                                                           suggestion.confidence > 0.6 ? '#fff3cd' : '#f8d7da',
+                                                color: suggestion.confidence > 0.8 ? '#155724' :
+                                                       suggestion.confidence > 0.6 ? '#856404' : '#721c24'
+                                            }
+                                        }, `${Math.round(suggestion.confidence * 100)}% confident`)
+                                    ),
+                                    React.createElement('div', {
+                                        style: {
+                                            fontSize: '12px',
+                                            fontFamily: 'monospace',
+                                            marginBottom: '8px',
+                                            fontWeight: 'bold'
+                                        }
+                                    }, 
+                                        `📥 ${suggestion.source_field}`,
+                                        React.createElement('div', { style: { color: '#667eea', margin: '5px 0' } }, '↓'),
+                                        `📤 ${suggestion.target_field}`
+                                    ),
+                                    suggestion.suggested_formula && React.createElement('div', {
+                                        style: {
+                                            fontSize: '11px',
+                                            padding: '8px',
+                                            background: '#fff',
+                                            borderRadius: '4px',
+                                            fontFamily: 'monospace',
+                                            marginBottom: '8px',
+                                            border: '1px solid #ddd'
+                                        }
+                                    }, `✏️ ${suggestion.suggested_formula}`),
+                                    React.createElement('div', {
+                                        style: {
+                                            fontSize: '11px',
+                                            color: '#666',
+                                            fontStyle: 'italic',
+                                            marginBottom: '10px',
+                                            lineHeight: '1.4'
+                                        }
+                                    }, `💡 ${suggestion.reasoning}`),
+                                    React.createElement('div', {
+                                        style: { display: 'flex', gap: '8px' }
+                                    },
+                                        React.createElement('button', {
+                                            className: 'btn btn-success',
+                                            style: { flex: 1, fontSize: '11px', padding: '8px' },
+                                            onClick: () => onApprove(suggestion)
+                                        }, '✅ Apply'),
+                                        React.createElement('button', {
+                                            className: 'btn btn-danger',
+                                            style: { flex: 1, fontSize: '11px', padding: '8px' },
+                                            onClick: () => onReject(suggestion)
+                                        }, '✕ Reject')
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            );
+        }
+        
+        function App() {
+            const [inputSchema, setInputSchema] = useState(null);
+            const [outputSchema, setOutputSchema] = useState(null);
+            const [inputSchemaDefinition, setInputSchemaDefinition] = useState(null); // Schema Editor definition
+            const [outputSchemaDefinition, setOutputSchemaDefinition] = useState(null); // Schema Editor definition
+            const [connections, setConnections] = useState([]);
+            const [selectedConnection, setSelectedConnection] = useState(null);
+            const [draggedField, setDraggedField] = useState(null);
+            const [mappingName, setMappingName] = useState('');
+            const [statusMessage, setStatusMessage] = useState(null);
+            const [showUploadModal, setShowUploadModal] = useState(false);
+            const [uploadDirection, setUploadDirection] = useState('input');
+            const [activeTab, setActiveTab] = useState('input');
+            const [fieldPositions, setFieldPositions] = useState({});
+            const [sessionLoaded, setSessionLoaded] = useState(false);
+            const [inputExample, setInputExample] = useState('');
+            const [outputExample, setOutputExample] = useState('');
+            const [hoverPopup, setHoverPopup] = useState(null);
+            const [showFormulaEditor, setShowFormulaEditor] = useState(false);
+            const [editingConnection, setEditingConnection] = useState(null);
+            
+            // AI Integration
+            const [aiSuggestions, setAiSuggestions] = useState([]);
+            const [showAiPanel, setShowAiPanel] = useState(false);
+            const [aiProcessing, setAiProcessing] = useState(false);
+            const [showSettings, setShowSettings] = useState(false);
+            const [selectedOutputField, setSelectedOutputField] = useState(null);
+            
+            // Schema Editor
+            const [showSchemaEditor, setShowSchemaEditor] = useState(false);
+            
+            // Sidebar visibility
+            const [showSidebar, setShowSidebar] = useState(true);
+            
+            // Search functionality
+            const [searchQuery, setSearchQuery] = useState('');
+            const [searchResults, setSearchResults] = useState([]);
+            const [currentSearchIndex, setCurrentSearchIndex] = useState(-1);
+            const [highlightedField, setHighlightedField] = useState(null);
+            
+            // Persistent popup
+            const [popupPinned, setPopupPinned] = useState(false);
+            
+            // Hide/show connected fields
+            const [hideConnected, setHideConnected] = useState(false);
+            
+            const canvasRef = useRef(null);
+            const hoverTimeoutRef = useRef(null);
+            
+            const showStatus = (message, type) => {
+                setStatusMessage({ message, type });
+                setTimeout(() => setStatusMessage(null), 5000);
+            };
+            
+            // Load session on mount
+            useEffect(() => {
+                loadSession();
+            }, []);
+            
+            // Auto-save to localStorage every 30 seconds
+            useEffect(() => {
+                if (!sessionLoaded) return;
+                
+                const autoSave = setInterval(() => {
+                    saveToLocalStorage();
+                }, 30000); // 30 seconds
+                
+                return () => clearInterval(autoSave);
+            }, [inputSchema, outputSchema, connections, mappingName, sessionLoaded]);
+            
+            // Save on window close
+            useEffect(() => {
+                const handleBeforeUnload = (e) => {
+                    saveToLocalStorage();
+                };
+                
+                window.addEventListener('beforeunload', handleBeforeUnload);
+                return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+            }, [inputSchema, outputSchema, connections, mappingName]);
+            
+            const saveToLocalStorage = () => {
+                try {
+                    const session = {
+                        inputSchema,
+                        outputSchema,
+                        connections,
+                        mappingName,
+                        timestamp: new Date().toISOString()
+                    };
+                    localStorage.setItem('mappingSession', JSON.stringify(session));
+                } catch (error) {
+                    console.error('Error saving to localStorage:', error);
+                }
+            };
+            
+            const loadSession = async () => {
+                try {
+                    // Try localStorage first (instant recovery)
+                    const localSession = localStorage.getItem('mappingSession');
+                    if (localSession) {
+                        const session = JSON.parse(localSession);
+                        if (session.inputSchema) setInputSchema(session.inputSchema);
+                        if (session.outputSchema) setOutputSchema(session.outputSchema);
+                        if (session.connections) setConnections(session.connections);
+                        if (session.mappingName) setMappingName(session.mappingName);
+                        
+                        showStatus(`✅ Session recovered (${new Date(session.timestamp).toLocaleTimeString()})`, 'success');
+                        setSessionLoaded(true);
+                        setTimeout(updateFieldPositions, 500);
+                        return;
+                    }
+                    
+                    // Try backend session
+                    const response = await fetch(`${API_URL}/session/load`);
+                    const result = await response.json();
+                    
+                    if (result.success && result.session) {
+                        const session = result.session;
+                        if (session.inputSchema) setInputSchema(session.inputSchema);
+                        if (session.outputSchema) setOutputSchema(session.outputSchema);
+                        if (session.connections) setConnections(session.connections);
+                        if (session.mappingName) setMappingName(session.mappingName);
+                        
+                        showStatus('✅ Previous session loaded', 'success');
+                        setTimeout(updateFieldPositions, 500);
+                    }
+                    
+                    setSessionLoaded(true);
+                } catch (error) {
+                    console.error('Error loading session:', error);
+                    setSessionLoaded(true);
+                }
+            };
+            
+            const saveSessionToBackend = async () => {
+                try {
+                    const session = {
+                        inputSchema,
+                        outputSchema,
+                        connections,
+                        mappingName
+                    };
+                    
+                    const response = await fetch(`${API_URL}/session/save`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(session)
+                    });
+                    
+                    const result = await response.json();
+                    if (result.success) {
+                        showStatus('💾 Session saved to server', 'success');
+                    }
+                } catch (error) {
+                    showStatus('❌ Error saving session', 'error');
+                }
+            };
+            
+            const clearSession = async () => {
+                if (!confirm('Clear current session? This will remove all schemas and connections.')) {
+                    return;
+                }
+                
+                setInputSchema(null);
+                setOutputSchema(null);
+                setConnections([]);
+                setMappingName('');
+                setSelectedConnection(null);
+                
+                localStorage.removeItem('mappingSession');
+                
+                try {
+                    await fetch(`${API_URL}/session`, { method: 'DELETE' });
+                } catch (error) {
+                    console.error('Error clearing backend session:', error);
+                }
+                
+                showStatus('🗑️ Session cleared', 'success');
+            };
+            
+            const uploadSchema = async (file, direction, type) => {
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('name', file.name);
+                formData.append('schema_type', type);
+                formData.append('direction', direction);
+                
+                // Save example file content
+                const fileContent = await file.text();
+                if (direction === 'input') {
+                    setInputExample(fileContent);
+                } else {
+                    setOutputExample(fileContent);
+                }
+                
+                try {
+                    const response = await fetch(`${API_URL}/schemas/upload`, {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        if (direction === 'input') {
+                            setInputSchema(result.schema);
+                        } else {
+                            setOutputSchema(result.schema);
+                        }
+                        showStatus(`✅ ${direction} schema uploaded: ${result.schema.field_count} fields`, 'success');
+                        setShowUploadModal(false);
+                        
+                        // Calculate positions after schemas load
+                        setTimeout(updateFieldPositions, 100);
+                    }
+                } catch (error) {
+                    showStatus('❌ Error: ' + error.message, 'error');
+                }
+            };
+            
+            const uploadExampleFile = async (file, direction) => {
+                const fileContent = await file.text();
+                if (direction === 'input') {
+                    setInputExample(fileContent);
+                    showStatus(`✅ Input example file loaded (${file.name})`, 'success');
+                } else {
+                    setOutputExample(fileContent);
+                    showStatus(`✅ Output example file loaded (${file.name})`, 'success');
+                }
+            };
+            
+            const updateFieldPositions = () => {
+                const positions = {};
+                const canvasEl = canvasRef.current;
+                if (!canvasEl) return;
+                
+                const canvasRect = canvasEl.getBoundingClientRect();
+                const scrollTop = canvasEl.scrollTop;
+                const scrollLeft = canvasEl.scrollLeft;
+                
+                document.querySelectorAll('[data-field-id]').forEach(el => {
+                    const rect = el.getBoundingClientRect();
+                    const fieldId = el.dataset.fieldId;
+                    const isInput = fieldId.startsWith('input-');
+                    
+                    positions[fieldId] = {
+                        x: (isInput 
+                            ? rect.right - canvasRect.left  // Input: dalla fine (destra) del box
+                            : rect.left - canvasRect.left) + scrollLeft,   // Output: dall'inizio (sinistra) del box
+                        y: rect.top - canvasRect.top + rect.height / 2 + scrollTop
+                    };
+                });
+                setFieldPositions(positions);
+            };
+            
+            useEffect(() => {
+                let animationFrameId;
+                
+                const handleScroll = () => {
+                    // Use requestAnimationFrame for smooth updates
+                    if (animationFrameId) {
+                        cancelAnimationFrame(animationFrameId);
+                    }
+                    animationFrameId = requestAnimationFrame(updateFieldPositions);
+                };
+                
+                window.addEventListener('resize', updateFieldPositions);
+                const canvasEl = canvasRef.current;
+                if (canvasEl) {
+                    canvasEl.addEventListener('scroll', handleScroll, true);
+                }
+                return () => {
+                    window.removeEventListener('resize', updateFieldPositions);
+                    if (canvasEl) {
+                        canvasEl.removeEventListener('scroll', handleScroll, true);
+                    }
+                    if (animationFrameId) {
+                        cancelAnimationFrame(animationFrameId);
+                    }
+                };
+            }, []);
+            
+            useEffect(() => {
+                if (inputSchema || outputSchema) {
+                    setTimeout(updateFieldPositions, 100);
+                }
+            }, [inputSchema, outputSchema]);
+            
+            // Update positions when connections change (new arrows added)
+            useEffect(() => {
+                if (connections.length > 0) {
+                    setTimeout(updateFieldPositions, 50);
+                }
+            }, [connections]);
+            
+            // Update positions when formula editor opens/closes (layout shifts)
+            useEffect(() => {
+                setTimeout(updateFieldPositions, 100);
+            }, [showFormulaEditor]);
+            
+            // Update positions when sidebar is toggled (layout shifts)
+            useEffect(() => {
+                // Wait for the CSS transition to complete (0.3s)
+                setTimeout(updateFieldPositions, 350);
+            }, [showSidebar]);
+            
+            // Search function with RegExp
+            const performSearch = () => {
+                if (!searchQuery.trim()) {
+                    setSearchResults([]);
+                    setCurrentSearchIndex(-1);
+                    setHighlightedField(null);
+                    return;
+                }
+                
+                const results = [];
+                let regex;
+                
+                try {
+                    // Try to create regex from search query
+                    regex = new RegExp(searchQuery, 'i'); // case insensitive
+                } catch (e) {
+                    // If invalid regex, treat as literal string
+                    regex = new RegExp(searchQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+                }
+                
+                // Search in INPUT schema
+                if (inputSchema && inputSchema.fields) {
+                    Object.values(inputSchema.fields).forEach(field => {
+                        if (regex.test(field.name) || 
+                            regex.test(field.path) || 
+                            regex.test(field.business_term || '') ||
+                            regex.test(field.description || '')) {
+                            results.push({ field, type: 'input' });
+                        }
+                    });
+                }
+                
+                // Search in OUTPUT schema
+                if (outputSchema && outputSchema.fields) {
+                    Object.values(outputSchema.fields).forEach(field => {
+                        if (regex.test(field.name) || 
+                            regex.test(field.path) || 
+                            regex.test(field.business_term || '') ||
+                            regex.test(field.description || '')) {
+                            results.push({ field, type: 'output' });
+                        }
+                    });
+                }
+                
+                setSearchResults(results);
+                if (results.length > 0) {
+                    setCurrentSearchIndex(0);
+                    scrollToField(results[0]);
+                } else {
+                    setCurrentSearchIndex(-1);
+                    setHighlightedField(null);
+                    showStatus('🔍 No results found', 'error');
+                }
+            };
+            
+            const nextSearchResult = () => {
+                if (searchResults.length === 0) return;
+                
+                const nextIndex = (currentSearchIndex + 1) % searchResults.length;
+                setCurrentSearchIndex(nextIndex);
+                scrollToField(searchResults[nextIndex]);
+            };
+            
+            const scrollToField = (result) => {
+                setHighlightedField(result);
+                
+                // Find the field element and scroll to it
+                const fieldId = `${result.type}-${result.field.id}`;
+                const element = document.querySelector(`[data-field-id="${fieldId}"]`);
+                
+                if (element) {
+                    element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    
+                    // Flash highlight animation
+                    element.style.transition = 'box-shadow 0.3s';
+                    element.style.boxShadow = '0 0 20px 5px #ffd700';
+                    setTimeout(() => {
+                        element.style.boxShadow = '';
+                    }, 1000);
+                }
+            };
+            
+            const addConnection = (sourceField, targetField) => {
+                // Check if connection already exists
+                const exists = connections.find(c => 
+                    c.source === sourceField.path && c.target === targetField.path
+                );
+                if (exists) {
+                    showStatus('⚠️ Connection already exists', 'error');
+                    return;
+                }
+                
+                const conn = {
+                    id: `conn_${Date.now()}`,
+                    source: sourceField.path,
+                    target: targetField.path,
+                    sourceName: sourceField.name,
+                    targetName: targetField.name,
+                    transformation: { type: 'direct' }
+                };
+                setConnections([...connections, conn]);
+                showStatus(`✅ Connected: ${sourceField.name} → ${targetField.name}`, 'success');
+                updateFieldPositions();
+            };
+            
+            const deleteConnection = (connId) => {
+                setConnections(connections.filter(c => c.id !== connId));
+                setSelectedConnection(null);
+                showStatus('🗑️ Connection deleted', 'success');
+            };
+            
+            // Expose delete callback for double-click on connections
+            useEffect(() => {
+                window.deleteConnectionCallback = deleteConnection;
+                
+                // Export functions
+                window.exportMappingCSV = () => {
+                    let csv = 'Source Field,Source Path,Target Field,Target Path,Transformation,Source Type,Target Type,Business Term Source,Business Term Target,Source Offset,Source Length,Source XMLPath,Target Offset,Target Length,Target XMLPath\n';
+                    connections.forEach(conn => {
+                        const sourceField = inputSchema?.fields?.[conn.source] || {};
+                        const targetField = outputSchema?.fields?.[conn.target] || {};
+                        const transformation = conn.transformation?.type || 'direct';
+                        
+                        csv += `"${conn.sourceName || conn.source}","${conn.source}","${conn.targetName || conn.target}","${conn.target}","${transformation}","${sourceField.type || ''}","${targetField.type || ''}","${sourceField.business_term || ''}","${targetField.business_term || ''}","${sourceField.offset || ''}","${sourceField.length || ''}","${sourceField.xml_path || ''}","${targetField.offset || ''}","${targetField.length || ''}","${targetField.xml_path || ''}"\n`;
+                    });
+                    
+                    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `${mappingName || 'mapping'}_export.csv`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                    showStatus('📊 Mapping exported as CSV', 'success');
+                };
+                
+                window.exportMappingJSON = () => {
+                    const mappingData = {
+                        name: mappingName,
+                        created: new Date().toISOString(),
+                        inputSchema: inputSchema?.name || 'input',
+                        outputSchema: outputSchema?.name || 'output',
+                        connections: connections.map(conn => ({
+                            id: conn.id,
+                            source: {
+                                field: conn.source,
+                                name: conn.sourceName,
+                                path: conn.source,
+                                type: inputSchema?.fields?.[conn.source]?.type,
+                                businessTerm: inputSchema?.fields?.[conn.source]?.business_term,
+                                offset: inputSchema?.fields?.[conn.source]?.offset,
+                                length: inputSchema?.fields?.[conn.source]?.length,
+                                xmlPath: inputSchema?.fields?.[conn.source]?.xml_path
+                            },
+                            target: {
+                                field: conn.target,
+                                name: conn.targetName,
+                                path: conn.target,
+                                type: outputSchema?.fields?.[conn.target]?.type,
+                                businessTerm: outputSchema?.fields?.[conn.target]?.business_term,
+                                calculation: outputSchema?.fields?.[conn.target]?.calculation,
+                                offset: outputSchema?.fields?.[conn.target]?.offset,
+                                length: outputSchema?.fields?.[conn.target]?.length,
+                                xmlPath: outputSchema?.fields?.[conn.target]?.xml_path
+                            },
+                            transformation: conn.transformation
+                        }))
+                    };
+                    
+                    const blob = new Blob([JSON.stringify(mappingData, null, 2)], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `${mappingName || 'mapping'}_export.json`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                    showStatus('📄 Mapping exported as JSON', 'success');
+                };
+                
+                return () => {
+                    delete window.deleteConnectionCallback;
+                    delete window.exportMappingCSV;
+                    delete window.exportMappingJSON;
+                };
+            }, [connections, mappingName, inputSchema, outputSchema]);
+            
+            // Project Management: Save Project
+            const saveProject = () => {
+                if (!mappingName) {
+                    showStatus('⚠️ Enter project name first', 'error');
+                    return;
+                }
+                
+                const project = {
+                    projectName: mappingName,
+                    version: '2.0', // Updated to 2.0 with schema definitions
+                    created: new Date().toISOString(),
+                    inputSchema: inputSchema,
+                    outputSchema: outputSchema,
+                    inputSchemaDefinition: inputSchemaDefinition, // Schema Editor definition
+                    outputSchemaDefinition: outputSchemaDefinition, // Schema Editor definition
+                    inputExample: inputExample,
+                    outputExample: outputExample,
+                    connections: connections
+                };
+                
+                const blob = new Blob([JSON.stringify(project, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${mappingName}_project.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+                showStatus('📦 Project saved with schema definitions!', 'success');
+            };
+            
+            // Project Management: Load Project
+            const loadProject = () => {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = '.json';
+                
+                input.onchange = async (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    
+                    try {
+                        const text = await file.text();
+                        const project = JSON.parse(text);
+                        
+                        // Validate project structure
+                        if (!project.projectName || !project.inputSchema || !project.outputSchema) {
+                            showStatus('⚠️ Invalid project file', 'error');
+                            return;
+                        }
+                        
+                        // Load all data
+                        setMappingName(project.projectName);
+                        setInputSchema(project.inputSchema);
+                        setOutputSchema(project.outputSchema);
+                        setInputSchemaDefinition(project.inputSchemaDefinition || null);
+                        setOutputSchemaDefinition(project.outputSchemaDefinition || null);
+                        setInputExample(project.inputExample || '');
+                        setOutputExample(project.outputExample || '');
+                        setConnections(project.connections || []);
+                        
+                        // Update field positions after schemas load
+                        setTimeout(() => {
+                            updateFieldPositions();
+                            const hasDefinitions = project.inputSchemaDefinition || project.outputSchemaDefinition;
+                            const msg = hasDefinitions 
+                                ? `📦 Project "${project.projectName}" loaded with schema definitions!`
+                                : `📦 Project "${project.projectName}" loaded!`;
+                            showStatus(msg, 'success');
+                        }, 500);
+                        
+                    } catch (err) {
+                        console.error('Load project error:', err);
+                        showStatus('❌ Failed to load project: ' + err.message, 'error');
+                    }
+                };
+                
+                input.click();
+            };
+            
+            // Reverse Mapping Function
+            const reverseMapping = async () => {
+                if (!inputSchema || !outputSchema || connections.length === 0) {
+                    showStatus('⚠️ Load schemas and create mappings first', 'error');
+                    return;
+                }
+                
+                const confirm = window.confirm(
+                    '🔄 REVERSE MAPPING\n\n' +
+                    'This will:\n' +
+                    '• Swap Input ↔ Output schemas\n' +
+                    '• Reverse all connections\n' +
+                    '• Invert transformations where possible\n\n' +
+                    'Non-invertible transformations (TRIM, CASE, SUBSTR) will be converted to direct mappings.\n\n' +
+                    'Continue?'
+                );
+                
+                if (!confirm) return;
+                
+                try {
+                    showStatus('🔄 Reversing mapping...', 'info');
+                    
+                    // Prepare project data
+                    const project = {
+                        projectName: mappingName || 'Untitled',
+                        version: '1.0',
+                        created: new Date().toISOString(),
+                        inputSchema: inputSchema,
+                        outputSchema: outputSchema,
+                        inputExample: inputExample,
+                        outputExample: outputExample,
+                        connections: connections
+                    };
+                    
+                    // Call backend
+                    const response = await fetch('http://localhost:8080/api/mapping/reverse', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ project })
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error('Reverse failed');
+                    }
+                    
+                    const data = await response.json();
+                    const reversed = data.reversed_project;
+                    const report = data.report;
+                    
+                    // Apply reversed mapping
+                    setInputSchema(reversed.inputSchema);
+                    setOutputSchema(reversed.outputSchema);
+                    setInputExample(reversed.inputExample || '');
+                    setOutputExample(reversed.outputExample || '');
+                    setConnections(reversed.connections || []);
+                    setMappingName(reversed.projectName);
+                    
+                    // Update UI
+                    setTimeout(() => {
+                        updateFieldPositions();
+                    }, 500);
+                    
+                    // Show report
+                    if (report.total_warnings > 0) {
+                        let warningMsg = `⚠️ Reversed with ${report.total_warnings} warning(s):\n\n`;
+                        report.warnings.slice(0, 5).forEach(w => {
+                            warningMsg += `• ${w.source} → ${w.target}\n  ${w.reason}\n\n`;
+                        });
+                        if (report.warnings.length > 5) {
+                            warningMsg += `... and ${report.warnings.length - 5} more`;
+                        }
+                        alert(warningMsg);
+                    }
+                    
+                    showStatus(`🔄 Mapping reversed! ${reversed.connections.length} connections inverted`, 'success');
+                    
+                } catch (err) {
+                    console.error('Reverse error:', err);
+                    showStatus('❌ Failed to reverse mapping: ' + err.message, 'error');
+                }
+            };
+            
+            const updateConnectionTransformation = (connId, transformation) => {
+                setConnections(connections.map(c => 
+                    c.id === connId ? { ...c, transformation } : c
+                ));
+                showStatus('✅ Transformation updated', 'success');
+            };
+            
+            const saveMapping = async () => {
+                if (!mappingName || connections.length === 0) {
+                    showStatus('⚠️ Enter name and add connections', 'error');
+                    return;
+                }
+                
+                try {
+                    const response = await fetch(`${API_URL}/mappings`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            name: mappingName,
+                            input_schema: inputSchema?.name || 'input',
+                            output_schema: outputSchema?.name || 'output',
+                            rules: connections.map(c => ({
+                                id: c.id,
+                                source: c.source,
+                                target: c.target,
+                                transformation: c.transformation,
+                                enabled: true
+                            }))
+                        })
+                    });
+                    
+                    const result = await response.json();
+                    if (result.success) {
+                        showStatus('✅ Mapping saved!', 'success');
+                    }
+                } catch (error) {
+                    showStatus('❌ Save error', 'error');
+                }
+            };
+            
+            const downloadSampleCSV = async (type) => {
+                try {
+                    const response = await fetch(`${API_URL}/csv/sample/${type}`);
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `sample_${type}.csv`;
+                    a.click();
+                    showStatus(`✅ Downloaded sample ${type} CSV`, 'success');
+                } catch (error) {
+                    showStatus('❌ Download error', 'error');
+                }
+            };
+            
+            // AI Auto-Map Function
+            const runAIAutoMap = async () => {
+                if (!inputSchema || !outputSchema) {
+                    showStatus('⚠️ Load input and output schemas first', 'error');
+                    return;
+                }
+                
+                setAiProcessing(true);
+                setShowAiPanel(true);
+                showStatus('🤖 AI analyzing schemas...', 'success');
+                
+                try {
+                    // Prepare schema data
+                    const inputFields = Object.values(inputSchema.fields || {}).map(f => ({
+                        name: f.name,
+                        path: f.path,
+                        type: f.type,
+                        business_term: f.business_term,
+                        description: f.description,
+                        cardinality: f.cardinality
+                    }));
+                    
+                    const outputFields = Object.values(outputSchema.fields || {}).map(f => ({
+                        name: f.name,
+                        path: f.path,
+                        type: f.type,
+                        business_term: f.business_term,
+                        description: f.description,
+                        cardinality: f.cardinality,
+                        calculation: f.calculation
+                    }));
+                    
+                    // Prepare example data (first 10 lines)
+                    const inputSample = inputExample ? inputExample.split('\n').slice(0, 10).join('\n') : '';
+                    const outputSample = outputExample ? outputExample.split('\n').slice(0, 10).join('\n') : '';
+                    
+                    // Try Claude first, fallback to OpenAI
+                    let suggestions = [];
+                    
+                    // Call backend instead of direct API
+                    const response = await fetch(`${API_URL}/ai/auto-map`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            input_fields: inputFields,
+                            output_fields: outputFields,
+                            input_sample: inputSample,
+                            output_sample: outputSample
+                        })
+                    });
+                    
+                    if (!response.ok) {
+                        const error = await response.json();
+                        throw new Error(error.detail || 'Backend AI error');
+                    }
+                    
+                    suggestions = await response.json();
+                    
+                    setAiSuggestions(suggestions);
+                    showStatus(`✅ AI found ${suggestions.length} suggestions`, 'success');
+                    
+                } catch (error) {
+                    console.error('AI Error:', error);
+                    showStatus('❌ AI error: ' + error.message, 'error');
+                } finally {
+                    setAiProcessing(false);
+                }
+            };
+            
+            
+            // AI Assist for single field
+            const runAIAssist = async (outputField) => {
+                setSelectedOutputField(outputField);
+                setAiProcessing(true);
+                setShowAiPanel(true);
+                
+                // This would call AI for just this one field
+                // For now, trigger auto-map and filter
+                await runAIAutoMap();
+            };
+            
+            // Business Rules Automap - Match by identical business_term
+            const runBusinessRulesAutomap = () => {
+                if (!inputSchema || !outputSchema) {
+                    showStatus('⚠️ Load input and output schemas first', 'error');
+                    return;
+                }
+                
+                const suggestions = [];
+                const inputFields = Object.values(inputSchema.fields || {});
+                const outputFields = Object.values(outputSchema.fields || {});
+                
+                // Find matches based on business_term
+                outputFields.forEach(outField => {
+                    const outBusinessTerm = (outField.business_term || '').trim().toLowerCase();
+                    
+                    // Skip if no business term
+                    if (!outBusinessTerm) return;
+                    
+                    // Find input fields with matching business term
+                    inputFields.forEach(inField => {
+                        const inBusinessTerm = (inField.business_term || '').trim().toLowerCase();
+                        
+                        if (inBusinessTerm && inBusinessTerm === outBusinessTerm) {
+                            // Check if connection already exists
+                            const exists = connections.find(c => 
+                                c.source === inField.path && c.target === outField.path
+                            );
+                            
+                            if (!exists) {
+                                suggestions.push({
+                                    source_field: inField.path,
+                                    target_field: outField.path,
+                                    confidence: 100, // Perfect match!
+                                    reasoning: `Exact match on business term: "${outField.business_term}"`,
+                                    suggested_formula: null
+                                });
+                            }
+                        }
+                    });
+                });
+                
+                if (suggestions.length > 0) {
+                    setAiSuggestions(suggestions);
+                    setShowAiPanel(true);
+                    showStatus(`📋 Found ${suggestions.length} business rule match(es)!`, 'success');
+                } else {
+                    showStatus('ℹ️ No matching business terms found', 'info');
+                }
+            };
+            
+            // Approve AI suggestion
+            const approveAISuggestion = (suggestion) => {
+                console.log('🔵 APPROVE CALLED:', suggestion.source_field, '→', suggestion.target_field);
+                
+                const sourceField = Object.values(inputSchema.fields).find(f => f.path === suggestion.source_field);
+                const targetField = Object.values(outputSchema.fields).find(f => f.path === suggestion.target_field);
+                
+                if (sourceField && targetField) {
+                    const conn = {
+                        id: `conn_${Date.now()}`,
+                        source: sourceField.path,
+                        target: targetField.path,
+                        sourceName: sourceField.name,
+                        targetName: targetField.name,
+                        transformation: suggestion.suggested_formula 
+                            ? { type: 'formula', formula: suggestion.suggested_formula }
+                            : { type: 'direct' }
+                    };
+                    
+                    console.log('  ✅ Connection created:', conn.id);
+                    setConnections(prev => [...prev, conn]);
+                    
+                    // CRITICAL: Use functional update to get current state
+                    setAiSuggestions(prevSuggestions => {
+                        const newSuggestions = prevSuggestions.filter(s => 
+                            !(s.source_field === suggestion.source_field && 
+                              s.target_field === suggestion.target_field)
+                        );
+                        console.log('  📉 Suggestions:', prevSuggestions.length, '→', newSuggestions.length);
+                        return newSuggestions;
+                    });
+                    
+                    showStatus(`✅ Applied: ${sourceField.name} → ${targetField.name}`, 'success');
+                    setTimeout(updateFieldPositions, 50);
+                } else {
+                    console.error('  ❌ Field not found!', {
+                        sourceField: suggestion.source_field,
+                        targetField: suggestion.target_field,
+                        foundSource: !!sourceField,
+                        foundTarget: !!targetField
+                    });
+                }
+            };
+            
+            // Reject AI suggestion
+            const rejectAISuggestion = (suggestion) => {
+                // Filter by content not reference
+                setAiSuggestions(aiSuggestions.filter(s => 
+                    !(s.source_field === suggestion.source_field && s.target_field === suggestion.target_field)
+                ));
+            };
+            
+            return React.createElement('div', { className: 'app-container' },
+                // Sidebar toggle button
+                React.createElement('button', {
+                    className: 'sidebar-toggle',
+                    onClick: () => setShowSidebar(!showSidebar),
+                    title: showSidebar ? 'Hide sidebar' : 'Show sidebar'
+                }, showSidebar ? '−' : '+'),
+                
+                // Sidebar wrapper with collapse
+                React.createElement('div', { 
+                    className: `sidebar-wrapper ${showSidebar ? '' : 'collapsed'}`,
+                    style: {
+                        width: showSidebar ? '350px' : '0',
+                        overflow: 'hidden',
+                        transition: 'width 0.3s ease'
+                    }
+                },
+                    React.createElement(Sidebar, {
+                    inputSchema,
+                    outputSchema,
+                    connections,
+                    activeTab,
+                    setActiveTab,
+                    setShowUploadModal,
+                    setUploadDirection,
+                    downloadSampleCSV,
+                    statusMessage,
+                    setDraggedField,
+                    selectedConnection,
+                    setSelectedConnection,
+                    uploadExampleFile,
+                    inputExample,
+                    outputExample
+                })
+                ),  // Close sidebar-wrapper
+                
+                React.createElement(MainCanvas, {
+                    inputSchema,
+                    outputSchema,
+                    connections,
+                    draggedField,
+                    setDraggedField,
+                    addConnection,
+                    mappingName,
+                    setMappingName,
+                    saveMapping,
+                    canvasRef,
+                    fieldPositions,
+                    updateFieldPositions,
+                    selectedConnection,
+                    setSelectedConnection,
+                    saveSessionToBackend,
+                    clearSession,
+                    sessionLoaded,
+                    inputExample,
+                    outputExample,
+                    hoverPopup,
+                    setHoverPopup,
+                    hoverTimeoutRef,
+                    setShowFormulaEditor,
+                    setEditingConnection,
+                    runAIAutoMap,
+                    runBusinessRulesAutomap,
+                    aiProcessing,
+                    setShowSettings,
+                    searchQuery,
+                    setSearchQuery,
+                    performSearch,
+                    nextSearchResult,
+                    searchResults,
+                    currentSearchIndex,
+                    saveProject,
+                    loadProject,
+                    reverseMapping,
+                    setPopupPinned,
+                    popupPinned,
+                    setShowSchemaEditor,
+                    hideConnected,
+                    setHideConnected
+                }),
+                
+                selectedConnection && React.createElement(PropertiesPanel, {
+                    connection: selectedConnection,
+                    updateConnectionTransformation,
+                    deleteConnection,
+                    setSelectedConnection,
+                    setShowFormulaEditor,
+                    setEditingConnection
+                }),
+                
+                showUploadModal && React.createElement(UploadModal, {
+                    direction: uploadDirection,
+                    onClose: () => setShowUploadModal(false),
+                    onUpload: uploadSchema
+                }),
+                
+                hoverPopup && React.createElement(HoverPopup, { 
+                    popup: hoverPopup,
+                    setPopupPinned,
+                    setHoverPopup
+                }),
+                
+                showFormulaEditor && editingConnection && React.createElement(FormulaEditor, {
+                    connection: editingConnection,
+                    onSave: (formula) => {
+                        updateConnectionTransformation(editingConnection.id, { 
+                            type: 'formula',
+                            formula: formula 
+                        });
+                        setShowFormulaEditor(false);
+                        setEditingConnection(null);
+                    },
+                    onClose: () => {
+                        setShowFormulaEditor(false);
+                        setEditingConnection(null);
+                    }
+                }),
+                
+                showSettings && React.createElement(SettingsModal, {
+                    onClose: () => setShowSettings(false)
+                }),
+                
+                showSchemaEditor && React.createElement(SchemaEditorModal, {
+                    show: showSchemaEditor,
+                    onClose: () => setShowSchemaEditor(false),
+                    onSchemaSelect: (schema, direction, definition) => {
+                        if (direction === 'input') {
+                            setInputSchema(schema);
+                            setInputSchemaDefinition(definition);
+                            showStatus('✅ Schema set as Input!', 'success');
+                        } else {
+                            setOutputSchema(schema);
+                            setOutputSchemaDefinition(definition);
+                            showStatus('✅ Schema set as Output!', 'success');
+                        }
+                        setTimeout(updateFieldPositions, 300);
+                    }
+                }),
+                
+                showAiPanel && React.createElement(AISuggestionsPanel, {
+                    suggestions: aiSuggestions,
+                    onApprove: approveAISuggestion,
+                    onReject: rejectAISuggestion,
+                    onClose: () => setShowAiPanel(false),
+                    processing: aiProcessing
+                })
+            );
+        }
+        
+        function Sidebar({ inputSchema, outputSchema, connections, activeTab, setActiveTab, setShowUploadModal, setUploadDirection, downloadSampleCSV, statusMessage, setDraggedField, selectedConnection, setSelectedConnection, uploadExampleFile, inputExample, outputExample }) {
+            return React.createElement('div', { className: 'sidebar' },
+                React.createElement('div', { className: 'sidebar-header' },
+                    React.createElement('h2', null, '🎨 Visual Mapper'),
+                    React.createElement('p', { style: { fontSize: '12px' } }, 'Drag & Drop CSV Mapping')
+                ),
+                React.createElement('div', { className: 'sidebar-content' },
+                    statusMessage && React.createElement('div', { 
+                        className: `status-message status-${statusMessage.type}` 
+                    }, statusMessage.message),
+                    React.createElement('div', { className: 'tabs' },
+                        React.createElement('div', { 
+                            className: `tab ${activeTab === 'input' ? 'active' : ''}`,
+                            onClick: () => setActiveTab('input')
+                        }, '📥 Input'),
+                        React.createElement('div', { 
+                            className: `tab ${activeTab === 'output' ? 'active' : ''}`,
+                            onClick: () => setActiveTab('output')
+                        }, '📤 Output'),
+                        React.createElement('div', { 
+                            className: `tab ${activeTab === 'connections' ? 'active' : ''}`,
+                            onClick: () => setActiveTab('connections')
+                        }, `🔗 ${connections.length}`)
+                    ),
+                    activeTab === 'input' && React.createElement('div', null,
+                        React.createElement('button', {
+                            className: 'btn btn-primary btn-full',
+                            onClick: () => {
+                                setUploadDirection('input');
+                                setShowUploadModal(true);
+                            }
+                        }, '📤 Upload Input Schema'),
+                        React.createElement('label', {
+                            className: 'btn btn-secondary btn-full',
+                            style: { cursor: 'pointer' }
+                        }, 
+                            inputExample ? '✅ Example File Loaded' : '📄 Upload Example File',
+                            React.createElement('input', {
+                                type: 'file',
+                                accept: '.xml,.json,.txt,.csv',
+                                style: { display: 'none' },
+                                onChange: (e) => e.target.files[0] && uploadExampleFile(e.target.files[0], 'input')
+                            })
+                        ),
+                        React.createElement('button', {
+                            className: 'btn btn-secondary btn-full',
+                            onClick: () => downloadSampleCSV('input')
+                        }, '📥 Download Sample CSV'),
+                        inputSchema ? React.createElement('div', { style: { fontSize: '12px', color: '#666', marginBottom: '10px' } },
+                            `${inputSchema.field_count} fields - Drag to canvas`
+                        ) : React.createElement('div', { className: 'empty-state' },
+                            React.createElement('div', { style: { fontSize: '48px' } }, '📋'),
+                            React.createElement('p', null, 'Upload CSV schema')
+                        )
+                    ),
+                    activeTab === 'output' && React.createElement('div', null,
+                        React.createElement('button', {
+                            className: 'btn btn-primary btn-full',
+                            onClick: () => {
+                                setUploadDirection('output');
+                                setShowUploadModal(true);
+                            }
+                        }, '📤 Upload Output Schema'),
+                        React.createElement('label', {
+                            className: 'btn btn-secondary btn-full',
+                            style: { cursor: 'pointer' }
+                        }, 
+                            outputExample ? '✅ Example File Loaded' : '📄 Upload Example File',
+                            React.createElement('input', {
+                                type: 'file',
+                                accept: '.xml,.json,.txt,.csv',
+                                style: { display: 'none' },
+                                onChange: (e) => e.target.files[0] && uploadExampleFile(e.target.files[0], 'output')
+                            })
+                        ),
+                        React.createElement('button', {
+                            className: 'btn btn-secondary btn-full',
+                            onClick: () => downloadSampleCSV('output')
+                        }, '📥 Download Sample CSV'),
+                        outputSchema ? React.createElement('div', { style: { fontSize: '12px', color: '#666', marginBottom: '10px' } },
+                            `${outputSchema.field_count} fields - Drag to canvas`
+                        ) : React.createElement('div', { className: 'empty-state' },
+                            React.createElement('div', { style: { fontSize: '48px' } }, '📋'),
+                            React.createElement('p', null, 'Upload CSV schema')
+                        )
+                    ),
+                    activeTab === 'connections' && React.createElement(ConnectionsList, {
+                        connections,
+                        selectedConnection,
+                        setSelectedConnection
+                    })
+                )
+            );
+        }
+        
+        function MainCanvas({ inputSchema, outputSchema, connections, draggedField, setDraggedField, addConnection, mappingName, setMappingName, saveMapping, canvasRef, fieldPositions, updateFieldPositions, selectedConnection, setSelectedConnection, saveSessionToBackend, clearSession, sessionLoaded, inputExample, outputExample, hoverPopup, setHoverPopup, hoverTimeoutRef, setShowFormulaEditor, setEditingConnection, runAIAutoMap, runBusinessRulesAutomap, aiProcessing, setShowSettings, searchQuery, setSearchQuery, performSearch, nextSearchResult, searchResults, currentSearchIndex, saveProject, loadProject, reverseMapping, setPopupPinned, popupPinned, setShowSchemaEditor, hideConnected, setHideConnected }) {
+            const [dropTarget, setDropTarget] = useState(null);
+            
+            const handleDrop = (targetField, targetType) => {
+                if (!draggedField) return;
+                
+                if (draggedField.type === 'input' && targetType === 'output') {
+                    addConnection(draggedField.field, targetField);
+                } else if (draggedField.type === 'output' && targetType === 'input') {
+                    addConnection(targetField, draggedField.field);
+                } else {
+                    // Same side drop - not allowed
+                }
+                
+                setDraggedField(null);
+                setDropTarget(null);
+            };
+            
+            return React.createElement('div', { className: 'main-canvas' },
+                React.createElement('div', { className: 'toolbar' },
+                    React.createElement('div', {
+                        style: { display: 'flex', alignItems: 'center', gap: '8px', marginRight: '20px' }
+                    },
+                        React.createElement('input', {
+                            type: 'text',
+                            className: 'search-input',
+                            placeholder: 'Search fields (RegExp supported)...',
+                            value: searchQuery,
+                            onChange: (e) => setSearchQuery(e.target.value),
+                            onKeyPress: (e) => { if (e.key === 'Enter') performSearch(); }
+                        }),
+                        React.createElement('button', {
+                            className: 'btn btn-primary',
+                            onClick: performSearch,
+                            disabled: !searchQuery.trim(),
+                            title: 'Search for fields matching pattern'
+                        }, '🔍 Search'),
+                        React.createElement('button', {
+                            className: 'btn btn-secondary',
+                            onClick: nextSearchResult,
+                            disabled: searchResults.length === 0,
+                            title: `Next result (${currentSearchIndex + 1}/${searchResults.length})`
+                        }, `🔽 Next ${searchResults.length > 0 ? `(${currentSearchIndex + 1}/${searchResults.length})` : ''}`)
+                    ),
+                    React.createElement('input', {
+                        type: 'text',
+                        placeholder: 'Mapping name...',
+                        value: mappingName,
+                        onChange: (e) => setMappingName(e.target.value),
+                        style: { width: '200px' }
+                    }),
+                    React.createElement('button', {
+                        className: 'btn btn-success',
+                        onClick: saveMapping
+                    }, '💾 Save Mapping'),
+                    React.createElement('button', {
+                        className: 'btn btn-secondary',
+                        onClick: () => window.exportMappingCSV?.(),
+                        disabled: connections.length === 0,
+                        title: 'Export mapping as CSV'
+                    }, '📊 Export CSV'),
+                    React.createElement('button', {
+                        className: 'btn btn-secondary',
+                        onClick: () => window.exportMappingJSON?.(),
+                        disabled: connections.length === 0,
+                        title: 'Export mapping as JSON'
+                    }, '📄 Export JSON'),
+                    React.createElement('div', {
+                        style: { 
+                            width: '2px', 
+                            height: '30px', 
+                            background: '#ddd', 
+                            margin: '0 10px' 
+                        }
+                    }),
+                    React.createElement('button', {
+                        className: 'btn btn-success',
+                        onClick: saveProject,
+                        disabled: !mappingName || !inputSchema || !outputSchema,
+                        title: 'Save complete project (schemas + examples + mappings)'
+                    }, '📦 Save Project'),
+                    React.createElement('button', {
+                        className: 'btn btn-primary',
+                        onClick: loadProject,
+                        title: 'Load project from file'
+                    }, '📂 Load Project'),
+                    React.createElement('button', {
+                        className: 'btn btn-danger',
+                        onClick: reverseMapping,
+                        disabled: !inputSchema || !outputSchema || connections.length === 0,
+                        title: 'Reverse mapping: Swap input↔output and invert transformations'
+                    }, '🔄 Reverse'),
+                    React.createElement('button', {
+                        className: `btn ${hideConnected ? 'btn-success' : 'btn-secondary'}`,
+                        onClick: () => setHideConnected(!hideConnected),
+                        disabled: connections.length === 0,
+                        title: hideConnected ? 'Show all fields' : 'Hide connected fields'
+                    }, hideConnected ? '👁️ Show All' : '🙈 Hide Connected'),
+                    React.createElement('button', {
+                        className: 'btn btn-success',
+                        onClick: () => {
+                            const input = document.createElement('input');
+                            input.type = 'file';
+                            input.accept = '.xml,.json,.csv';
+                            input.onchange = async (e) => {
+                                const file = e.target.files[0];
+                                if (!file) return;
+                                
+                                try {
+                                    const formData = new FormData();
+                                    formData.append('file', file);
+                                    formData.append('output_format', 'xml');
+                                    formData.append('validate', 'false');
+                                    
+                                    const res = await fetch(`${API_URL}/transform/execute`, {
+                                        method: 'POST',
+                                        body: formData
+                                    });
+                                    
+                                    if (res.ok) {
+                                        const blob = await res.blob();
+                                        const url = window.URL.createObjectURL(blob);
+                                        const a = document.createElement('a');
+                                        a.href = url;
+                                        a.download = 'transformed_output.xml';
+                                        a.click();
+                                        window.URL.revokeObjectURL(url);
+                                        showStatus('✅ Transformation complete! File downloaded.', 'success');
+                                    } else {
+                                        const error = await res.json();
+                                        showStatus(`❌ Transformation failed: ${error.errors ? error.errors.join(', ') : 'Unknown error'}`, 'error');
+                                    }
+                                } catch (err) {
+                                    showStatus(`❌ Error: ${err.message}`, 'error');
+                                }
+                            };
+                            input.click();
+                        },
+                        disabled: !inputSchema || !outputSchema || connections.length === 0,
+                        title: 'Execute transformation: Upload input file and download transformed output'
+                    }, '🔄 Execute Transform'),
+                    React.createElement('button', {
+                        className: 'btn btn-primary',
+                        onClick: runAIAutoMap,
+                        disabled: !inputSchema || !outputSchema || aiProcessing,
+                        title: 'AI analyzes schemas and suggests mappings'
+                    }, aiProcessing ? '⏳ AI Working...' : '🤖 AI Auto-Map'),
+                    React.createElement('button', {
+                        className: 'btn btn-success',
+                        onClick: runBusinessRulesAutomap,
+                        disabled: !inputSchema || !outputSchema,
+                        title: 'Automatically match fields with identical business terms'
+                    }, '📋 Business Rules'),
+                    React.createElement('button', {
+                        className: 'btn btn-primary',
+                        onClick: () => setShowSchemaEditor(true),
+                        title: 'Visual schema structure builder'
+                    }, '🏗️ Schema Editor'),
+                    React.createElement('button', {
+                        className: 'btn btn-secondary',
+                        onClick: () => setShowSettings(true),
+                        title: 'Configure AI API keys'
+                    }, '⚙️ Settings'),
+                    React.createElement('button', {
+                        className: 'btn btn-primary',
+                        onClick: saveSessionToBackend,
+                        title: 'Save current session to server'
+                    }, '💾 Save Session'),
+                    React.createElement('button', {
+                        className: 'btn btn-secondary',
+                        onClick: clearSession,
+                        title: 'Clear all and start fresh'
+                    }, '🗑️ Clear Session'),
+                    React.createElement('div', { style: { marginLeft: 'auto', fontSize: '13px', color: '#666' } },
+                        `${connections.length} connection(s)`,
+                        sessionLoaded && React.createElement('span', { 
+                            style: { marginLeft: '10px', fontSize: '11px', color: '#4caf50' }
+                        }, '● Auto-save active')
+                    )
+                ),
+                React.createElement('div', { className: 'canvas-area', ref: canvasRef },
+                    draggedField && React.createElement('div', {
+                        style: {
+                            position: 'fixed',
+                            top: '10px',
+                            left: '50%',
+                            transform: 'translateX(-50%)',
+                            background: '#4caf50',
+                            color: 'white',
+                            padding: '10px 20px',
+                            borderRadius: '6px',
+                            fontWeight: 'bold',
+                            zIndex: 1000
+                        }
+                    }, `✋ Dragging: ${draggedField.field.name} → Drop on ${draggedField.type === 'input' ? 'OUTPUT' : 'INPUT'} field`),
+                    
+                    React.createElement(ConnectionsSVG, {
+                        connections,
+                        fieldPositions,
+                        selectedConnection,
+                        setSelectedConnection
+                    }),
+                    
+                    React.createElement('div', { 
+                        className: 'canvas-columns'
+                    },
+                        // INPUT COLUMN
+                        React.createElement('div', { 
+                            className: 'canvas-column',
+                            id: 'input-column',
+                            style: { width: '450px' }
+                        },
+                            React.createElement('h3', {
+                                style: { cursor: 'ew-resize' },  // Always show resize cursor
+                                onMouseDown: (e) => {
+                                    e.preventDefault();
+                                    console.log('INPUT HEADER DRAG START');
+                                    const column = document.getElementById('input-column');
+                                    const startX = e.clientX;
+                                    const startWidth = column.offsetWidth;
+                                    
+                                    const onMouseMove = (moveEvent) => {
+                                        const delta = moveEvent.clientX - startX;
+                                        const newWidth = Math.max(250, Math.min(900, startWidth + delta));
+                                        column.style.flex = `0 0 ${newWidth}px`;
+                                        column.style.width = newWidth + 'px';
+                                        
+                                        // Update arrows
+                                        requestAnimationFrame(() => {
+                                            updateFieldPositions();
+                                        });
+                                    };
+                                    
+                                    const onMouseUp = () => {
+                                        console.log('INPUT HEADER DRAG END');
+                                        document.removeEventListener('mousemove', onMouseMove);
+                                        document.removeEventListener('mouseup', onMouseUp);
+                                        document.body.style.cursor = '';
+                                    };
+                                    
+                                    document.body.style.cursor = 'ew-resize';
+                                    document.addEventListener('mousemove', onMouseMove);
+                                    document.addEventListener('mouseup', onMouseUp);
+                                }
+                            }, '📥 INPUT SCHEMA'),
+                            inputSchema && Object.values(inputSchema.fields)
+                                .filter(field => {
+                                    if (!hideConnected) return true;
+                                    // Hide if field is source of any connection
+                                    return !connections.some(conn => 
+                                        conn.source === field.id || 
+                                        (conn.sources && conn.sources.includes(field.id))
+                                    );
+                                })
+                                .map(field =>
+                                React.createElement(FieldBox, {
+                                    key: field.id,
+                                    field,
+                                    type: 'input',
+                                    setDraggedField,
+                                    draggedField,
+                                    dropTarget,
+                                    setDropTarget,
+                                    handleDrop,
+                                    updateFieldPositions,
+                                    connections,
+                                    inputExample,
+                                    outputExample,
+                                    inputSchema,
+                                    outputSchema,
+                                    setHoverPopup,
+                                    hoverTimeoutRef,
+                                    popupPinned,
+                                    setPopupPinned,
+                                    selectedConnection
+                                })
+                            )
+                        ),
+                        
+                        // OUTPUT COLUMN
+                        React.createElement('div', { 
+                            className: 'canvas-column',
+                            id: 'output-column',
+                            style: { width: '450px' }
+                        },
+                            React.createElement('h3', {
+                                style: { cursor: 'ew-resize' },  // Always show resize cursor
+                                onMouseDown: (e) => {
+                                    e.preventDefault();
+                                    console.log('OUTPUT HEADER DRAG START');
+                                    const column = document.getElementById('output-column');
+                                    const startX = e.clientX;
+                                    const startWidth = column.offsetWidth;
+                                    
+                                    const onMouseMove = (moveEvent) => {
+                                        const delta = moveEvent.clientX - startX; // Moving right = positive delta
+                                        const newWidth = Math.max(250, Math.min(900, startWidth - delta)); // Subtract delta: drag left = wider
+                                        column.style.flex = `0 0 ${newWidth}px`;
+                                        column.style.width = newWidth + 'px';
+                                        
+                                        // Update arrows
+                                        requestAnimationFrame(() => {
+                                            updateFieldPositions();
+                                        });
+                                    };
+                                    
+                                    const onMouseUp = () => {
+                                        console.log('OUTPUT HEADER DRAG END');
+                                        document.removeEventListener('mousemove', onMouseMove);
+                                        document.removeEventListener('mouseup', onMouseUp);
+                                        document.body.style.cursor = '';
+                                    };
+                                    
+                                    document.body.style.cursor = 'ew-resize';
+                                    document.addEventListener('mousemove', onMouseMove);
+                                    document.addEventListener('mouseup', onMouseUp);
+                                }
+                            }, '📤 OUTPUT SCHEMA'),
+                            outputSchema && Object.values(outputSchema.fields)
+                                .filter(field => {
+                                    if (!hideConnected) return true;
+                                    // Hide if field is target of any connection
+                                    return !connections.some(conn => conn.target === field.id);
+                                })
+                                .map(field =>
+                                React.createElement(FieldBox, {
+                                    key: field.id,
+                                    field,
+                                    type: 'output',
+                                    setDraggedField,
+                                    draggedField,
+                                    dropTarget,
+                                    setDropTarget,
+                                    handleDrop,
+                                    updateFieldPositions,
+                                    connections,
+                                    inputExample,
+                                    outputExample,
+                                    inputSchema,
+                                    outputSchema,
+                                    setHoverPopup,
+                                    hoverTimeoutRef,
+                                    popupPinned,
+                                    setPopupPinned,
+                                    selectedConnection
+                                })
+                            )
+                        )
+                    ),
+                    (!inputSchema || !outputSchema) && React.createElement('div', { className: 'empty-state' },
+                        React.createElement('div', { style: { fontSize: '64px' } }, '📊'),
+                        React.createElement('h3', null, 'Upload Schemas to Start'),
+                        React.createElement('p', null, 'Upload input & output CSV schemas, then drag to connect')
+                    )
+                )
+            );
+        }
+        
+        function FieldBox({ field, type, setDraggedField, draggedField, dropTarget, setDropTarget, handleDrop, updateFieldPositions, connections, inputExample, outputExample, inputSchema, outputSchema, setHoverPopup, hoverTimeoutRef, popupPinned, setPopupPinned, selectedConnection }) {
+            const isConnected = connections.some(c => 
+                (type === 'input' && c.source === field.path) ||
+                (type === 'output' && c.target === field.path)
+            );
+            
+            const isDropTarget = dropTarget === field.id;
+            const isDragging = draggedField?.field.id === field.id;
+            
+            const handleMouseEnter = (e, immediate = false) => {
+                console.log('HOVER START on', field.name, 'type:', type, 'immediate:', immediate);
+                
+                // If popup is pinned, don't do anything on hover
+                if (popupPinned && !immediate) return;
+                
+                if (hoverTimeoutRef.current) {
+                    clearTimeout(hoverTimeoutRef.current);
+                }
+                
+                // Capture rect BEFORE setTimeout
+                const rect = e.currentTarget.getBoundingClientRect();
+                
+                const showPopupFn = () => {
+                    console.log('SHOWING POPUP for', field.name);
+                    
+                    if (type === 'input' && inputExample) {
+                        // INPUT: Extract context using offset/length or XML path
+                        const lines = inputExample.split('\n');
+                        let contextLines = [];
+                        let highlightIndex = -1;
+                        let highlightChar = null;
+                        
+                        // Detect format
+                        const isXML = inputExample.trim().startsWith('<');
+                        const isJSON = inputExample.trim().startsWith('{') || inputExample.trim().startsWith('[');
+                        const isFlat = !isXML && !isJSON;
+                        
+                        if (isFlat && field.offset !== undefined && field.length !== undefined) {
+                            // IDOC FORMAT: segment pattern + offset + length
+                            const segmentName = field.path.split('.')[0]; // E1EDK01
+                            const offset = parseInt(field.offset) || 0;
+                            const length = parseInt(field.length) || 0;
+                            
+                            // Find line containing this segment
+                            let foundLine = -1;
+                            
+                            for (let i = 0; i < lines.length; i++) {
+                                const line = lines[i];
+                                // Check both E1 and E2 prefixes (E1EDK01 might be E2EDK01 in file)
+                                const altSegment = segmentName.replace(/^E1/, 'E2');
+                                
+                                if (line.startsWith(segmentName) || line.startsWith(altSegment)) {
+                                    foundLine = i;
+                                    break; // Take first occurrence
+                                }
+                            }
+                            
+                            if (foundLine >= 0) {
+                                // Get 5 lines before and after
+                                const start = Math.max(0, foundLine - 5);
+                                const end = Math.min(lines.length, foundLine + 6);
+                                contextLines = lines.slice(start, end);
+                                highlightIndex = foundLine - start;
+                                
+                                // Highlight EXACTLY offset -> offset+length
+                                const line = lines[foundLine];
+                                const charStart = offset;
+                                const charEnd = Math.min(offset + length, line.length);
+                                
+                                console.log('HIGHLIGHT CHAR:', {
+                                    field: field.name,
+                                    segment: segmentName,
+                                    line: line.substring(0, 100),
+                                    offset: offset,
+                                    length: length,
+                                    charStart: charStart,
+                                    charEnd: charEnd,
+                                    extractedValue: line.substring(charStart, charEnd)
+                                });
+                                
+                                highlightChar = { start: charStart, end: charEnd };
+                            }
+                        } else if ((isXML || isJSON) && (field.xml_path || field.json_path)) {
+                            // XML/JSON: Use backend API for extraction
+                            console.log('📡 Calling API for XML/JSON extraction:', field.name);
+                            
+                            const fieldPath = field.xml_path || field.json_path || field.path;
+                            const formatType = isXML ? 'xml' : 'json';
+                            
+                            // Call API asynchronously
+                            fetch('http://localhost:8080/api/preview/extract', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    example_content: inputExample,
+                                    field_path: fieldPath,
+                                    field_name: field.name,
+                                    format_type: formatType
+                                })
+                            })
+                            .then(res => res.json())
+                            .then(data => {
+                                console.log('✅ API Response:', data);
+                                
+                                if (data.error) {
+                                    console.error('API Error:', data.error);
+                                    // Show error in popup
+                                    setHoverPopup({
+                                        field,
+                                        type,
+                                        rect,
+                                        code: `Error: ${data.error}`,
+                                        contextLines: [],
+                                        highlightIndex: -1
+                                    });
+                                    return;
+                                }
+                                
+                                // Success - show extracted value
+                                const extractedValue = data.value || 'N/A';
+                                const code = `<${field.name}>${extractedValue}</${field.name}>`;
+                                
+                                setHoverPopup({
+                                    field,
+                                    type,
+                                    rect,
+                                    code,
+                                    contextLines: data.context_lines || [],
+                                    highlightIndex: data.highlight_line || -1,
+                                    highlightChar: null // XML uses line-level highlighting
+                                });
+                            })
+                            .catch(err => {
+                                console.error('API Call Failed:', err);
+                                setHoverPopup({
+                                    field,
+                                    type,
+                                    rect,
+                                    code: `Error: ${err.message}`,
+                                    contextLines: [],
+                                    highlightIndex: -1
+                                });
+                            });
+                            
+                            // Show loading state immediately
+                            setHoverPopup({
+                                field,
+                                type,
+                                rect,
+                                code: '⏳ Loading...',
+                                contextLines: ['Extracting value from ' + formatType.toUpperCase() + '...'],
+                                highlightIndex: -1
+                            });
+                            
+                            return; // Exit early - popup will be updated by API response
+                        } else {
+                            // FALLBACK: Search by field name/path
+                            const searchTerms = [field.name, field.path, field.id].filter(Boolean);
+                            
+                            lines.forEach((line, idx) => {
+                                if (searchTerms.some(term => line.includes(term))) {
+                                    if (highlightIndex === -1) {
+                                        highlightIndex = idx;
+                                    }
+                                }
+                            });
+                            
+                            if (highlightIndex >= 0) {
+                                const start = Math.max(0, highlightIndex - 5);
+                                const end = Math.min(lines.length, highlightIndex + 6);
+                                contextLines = lines.slice(start, end);
+                                highlightIndex = highlightIndex - start;
+                            } else {
+                                // Show first 11 lines as fallback
+                                contextLines = lines.slice(0, Math.min(11, lines.length));
+                                highlightIndex = 0;
+                            }
+                        }
+                        
+                        setHoverPopup({
+                            type: 'input',
+                            field: field,
+                            lines: contextLines,
+                            highlightIndex: highlightIndex,
+                            highlightChar: highlightChar,
+                            x: rect.right + 10,
+                            y: rect.top
+                        });
+                        
+                    } else if (type === 'output' && isConnected) {
+                        console.log('OUTPUT HOVER START', field.name, 'isConnected:', isConnected);
+                        
+                        // OUTPUT: Generate XML code with ACTUAL VALUES from input
+                        const relatedConns = connections.filter(c => c.target === field.path);
+                        console.log('Related connections:', relatedConns);
+                        
+                        let code = '';
+                        
+                        // Generate XML from xmlpath
+                        const xmlPath = field.xml_path || field.path;
+                        const nodeName = xmlPath.split('/').pop();
+                        
+                        // Function to extract value from input example
+                        const extractValueFromInput = (sourceField) => {
+                            console.log('Extracting value for:', sourceField);
+                            if (!inputExample || !inputSchema) {
+                                console.log('No inputExample or inputSchema');
+                                return null;
+                            }
+                            
+                            const lines = inputExample.split('\n');
+                            const sourceFieldData = inputSchema.fields[sourceField.replace('.', '_')];
+                            console.log('Source field data:', sourceFieldData);
+                            
+                            if (!sourceFieldData || !sourceFieldData.offset || !sourceFieldData.length) {
+                                console.log('Missing offset/length');
+                                return null;
+                            }
+                            
+                            const segmentName = sourceField.split('.')[0];
+                            const offset = parseInt(sourceFieldData.offset);
+                            const length = parseInt(sourceFieldData.length);
+                            
+                            // Find line with segment
+                            for (let line of lines) {
+                                const altSegment = segmentName.replace(/^E1/, 'E2');
+                                if (line.startsWith(segmentName) || line.startsWith(altSegment)) {
+                                    // Extract value at offset
+                                    const value = line.substring(offset, offset + length).trim();
+                                    console.log('Extracted value:', value, 'from offset', offset, 'length', length);
+                                    return value || null;
+                                }
+                            }
+                            return null;
+                        };
+                        
+                        if (relatedConns.length === 1) {
+                            const conn = relatedConns[0];
+                            let value = null;
+                            
+                            // Try to get actual value from input example
+                            value = extractValueFromInput(conn.source);
+                            
+                            if (!value) {
+                                // Fallback to field name
+                                value = conn.sourceName || conn.source;
+                            }
+                            
+                            console.log('Final value:', value);
+                            
+                            if (conn.transformation && conn.transformation.formula) {
+                                code = `<${nodeName}>\${${conn.transformation.formula}}</${nodeName}>`;
+                            } else if (conn.transformation && conn.transformation.type !== 'direct') {
+                                code = `<${nodeName}>\${${conn.transformation.type.toUpperCase()}(${value})}</${nodeName}>`;
+                            } else {
+                                code = `<${nodeName}>${value}</${nodeName}>`;
+                            }
+                            
+                        } else if (relatedConns.length > 1) {
+                            // Multiple inputs: extract all values
+                            const values = relatedConns.map(c => {
+                                const val = extractValueFromInput(c.source);
+                                return val || c.sourceName || c.source;
+                            }).join(' ');
+                            code = `<${nodeName}>${values}</${nodeName}>`;
+                        } else {
+                            // No connection yet
+                            code = `<${nodeName}>TO_BE_MAPPED</${nodeName}>`;
+                        }
+                        
+                        // Add parent context if available
+                        const pathParts = xmlPath.split('/').filter(p => p);
+                        if (pathParts.length > 1) {
+                            const parentNode = pathParts[pathParts.length - 2];
+                            code = `<${parentNode}>\n  ${code}\n</${parentNode}>`;
+                        }
+                        
+                        console.log('Generated code:', code);
+                        
+                        setHoverPopup({
+                            type: 'output',
+                            code: code,
+                            field: field,
+                            connections: relatedConns,
+                            x: rect.left - 410,
+                            y: rect.top
+                        });
+                    }
+                };
+                
+                // Show immediately on click, or after 2s on hover
+                if (immediate) {
+                    showPopupFn();
+                } else {
+                    hoverTimeoutRef.current = setTimeout(showPopupFn, 2000);
+                }
+            };
+            
+            const handleMouseLeave = () => {
+                // Don't hide popup if it's pinned
+                if (popupPinned) return;
+                
+                if (hoverTimeoutRef.current) {
+                    clearTimeout(hoverTimeoutRef.current);
+                }
+                setHoverPopup(null);
+            };
+            
+            const handleFieldClick = (e) => {
+                // Single click: show popup immediately and pin it
+                if (hoverTimeoutRef.current) {
+                    clearTimeout(hoverTimeoutRef.current);
+                }
+                
+                // Trigger the hover popup immediately
+                handleMouseEnter(e, true); // Pass immediate=true
+                setPopupPinned(true);
+                updateFieldPositions();
+            };
+            
+            // Check if this field is part of selected connection
+            const isHighlighted = selectedConnection && (
+                (selectedConnection.source === field.id) ||
+                (selectedConnection.sources && selectedConnection.sources.includes(field.id)) ||
+                (selectedConnection.target === field.id)
+            );
+            
+            return React.createElement('div', {
+                className: `field-box ${field.required ? 'required' : ''} ${field.calculation ? 'calculated' : ''} ${isDragging ? 'dragging' : ''} ${isDropTarget ? 'selected' : ''} ${isHighlighted ? 'highlighted' : ''}`,
+                'data-field-id': `${type}-${field.id}`,
+                draggable: true,
+                onDragStart: (e) => {
+                    setDraggedField({ field, type });
+                    e.dataTransfer.effectAllowed = 'link';
+                },
+                onDragEnd: () => {
+                    setDraggedField(null);
+                    setDropTarget(null);
+                },
+                onDragOver: (e) => {
+                    if (draggedField && draggedField.type !== type) {
+                        e.preventDefault();
+                        setDropTarget(field.id);
+                    }
+                },
+                onDragLeave: () => {
+                    setDropTarget(null);
+                },
+                onDrop: (e) => {
+                    e.preventDefault();
+                    handleDrop(field, type);
+                },
+                onClick: handleFieldClick,
+                onMouseEnter: (e) => handleMouseEnter(e, false),
+                onMouseLeave: handleMouseLeave
+            },
+                React.createElement('div', { className: 'field-name' },
+                    isConnected && (type === 'input' ? '→ ' : '← '),
+                    field.name
+                ),
+                field.business_term && React.createElement('div', { className: 'field-business' },
+                    field.business_term
+                ),
+                React.createElement('div', { className: 'field-meta' },
+                    React.createElement('span', { className: 'field-badge', style: { background: '#e3f2fd' } }, field.type),
+                    React.createElement('span', { className: 'field-badge', style: { background: '#f3e5f5' } }, field.cardinality),
+                    field.calculation && React.createElement('span', { className: 'field-badge', style: { background: '#fff3cd' } }, '📐 ' + field.calculation.substring(0, 15)),
+                    field.offset && React.createElement('span', { className: 'field-badge', style: { background: '#e8f5e9' } }, '📍 ' + field.offset),
+                    field.length && React.createElement('span', { className: 'field-badge', style: { background: '#fce4ec' } }, '📏 ' + field.length),
+                    field.xml_path && React.createElement('span', { className: 'field-badge', style: { background: '#fff9c4', fontSize: '9px' }, title: field.xml_path }, '🌐 ' + field.xml_path.substring(field.xml_path.lastIndexOf('/') + 1))
+                )
+            );
+        }
+        
+        function ConnectionsSVG({ connections, fieldPositions, selectedConnection, setSelectedConnection }) {
+            if (connections.length === 0) return null;
+            
+            return React.createElement('svg', { className: 'connections' },
+                connections.map(conn => {
+                    // Handle both single source and multiple sources (for CONCAT)
+                    const sourceId = conn.source || (conn.sources && conn.sources[0]);
+                    const targetId = conn.target;
+                    
+                    if (!sourceId || !targetId) return null;
+                    
+                    const sourcePos = fieldPositions[`input-${sourceId.replace(/\./g, '_')}`];
+                    const targetPos = fieldPositions[`output-${targetId.replace(/\./g, '_')}`];
+                    
+                    if (!sourcePos || !targetPos) return null;
+                    
+                    const isSelected = selectedConnection?.id === conn.id;
+                    const pathD = `M ${sourcePos.x} ${sourcePos.y} C ${sourcePos.x + 20} ${sourcePos.y}, ${targetPos.x - 20} ${targetPos.y}, ${targetPos.x} ${targetPos.y}`;
+                    
+                    return React.createElement('g', { key: conn.id },
+                        React.createElement('path', {
+                            d: pathD,
+                            className: `connection-line ${isSelected ? 'selected' : ''}`,
+                            onClick: (e) => {
+                                e.stopPropagation();
+                                setSelectedConnection(conn);
+                            },
+                            onDoubleClick: (e) => {
+                                e.stopPropagation();
+                                if (confirm(`Eliminare collegamento ${conn.sourceName} → ${conn.targetName}?`)) {
+                                    setSelectedConnection(null);
+                                    // Trigger delete (pass to parent)
+                                    window.deleteConnectionCallback?.(conn.id);
+                                }
+                            },
+                            style: { cursor: 'pointer' }
+                        }),
+                        React.createElement('polygon', {
+                            className: 'connection-arrow',
+                            points: `${targetPos.x},${targetPos.y} ${targetPos.x-10},${targetPos.y-5} ${targetPos.x-10},${targetPos.y+5}`,
+                            style: { fill: isSelected ? '#f44336' : '#667eea', cursor: 'pointer' },
+                            onDoubleClick: (e) => {
+                                e.stopPropagation();
+                                if (confirm(`Eliminare collegamento ${conn.sourceName} → ${conn.targetName}?`)) {
+                                    setSelectedConnection(null);
+                                    window.deleteConnectionCallback?.(conn.id);
+                                }
+                            }
+                        })
+                    );
+                })
+            );
+        }
+        
+        function ConnectionsList({ connections, selectedConnection, setSelectedConnection }) {
+            if (connections.length === 0) {
+                return React.createElement('div', { className: 'empty-state' },
+                    React.createElement('p', null, 'No connections yet'),
+                    React.createElement('small', null, 'Drag input fields to output fields')
+                );
+            }
+            
+            return React.createElement('div', null,
+                connections.map(conn =>
+                    React.createElement('div', {
+                        key: conn.id,
+                        className: `connection-list-item ${selectedConnection?.id === conn.id ? 'selected' : ''}`,
+                        onClick: () => setSelectedConnection(conn)
+                    },
+                        React.createElement('div', { style: { fontSize: '11px', color: '#4caf50', fontWeight: 'bold' } },
+                            '📥 ' + conn.source
+                        ),
+                        React.createElement('div', { style: { fontSize: '11px', color: '#2196f3', fontWeight: 'bold', marginTop: '4px' } },
+                            '📤 ' + conn.target
+                        ),
+                        React.createElement('div', { style: { fontSize: '10px', color: '#666', marginTop: '4px' } },
+                            '⚙️ ' + conn.transformation.type
+                        )
+                    )
+                )
+            );
+        }
+        
+        function PropertiesPanel({ connection, updateConnectionTransformation, deleteConnection, setSelectedConnection, setShowFormulaEditor, setEditingConnection }) {
+            const [transType, setTransType] = useState(connection.transformation.type);
+            
+            return React.createElement('div', { className: 'properties-panel' },
+                React.createElement('h3', { style: { marginBottom: '20px' } }, '⚙️ Connection Properties'),
+                React.createElement('div', { className: 'form-group' },
+                    React.createElement('label', null, 'Source:'),
+                    React.createElement('input', { 
+                        type: 'text', 
+                        value: connection.source, 
+                        readOnly: true,
+                        style: { background: '#f5f5f5', color: '#4caf50', fontWeight: 'bold' }
+                    })
+                ),
+                React.createElement('div', { className: 'form-group' },
+                    React.createElement('label', null, 'Target:'),
+                    React.createElement('input', { 
+                        type: 'text', 
+                        value: connection.target, 
+                        readOnly: true,
+                        style: { background: '#f5f5f5', color: '#2196f3', fontWeight: 'bold' }
+                    })
+                ),
+                React.createElement('div', { className: 'form-group' },
+                    React.createElement('label', null, 'Transformation Rule:'),
+                    React.createElement('select', {
+                        value: transType,
+                        onChange: (e) => {
+                            setTransType(e.target.value);
+                            updateConnectionTransformation(connection.id, { type: e.target.value, params: {} });
+                        }
+                    },
+                        React.createElement('option', { value: 'direct' }, '→ Direct (1:1)'),
+                        React.createElement('option', { value: 'concat' }, '🔗 Concatenate'),
+                        React.createElement('option', { value: 'substring' }, '✂️ Substring'),
+                        React.createElement('option', { value: 'format_date' }, '📅 Format Date'),
+                        React.createElement('option', { value: 'lookup' }, '📊 Lookup Table'),
+                        React.createElement('option', { value: 'upper' }, '⬆️ Uppercase'),
+                        React.createElement('option', { value: 'lower' }, '⬇️ Lowercase'),
+                        React.createElement('option', { value: 'trim' }, '✂️ Trim Spaces'),
+                        React.createElement('option', { value: 'math' }, '🔢 Math Operation'),
+                        React.createElement('option', { value: 'formula' }, '✏️ Custom Formula')
+                    )
+                ),
+                connection.transformation?.formula && React.createElement('div', { className: 'form-group' },
+                    React.createElement('label', null, 'Formula:'),
+                    React.createElement('div', { 
+                        style: { 
+                            padding: '10px', 
+                            background: '#f9f9f9', 
+                            borderRadius: '4px',
+                            fontFamily: 'monospace',
+                            fontSize: '12px',
+                            wordBreak: 'break-all'
+                        } 
+                    }, connection.transformation.formula)
+                ),
+                React.createElement('button', {
+                    className: 'btn btn-primary',
+                    style: { width: '100%', marginTop: '15px' },
+                    onClick: () => {
+                        setEditingConnection(connection);
+                        setShowFormulaEditor(true);
+                    }
+                }, '✏️ Edit Formula'),
+                React.createElement('div', { style: { display: 'flex', gap: '10px', marginTop: '30px' } },
+                    React.createElement('button', {
+                        className: 'btn btn-danger',
+                        style: { flex: 1 },
+                        onClick: () => deleteConnection(connection.id)
+                    }, '🗑️ Delete'),
+                    React.createElement('button', {
+                        className: 'btn btn-secondary',
+                        style: { flex: 1 },
+                        onClick: () => setSelectedConnection(null)
+                    }, '✕ Close')
+                )
+            );
+        }
+        
+        function UploadModal({ direction, onClose, onUpload }) {
+            const [file, setFile] = useState(null);
+            const [type, setType] = useState('csv');
+            const [isDragging, setIsDragging] = useState(false);
+            const fileInputRef = useRef(null);
+            
+            const handleDragOver = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setIsDragging(true);
+            };
+            
+            const handleDragLeave = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setIsDragging(false);
+            };
+            
+            const handleDrop = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setIsDragging(false);
+                
+                const droppedFile = e.dataTransfer.files[0];
+                if (droppedFile) {
+                    setFile(droppedFile);
+                }
+            };
+            
+            return React.createElement('div', { className: 'modal-overlay', onClick: onClose },
+                React.createElement('div', { className: 'modal', onClick: (e) => e.stopPropagation() },
+                    React.createElement('h3', { style: { marginBottom: '20px' } }, `Upload ${direction} Schema`),
+                    React.createElement('div', { className: 'form-group' },
+                        React.createElement('label', null, 'Schema Type:'),
+                        React.createElement('select', {
+                            value: type,
+                            onChange: (e) => setType(e.target.value)
+                        },
+                            React.createElement('option', { value: 'csv' }, '📊 CSV (Recommended)'),
+                            React.createElement('option', { value: 'xsd' }, '📄 XSD'),
+                            React.createElement('option', { value: 'idoc' }, '📊 IDOC')
+                        )
+                    ),
+                    React.createElement('div', {
+                        className: 'upload-area',
+                        onClick: () => fileInputRef.current?.click(),
+                        onDragOver: handleDragOver,
+                        onDragLeave: handleDragLeave,
+                        onDrop: handleDrop,
+                        style: {
+                            border: isDragging ? '3px dashed #667eea' : '2px dashed #ddd',
+                            background: isDragging ? '#f0f4ff' : 'transparent'
+                        }
+                    },
+                        file ? React.createElement('div', null,
+                            React.createElement('div', { style: { fontSize: '48px' } }, '✅'),
+                            React.createElement('div', { style: { fontWeight: 'bold' } }, file.name)
+                        ) : React.createElement('div', null,
+                            React.createElement('div', { style: { fontSize: '64px' } }, isDragging ? '📂' : '📁'),
+                            React.createElement('div', null, isDragging ? 'Drop file here' : 'Click or drag file here')
+                        ),
+                        React.createElement('input', {
+                            ref: fileInputRef,
+                            type: 'file',
+                            style: { display: 'none' },
+                            onChange: (e) => setFile(e.target.files[0]),
+                            accept: '.csv,.xsd,.json,.xml,.txt'
+                        })
+                    ),
+                    React.createElement('div', { style: { display: 'flex', gap: '10px', marginTop: '20px', justifyContent: 'flex-end' } },
+                        React.createElement('button', { className: 'btn btn-secondary', onClick: onClose }, 'Cancel'),
+                        React.createElement('button', {
+                            className: 'btn btn-primary',
+                            onClick: () => file && onUpload(file, direction, type),
+                            disabled: !file
+                        }, 'Upload')
+                    )
+                )
+            );
+        }
+        
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(React.createElement(App));
+    </script>
+</body>
+</html>

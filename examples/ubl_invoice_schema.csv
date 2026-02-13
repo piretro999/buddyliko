@@ -1,0 +1,18 @@
+campo,business_term,spiegazione,obbligatorio,numerosità,condizionalità,calcolo,offset,lunghezza,xmlpath,json_path
+Invoice.ID,Invoice Number,Unique invoice identifier,SI,1..1,,,,,/Invoice/cbc:ID,$.Invoice.ID
+Invoice.IssueDate,Issue Date,Invoice issue date,SI,1..1,,,,,/Invoice/cbc:IssueDate,$.Invoice.IssueDate
+Invoice.DueDate,Due Date,Payment due date,NO,0..1,,,,,/Invoice/cbc:DueDate,$.Invoice.DueDate
+Invoice.InvoicedQuantity,Quantity,Total invoiced quantity,NO,0..1,,,,,/Invoice/cbc:InvoicedQuantity,$.Invoice.InvoicedQuantity
+Invoice.DocumentCurrencyCode,Currency,Document currency code,SI,1..1,,,,,/Invoice/cbc:DocumentCurrencyCode,$.Invoice.DocumentCurrencyCode
+Invoice.Lines.Line,Invoice Line,Individual line item,NO,0..N,,,,,/Invoice/cac:InvoiceLine,$.Invoice.InvoiceLine[*]
+Invoice.Lines.Line.ID,Line ID,Line identifier,SI,1..1,,,,,/Invoice/cac:InvoiceLine/cbc:ID,$.Invoice.InvoiceLine[*].ID
+Invoice.Lines.Line.InvoicedQuantity,Line Quantity,Quantity for this line,SI,1..1,,,,,/Invoice/cac:InvoiceLine/cbc:InvoicedQuantity,$.Invoice.InvoiceLine[*].InvoicedQuantity
+Invoice.Lines.Line.Description,Description,Item description,NO,0..1,,,,,/Invoice/cac:InvoiceLine/cac:Item/cbc:Description,$.Invoice.InvoiceLine[*].Item.Description
+Invoice.Lines.Line.UnitPrice,Unit Price,Price per unit,SI,1..1,,,,,/Invoice/cac:InvoiceLine/cac:Price/cbc:PriceAmount,$.Invoice.InvoiceLine[*].Price.PriceAmount
+Invoice.Lines.Line.LineTotal,Line Total,Total amount for line,NO,0..1,,,,,/Invoice/cac:InvoiceLine/cbc:LineExtensionAmount,$.Invoice.InvoiceLine[*].LineExtensionAmount
+Invoice.TaxTotal.TaxAmount,Tax Amount,Total tax amount,SI,1..1,,,,,/Invoice/cac:TaxTotal/cbc:TaxAmount,$.Invoice.TaxTotal.TaxAmount
+Invoice.LegalMonetaryTotal.TaxExclusiveAmount,Amount Excl Tax,Amount excluding tax,SI,1..1,,,,,/Invoice/cac:LegalMonetaryTotal/cbc:TaxExclusiveAmount,$.Invoice.LegalMonetaryTotal.TaxExclusiveAmount
+Invoice.LegalMonetaryTotal.TaxInclusiveAmount,Amount Incl Tax,Amount including tax,SI,1..1,,,,,/Invoice/cac:LegalMonetaryTotal/cbc:TaxInclusiveAmount,$.Invoice.LegalMonetaryTotal.TaxInclusiveAmount
+Invoice.LegalMonetaryTotal.PayableAmount,Payable Amount,Total payable amount,SI,1..1,,,,,/Invoice/cac:LegalMonetaryTotal/cbc:PayableAmount,$.Invoice.LegalMonetaryTotal.PayableAmount
+Invoice.AccountingSupplierParty.Party.Name,Supplier Name,Seller/supplier name,SI,1..1,,,,,/Invoice/cac:AccountingSupplierParty/cac:Party/cac:PartyName/cbc:Name,$.Invoice.AccountingSupplierParty.Party.PartyName.Name
+Invoice.AccountingCustomerParty.Party.Name,Customer Name,Buyer/customer name,SI,1..1,,,,,/Invoice/cac:AccountingCustomerParty/cac:Party/cac:PartyName/cbc:Name,$.Invoice.AccountingCustomerParty.Party.PartyName.Name

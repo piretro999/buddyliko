@@ -1,0 +1,85 @@
+{
+  "Invoice": {
+    "ID": "INV-2024-001",
+    "IssueDate": "2024-01-15",
+    "DueDate": "2024-02-15",
+    "InvoicedQuantity": 10,
+    "DocumentCurrencyCode": "EUR",
+    "AccountingSupplierParty": {
+      "Party": {
+        "PartyName": {
+          "Name": "Acme Corporation SRL"
+        }
+      }
+    },
+    "AccountingCustomerParty": {
+      "Party": {
+        "PartyName": {
+          "Name": "Client SA"
+        }
+      }
+    },
+    "InvoiceLine": [
+      {
+        "ID": "1",
+        "InvoicedQuantity": {
+          "unitCode": "PCE",
+          "value": 5
+        },
+        "LineExtensionAmount": {
+          "currencyID": "EUR",
+          "value": 500.00
+        },
+        "Item": {
+          "Description": "Professional Services - Consulting"
+        },
+        "Price": {
+          "PriceAmount": {
+            "currencyID": "EUR",
+            "value": 100.00
+          }
+        }
+      },
+      {
+        "ID": "2",
+        "InvoicedQuantity": {
+          "unitCode": "PCE",
+          "value": 3
+        },
+        "LineExtensionAmount": {
+          "currencyID": "EUR",
+          "value": 150.00
+        },
+        "Item": {
+          "Description": "Software License"
+        },
+        "Price": {
+          "PriceAmount": {
+            "currencyID": "EUR",
+            "value": 50.00
+          }
+        }
+      }
+    ],
+    "TaxTotal": {
+      "TaxAmount": {
+        "currencyID": "EUR",
+        "value": 143.00
+      }
+    },
+    "LegalMonetaryTotal": {
+      "TaxExclusiveAmount": {
+        "currencyID": "EUR",
+        "value": 650.00
+      },
+      "TaxInclusiveAmount": {
+        "currencyID": "EUR",
+        "value": 793.00
+      },
+      "PayableAmount": {
+        "currencyID": "EUR",
+        "value": 793.00
+      }
+    }
+  }
+}

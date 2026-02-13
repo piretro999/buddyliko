@@ -1,0 +1,108 @@
+{
+  "name": "esempio1",
+  "input_schema": "sample_input",
+  "output_schema": "sample_output",
+  "rules": [
+    {
+      "id": "conn_1770845919015",
+      "source": "E1EDK01.BELNR",
+      "target": "Invoice.ID",
+      "transformation": {
+        "type": "direct"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_1770845925654",
+      "source": "E1EDK01.DATUM",
+      "target": "Invoice.IssueDate",
+      "transformation": {
+        "type": "direct"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_1770845936096",
+      "source": "E1EDP26.BEZTX",
+      "target": "InvoiceLine.Item.Description",
+      "transformation": {
+        "type": "direct"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_1770845942183",
+      "source": "E1EDP19.MSATZ",
+      "target": "InvoiceLine.TaxTotal.TaxSubtotal.TaxCategory.Percent",
+      "transformation": {
+        "type": "direct"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_1770845946598",
+      "source": "E1EDP19.MWSKZ",
+      "target": "InvoiceLine.TaxTotal.TaxSubtotal.TaxCategory.ID",
+      "transformation": {
+        "type": "direct"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_1770845963702",
+      "source": "E1EDP01.PREIS",
+      "target": "InvoiceLine.Price.PriceAmount",
+      "transformation": {
+        "type": "direct"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_1770845968821",
+      "source": "E1EDP01.MENGE",
+      "target": "InvoiceLine.InvoicedQuantity",
+      "transformation": {
+        "type": "direct"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_1770845972567",
+      "source": "E1EDP01.POSEX",
+      "target": "InvoiceLine.ID",
+      "transformation": {
+        "type": "direct"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_1770846064966",
+      "source": "E1EDP01.MENEE",
+      "target": "InvoiceLine.Item.Description",
+      "transformation": {
+        "type": "direct"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    }
+  ],
+  "lookup_tables": {},
+  "metadata": {}
+}

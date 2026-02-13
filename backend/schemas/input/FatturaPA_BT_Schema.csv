@@ -1,0 +1,341 @@
+campo|business_term|spiegazione|obbligatorio|numerosità|condizionalità|offset|lunghezza
+FatturaElettronicaHeader|1|FatturaPA field FatturaElettronicaHeader|X|1 ..1||FatturaElettronicaHeader|
+DatiTrasmissione|1.1|FatturaPA field DatiTrasmissione|X|1 ..1||FatturaElettronicaHeader/DatiTrasmissione|
+IdTrasmittente|1.1.1|FatturaPA field IdTrasmittente|X|1 ..1||FatturaElettronicaHeader/DatiTrasmissione/IdTrasmittente|
+IdPaese|BT-31|Seller VAT identifier|X|1 ..1||FatturaElettronicaHeader/DatiTrasmissione/IdTrasmittente/IdPaese|
+IdCodice|BT-30|"Seller legal registration identifier
+Seller VAT identifier"|X|1 ..1||FatturaElettronicaHeader/DatiTrasmissione/IdTrasmittente/IdCodice|
+ProgressivoInvio|1.1.2|FatturaPA field ProgressivoInvio|X|1 ..1||FatturaElettronicaHeader/DatiTrasmissione/ProgessivoInvio|
+FormatoTrasmissione|1.1.3|FatturaPA field FormatoTrasmissione|X|1 ..1||FatturaElettronicaHeader/DatiTrasmissione/FormatoTrasmissione|
+CodiceDestinatario|BT-49|Buyer electronic address|X|1 ..1||FatturaElettronicaHeader/DatiTrasmissione/CodiceDestinatario|
+ContattiTrasmittente|1.1.5|FatturaPA field ContattiTrasmittente||0 ..1||FatturaElettronicaHeader/DatiTrasmissione/ContattiTrasmittente|
+Telefono|1.1.5.1|FatturaPA field Telefono||0 ..1||FatturaElettronicaHeader/DatiTrasmissione/ContattiTrasmittente/Telefono|
+Email|1.1.5.2|FatturaPA field Email||0 ..1||FatturaElettronicaHeader/DatiTrasmissione/ContattiTrasmittente/Email|
+PECDestinatario|1.1.6|FatturaPA field PECDestinatario||0 ..1||FatturaElettronicaHeader/DatiTrasmissione/PECDestinatario|
+CedentePrestatore|1.2|FatturaPA field CedentePrestatore|X|1 ..1||FatturaElettronicaHeader/CedentePrestatore|
+DatiAnagrafici|1.2.1|FatturaPA field DatiAnagrafici|X|1 ..1||FatturaElettronicaHeader/CedentePrestatore/DatiAnagrafici|
+IdFiscaleIVA|1.2.1.1|FatturaPA field IdFiscaleIVA|X|1 ..1||FatturaElettronicaHeader/CedentePrestatore/DatiAnagrafici/IdFiscaleIVA|
+IdPaese|BT-31|Seller VAT identifier|X|1 ..1||FatturaElettronicaHeader/CedentePrestatore/DatiAnagrafici/IdFiscaleIVA/IdPaese|
+IdCodice|BT-31|Seller VAT identifier|X|1 ..1||FatturaElettronicaHeader/CedentePrestatore/DatiAnagrafici/IdFiscaleIVA/IdCodice|
+CodiceFiscale|BT-30|Seller legal registration identifier||0 ..1||FatturaElettronicaHeader/CedentePrestatore/DatiAnagrafici/CodiceFiscale|
+Anagrafica|1.2.1.3|FatturaPA field Anagrafica|X|1 ..1||"
+FatturaElettronicaHeader/CedentePrestatore/DatiAnagrafici/Anagrafica"|
+Denominazione|BT-27|Seller name||0 ..1||"
+FatturaElettronicaHeader/CedentePrestatore/DatiAnagrafici/Anagrafica/Denominazione"|
+Nome|BT-27|Seller name||0 ..1||"
+FatturaElettronicaHeader/CedentePrestatore/DatiAnagrafici/Anagrafica/Nome"|
+Cognome|BT-27|Seller name||0 ..1||"
+FatturaElettronicaHeader/CedentePrestatore/DatiAnagrafici/Anagrafica/Cognome"|
+Titolo|1.2.1.3.4|FatturaPA field Titolo||0 ..1||"
+FatturaElettronicaHeader/CedentePrestatore/DatiAnagrafici/Anagrafica/Titolo"|
+CodEORI|BT-29|Seller identifier||0 ..1||FatturaElettronicaHeader/CedentePrestatore/DatiAnagrafici/Anagrafica/CodEORI|
+AlboProfessionale|BT-29|Seller identifier||0 ..1||"
+FatturaElettronicaHeader/CedentePrestatore/DatiAnagrafici/AlboProfessionale"|
+ProvinciaAlbo|1.2.1.5|FatturaPA field ProvinciaAlbo||0 ..1||"
+FatturaElettronicaHeader/CedentePrestatore/DatiAnagrafici/ProvinciaAlbo"|
+NumeroIscrizioneAlbo|BT-29|Seller identifier||0 ..1||"
+FatturaElettronicaHeader/CedentePrestatore/DatiAnagrafici/NumeroIscrizioneAlbo"|
+DataIscrizioneAlbo|BT-29|Seller identifier||0 ..1||"
+FatturaElettronicaHeader/CedentePrestatore/DatiAnagrafici/DataIscrizioneAlbo"|
+RegimeFiscale|1.2.1.8|FatturaPA field RegimeFiscale|X|1 ..1||FatturaElettronicaHeader/CedentePrestatore/DatiAnagrafici/RegimeFiscale|
+Sede|1.2.2|FatturaPA field Sede|X|1 ..1||FatturaElettronicaHeader/CedentePrestatore/Sede|
+Indirizzo|BT-35|Seller address line 1|X|1 ..1||FatturaElettronicaHeader/CedentePrestatore/Sede/Indirizzo|
+NumeroCivico|BT-36|Seller address line 2||0 ..1||FatturaElettronicaHeader/CedentePrestatore/Sede/NumeroCivico|
+CAP|BT-38|Seller post code|X|1 ..1||FatturaElettronicaHeader/CedentePrestatore/Sede/CAP|
+Comune|BT-37|Seller city|X|1 ..1||FatturaElettronicaHeader/CedentePrestatore/Sede/Comune|
+Provincia|BT-39|Seller country subdivision||0 ..1||FatturaElettronicaHeader/CedentePrestatore/Sede/Provincia|
+Nazione|BT-40|Seller country code|X|1 ..1||FatturaElettronicaHeader/CedentePrestatore/Sede/Nazione|
+StabileOrganizzazione|1.2.3|FatturaPA field StabileOrganizzazione||0 ..1||FatturaElettronicaHeader/CedentePrestatore/StabileOrganizzazione|
+Indirizzo|1.2.3.1|FatturaPA field Indirizzo|X|1 ..1||FatturaElettronicaHeader/CedentePrestatore/StabileOrganizzazione/Indirizzo|
+NumeroCivico|1.2.3.2|FatturaPA field NumeroCivico||0 ..1||FatturaElettronicaHeader/CedentePrestatore/StabileOrganizzazione/NumeroCivico|
+CAP|1.2.3.3|FatturaPA field CAP|X|1 ..1||FatturaElettronicaHeader/CedentePrestatore/StabileOrganizzazione/CAP|
+Comune|1.2.3.4|FatturaPA field Comune|X|1 ..1||FatturaElettronicaHeader/CedentePrestatore/StabileOrganizzazione/Comune|
+Provincia|1.2.3.5|FatturaPA field Provincia||0 ..1||FatturaElettronicaHeader/CedentePrestatore/StabileOrganizzazione/Provincia|
+Nazione|1.2.3.6|FatturaPA field Nazione|X|1 ..1||FatturaElettronicaHeader/CedentePrestatore/StabileOrganizzazione/Nazione|
+IscrizioneREA|1.2.4|FatturaPA field IscrizioneREA||0 ..1||FatturaElettronicaHeader/CedentePrestatore/IscrizioneREA|
+Ufficio|BT-29|Seller identifier|X|1 ..1||FatturaElettronicaHeader/CedentePrestatore/IscrizioneREA/Ufficio|
+NumeroREA|BT-29|Seller identifier|X|1 ..1||FatturaElettronicaHeader/CedentePrestatore/IscrizioneREA/NumeroREA|
+CapitaleSociale|BT-33|Seller additional legal information||0 ..1||FatturaElettronicaHeader/CedentePrestatore/IscrizioneREA/CapitaleSociale|
+SocioUnico|BT-33|Seller additional legal information||0 ..1||FatturaElettronicaHeader/CedentePrestatore/IscrizioneREA/SocioUnico |
+StatoLiquidazione|BT-33|Seller additional legal information|X|1 ..1||FatturaElettronicaHeader/CedentePrestatore/IscrizioneREA/StatoLiquidazione|
+Contatti|1.2.5|FatturaPA field Contatti||0 ..1||FatturaElettronicaHeader/CedentePrestatore/Contatti|
+Telefono|BT-42|Seller contact telephone number||0 ..1||FatturaElettronicaHeader/CedentePrestatore/Contatti/Telefono|
+Fax|1.2.5.2|FatturaPA field Fax||0 ..1||FatturaElettronicaHeader/CedentePrestatore/Contatti/Fax|
+Email|BT-43|Seller contact email address||0 ..1||FatturaElettronicaHeader/CedentePrestatore/Contatti/Email|
+RiferimentoAmministrazione|BT-19|Buyer accounting reference||0 ..1||FatturaElettronicaHeader/CedentePrestatore/RiferimentoAmministrazione|
+RappresentanteFiscale|1.3|FatturaPA field RappresentanteFiscale||0 ..1||FatturaElettronicaHeader/RappresentanteFiscale |
+DatiAnagrafici|1.3.1|FatturaPA field DatiAnagrafici|X|1 ..1||FatturaElettronicaHeader/RappresentanteFiscale/DatiAnagrafici|
+IdFiscaleIVA|1.3.1.1|FatturaPA field IdFiscaleIVA|X|1 ..1||FatturaElettronicaHeader/RappresentanteFiscale/DatiAnagrafici/IdFiscaleIVA|
+IdPaese|BT-63|Seller tax representative VAT identifier|X|1 ..1||FatturaElettronicaHeader/RappresentanteFiscale/DatiAnagrafici/IdFiscaleIVA/IdPaese|
+IdCodice|BT-63|Seller tax representative VAT identifier|X|1 ..1||FatturaElettronicaHeader/RappresentanteFiscale/DatiAnagrafici/IdFiscaleIVA/IdCodice|
+CodiceFiscale|1.3.1.2|FatturaPA field CodiceFiscale||0 ..1||FatturaElettronicaHeader/RappresentanteFiscale/DatiAnagrafici/CodiceFiscale|
+Anagrafica|1.3.1.3|FatturaPA field Anagrafica|X|1 ..1||FatturaElettronicaHeader/RappresentanteFiscale/DatiAnagrafici/Anagrafica|
+Denominazione|BT-62|Seller tax representative name||0 ..1||FatturaElettronicaHeader/RappresentanteFiscale/DatiAnagrafici/Anagrafica/Denominazione|
+Nome|BT-62|Seller tax representative name||0 ..1||FatturaElettronicaHeader/RappresentanteFiscale/DatiAnagrafici/Anagrafica/Nome|
+Cognome|BT-62|Seller tax representative name||0 ..1||FatturaElettronicaHeader/RappresentanteFiscale/DatiAnagrafici/Anagrafica/Cognome|
+Titolo|1.3.1.3.4|FatturaPA field Titolo||0 ..1||FatturaElettronicaHeader/RappresentanteFiscale/DatiAnagrafici/Anagrafica/Titolo|
+CodEORI|1.3.1.3.5|FatturaPA field CodEORI||0 ..1||FatturaElettronicaHeader/RappresentanteFiscale/DatiAnagrafici/Anagrafica/CodEORI|
+CessionarioCommittente|1.4|FatturaPA field CessionarioCommittente|X|1 ..1||FatturaElettronicaHeader/CessionarioCommittente|
+DatiAnagrafici|1.4.1|FatturaPA field DatiAnagrafici|X|1 ..1||FatturaElettronicaHeaderCessionarioCommittente/DatiAnagrafici|
+IdFiscaleIVA|1.4.1.1|FatturaPA field IdFiscaleIVA||0 ..1||FatturaElettronicaHeader/CessionarioCommittente/DatiAnagrafici/IdFiscaleIVA|
+IdPaese|BT-48|Buyer VAT identifier|X|1 ..1||FatturaElettronicaHeader/CessionarioCommittente/DatiAnagrafici/IdFiscaleIVA/IdPaese|
+IdCodice|BT-48|Buyer VAT identifier|X|1 ..1||FatturaElettronicaHeader/CessionarioCommittente/DatiAnagrafici/IdFiscaleIVA/IdCodice|
+CodiceFiscale|BT-47|Buyer legal registration identifier||0 ..1||FatturaElettronicaHeader/CessionarioCommittente/DatiAnagrafici/CodiceFiscale|
+Anagrafica|1.4.1.3|FatturaPA field Anagrafica|X|1 ..1||FatturaElettronicaHeader/CessionarioCommittente/DatiAnagrafici/Anagrafica|
+Denominazione|BT-44|Buyer name||0 ..1||FatturaElettronicaHeader/CessionarioCommittente/DatiAnagrafici/Anagrafica/Denominazione|
+Nome|BT-44|Buyer name||0 ..1||FatturaElettronicaHeader/CessionarioCommittente/DatiAnagrafici/Anagrafica/Nome|
+Cognome|BT-44|Buyer name||0 ..1||FatturaElettronicaHeader/CessionarioCommittente/DatiAnagrafici/Anagrafica/Cognome|
+Titolo|1.4.1.3.4|FatturaPA field Titolo||0 ..1||FatturaElettronicaHeader/CessionarioCommittente/DatiAnagrafici/Anagrafica/Titolo|
+CodEORI|BT-46|Buyer identifier||0 ..1||FatturaElettronicaHeader/CessionarioCommittente/DatiAnagrafici/Anagrafica/CodEORI|
+Sede|1.4.2|FatturaPA field Sede|X|1 ..1||FatturaElettronicaHeader/CessionarioCommittente/Sede|
+Indirizzo|BT-50|Buyer address line 1|X|1 ..1||FatturaElettronicaHeader/CessionarioCommittente/Sede/Indirizzo|
+NumeroCivico|BT-51|Buyer address line 2||0 ..1||FatturaElettronicaHeader/CessionarioCommittente/Sede/NumeroCivico|
+CAP|BT-53|Buyer post code|X|1 ..1||FatturaElettronicaHeader/CessionarioCommittente/Sede/CAP|
+Comune|BT-52|Buyer city|X|1 ..1||FatturaElettronicaHeader/CessionarioCommittente/Sede/Comune|
+Provincia|BT-54|Buyer country subdivision||0 ..1||FatturaElettronicaHeader/CessionarioCommittente/Sede/Provincia|
+Nazione|BT-55|Buyer country code|X|1 ..1||FatturaElettronicaHeader/CessionarioCommittente/Sede/Nazione|
+StabileOrganizzazione|1.4.3|FatturaPA field StabileOrganizzazione||0 ..1||FatturaElettronicaHeader/CessionarioCommittente/StabileOrganizzazione|
+Indirizzo|1.4.3.1|FatturaPA field Indirizzo|X|1 ..1||FatturaElettronicaHeader/CessionarioCommittente/StabileOrganizzazione/Indirizzo|
+NumeroCivico|1.4.3.2|FatturaPA field NumeroCivico||0 ..1||FatturaElettronicaHeader/CessionarioCommittente/StabileOrganizzazione/NumeroCivico|
+CAP|1.4.3.3|FatturaPA field CAP|X|1 ..1||FatturaElettronicaHeader/CessionarioCommittente/StabileOrganizzazione/CAP|
+Comune|1.4.3.4|FatturaPA field Comune|X|1 ..1||FatturaElettronicaHeader/CessionarioCommittente/StabileOrganizzazione/Comune|
+Provincia|1.4.3.5|FatturaPA field Provincia||0 ..1||FatturaElettronicaHeader/CessionarioCommittente/StabileOrganizzazione/Provincia|
+Nazione|1.4.3.6|FatturaPA field Nazione|X|1 ..1||FatturaElettronicaHeader/CessionarioCommittente/StabileOrganizzazione/Nazione|
+RappresentanteFiscale|1.4.4|FatturaPA field RappresentanteFiscale||0 ..1||FatturaElettronicaHeader/CessionarioCommittente/RappresentanteFiscale|
+IdFiscaleIVA|1.4.4.1|FatturaPA field IdFiscaleIVA|X|1 ..1||FatturaElettronicaHeader/CessionarioCommittente/RappresentanteFiscale/IdFiscale|
+IdPaese|1.4.4.1.1|FatturaPA field IdPaese|X|1 ..1||FatturaElettronicaHeader/CessionarioCommittente/RappresentanteFiscale/IdFiscale/IdPaese|
+IdCodice|1.4.4.1.2|FatturaPA field IdCodice|X|1 ..1||FatturaElettronicaHeader/CessionarioCommittente/RappresentanteFiscale/IdFiscale/IdCodice|
+Denominazione|1.4.4.2|FatturaPA field Denominazione||0 ..1||FatturaElettronicaHeader/CessionarioCommittente/RappresentanteFiscale/Denominazione|
+Nome|1.4.4.3|FatturaPA field Nome||0 ..1||FatturaElettronicaHeader/CessionarioCommittente/RappresentanteFiscale/Nome|
+Cognome|1.4.4.4|FatturaPA field Cognome||0 ..1||FatturaElettronicaHeader/CessionarioCommittente/RappresentanteFiscale/Cognome|
+TerzoIntermediarioOSoggettoEmittente|1.5|FatturaPA field TerzoIntermediarioOSoggettoEmittente||0 ..1||FatturaElettronicaHeader/TerzoIntermediarioOSoggettoEmittente|
+DatiAnagrafici|1.5.1|FatturaPA field DatiAnagrafici|X|1 ..1||FatturaElettronicaHeader/TerzoIntermediarioOSoggettoEmittente/DatiAnagrafici|
+IdFiscaleIVA|1.5.1.1|FatturaPA field IdFiscaleIVA||0 ..1||FatturaElettronicaHeader/TerzoIntermediarioOSoggettoEmittente/DatiAnagrafici/IdFiscaleIVA|
+IdPaese|1.5.1.1.1|FatturaPA field IdPaese|X|1 ..1||FatturaElettronicaHeader/TerzoIntermediarioOSoggettoEmittente/DatiAnagrafici/IdFiscaleIVA/IdPaese|
+IdCodice|1.5.1.1.2|FatturaPA field IdCodice|X|1 ..1||FatturaElettronicaHeader/TerzoIntermediarioOSoggettoEmittente/DatiAnagrafici/IdFiscaleIVA/IdCodice|
+CodiceFiscale|1.5.1.2|FatturaPA field CodiceFiscale||0 ..1||FatturaElettronicaHeader/TerzoIntermediarioOSoggettoEmittente/DatiAnagrafici/CodiceFiscale|
+Anagrafica|1.5.1.3|FatturaPA field Anagrafica|X|1 ..1||FatturaElettronicaHeader/TerzoIntermediarioOSoggettoEmittente/DatiAnagrafici/Anagrafica|
+Denominazione|1.5.1.3.1|FatturaPA field Denominazione||0 ..1||FatturaElettronicaHeader/TerzoIntermediarioOSoggettoEmittente/DatiAnagrafici/Anagrafica/Denominazione|
+Nome|1.5.1.3.2|FatturaPA field Nome||0 ..1||FatturaElettronicaHeader/TerzoIntermediarioOSoggettoEmittente/DatiAnagrafici/Anagrafica/Nome|
+Cognome|1.5.1.3.3|FatturaPA field Cognome||0 ..1||FatturaElettronicaHeader/TerzoIntermediarioOSoggettoEmittente/DatiAnagrafici/Anagrafica/Cognome|
+Titolo|1.5.1.3.4|FatturaPA field Titolo||0 ..1||FatturaElettronicaHeader/TerzoIntermediarioOSoggettoEmittente/DatiAnagrafici/Anagrafica/Titolo|
+CodEORI|1.5.1.3.5|FatturaPA field CodEORI||0 ..1||FatturaElettronicaHeader/TerzoIntermediarioOSoggettoEmittente/DatiAnagrafici/Anagrafica/CodEORI|
+SoggettoEmittente|1.6|FatturaPA field SoggettoEmittente||0 ..1||FatturaElettronicaHeader/SoggettoEmittente|
+FatturaElettronicaBody|2|FatturaPA field FatturaElettronicaBody||1 ..n||FatturaElettronicaBody|
+DatiGenerali|2.1|FatturaPA field DatiGenerali|X|1 ..1||FatturaElettronicaBody/DatiGenerali|
+DatiGeneraliDocumento|2.1.1|FatturaPA field DatiGeneraliDocumento|X|1 ..1||FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento|
+TipoDocumento|2.1.1.1|FatturaPA field TipoDocumento|X|1 ..1||FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/TipoDocumento|
+Divisa|BT-5|Invoice currency code|X|1 ..1||FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/Divisa|
+Data|BT-2|"Invoice issue date
+Actual Delivery Date"|X|1 ..1||FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/Data|
+Numero|BT-1|Invoice number|X|1 ..1||FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/Numero|
+DatiRitenuta|2.1.1.5|FatturaPA field DatiRitenuta||0 ..n||FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/DatiRitenuta|
+TipoRitenuta|2.1.1.5.1|FatturaPA field TipoRitenuta|X|1 ..1||FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/DatiRitenuta/TipoRitenuta|
+ImportoRitenuta|2.1.1.5.2|FatturaPA field ImportoRitenuta|X|1 ..1||FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/DatiRitenuta/ImportoRitenuta|
+AliquotaRitenuta|2.1.1.5.3|FatturaPA field AliquotaRitenuta|X|1 ..1||FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/DatiRitenuta/AliquotaRitenuta|
+CausalePagamento|2.1.1.5.4|FatturaPA field CausalePagamento|X|1 ..1||FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/DatiRitenuta/CausalePagamento|
+DatiBollo|2.1.1.6|FatturaPA field DatiBollo||0 ..1||FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/DatiBollo|
+BolloVirtuale|BT-105|"Document level charge reason code
+Document level allowance reason code"|X|1 ..1||FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/DatiBollo/BolloVirtuale|
+ImportoBollo|BT-99|"Document level charge amount
+Document level allowance amount"|X|1 ..1||FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/DatiBollo/ImportoBollo|
+DatiCassaPrevidenziale|2.1.1.7|FatturaPA field DatiCassaPrevidenziale||0 ..n||FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/DatiCassaPrevidenziale|
+TipoCassa|BT-104|Document level charge reason|X|1 ..1||FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/DatiCassaPrevidenziale/TipoCassa|
+AlCassa|BT-101|Document level charge percentage|X|1 ..1||FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/DatiCassaPrevidenziale/AlCassa|
+ImportoContributoCassa|BT-99|Document level charge amount|X|1 ..1||FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/DatiCassaPrevidenziale/ImportoContributoCassa|
+ImponibileCassa|BT-100|Document level charge base amount||0 ..1||FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/DatiCassaPrevidenziale/ImponibileCassa|
+AliquotaIVA|BT-103|Document level charge base amount|X|1 ..1||FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/DatiCassaPrevidenziale/AliquotaIVA|
+Ritenuta|BT-104|Document level charge reason||0 ..1||FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/DatiCassaPrevidenziale/Ritenuta+C135:E1C135:G135|
+Natura|BT-104|Document level charge reason||0 ..1||FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/DatiCassaPrevidenziale/Natura|
+RiferimentoAmministrazione|2.1.1.7.8|FatturaPA field RiferimentoAmministrazione||0 ..1||FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/DatiCassaPrevidenziale/RiferimentoAmministrazione|
+ScontoMaggiorazione|2.1.1.8|FatturaPA field ScontoMaggiorazione||0 ..n||FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/ScontoMaggiorazione|
+Tipo|2.1.1.8.1|FatturaPA field Tipo|X|1 ..1||FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/ScontoMaggiorazione/Tipo|
+Percentuale|2.1.1.8.2|FatturaPA field Percentuale||0 ..1||FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/ScontoMaggiorazione/Percentuale|
+Importo|2.1.1.8.3|FatturaPA field Importo||0 ..1||FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/ScontoMaggiorazione/Importo|
+ImportoTotaleDocumento|BT-112|Invoice total amount with VAT||0 ..1||FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/ImportoTotaleDocumento|
+Arrotondamento|BT-114|Rounding amount||0 ..1||FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/Arrotondamento|
+Causale|BT-22|Invoice note||0 ..n||FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/Causale|
+Art73|2.1.1.12|FatturaPA field Art73||0 ..1||FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/Art73|
+DatiOrdineAcquisto|2.1.2|FatturaPA field DatiOrdineAcquisto||0 ..n||"FatturaElettronicaBody/DatiGenerali/DatiOrdineAcquisto
+"|
+RiferimentoNumeroLinea|BT-126|Invoice line identifier||0 ..n||"FatturaElettronicaBody/DatiGenerali/DatiOrdineAcquisto/RiferimentoNumeroLinea
+"|
+IdDocumento|BT-13|Purchase Order Reference|X|1 ..1||"FatturaElettronicaBody/DatiGenerali/DatiOrdineAcquisto/IdDocumento
+"|
+Data|2.1.2.3|FatturaPA field Data||0 ..1||"FatturaElettronicaBody/DatiGenerali/DatiOrdineAcquisto/Data
+"|
+NumItem|BT-132|Referenced purchase order line reference||0 ..1||"FatturaElettronicaBody/DatiGenerali/DatiOrdineAcquisto/NumItem
+"|
+CodiceCommessaConvenzione|BT-10|"Buyer reference 
+Invoice line object identifier"||0 ..1||"FatturaElettronicaBody/DatiGenerali/DatiOrdineAcquisto/CodiceCommessaConvenzione
+"|
+CodiceCUP|2.1.2.6|FatturaPA field CodiceCUP||0 ..1||"FatturaElettronicaBody/DatiGenerali/DatiOrdineAcquisto/CodiceCUP
+"|
+CodiceCIG|2.1.2.7|FatturaPA field CodiceCIG||0 ..1||"FatturaElettronicaBody/DatiGenerali/DatiOrdineAcquisto/CodiceCIG
+"|
+DatiContratto|2.1.3|FatturaPA field DatiContratto||0 ..n||"FatturaElettronicaBody/DatiGenerali/DatiContratto
+"|
+RiferimentoNumeroLinea|BT-126|Invoice line identifier||0 ..n||FatturaElettronicaBody/DatiGenerali/DatiContratto/RiferimentoNumeroLinea|
+IdDocumento|BT-12|"Contract reference
+Invoice line object identifier"|X|1 ..1||FatturaElettronicaBody/DatiGenerali/DatiContratto/IdDocumento|
+Data|2.1.3.3|FatturaPA field Data||0 ..1||"FatturaElettronicaBody/DatiGenerali/DatiContratto/Data
+"|
+NumItem|2.1.3.4|FatturaPA field NumItem||0 ..1||"FatturaElettronicaBody/DatiGenerali/DatiContratto/NumItem
+"|
+CodiceCommessaConvenzione|BT-128|FatturaPA field CodiceCommessaConvenzione||0 ..1||"FatturaElettronicaBody/DatiGenerali/DatiContratto/CodiceCommessaConvenzione
+"|
+CodiceCUP|BT-11|"Project reference
+Invoice line object identifier"||0 ..1||"FatturaElettronicaBody/DatiGenerali/DatiContratto/CodiceCUP
+"|
+CodiceCIG|BT-17|"Tender or lot reference
+Invoice line object identifier"||0 ..1||"FatturaElettronicaBody/DatiGenerali/DatiContratto/CodiceCIG
+"|
+DatiConvenzione|2.1.4|FatturaPA field DatiConvenzione||0 ..n||"FatturaElettronicaBody/DatiGenerali/DatiConvenzione
+"|
+RiferimentoNumeroLinea|BT-126|Invoice line identifier||0 ..n||FatturaElettronicaBody/DatiGenerali/DatiConvenzione/RiferimentoNumeroLinea|
+IdDocumento|BT-12|"Contract reference
+Invoice line object identifier"|X|1 ..1||FatturaElettronicaBody/DatiGenerali/DatiConvenzione/IdDocumento|
+Data|2.1.4.3|FatturaPA field Data||0 ..1||"FatturaElettronicaBody/DatiGenerali/DatiConvenzione/Data
+"|
+NumItem|2.1.4.4|FatturaPA field NumItem||0 ..1||"FatturaElettronicaBody/DatiGenerali/DatiConvenzione/NumItem
+"|
+CodiceCommessaConvenzione|2.1.4.5|FatturaPA field CodiceCommessaConvenzione||0 ..1||"FatturaElettronicaBody/DatiGenerali/DatiConvenzione/CodiceCommessaConvenzione
+"|
+CodiceCUP|2.1.4.6|FatturaPA field CodiceCUP||0 ..1||"FatturaElettronicaBody/DatiGenerali/DatiConvenzione/CodiceCUP
+"|
+CodiceCIG|2.1.4.7|FatturaPA field CodiceCIG||0 ..1||"FatturaElettronicaBody/DatiGenerali/DatiConvenzione/CodiceCIG
+"|
+DatiRicezione|2.1.5|FatturaPA field DatiRicezione||0 ..n||FatturaElettronicaBody/DatiGenerali/DatiRicezione|
+RiferimentoNumeroLinea|2.1.5.1|FatturaPA field RiferimentoNumeroLinea||0 ..n||FatturaElettronicaBody/DatiGenerali/DatiRicezione/RiferimentoNumeroLinea|
+IdDocumento|BT-15|Receiving advice reference|X|1 ..1||FatturaElettronicaBody/DatiGenerali/DatiRicezione/IdDocumento|
+Data|2.1.5.3|FatturaPA field Data||0 ..1||FatturaElettronicaBody/DatiGenerali/DatiRicezione/Data|
+NumItem|2.1.5.4|FatturaPA field NumItem||0 ..1||FatturaElettronicaBody/DatiGenerali/DatiRicezione/NumItem|
+CodiceCommessaConvenzione|2.1.5.5|FatturaPA field CodiceCommessaConvenzione||0 ..1||FatturaElettronicaBody/DatiGenerali/DatiRicezione/CodiceCommessaConvenzione|
+CodiceCUP|2.1.5.6|FatturaPA field CodiceCUP||0 ..1||FatturaElettronicaBody/DatiGenerali/DatiRicezione/CodiceCUP|
+CodiceCIG|2.1.5.7|FatturaPA field CodiceCIG||0 ..1||FatturaElettronicaBody/DatiGenerali/DatiRicezione/CodiceCIG|
+DatiFattureCollegate|2.1.6|FatturaPA field DatiFattureCollegate||0 ..n||FatturaElettronicaBody/DatiGenerali/DatiFattureCollegate|
+RiferimentoNumeroLinea|2.1.6.1|FatturaPA field RiferimentoNumeroLinea||0 ..n||FatturaElettronicaBody/DatiGenerali/DatiFattureCollegate/RiferimentoNumeroLinea|
+IdDocumento|BT-25|Preceding Invoice number|X|1 ..1||FatturaElettronicaBody/DatiGenerali/DatiFattureCollegate/IdDocumento|
+Data|BT-26|Preceding Invoice issue date||0 ..1||FatturaElettronicaBody/DatiGenerali/DatiFattureCollegate/Data|
+NumItem|2.1.6.4|FatturaPA field NumItem||0 ..1||FatturaElettronicaBody/DatiGenerali/DatiFattureCollegate/NumItem|
+CodiceCommessaConvenzione|2.1.6.5|FatturaPA field CodiceCommessaConvenzione||0 ..1||FatturaElettronicaBody/DatiGenerali/DatiFattureCollegate/CodiceCommessaConvenzione|
+CodiceCUP|2.1.6.6|FatturaPA field CodiceCUP||0 ..1||FatturaElettronicaBody/DatiGenerali/DatiFattureCollegate/CodiceCUP|
+CodiceCIG|2.1.6.7|FatturaPA field CodiceCIG||0 ..1||FatturaElettronicaBody/DatiGenerali/DatiFattureCollegate/CodiceCIG|
+DatiSAL|2.1.7|FatturaPA field DatiSAL||0 ..n||FatturaElettronicaBody/DatiGenerali/DatiSAL|
+RiferimentoFase|BT-18|Invoiced object identifier|X|1 ..1||FatturaElettronicaBody/DatiGenerali/DatiSAL/RiferimentoFase|
+DatiDDT|2.1.8|FatturaPA field DatiDDT||0 ..n||FatturaElettronicaBody/DatiGenerali/DatiDDT|
+NumeroDDT|BT-16|Despatch Advice reference|X|1 ..1||FatturaElettronicaBody/DatiGenerali/DatiDDT/NumeroDDT|
+DataDDT|2.1.8.2|FatturaPA field DataDDT|X|1 ..1||FatturaElettronicaBody/DatiGenerali/DatiDDT/DataDDT|
+RiferimentoNumeroLinea|BT-126|Invoice line identifier||0 ..n||FatturaElettronicaBody/DatiGenerali/DatiDDT/RiferimentoNumeroLinea|
+DatiTrasporto|2.1.9|FatturaPA field DatiTrasporto||0 ..1||FatturaElettronicaBody/DatiGenerali/DatiTrasporto|
+DatiAnagraficiVettore|2.1.9.1|FatturaPA field DatiAnagraficiVettore||0 ..1||FatturaElettronicaBody/DatiGenerali/DatiTrasporto/DatiAnagraficiVettore|
+IdFiscaleIVA|2.1.9.1.1|FatturaPA field IdFiscaleIVA|X|1 ..1||FatturaElettronicaBody/DatiGenerali/DatiTrasporto/DatiAnagraficiVettore/IdFiscaleIVA|
+IdPaese|2.1.9.1.1.1|FatturaPA field IdPaese|X|1 ..1||FatturaElettronicaBody/DatiGenerali/DatiTrasporto/DatiAnagraficiVettore/IdFiscaleIVA/IdPaese|
+IdCodice|2.1.9.1.1.2|FatturaPA field IdCodice|X|1 ..1||FatturaElettronicaBody/DatiGenerali/DatiTrasporto/DatiAnagraficiVettore/IdFiscaleIVA/IdCodice|
+CodiceFiscale|2.1.9.1.2|FatturaPA field CodiceFiscale||0 ..1||FatturaElettronicaBody/DatiGenerali/DatiTrasporto/DatiAnagraficiVettore/CodiceFiscale|
+Anagrafica|2.1.9.1.3|FatturaPA field Anagrafica|X|1 ..1||FatturaElettronicaBody/DatiGenerali/DatiTrasporto/DatiAnagraficiVettore/Anagrafica|
+Denominazione|2.1.9.1.3.1|FatturaPA field Denominazione||0 ..1||FatturaElettronicaBody/DatiGenerali/DatiTrasporto/DatiAnagraficiVettore/Anagrafica/Denominazione|
+Nome|2.1.9.1.3.2|FatturaPA field Nome||0 ..1||FatturaElettronicaBody/DatiGenerali/DatiTrasporto/DatiAnagraficiVettore/Anagrafica/Nome|
+Cognome|2.1.9.1.3.3|FatturaPA field Cognome||0 ..1||FatturaElettronicaBody/DatiGenerali/DatiTrasporto/DatiAnagraficiVettore/Anagrafica/Cognome|
+Titolo|2.1.9.1.3.4|FatturaPA field Titolo||0 ..1||FatturaElettronicaBody/DatiGenerali/DatiTrasporto/DatiAnagraficiVettore/Anagrafica/Titolo|
+CodEORI|2.1.9.1.3.5|FatturaPA field CodEORI||0 ..1||FatturaElettronicaBody/DatiGenerali/DatiTrasporto/DatiAnagraficiVettore/Anagrafica/CodEORI|
+NumeroLicenzaGuida|2.1.9.1.4|FatturaPA field NumeroLicenzaGuida||0 ..1||FatturaElettronicaBody/DatiGenerali/DatiTrasportoDatiAnagraficiVettore/NumeroLicenzaGuida|
+MezzoTrasporto|2.1.9.2|FatturaPA field MezzoTrasporto||0 ..1||FatturaElettronicaBody/DatiGenerali/DatiTrasporto/MezzoTrasporto|
+CausaleTrasporto|2.1.9.3|FatturaPA field CausaleTrasporto||0 ..1||FatturaElettronicaBody/DatiGenerali/DatiTrasporto/CausaleTrasporto|
+NumeroColli|2.1.9.4|FatturaPA field NumeroColli||0 ..1||FatturaElettronicaBody/DatiGenerali/DatiTrasporto/NumeroColli|
+Descrizione|2.1.9.5|FatturaPA field Descrizione||0 ..1||FatturaElettronicaBody/DatiGenerali/DatiTrasporto/Descrizione|
+UnitaMisuraPeso|2.1.9.6|FatturaPA field UnitaMisuraPeso||0 ..1||FatturaElettronicaBody/DatiGenerali/DatiTrasporto/UnitaMisuraPeso|
+PesoLordo|2.1.9.7|FatturaPA field PesoLordo||0 ..1||FatturaElettronicaBody/DatiGenerali/DatiTrasporto/PesoLordo|
+PesoNetto|2.1.9.8|FatturaPA field PesoNetto||0 ..1||FatturaElettronicaBody/DatiGenerali/DatiTrasporto/PesoNetto|
+DataOraRitiro|2.1.9.9|FatturaPA field DataOraRitiro||0 ..1||FatturaElettronicaBody/DatiGenerali/DatiTrasporto/DataOraRitiro|
+DataInizioTrasporto|2.1.9.10|FatturaPA field DataInizioTrasporto||0 ..1||FatturaElettronicaBody/DatiGenerali/DatiTrasporto/DataInizioTrasporto|
+TipoResa|2.1.9.11|FatturaPA field TipoResa||0 ..1||FatturaElettronicaBody/DatiGenerali/DatiTrasporto/TipoResa|
+IndirizzoResa|2.1.9.12|FatturaPA field IndirizzoResa||0 ..1||FatturaElettronicaBody/DatiGenerali/DatiTrasporto/IndirizzoResa|
+Indirizzo|BT-75|Deliver to address line 1|X|1 ..1||FatturaElettronicaBody/DatiGenerali/DatiTrasporto/IndirizzoResa/Indirizzo|
+NumeroCivico|BT-76|Deliver to address line 2||0 ..1||FatturaElettronicaBody/DatiGenerali/DatiTrasporto/IndirizzoResa/NumeroCivico|
+CAP|BT-78|Deliver to post code|X|1 ..1||FatturaElettronicaBody/DatiGenerali/DatiTrasporto/IndirizzoResa/CAP|
+Comune|BT-77|Deliver to city|X|1 ..1||FatturaElettronicaBody/DatiGenerali/DatiTrasporto/IndirizzoResa/Comune|
+Provincia|BT-79|Deliver to country subdivision||0 ..1||FatturaElettronicaBody/DatiGenerali/DatiTrasporto/IndirizzoResa/Provincia|
+Nazione|BT-80|Deliver to country code|X|1 ..1||FatturaElettronicaBody/DatiGenerali/DatiTrasporto/IndirizzoResa/Nazione|
+DataOraConsegna|BT-72|Actual delivery date||0 ..1||FatturaElettronicaBody/DatiGenerali/DatiTrasporto/DataOraConsegna|
+FatturaPrincipale|2.1.10|FatturaPA field FatturaPrincipale||0 ..1||FatturaElettronicaBody/DatiGenerali/FatturaPrincipale|
+NumeroFatturaPrincipale|2.1.10.1|FatturaPA field NumeroFatturaPrincipale|X|1 ..1||FatturaElettronicaBody/DatiGenerali/FatturaPrincipale/NumeroFatturaPrincipale|
+DataFatturaPrincipale|2.1.10.2|FatturaPA field DataFatturaPrincipale|X|1 ..1||FatturaElettronicaBody/DatiGenerali/FatturaPrincipale/DataFatturaPrincipale|
+DatiBeniServizi|2.2|FatturaPA field DatiBeniServizi|X|1 ..1||FatturaElettronicaBody//DatiBeniServizi |
+DettaglioLinee|2.2.1|FatturaPA field DettaglioLinee||1 ..n||FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee|
+NumeroLinea|BT-126|Invoice line identifier|X|1 ..1||FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee/NumeroLinea|
+TipoCessionePrestazione|BT-160|"Item attribute name
+Item attribute value"||0 ..1||FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee/TipoCessionePrestazione|
+CodiceArticolo|2.2.1.3|FatturaPA field CodiceArticolo||0 ..n||FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee/CodiceArticolo|
+CodiceTipo|BT-155|"IItem Seller's identifier
+Item standard identifier Scheme identifier
+Item classification identifier Scheme identifier"|X|1 ..1||FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee/CodiceArticolo/CodiceTipo|
+CodiceValore|BT-155|"Item Seller's identifier
+Item standard identifier
+Item classification identifier"|X|1 ..1||FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee/CodiceArticolo/CodiceValore|
+Descrizione|BT-153|"Item name
+Item description"|X|1 ..1||FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee/Descrizione|
+Quantita|BT-129|Invoiced quantity||0 ..1||FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee/Quantita|
+UnitaMisura|BT-130|Invoiced quantity unit of measure||0 ..1||FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee/UnitaMisura|
+DataInizioPeriodo|BT-134|Invoice line period start date||0 ..1||FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee/DataInizioPeriodo|
+DataFinePeriodo|BT-135|Invoice line period end date||0 ..1||FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee/DataFinePeriodo|
+PrezzoUnitario|BT-148|Item gross price|X|1 ..1||FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee/PrezzoUnitario|
+ScontoMaggiorazione|2.2.1.10|FatturaPA field ScontoMaggiorazione||0 ..n||FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee/ScontoMaggiorazione|
+Tipo|2.2.1.10.1|FatturaPA field Tipo|X|1 ..1||FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee/ScontoMaggiorazione/Tipo|
+Percentuale|2.2.1.10.2|FatturaPA field Percentuale||0 ..1||FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee/ScontoMaggiorazione/Percentuale|
+Importo|BT-147|Item price disconut||0 ..1||FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee/ScontoMaggiorazione/Importo|
+PrezzoTotale|BT-131|Invoice line net amount|X|1 ..1||FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee/PrezzoTotale|
+AliquotaIVA|BT-152|Invoiced item VAT rate|X|1 ..1||FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee/AliquotaIVA|
+Ritenuta|BT-161|Item attribute value||0 ..1||FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee/Ritenuta|
+Natura|BT-160|"Item attribute name
+Item attribute value"||0 ..1||FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee/Natura|
+RiferimentoAmministrazione|BT-133|Invoice line Buyer accounting reference||0 ..1||FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee/RiferimentoAmministrazione|
+AltriDatiGestionali|2.2.1.16|FatturaPA field AltriDatiGestionali||0 ..n||FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee/AltriDatiGestionali|
+TipoDato|BT-160|Item attribute name|X|1 ..1||FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee/AltriDatiGestionali/TipoDato|
+RiferimentoTesto|BT-161|Item attribute value||0 ..1||FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee/AltriDatiGestionali/RiferimentoTesto|
+RiferimentoNumero|BT-161|Item attribute value||0 ..1||FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee/AltriDatiGestionali/RiferimentoNumero|
+RiferimentoData|BT-161|Item attribute value||0 ..1||FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee/AltriDatiGestionali/RiferimentoData|
+DatiRiepilogo|2.2.2|FatturaPA field DatiRiepilogo||1 ..n||FatturaElettronicaBody/DatiBeniServizi/DatiRiepilogo|
+AliquotaIVA|BT-119|VAT category rate|X|1 ..1||FatturaElettronicaBody/DatiBeniServizi/DatiRiepilogo/AliquotaIVA|
+Natura|BT-120|VAT exemption reason text||0 ..1||FatturaElettronicaBody/DatiBeniServizi/DatiRiepilogo/Natura|
+SpeseAccessorie|BT-160|"Item attribute name
+Item attribute value"||0 ..1||FatturaElettronicaBody/DatiBeniServizi/DatiRiepilogo/SpeseAccessorie|
+Arrotondamento|2.2.2.4|FatturaPA field Arrotondamento||0 ..1||FatturaElettronicaBody/DatiBeniServizi/DatiRiepilogo/Arrotondamento|
+ImponibileImporto|BT-116|VAT category taxable amount|X|1 ..1||FatturaElettronicaBody/DatiBeniServizi/DatiRiepilogo/ImponibileImporto|
+Imposta|BT-117|VAT category tax amount|X|1 ..1||FatturaElettronicaBody/DatiBeniServizi/DatiRiepilogo/Imposta|
+EsigibilitaIVA|BT-8|"Value added tax point date code
+VAT category code"||0 ..1||FatturaElettronicaBody/DatiBeniServizi/DatiRiepilogo/EsigibilitaIVA|
+RiferimentoNormativo|BT-120|VAT exemption reason text||0 ..1||FatturaElettronicaBody/DatiBeniServizi/DatiRiepilogo/RiferimentoNormativo|
+DatiVeicoli|2.3|FatturaPA field DatiVeicoli||0 ..1||FatturaElettronicaBody/DatiVeicoli|
+Data|BT-161|Item attribute value|X|1 ..1||FatturaElettronicaBody/DatiVeicoli/Data|
+TotalePercorso|BT-161|Item attribute value|X|1 ..1||FatturaElettronicaBody/DatiVeicoli/TotalePercorso|
+DatiPagamento|2.4|FatturaPA field DatiPagamento||0 ..n||FatturaElettronicaBody/DatiPagamento|
+CondizioniPagamento|BT-20|Payment terms|X|1 ..1||FatturaElettronicaBody/DatiPagamento/CondizioniPagamento|
+DettaglioPagamento|2.4.2|FatturaPA field DettaglioPagamento||1 ..n||FatturaElettronicaBody/DatiPagamento/DettaglioPagamento|
+Beneficiario|BT-59|Payee name||0 ..1||FatturaElettronicaBody/DatiPagamento/DettaglioPagamento/Beneficiario|
+ModalitaPagamento|BT-81|Payment means type code|X|1 ..1||FatturaElettronicaBody/DatiPagamento/DettaglioPagamento/ModalitaPagamento|
+DataRiferimentoTerminiPagamento|2.4.2.3|FatturaPA field DataRiferimentoTerminiPagamento||0 ..1||FatturaElettronicaBody/DatiPagamento/DettaglioPagamento/DataRiferimentoTerminiPagamento|
+GiorniTerminiPagamento|BT-20|Payment terms||0 ..1||FatturaElettronicaBody/DatiPagamento/DettaglioPagamento/GiorniTerminiPagamento|
+DataScadenzaPagamento|BT-9|Payment due date||0 ..1||FatturaElettronicaBody/DatiPagamento/DettaglioPagamento/DataScadenzaPagamento|
+ImportoPagamento|BT-115|Amount due for payment|X|1 ..1||FatturaElettronicaBody/DatiPagamento/DettaglioPagamento/ImportoPagamento|
+CodUfficioPostale|2.4.2.7|FatturaPA field CodUfficioPostale||0 ..1||FatturaElettronicaBody/DatiPagamento/DettaglioPagamento/CodUfficioPostale|
+CognomeQuietanzante|BT-60|Payee identifier||0 ..1||FatturaElettronicaBody/DatiPagamento/DettaglioPagamento/CognomeQuietanzante|
+NomeQuietanzante|BT-60|Payee identifier||0 ..1||FatturaElettronicaBody/DatiPagamento/DettaglioPagamento/NomeQuietanzante|
+CFQuietanzante|BT-61|Payee legal registration identifier||0 ..1||FatturaElettronicaBody/DatiPagamento/DettaglioPagamento/CGQuietanzante|
+TitoloQuietanzante|2.4.2.11|FatturaPA field TitoloQuietanzante||0 ..1||FatturaElettronicaBody/DatiPagamento/DettaglioPagamento/TitoloQuietanzante|
+IstitutoFinanziario|2.4.2.12|FatturaPA field IstitutoFinanziario||0 ..1||FatturaElettronicaBody/DatiPagamento/DettaglioPagamento/IstitutoFinanziario|
+IBAN|BT-84|Payment account identifier||0 ..1||FatturaElettronicaBody/DatiPagamento/DettaglioPagamento/IBAN|
+ABI|2.4.2.14|FatturaPA field ABI||0 ..1||FatturaElettronicaBody/DatiPagamento/DettaglioPagamento/ABI|
+CAB|2.4.2.15|FatturaPA field CAB||0 ..1||FatturaElettronicaBody/DatiPagamento/DettaglioPagamento/CAB|
+BIC|BT-86|Payment service provider identifier||0 ..1||FatturaElettronicaBody/DatiPagamento/DettaglioPagamento/BIC|
+ScontoPagamentoAnticipato|2.4.2.17|FatturaPA field ScontoPagamentoAnticipato||0 ..1||FatturaElettronicaBody/DatiPagamento/DettaglioPagamento/ScontoPagamentoAnticipato|
+DataLimitePagamentoAnticipato|2.4.2.18|FatturaPA field DataLimitePagamentoAnticipato||0 ..1||FatturaElettronicaBody/DatiPagamento/DettaglioPagamento/DataLimitePagamentoAnticipato|
+PenalitaPagamentiRitardati|2.4.2.19|FatturaPA field PenalitaPagamentiRitardati||0 ..1||FatturaElettronicaBody/DatiPagamento/DettaglioPagamento/PenalitaPagamentiRitardati|
+DataDecorrenzaPenale|2.4.2.20|FatturaPA field DataDecorrenzaPenale||0 ..1||FatturaElettronicaBody/DatiPagamento/DettaglioPagamento/DataDecorrenzaPenale|
+CodicePagamento|BT-83|Remittance information||0 ..1||FatturaElettronicaBody/DatiPagamento/DettaglioPagamento/CodicePagamento|
+Allegati|2.5|FatturaPA field Allegati||0 ..n||FatturaElettronicaBody/Allegati|
+NomeAttachment|BT-122|Supporting document reference|X|1 ..1||FatturaElettronicaBody/Allegati/NomeAttachment|
+AlgoritmoCompressione|2.5.2|FatturaPA field AlgoritmoCompressione||0 ..1||FatturaElettronicaBody/Allegati/AlgoritmoCompressione|
+FormatoAttachment|BT-125|Attached document Mime code||0 ..1||FatturaElettronicaBody/Allegati/FormatoAttachment|
+DescrizioneAttachment|BT-123|Supporting document description||0 ..1||FatturaElettronicaBody/Allegati/DescrizioneAttachment|
+Attachment|BT-125|Attached document|X|1 ..1||FatturaElettronicaBody/Allegati/Attachment|

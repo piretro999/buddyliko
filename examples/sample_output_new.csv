@@ -1,0 +1,9 @@
+campo,business_term,spiegazione,obbligatorio,numerosità,condizionalità,calcolo,offset,lunghezza,xmlpath
+Invoice.ID,Invoice Number,Numero fattura output,SI,1..1,,,,,/Invoice/ID
+Invoice.IssueDate,Issue Date,Data emissione,SI,1..1,,,,,/Invoice/IssueDate
+Invoice.DocumentCurrencyCode,Currency Code,Codice valuta,SI,1..1,,,,,/Invoice/DocumentCurrencyCode
+InvoiceLine.ID,Line ID,Identificativo riga,SI,1..N,,,,,/Invoice/InvoiceLine/ID
+InvoiceLine.InvoicedQuantity,Invoiced Quantity,Quantità fatturata,SI,1..N,,,,,/Invoice/InvoiceLine/InvoicedQuantity
+InvoiceLine.LineExtensionAmount,Line Total,Totale riga (senza IVA),SI,1..N,,InvoicedQuantity * Price,,,/Invoice/InvoiceLine/LineExtensionAmount
+InvoiceLine.Price.PriceAmount,Price,Prezzo unitario,SI,1..N,,,,,/Invoice/InvoiceLine/Price/PriceAmount
+InvoiceLine.TaxTotal.TaxAmount,Tax Amount,Importo IVA riga,SI,1..N,,LineExtensionAmount * (TaxPercent / 100),,,/Invoice/InvoiceLine/TaxTotal/TaxAmount

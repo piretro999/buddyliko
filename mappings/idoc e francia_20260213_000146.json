@@ -1,0 +1,31 @@
+{
+  "name": "idoc e francia",
+  "input_schema": "idoc_complete_input_updated_v3",
+  "output_schema": "output_UBLFR",
+  "rules": [
+    {
+      "id": "conn_1770937192805",
+      "source": "E1EDK01.BSART",
+      "target": "Code de type de facture",
+      "transformation": {
+        "type": "direct"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_1770937234681",
+      "source": "E1EDK01.KUNDEUINR",
+      "target": "Numéro de SIREN",
+      "transformation": {
+        "type": "direct"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    }
+  ],
+  "lookup_tables": {},
+  "metadata": {}
+}

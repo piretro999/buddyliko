@@ -1,0 +1,20 @@
+{
+  "name": "esempio1",
+  "input_schema": "sample_input",
+  "output_schema": "sample_output",
+  "rules": [
+    {
+      "id": "conn_1770826873791",
+      "source": "E1EDK01.BELNR",
+      "target": "Invoice.ID",
+      "transformation": {
+        "type": "direct"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    }
+  ],
+  "lookup_tables": {},
+  "metadata": {}
+}

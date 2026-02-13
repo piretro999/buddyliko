@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Invoice xmlns="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2" 
+         xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2"
+         xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2">
+  
+  <cbc:ID>INV-2024-001</cbc:ID>
+  <cbc:IssueDate>2024-01-15</cbc:IssueDate>
+  <cbc:DueDate>2024-02-15</cbc:DueDate>
+  <cbc:InvoicedQuantity>10</cbc:InvoicedQuantity>
+  <cbc:DocumentCurrencyCode>EUR</cbc:DocumentCurrencyCode>
+  
+  <cac:AccountingSupplierParty>
+    <cac:Party>
+      <cac:PartyName>
+        <cbc:Name>Acme Corporation SRL</cbc:Name>
+      </cac:PartyName>
+    </cac:Party>
+  </cac:AccountingSupplierParty>
+  
+  <cac:AccountingCustomerParty>
+    <cac:Party>
+      <cac:PartyName>
+        <cbc:Name>Client SA</cbc:Name>
+      </cac:PartyName>
+    </cac:Party>
+  </cac:AccountingCustomerParty>
+  
+  <cac:InvoiceLine>
+    <cbc:ID>1</cbc:ID>
+    <cbc:InvoicedQuantity unitCode="PCE">5</cbc:InvoicedQuantity>
+    <cbc:LineExtensionAmount currencyID="EUR">500.00</cbc:LineExtensionAmount>
+    <cac:Item>
+      <cbc:Description>Professional Services - Consulting</cbc:Description>
+    </cac:Item>
+    <cac:Price>
+      <cbc:PriceAmount currencyID="EUR">100.00</cbc:PriceAmount>
+    </cac:Price>
+  </cac:InvoiceLine>
+  
+  <cac:InvoiceLine>
+    <cbc:ID>2</cbc:ID>
+    <cbc:InvoicedQuantity unitCode="PCE">3</cbc:InvoicedQuantity>
+    <cbc:LineExtensionAmount currencyID="EUR">150.00</cbc:LineExtensionAmount>
+    <cac:Item>
+      <cbc:Description>Software License</cbc:Description>
+    </cac:Item>
+    <cac:Price>
+      <cbc:PriceAmount currencyID="EUR">50.00</cbc:PriceAmount>
+    </cac:Price>
+  </cac:InvoiceLine>
+  
+  <cac:TaxTotal>
+    <cbc:TaxAmount currencyID="EUR">143.00</cbc:TaxAmount>
+  </cac:TaxTotal>
+  
+  <cac:LegalMonetaryTotal>
+    <cbc:TaxExclusiveAmount currencyID="EUR">650.00</cbc:TaxExclusiveAmount>
+    <cbc:TaxInclusiveAmount currencyID="EUR">793.00</cbc:TaxInclusiveAmount>
+    <cbc:PayableAmount currencyID="EUR">793.00</cbc:PayableAmount>
+  </cac:LegalMonetaryTotal>
+  
+</Invoice>

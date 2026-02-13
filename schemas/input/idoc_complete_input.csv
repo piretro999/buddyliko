@@ -1,0 +1,242 @@
+campo,business_term,spiegazione,obbligatorio,numerosità,condizionalità,calcolo,offset,lunghezza,xmlpath
+E1EDK01.CURCY,Currency,Currency,SI,1..1,,,0,3,/IDOC/E1EDK01/CURCY
+E1EDK01.HWAER,EDI local currency,EDI local currency,NO,0..1,,,3,3,/IDOC/E1EDK01/HWAER
+E1EDK01.WKURS,Exchange rate,Exchange rate,NO,0..1,,,6,12,/IDOC/E1EDK01/WKURS
+E1EDK01.ZTERM,Terms of payment key,Terms of payment key,NO,0..1,,,18,4,/IDOC/E1EDK01/ZTERM
+E1EDK01.KUNDEUINR,VAT Registration Number,VAT Registration Number,NO,0..1,,,22,20,/IDOC/E1EDK01/KUNDEUINR
+E1EDK01.EIGENUINR,VAT Registration Number,VAT Registration Number,NO,0..1,,,42,20,/IDOC/E1EDK01/EIGENUINR
+E1EDK01.BSART,Document Type,Document Type,NO,0..1,,,62,4,/IDOC/E1EDK01/BSART
+E1EDK01.BELNR,IDOC document number,IDOC document number,SI,1..1,,,66,35,/IDOC/E1EDK01/BELNR
+E1EDK01.NTGEW,Net weight,Net weight,NO,0..1,,,101,15,/IDOC/E1EDK01/NTGEW
+E1EDK01.BRGEW,Net weight,Net weight,NO,0..1,,,116,15,/IDOC/E1EDK01/BRGEW
+E1EDK01.GEWEI,Weight unit,Weight unit,NO,0..1,,,131,3,/IDOC/E1EDK01/GEWEI
+E1EDK01.RECIPNT_NO,Number of recipient,Number of recipient (for contr,NO,0..1,,,134,20,/IDOC/E1EDK01/RECIPNT_NO
+E1EDK01.FKTYP,Billing Category,Billing Category,NO,0..1,,,154,64,/IDOC/E1EDK01/FKTYP
+E1EDKA1.PARVW,Partner function,Partner function (e.g. sold-to,NO,0..1,,,218,2,/IDOC/E1EDKA1/PARVW
+E1EDKA1.LIFNR,Supplier Number at Customer Lo,Supplier Number at Customer Lo,NO,0..1,,,220,10,/IDOC/E1EDKA1/LIFNR
+E1EDKA1.NAME1,Name 1,Name 1,NO,0..1,,,230,35,/IDOC/E1EDKA1/NAME1
+E1EDKA1.STRAS,Street and house number 1,Street and house number 1,NO,0..1,,,265,35,/IDOC/E1EDKA1/STRAS
+E1EDKA1.ORT01,City,City,NO,0..1,,,300,35,/IDOC/E1EDKA1/ORT01
+E1EDKA1.PSTLZ,Postal code,Postal code,NO,0..1,,,335,10,/IDOC/E1EDKA1/PSTLZ
+E1EDKA1.LAND1,Country Key,Country Key,NO,0..1,,,345,2,/IDOC/E1EDKA1/LAND1
+E1EDKA1.TELF1,1st telephone number of contac,1st telephone number of contac,NO,0..1,,,347,16,/IDOC/E1EDKA1/TELF1
+E1EDKA1.TELFX,Fax number,Fax number,NO,0..1,,,363,16,/IDOC/E1EDKA1/TELFX
+E1EDKA1.SPRAS,Language key,Language key,NO,0..1,,,379,20,/IDOC/E1EDKA1/SPRAS
+E1EDKA1.BNAME,IDoc user name,IDoc user name,NO,0..1,,,399,35,/IDOC/E1EDKA1/BNAME
+E1EDKA1.PAORG,IDOC organization code,IDOC organization code,NO,0..1,,,434,20,/IDOC/E1EDKA1/PAORG
+E1EDKA1.PARVW,Partner function,Partner function (e.g. sold-to,NO,0..1,,,454,2,/IDOC/E1EDKA1/PARVW
+E1EDKA1.PARTN,Partner number,Partner number,NO,0..1,,,456,20,/IDOC/E1EDKA1/PARTN
+E1EDKA1.LIFNR,Supplier Number at Customer Lo,Supplier Number at Customer Lo,NO,0..1,,,476,10,/IDOC/E1EDKA1/LIFNR
+E1EDKA1.NAME1,Name 1,Name 1,NO,0..1,,,486,35,/IDOC/E1EDKA1/NAME1
+E1EDKA1.STRAS,Street and house number 1,Street and house number 1,NO,0..1,,,521,35,/IDOC/E1EDKA1/STRAS
+E1EDKA1.ORT01,City,City,NO,0..1,,,556,35,/IDOC/E1EDKA1/ORT01
+E1EDKA1.PSTLZ,Postal code,Postal code,NO,0..1,,,591,10,/IDOC/E1EDKA1/PSTLZ
+E1EDKA1.LAND1,Country Key,Country Key,NO,0..1,,,601,2,/IDOC/E1EDKA1/LAND1
+E1EDKA1.SPRAS,Language key,Language key,NO,0..1,,,603,20,/IDOC/E1EDKA1/SPRAS
+E1EDKA1.ORT02,District,District,NO,0..1,,,623,20,/IDOC/E1EDKA1/ORT02
+E1EDKA1.REGIO,Region,Region,NO,0..1,,,643,3,/IDOC/E1EDKA1/REGIO
+E1EDKA1.SPRAS_ISO,2-Character SAP Language Code,2-Character SAP Language Code,NO,0..1,,,646,20,/IDOC/E1EDKA1/SPRAS_ISO
+E1EDKA1.PARVW,Partner function,Partner function (e.g. sold-to,NO,0..1,,,666,2,/IDOC/E1EDKA1/PARVW
+E1EDKA1.PARTN,Partner number,Partner number,NO,0..1,,,668,20,/IDOC/E1EDKA1/PARTN
+E1EDKA1.NAME1,Name 1,Name 1,NO,0..1,,,688,35,/IDOC/E1EDKA1/NAME1
+E1EDKA1.STRAS,Street and house number 1,Street and house number 1,NO,0..1,,,723,35,/IDOC/E1EDKA1/STRAS
+E1EDKA1.ORT01,City,City,NO,0..1,,,758,35,/IDOC/E1EDKA1/ORT01
+E1EDKA1.PSTLZ,Postal code,Postal code,NO,0..1,,,793,10,/IDOC/E1EDKA1/PSTLZ
+E1EDKA1.LAND1,Country Key,Country Key,NO,0..1,,,803,2,/IDOC/E1EDKA1/LAND1
+E1EDKA1.SPRAS,Language key,Language key,NO,0..1,,,805,20,/IDOC/E1EDKA1/SPRAS
+E1EDKA1.ORT02,District,District,NO,0..1,,,825,20,/IDOC/E1EDKA1/ORT02
+E1EDKA1.REGIO,Region,Region,NO,0..1,,,845,3,/IDOC/E1EDKA1/REGIO
+E1EDKA1.SPRAS_ISO,2-Character SAP Language Code,2-Character SAP Language Code,NO,0..1,,,848,20,/IDOC/E1EDKA1/SPRAS_ISO
+E1EDKA1.PARVW,Partner function,Partner function (e.g. sold-to,NO,0..1,,,868,2,/IDOC/E1EDKA1/PARVW
+E1EDKA1.PARTN,Partner number,Partner number,NO,0..1,,,870,20,/IDOC/E1EDKA1/PARTN
+E1EDKA1.NAME1,Name 1,Name 1,NO,0..1,,,890,35,/IDOC/E1EDKA1/NAME1
+E1EDKA1.STRAS,Street and house number 1,Street and house number 1,NO,0..1,,,925,35,/IDOC/E1EDKA1/STRAS
+E1EDKA1.ORT01,City,City,NO,0..1,,,960,35,/IDOC/E1EDKA1/ORT01
+E1EDKA1.PSTLZ,Postal code,Postal code,NO,0..1,,,995,10,/IDOC/E1EDKA1/PSTLZ
+E1EDKA1.LAND1,Country Key,Country Key,NO,0..1,,,1005,2,/IDOC/E1EDKA1/LAND1
+E1EDKA1.SPRAS,Language key,Language key,NO,0..1,,,1007,20,/IDOC/E1EDKA1/SPRAS
+E1EDKA1.ORT02,District,District,NO,0..1,,,1027,20,/IDOC/E1EDKA1/ORT02
+E1EDKA1.REGIO,Region,Region,NO,0..1,,,1047,3,/IDOC/E1EDKA1/REGIO
+E1EDKA1.SPRAS_ISO,2-Character SAP Language Code,2-Character SAP Language Code,NO,0..1,,,1050,20,/IDOC/E1EDKA1/SPRAS_ISO
+E1EDKA1.PARVW,Partner function,Partner function (e.g. sold-to,NO,0..1,,,1070,2,/IDOC/E1EDKA1/PARVW
+E1EDKA1.PARTN,Partner number,Partner number,NO,0..1,,,1072,20,/IDOC/E1EDKA1/PARTN
+E1EDKA1.LIFNR,Supplier Number at Customer Lo,Supplier Number at Customer Lo,NO,0..1,,,1092,10,/IDOC/E1EDKA1/LIFNR
+E1EDKA1.NAME1,Name 1,Name 1,NO,0..1,,,1102,35,/IDOC/E1EDKA1/NAME1
+E1EDKA1.STRAS,Street and house number 1,Street and house number 1,NO,0..1,,,1137,35,/IDOC/E1EDKA1/STRAS
+E1EDKA1.ORT01,City,City,NO,0..1,,,1172,35,/IDOC/E1EDKA1/ORT01
+E1EDKA1.PSTLZ,Postal code,Postal code,NO,0..1,,,1207,10,/IDOC/E1EDKA1/PSTLZ
+E1EDKA1.LAND1,Country Key,Country Key,NO,0..1,,,1217,2,/IDOC/E1EDKA1/LAND1
+E1EDKA1.SPRAS,Language key,Language key,NO,0..1,,,1219,20,/IDOC/E1EDKA1/SPRAS
+E1EDKA1.ORT02,District,District,NO,0..1,,,1239,20,/IDOC/E1EDKA1/ORT02
+E1EDKA1.REGIO,Region,Region,NO,0..1,,,1259,3,/IDOC/E1EDKA1/REGIO
+E1EDKA1.SPRAS_ISO,2-Character SAP Language Code,2-Character SAP Language Code,NO,0..1,,,1262,20,/IDOC/E1EDKA1/SPRAS_ISO
+E1EDKA1.PARVW,Partner function,Partner function (e.g. sold-to,NO,0..1,,,1282,2,/IDOC/E1EDKA1/PARVW
+E1EDKA1.LIFNR,Supplier Number at Customer Lo,Supplier Number at Customer Lo,NO,0..1,,,1284,10,/IDOC/E1EDKA1/LIFNR
+E1EDKA1.NAME1,Name 1,Name 1,NO,0..1,,,1294,35,/IDOC/E1EDKA1/NAME1
+E1EDKA1.STRAS,Street and house number 1,Street and house number 1,NO,0..1,,,1329,35,/IDOC/E1EDKA1/STRAS
+E1EDKA1.ORT01,City,City,NO,0..1,,,1364,35,/IDOC/E1EDKA1/ORT01
+E1EDKA1.COUNC,County code,County code,NO,0..1,,,1399,20,/IDOC/E1EDKA1/COUNC
+E1EDKA1.PSTLZ,Postal code,Postal code,NO,0..1,,,1419,10,/IDOC/E1EDKA1/PSTLZ
+E1EDKA1.LAND1,Country Key,Country Key,NO,0..1,,,1429,2,/IDOC/E1EDKA1/LAND1
+E1EDKA1.TELF1,1st telephone number of contac,1st telephone number of contac,NO,0..1,,,1431,16,/IDOC/E1EDKA1/TELF1
+E1EDKA1.REGIO,Region,Region,NO,0..1,,,1447,3,/IDOC/E1EDKA1/REGIO
+E1EDK02.QUALF,IDOC qualifier reference docum,IDOC qualifier reference docum,NO,0..1,IF ier reference docum,,1450,3,/IDOC/E1EDK02/QUALF
+E1EDK02.BELNR,IDOC document number,IDOC document number,SI,1..1,,,1453,35,/IDOC/E1EDK02/BELNR
+E1EDK02.DATUM,IDOC,IDOC: Date,SI,1..1,,,1488,8,/IDOC/E1EDK02/DATUM
+E1EDK02.QUALF,IDOC qualifier reference docum,IDOC qualifier reference docum,NO,0..1,IF ier reference docum,,1496,3,/IDOC/E1EDK02/QUALF
+E1EDK02.BELNR,IDOC document number,IDOC document number,SI,1..1,,,1499,35,/IDOC/E1EDK02/BELNR
+E1EDK02.QUALF,IDOC qualifier reference docum,IDOC qualifier reference docum,NO,0..1,IF ier reference docum,,1534,3,/IDOC/E1EDK02/QUALF
+E1EDK02.BELNR,IDOC document number,IDOC document number,SI,1..1,,,1537,35,/IDOC/E1EDK02/BELNR
+E1EDK02.DATUM,IDOC,IDOC: Date,SI,1..1,,,1572,8,/IDOC/E1EDK02/DATUM
+E1EDK02.QUALF,IDOC qualifier reference docum,IDOC qualifier reference docum,NO,0..1,IF ier reference docum,,1580,3,/IDOC/E1EDK02/QUALF
+E1EDK02.BELNR,IDOC document number,IDOC document number,SI,1..1,,,1583,35,/IDOC/E1EDK02/BELNR
+E1EDK02.QUALF,IDOC qualifier reference docum,IDOC qualifier reference docum,NO,0..1,IF ier reference docum,,1618,3,/IDOC/E1EDK02/QUALF
+E1EDK02.BELNR,IDOC document number,IDOC document number,SI,1..1,,,1621,35,/IDOC/E1EDK02/BELNR
+E1EDK02.QUALF,IDOC qualifier reference docum,IDOC qualifier reference docum,NO,0..1,IF ier reference docum,,1656,3,/IDOC/E1EDK02/QUALF
+E1EDK02.BELNR,IDOC document number,IDOC document number,SI,1..1,,,1659,35,/IDOC/E1EDK02/BELNR
+E1EDK03.IDDAT,Qualifier for IDOC date segmen,Qualifier for IDOC date segmen,NO,0..1,IF ier for idoc date segmen,,1694,3,/IDOC/E1EDK03/IDDAT
+E1EDK03.DATUM,IDOC,IDOC: Date,SI,1..1,,,1697,8,/IDOC/E1EDK03/DATUM
+E1EDK03.IDDAT,Qualifier for IDOC date segmen,Qualifier for IDOC date segmen,NO,0..1,IF ier for idoc date segmen,,1705,3,/IDOC/E1EDK03/IDDAT
+E1EDK03.DATUM,IDOC,IDOC: Date,SI,1..1,,,1708,8,/IDOC/E1EDK03/DATUM
+E1EDK03.IDDAT,Qualifier for IDOC date segmen,Qualifier for IDOC date segmen,NO,0..1,IF ier for idoc date segmen,,1716,3,/IDOC/E1EDK03/IDDAT
+E1EDK03.DATUM,IDOC,IDOC: Date,SI,1..1,,,1719,8,/IDOC/E1EDK03/DATUM
+E1EDK03.IDDAT,Qualifier for IDOC date segmen,Qualifier for IDOC date segmen,NO,0..1,IF ier for idoc date segmen,,1727,3,/IDOC/E1EDK03/IDDAT
+E1EDK03.DATUM,IDOC,IDOC: Date,SI,1..1,,,1730,8,/IDOC/E1EDK03/DATUM
+E1EDK03.IDDAT,Qualifier for IDOC date segmen,Qualifier for IDOC date segmen,NO,0..1,IF ier for idoc date segmen,,1738,3,/IDOC/E1EDK03/IDDAT
+E1EDK03.DATUM,IDOC,IDOC: Date,SI,1..1,,,1741,8,/IDOC/E1EDK03/DATUM
+E1EDK03.IDDAT,Qualifier for IDOC date segmen,Qualifier for IDOC date segmen,NO,0..1,IF ier for idoc date segmen,,1749,3,/IDOC/E1EDK03/IDDAT
+E1EDK03.DATUM,IDOC,IDOC: Date,SI,1..1,,,1752,8,/IDOC/E1EDK03/DATUM
+E1EDK03.IDDAT,Qualifier for IDOC date segmen,Qualifier for IDOC date segmen,NO,0..1,IF ier for idoc date segmen,,1760,3,/IDOC/E1EDK03/IDDAT
+E1EDK03.DATUM,IDOC,IDOC: Date,SI,1..1,,,1763,8,/IDOC/E1EDK03/DATUM
+E1EDK04.MWSKZ,VAT indicator,VAT indicator,NO,0..1,,,1771,2,/IDOC/E1EDK04/MWSKZ
+E1EDK04.MSATZ,VAT rate,VAT rate,NO,0..1,,,1773,5,/IDOC/E1EDK04/MSATZ
+E1EDK04.MWSBT,Value added tax amount,Value added tax amount,NO,0..1,,,1778,15,/IDOC/E1EDK04/MWSBT
+E1EDK17.QUALF,IDOC qualifier,IDOC qualifier: Terms of deliv,NO,0..1,IF ier: terms of deliv,,1793,3,/IDOC/E1EDK17/QUALF
+E1EDK17.LKOND,IDOC delivery condition code,IDOC delivery condition code,NO,0..1,,,1796,3,/IDOC/E1EDK17/LKOND
+E1EDK17.QUALF,IDOC qualifier,IDOC qualifier: Terms of deliv,NO,0..1,IF ier: terms of deliv,,1799,3,/IDOC/E1EDK17/QUALF
+E1EDK17.LKOND,IDOC delivery condition code,IDOC delivery condition code,NO,0..1,,,1802,3,/IDOC/E1EDK17/LKOND
+E1EDK17.LKTEXT,IDOC delivery condition text,IDOC delivery condition text,NO,0..1,,,1805,40,/IDOC/E1EDK17/LKTEXT
+E1EDK18.QUALF,IDOC qualifier,IDOC qualifier: Terms of payme,NO,0..1,IF ier: terms of payme,,1845,3,/IDOC/E1EDK18/QUALF
+E1EDK18.TAGE,IDOC Number of days,IDOC Number of days,NO,0..1,,,1848,3,/IDOC/E1EDK18/TAGE
+E1EDK18.PRZNT,IDOC percentage for terms of p,IDOC percentage for terms of p,NO,0..1,,,1851,5,/IDOC/E1EDK18/PRZNT
+E1EDK18.ZTERM_TXT,Text line,Text line,NO,0..1,,,1856,20,/IDOC/E1EDK18/ZTERM_TXT
+E1EDK28.BCOUN,Country Key,Country Key,NO,0..1,,,1876,2,/IDOC/E1EDK28/BCOUN
+E1EDK28.BRNUM,Bank Key,Bank Key,NO,0..1,,,1878,11,/IDOC/E1EDK28/BRNUM
+E1EDK28.BNAME,Bank name,Bank name,NO,0..1,,,1889,35,/IDOC/E1EDK28/BNAME
+E1EDK28.BALOC,Location of bank,Location of bank,NO,0..1,,,1924,20,/IDOC/E1EDK28/BALOC
+E1EDK28.ACNUM,Account number in bank data,Account number in bank data,NO,0..1,,,1944,18,/IDOC/E1EDK28/ACNUM
+E1EDK28.ACNAM,Account holder in bank data,Account holder in bank data,NO,0..1,,,1962,35,/IDOC/E1EDK28/ACNAM
+E1EDK28.BCOUN,Country Key,Country Key,NO,0..1,,,1997,2,/IDOC/E1EDK28/BCOUN
+E1EDK28.BRNUM,Bank Key,Bank Key,NO,0..1,,,1999,11,/IDOC/E1EDK28/BRNUM
+E1EDK28.BNAME,Bank name,Bank name,NO,0..1,,,2010,35,/IDOC/E1EDK28/BNAME
+E1EDK28.BALOC,Location of bank,Location of bank,NO,0..1,,,2045,20,/IDOC/E1EDK28/BALOC
+E1EDK28.ACNUM,Account number in bank data,Account number in bank data,NO,0..1,,,2065,18,/IDOC/E1EDK28/ACNUM
+E1EDK28.ACNAM,Account holder in bank data,Account holder in bank data,NO,0..1,,,2083,35,/IDOC/E1EDK28/ACNAM
+E1EDK28.BCOUN,Country Key,Country Key,NO,0..1,,,2118,2,/IDOC/E1EDK28/BCOUN
+E1EDK28.BRNUM,Bank Key,Bank Key,NO,0..1,,,2120,11,/IDOC/E1EDK28/BRNUM
+E1EDK28.BNAME,Bank name,Bank name,NO,0..1,,,2131,35,/IDOC/E1EDK28/BNAME
+E1EDK28.BALOC,Location of bank,Location of bank,NO,0..1,,,2166,20,/IDOC/E1EDK28/BALOC
+E1EDK28.ACNUM,Account number in bank data,Account number in bank data,NO,0..1,,,2186,18,/IDOC/E1EDK28/ACNUM
+E1EDK28.ACNAM,Account holder in bank data,Account holder in bank data,NO,0..1,,,2204,35,/IDOC/E1EDK28/ACNAM
+E1EDK28.BIBAN,IBAN,IBAN (International Bank Accou,NO,0..1,,,2239,20,/IDOC/E1EDK28/BIBAN
+E1EDK28.BCOUN,Country Key,Country Key,NO,0..1,,,2259,2,/IDOC/E1EDK28/BCOUN
+E1EDK28.BRNUM,Bank Key,Bank Key,NO,0..1,,,2261,11,/IDOC/E1EDK28/BRNUM
+E1EDK28.BNAME,Bank name,Bank name,NO,0..1,,,2272,35,/IDOC/E1EDK28/BNAME
+E1EDK28.BALOC,Location of bank,Location of bank,NO,0..1,,,2307,20,/IDOC/E1EDK28/BALOC
+E1EDK28.ACNUM,Account number in bank data,Account number in bank data,NO,0..1,,,2327,18,/IDOC/E1EDK28/ACNUM
+E1EDK28.ACNAM,Account holder in bank data,Account holder in bank data,NO,0..1,,,2345,35,/IDOC/E1EDK28/ACNAM
+E1EDK28.BCOUN,Country Key,Country Key,NO,0..1,,,2380,2,/IDOC/E1EDK28/BCOUN
+E1EDK28.BRNUM,Bank Key,Bank Key,NO,0..1,,,2382,11,/IDOC/E1EDK28/BRNUM
+E1EDK28.BNAME,Bank name,Bank name,NO,0..1,,,2393,35,/IDOC/E1EDK28/BNAME
+E1EDK28.BALOC,Location of bank,Location of bank,NO,0..1,,,2428,20,/IDOC/E1EDK28/BALOC
+E1EDK28.ACNUM,Account number in bank data,Account number in bank data,NO,0..1,,,2448,18,/IDOC/E1EDK28/ACNUM
+E1EDK28.ACNAM,Account holder in bank data,Account holder in bank data,NO,0..1,,,2466,35,/IDOC/E1EDK28/ACNAM
+E1EDK28.BIBAN,IBAN,IBAN (International Bank Accou,NO,0..1,,,2501,20,/IDOC/E1EDK28/BIBAN
+E1EDK28.BCOUN,Country Key,Country Key,NO,0..1,,,2521,2,/IDOC/E1EDK28/BCOUN
+E1EDK28.BRNUM,Bank Key,Bank Key,NO,0..1,,,2523,11,/IDOC/E1EDK28/BRNUM
+E1EDK28.BNAME,Bank name,Bank name,NO,0..1,,,2534,35,/IDOC/E1EDK28/BNAME
+E1EDK28.BALOC,Location of bank,Location of bank,NO,0..1,,,2569,20,/IDOC/E1EDK28/BALOC
+E1EDK28.ACNUM,Account number in bank data,Account number in bank data,NO,0..1,,,2589,18,/IDOC/E1EDK28/ACNUM
+E1EDK28.ACNAM,Account holder in bank data,Account holder in bank data,NO,0..1,,,2607,35,/IDOC/E1EDK28/ACNAM
+E1EDK28.BCOUN,Country Key,Country Key,NO,0..1,,,2642,2,/IDOC/E1EDK28/BCOUN
+E1EDK28.BRNUM,Bank Key,Bank Key,NO,0..1,,,2644,11,/IDOC/E1EDK28/BRNUM
+E1EDK28.BNAME,Bank name,Bank name,NO,0..1,,,2655,35,/IDOC/E1EDK28/BNAME
+E1EDK28.BALOC,Location of bank,Location of bank,NO,0..1,,,2690,20,/IDOC/E1EDK28/BALOC
+E1EDK28.ACNUM,Account number in bank data,Account number in bank data,NO,0..1,,,2710,18,/IDOC/E1EDK28/ACNUM
+E1EDK28.ACNAM,Account holder in bank data,Account holder in bank data,NO,0..1,,,2728,35,/IDOC/E1EDK28/ACNAM
+E1EDK28.BCOUN,Country Key,Country Key,NO,0..1,,,2763,2,/IDOC/E1EDK28/BCOUN
+E1EDK28.BRNUM,Bank Key,Bank Key,NO,0..1,,,2765,11,/IDOC/E1EDK28/BRNUM
+E1EDK28.BNAME,Bank name,Bank name,NO,0..1,,,2776,35,/IDOC/E1EDK28/BNAME
+E1EDK28.BALOC,Location of bank,Location of bank,NO,0..1,,,2811,20,/IDOC/E1EDK28/BALOC
+E1EDK28.ACNUM,Account number in bank data,Account number in bank data,NO,0..1,,,2831,18,/IDOC/E1EDK28/ACNUM
+E1EDK28.ACNAM,Account holder in bank data,Account holder in bank data,NO,0..1,,,2849,35,/IDOC/E1EDK28/ACNAM
+E1EDK28.BIBAN,IBAN,IBAN (International Bank Accou,NO,0..1,,,2884,20,/IDOC/E1EDK28/BIBAN
+E1EDK28.BCOUN,Country Key,Country Key,NO,0..1,,,2904,2,/IDOC/E1EDK28/BCOUN
+E1EDK28.BRNUM,Bank Key,Bank Key,NO,0..1,,,2906,11,/IDOC/E1EDK28/BRNUM
+E1EDK28.BNAME,Bank name,Bank name,NO,0..1,,,2917,35,/IDOC/E1EDK28/BNAME
+E1EDK28.BALOC,Location of bank,Location of bank,NO,0..1,,,2952,20,/IDOC/E1EDK28/BALOC
+E1EDK28.ACNUM,Account number in bank data,Account number in bank data,NO,0..1,,,2972,18,/IDOC/E1EDK28/ACNUM
+E1EDK28.ACNAM,Account holder in bank data,Account holder in bank data,NO,0..1,,,2990,35,/IDOC/E1EDK28/ACNAM
+E1EDK29.LAND1,Country Key,Country Key,NO,0..1,,,3025,2,/IDOC/E1EDK29/LAND1
+E1EDKT1.TDID,Text ID,Text ID,NO,0..1,,,3027,4,/IDOC/E1EDKT1/TDID
+E1EDKT1.TSSPRAS,Language Key,Language Key,NO,0..1,,,3031,2,/IDOC/E1EDKT1/TSSPRAS
+E1EDKT1.TSSPRAS_ISO,2-Character SAP Language Code,2-Character SAP Language Code,NO,0..1,,,3033,20,/IDOC/E1EDKT1/TSSPRAS_ISO
+E1EDK14.QUALF,IDOC qualifer organization,IDOC qualifer organization,NO,0..1,IF er organization,,3053,3,/IDOC/E1EDK14/QUALF
+E1EDK14.ORGID,IDOC organization,IDOC organization,NO,0..1,,,3056,20,/IDOC/E1EDK14/ORGID
+E1EDK14.QUALF,IDOC qualifer organization,IDOC qualifer organization,NO,0..1,IF er organization,,3076,3,/IDOC/E1EDK14/QUALF
+E1EDK14.ORGID,IDOC organization,IDOC organization,NO,0..1,,,3079,20,/IDOC/E1EDK14/ORGID
+E1EDK14.QUALF,IDOC qualifer organization,IDOC qualifer organization,NO,0..1,IF er organization,,3099,3,/IDOC/E1EDK14/QUALF
+E1EDK14.ORGID,IDOC organization,IDOC organization,NO,0..1,,,3102,20,/IDOC/E1EDK14/ORGID
+E1EDK14.QUALF,IDOC qualifer organization,IDOC qualifer organization,NO,0..1,IF er organization,,3122,3,/IDOC/E1EDK14/QUALF
+E1EDK14.ORGID,IDOC organization,IDOC organization,NO,0..1,,,3125,20,/IDOC/E1EDK14/ORGID
+E1EDK14.QUALF,IDOC qualifer organization,IDOC qualifer organization,NO,0..1,IF er organization,,3145,3,/IDOC/E1EDK14/QUALF
+E1EDK14.ORGID,IDOC organization,IDOC organization,NO,0..1,,,3148,20,/IDOC/E1EDK14/ORGID
+E1EDK14.QUALF,IDOC qualifer organization,IDOC qualifer organization,NO,0..1,IF er organization,,3168,3,/IDOC/E1EDK14/QUALF
+E1EDK14.ORGID,IDOC organization,IDOC organization,NO,0..1,,,3171,20,/IDOC/E1EDK14/ORGID
+E1EDP01.POSEX,Item number,Item number,SI,1..N,,,3191,6,/IDOC/E1EDP01/POSEX
+E1EDP01.MENGE,Quantity,Quantity,SI,1..N,,,3197,15,/IDOC/E1EDP01/MENGE
+E1EDP01.MENEE,Unit of measure,Unit of measure,NO,1..N,,,3212,10,/IDOC/E1EDP01/MENEE
+E1EDP01.NTGEW,Net weight,Net weight,NO,1..N,,,3222,15,/IDOC/E1EDP01/NTGEW
+E1EDP01.GEWEI,Weight unit,Weight unit,NO,1..N,,,3237,3,/IDOC/E1EDP01/GEWEI
+E1EDP01.BRGEW,Total weight,Total weight,NO,1..N,,,3240,15,/IDOC/E1EDP01/BRGEW
+E1EDP01.PSTYV,Sales document item category,Sales document item category,NO,1..N,,,3255,10,/IDOC/E1EDP01/PSTYV
+E1EDP01.WERKS,Plant,Plant,NO,1..N,,,3265,10,/IDOC/E1EDP01/WERKS
+E1EDP02.QUALF,IDOC qualifier reference docum,IDOC qualifier reference docum,NO,1..N,IF ier reference docum,,3275,3,/IDOC/E1EDP02/QUALF
+E1EDP02.QUALF,IDOC qualifier reference docum,IDOC qualifier reference docum,NO,1..N,IF ier reference docum,,3278,3,/IDOC/E1EDP02/QUALF
+E1EDP02.BELNR,IDOC document number,IDOC document number,SI,1..N,,,3281,35,/IDOC/E1EDP02/BELNR
+E1EDP02.ZEILE,Item number,Item number,NO,1..N,,,3316,20,/IDOC/E1EDP02/ZEILE
+E1EDP02.QUALF,IDOC qualifier reference docum,IDOC qualifier reference docum,NO,1..N,IF ier reference docum,,3336,3,/IDOC/E1EDP02/QUALF
+E1EDP02.BELNR,IDOC document number,IDOC document number,SI,1..N,,,3339,35,/IDOC/E1EDP02/BELNR
+E1EDP02.ZEILE,Item number,Item number,NO,1..N,,,3374,20,/IDOC/E1EDP02/ZEILE
+E1EDP02.DATUM,IDOC,IDOC: Date,SI,1..N,,,3394,8,/IDOC/E1EDP02/DATUM
+E1EDP02.QUALF,IDOC qualifier reference docum,IDOC qualifier reference docum,NO,1..N,IF ier reference docum,,3402,3,/IDOC/E1EDP02/QUALF
+E1EDP02.BELNR,IDOC document number,IDOC document number,SI,1..N,,,3405,35,/IDOC/E1EDP02/BELNR
+E1EDP02.QUALF,IDOC qualifier reference docum,IDOC qualifier reference docum,NO,1..N,IF ier reference docum,,3440,3,/IDOC/E1EDP02/QUALF
+E1EDP02.BELNR,IDOC document number,IDOC document number,SI,1..N,,,3443,35,/IDOC/E1EDP02/BELNR
+E1EDP02.DATUM,IDOC,IDOC: Date,SI,1..N,,,3478,8,/IDOC/E1EDP02/DATUM
+E1EDP03.IDDAT,Qualifier for IDOC date segmen,Qualifier for IDOC date segmen,NO,1..N,IF ier for idoc date segmen,,3486,3,/IDOC/E1EDP03/IDDAT
+E1EDP03.DATUM,Date,Date,SI,1..N,,,3489,8,/IDOC/E1EDP03/DATUM
+E1EDP03.IDDAT,Qualifier for IDOC date segmen,Qualifier for IDOC date segmen,NO,1..N,IF ier for idoc date segmen,,3497,3,/IDOC/E1EDP03/IDDAT
+E1EDP03.DATUM,Date,Date,SI,1..N,,,3500,8,/IDOC/E1EDP03/DATUM
+E1EDP03.IDDAT,Qualifier for IDOC date segmen,Qualifier for IDOC date segmen,NO,1..N,IF ier for idoc date segmen,,3508,3,/IDOC/E1EDP03/IDDAT
+E1EDP03.DATUM,Date,Date,SI,1..N,,,3511,8,/IDOC/E1EDP03/DATUM
+E1EDP03.IDDAT,Qualifier for IDOC date segmen,Qualifier for IDOC date segmen,NO,1..N,IF ier for idoc date segmen,,3519,3,/IDOC/E1EDP03/IDDAT
+E1EDP03.DATUM,Date,Date,SI,1..N,,,3522,8,/IDOC/E1EDP03/DATUM
+E1EDP03.IDDAT,Qualifier for IDOC date segmen,Qualifier for IDOC date segmen,NO,1..N,IF ier for idoc date segmen,,3530,3,/IDOC/E1EDP03/IDDAT
+E1EDP03.DATUM,Date,Date,SI,1..N,,,3533,8,/IDOC/E1EDP03/DATUM
+E1EDP19.QUALF,IDOC object identification suc,IDOC object identification suc,NO,1..N,IF ication suc,,3541,3,/IDOC/E1EDP19/QUALF
+E1EDP19.IDTNR,IDOC material ID,IDOC material ID,NO,1..N,,,3544,20,/IDOC/E1EDP19/IDTNR
+E1EDP19.KTEXT,IDOC short text,IDOC short text,NO,1..N,,,3564,40,/IDOC/E1EDP19/KTEXT
+E1EDP19.IDTNR_LONG,IDOC material ID,IDOC material ID,NO,1..N,,,3604,20,/IDOC/E1EDP19/IDTNR_LONG
+E1EDP05.ALCKZ,Surcharge or discount indicato,Surcharge or discount indicato,NO,1..N,,,3624,3,/IDOC/E1EDP05/ALCKZ
+E1EDP05.KOTXT,Condition text,Condition text,NO,1..N,,,3627,14,/IDOC/E1EDP05/KOTXT
+E1EDP05.BETRG,Fixed surcharge/discount on to,Fixed surcharge/discount on to,NO,1..N,,,3641,15,/IDOC/E1EDP05/BETRG
+E1EDP05.KRATE,Condition record per unit,Condition record per unit,NO,1..N,,,3656,20,/IDOC/E1EDP05/KRATE
+E1EDP05.UPRBS,Price unit,Price unit,NO,1..N,,,3676,10,/IDOC/E1EDP05/UPRBS
+E1EDP05.MEAUN,Unit of measurement,Unit of measurement,NO,1..N,,,3686,10,/IDOC/E1EDP05/MEAUN
+E1EDP05.KOEIN,Currency,Currency,NO,1..N,,,3696,10,/IDOC/E1EDP05/KOEIN
+E1EDP05.KOBAS,Base value to which condition,Base value to which condition,NO,1..N,,,3706,10,/IDOC/E1EDP05/KOBAS
+E1EDP04.MWSKZ,VAT indicator,VAT indicator,NO,1..N,,,3716,2,/IDOC/E1EDP04/MWSKZ
+E1EDP04.MSATZ,VAT rate,VAT rate,NO,1..N,,,3718,5,/IDOC/E1EDP04/MSATZ
+E1EDP04.MWSBT,Value added tax amount,Value added tax amount,NO,1..N,,,3723,15,/IDOC/E1EDP04/MWSBT
+E1EDP04.TXDAT,Date for defining tax rates,Date for defining tax rates,NO,1..N,,,3738,20,/IDOC/E1EDP04/TXDAT

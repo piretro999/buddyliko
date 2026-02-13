@@ -1,0 +1,460 @@
+{
+  "name": "PROVA",
+  "input_schema": "FatturaPA_Input_Schema",
+  "output_schema": "UBL_PEPPOL_Input_Schema",
+  "rules": [
+    {
+      "id": "conn_1771009888842",
+      "source": "Importo",
+      "target": "cbc.Amount",
+      "transformation": {
+        "type": "direct"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_1771009888923",
+      "source": "DataScadenzaPagamento",
+      "target": "cbc.DueDate",
+      "transformation": {
+        "type": "direct"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_1771009888983",
+      "source": "Divisa",
+      "target": "cbc.DocumentCurrencyCode",
+      "transformation": {
+        "type": "direct"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_1771009889042",
+      "source": "RiferimentoAmministrazione",
+      "target": "cbc.AccountingCost",
+      "transformation": {
+        "type": "direct"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_1771009889121",
+      "source": "DataInizioPeriodo",
+      "target": "cbc.StartDate",
+      "transformation": {
+        "type": "direct"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_1771009889148",
+      "source": "DataFinePeriodo",
+      "target": "cbc.EndDate",
+      "transformation": {
+        "type": "direct"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_1771009889181",
+      "source": "EsigibilitaIVA",
+      "target": "cbc.DescriptionCode",
+      "transformation": {
+        "type": "direct"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_1771009889228",
+      "source": "DescrizioneAttachment",
+      "target": "cbc.DocumentDescription",
+      "transformation": {
+        "type": "direct"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_1771009889271",
+      "source": "FormatoAttachment",
+      "target": "cbc.EmbeddedDocumentBinaryObject",
+      "transformation": {
+        "type": "direct"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_1771009889325",
+      "source": "Attachment",
+      "target": "cbc.EmbeddedDocumentBinaryObject",
+      "transformation": {
+        "type": "direct"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_1771009889362",
+      "source": "FormatoAttachment",
+      "target": "@mimeCode",
+      "transformation": {
+        "type": "direct"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_1771009889400",
+      "source": "Attachment",
+      "target": "@mimeCode",
+      "transformation": {
+        "type": "direct"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_1771009889442",
+      "source": "CodiceDestinatario",
+      "target": "cbc.EndpointID",
+      "transformation": {
+        "type": "direct"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_1771009889518",
+      "source": "TipoCessionePrestazione",
+      "target": "cbc.Name",
+      "transformation": {
+        "type": "direct"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_1771009889562",
+      "source": "TipoDato",
+      "target": "cbc.Name",
+      "transformation": {
+        "type": "direct"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_1771009889599",
+      "source": "SpeseAccessorie",
+      "target": "cbc.Name",
+      "transformation": {
+        "type": "direct"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_1771009889642",
+      "source": "Indirizzo",
+      "target": "cbc.StreetName",
+      "transformation": {
+        "type": "direct"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_1771009889689",
+      "source": "NumeroCivico",
+      "target": "cbc.AdditionalStreetName",
+      "transformation": {
+        "type": "direct"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_1771009889761",
+      "source": "Comune",
+      "target": "cbc.CityName",
+      "transformation": {
+        "type": "direct"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_1771009889790",
+      "source": "CAP",
+      "target": "cbc.PostalZone",
+      "transformation": {
+        "type": "direct"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_1771009889835",
+      "source": "Provincia",
+      "target": "cbc.CountrySubentity",
+      "transformation": {
+        "type": "direct"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_1771009889900",
+      "source": "CapitaleSociale",
+      "target": "cbc.CompanyLegalForm",
+      "transformation": {
+        "type": "direct"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_1771009889936",
+      "source": "SocioUnico",
+      "target": "cbc.CompanyLegalForm",
+      "transformation": {
+        "type": "direct"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_1771009889992",
+      "source": "StatoLiquidazione",
+      "target": "cbc.CompanyLegalForm",
+      "transformation": {
+        "type": "direct"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_1771009890036",
+      "source": "DataOraConsegna",
+      "target": "cbc.ActualDeliveryDate",
+      "transformation": {
+        "type": "direct"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_1771009890086",
+      "source": "ModalitaPagamento",
+      "target": "cbc.PaymentMeansCode",
+      "transformation": {
+        "type": "direct"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_1771009890136",
+      "source": "CodicePagamento",
+      "target": "cbc.PaymentID",
+      "transformation": {
+        "type": "direct"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_1771009890186",
+      "source": "PrezzoUnitario",
+      "target": "cbc.BaseAmount",
+      "transformation": {
+        "type": "direct"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_1771009890236",
+      "source": "ImponibileImporto",
+      "target": "cbc.TaxableAmount",
+      "transformation": {
+        "type": "direct"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_1771009890286",
+      "source": "Natura",
+      "target": "cbc.TaxExemptionReason",
+      "transformation": {
+        "type": "direct"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_1771009890336",
+      "source": "RiferimentoNormativo",
+      "target": "cbc.TaxExemptionReason",
+      "transformation": {
+        "type": "direct"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_1771009890386",
+      "source": "PrezzoTotale",
+      "target": "cbc.LineExtensionAmount",
+      "transformation": {
+        "type": "direct"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_1771009890436",
+      "source": "ImportoTotaleDocumento",
+      "target": "cbc.TaxInclusiveAmount",
+      "transformation": {
+        "type": "direct"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_1771009890497",
+      "source": "ImportoPagamento",
+      "target": "cbc.PayableAmount",
+      "transformation": {
+        "type": "direct"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_1771009890540",
+      "source": "Quantita",
+      "target": "cbc.InvoicedQuantity",
+      "transformation": {
+        "type": "direct"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_1771009890588",
+      "source": "Data",
+      "target": "cbc.Value",
+      "transformation": {
+        "type": "direct"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_1771009890637",
+      "source": "Ritenuta",
+      "target": "cbc.Value",
+      "transformation": {
+        "type": "direct"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_1771009890686",
+      "source": "RiferimentoTesto",
+      "target": "cbc.Value",
+      "transformation": {
+        "type": "direct"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_1771009890736",
+      "source": "RiferimentoNumero",
+      "target": "cbc.Value",
+      "transformation": {
+        "type": "direct"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_1771009890786",
+      "source": "RiferimentoData",
+      "target": "cbc.Value",
+      "transformation": {
+        "type": "direct"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_1771009890837",
+      "source": "TotalePercorso",
+      "target": "cbc.Value",
+      "transformation": {
+        "type": "direct"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    }
+  ],
+  "lookup_tables": {},
+  "metadata": {}
+}

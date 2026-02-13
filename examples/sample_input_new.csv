@@ -1,0 +1,10 @@
+campo,business_term,spiegazione,obbligatorio,numerosità,condizionalità,calcolo,offset,lunghezza,xmlpath
+EDI_DC40.DOCNUM,Document Number,Numero documento IDOC,SI,1..1,,,0,16,/IDOC/EDI_DC40/DOCNUM
+E1EDK01.BELNR,Invoice Number,Numero fattura,SI,1..1,,,16,35,/IDOC/E1EDK01/BELNR
+E1EDK01.DATUM,Invoice Date,Data emissione fattura,SI,1..1,,,51,8,/IDOC/E1EDK01/DATUM
+E1EDK01.WKURS,Exchange Rate,Tasso di cambio,NO,0..1,IF foreign currency,,59,12,/IDOC/E1EDK01/WKURS
+E1EDP01.POSEX,Line Item Number,Numero riga,SI,1..N,,,71,6,/IDOC/E1EDP01/POSEX
+E1EDP01.MENGE,Quantity,Quantità articolo,SI,1..N,,,77,15,/IDOC/E1EDP01/MENGE
+E1EDP01.PREIS,Unit Price,Prezzo unitario,SI,1..N,,,92,15,/IDOC/E1EDP01/PREIS
+E1EDP19.MWSKZ,Tax Code,Codice IVA,SI,1..N,,,107,2,/IDOC/E1EDP19/MWSKZ
+E1EDP19.MSATZ,Tax Rate,Aliquota IVA percentuale,SI,1..N,,,109,5,/IDOC/E1EDP19/MSATZ

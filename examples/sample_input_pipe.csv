@@ -1,0 +1,9 @@
+campo|business_term|spiegazione|obbligatorio|numerosità|condizionalità|calcolo|offset|lunghezza|xmlpath
+E1EDK01.CURCY|Currency|Currency code ISO 4217|SI|1..1|||0|3|/IDOC/E1EDK01/CURCY
+E1EDK01.BELNR|Invoice Number|IDOC document number|SI|1..1|||66|35|/IDOC/E1EDK01/BELNR
+E1EDK01.EIGENUINR|Supplier VAT|VAT Registration Number|SI|1..1|||42|20|/IDOC/E1EDK01/EIGENUINR
+E1EDKA1.NAME1|Party Name|Company name first line|SI|1..1|||300|35|/IDOC/E1EDKA1/NAME1
+E1EDKA1.STRAS|Street Address|Street and house number|NO|0..1|||335|35|/IDOC/E1EDKA1/STRAS
+E1EDP01.POSEX|Line Number|Item number|SI|1..N|||500|6|/IDOC/E1EDP01/POSEX
+E1EDP01.MENGE|Quantity|Quantity of goods|SI|1..N|||506|15|/IDOC/E1EDP01/MENGE
+E1EDP19.KTEXT|Item Description|Name/type of goods or service|NO|0..N|||600|40|/IDOC/E1EDP19/KTEXT

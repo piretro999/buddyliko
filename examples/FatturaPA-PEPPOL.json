@@ -1,0 +1,5452 @@
+{
+  "projectName": "FatturaPA-PEPPOL",
+  "version": "2.0",
+  "created": "2026-02-13T19:26:51.082894",
+  "description": "FatturaPA to UBL PEPPOL BIS 3.0 with executable transformation formulas",
+  "inputSchema": {
+    "name": "FatturaPA",
+    "format": "xml",
+    "namespace": "http://ivaservizi.agenziaentrate.gov.it/docs/xsd/fatture/v1.2",
+    "rootElement": "FatturaElettronica",
+    "fields": {
+      "1": {
+        "id": "fpa_0",
+        "name": "FatturaElettronicaHeader",
+        "business_term": "1",
+        "path": "FatturaElettronicaHeader",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaHeader"
+      },
+      "1.1": {
+        "id": "fpa_1",
+        "name": "DatiTrasmissione",
+        "business_term": "1.1",
+        "path": "FatturaElettronicaHeader/DatiTrasmissione",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaHeader/DatiTrasmissione"
+      },
+      "1.1.1": {
+        "id": "fpa_2",
+        "name": "IdTrasmittente",
+        "business_term": "1.1.1",
+        "path": "FatturaElettronicaHeader/DatiTrasmissione/IdTrasmittente",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaHeader/DatiTrasmissione/IdTrasmittente"
+      },
+      "BT-31": {
+        "id": "fpa_16",
+        "name": "IdCodice",
+        "business_term": "BT-31",
+        "path": "FatturaElettronicaHeader/CedentePrestatore/DatiAnagrafici/IdFiscaleIVA/IdCodice",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaHeader/CedentePrestatore/DatiAnagrafici/IdFiscaleIVA/IdCodice"
+      },
+      "BT-30": {
+        "id": "fpa_17",
+        "name": "CodiceFiscale",
+        "business_term": "BT-30",
+        "path": "FatturaElettronicaHeader/CedentePrestatore/DatiAnagrafici/CodiceFiscale",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaHeader/CedentePrestatore/DatiAnagrafici/CodiceFiscale"
+      },
+      "1.1.2": {
+        "id": "fpa_5",
+        "name": "ProgressivoInvio",
+        "business_term": "1.1.2",
+        "path": "FatturaElettronicaHeader/DatiTrasmissione/ProgessivoInvio",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaHeader/DatiTrasmissione/ProgessivoInvio"
+      },
+      "1.1.3": {
+        "id": "fpa_6",
+        "name": "FormatoTrasmissione",
+        "business_term": "1.1.3",
+        "path": "FatturaElettronicaHeader/DatiTrasmissione/FormatoTrasmissione",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaHeader/DatiTrasmissione/FormatoTrasmissione"
+      },
+      "BT-49": {
+        "id": "fpa_7",
+        "name": "CodiceDestinatario",
+        "business_term": "BT-49",
+        "path": "FatturaElettronicaHeader/DatiTrasmissione/CodiceDestinatario",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaHeader/DatiTrasmissione/CodiceDestinatario"
+      },
+      "1.1.5": {
+        "id": "fpa_8",
+        "name": "ContattiTrasmittente",
+        "business_term": "1.1.5",
+        "path": "FatturaElettronicaHeader/DatiTrasmissione/ContattiTrasmittente",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaHeader/DatiTrasmissione/ContattiTrasmittente"
+      },
+      "1.1.5.1": {
+        "id": "fpa_9",
+        "name": "Telefono",
+        "business_term": "1.1.5.1",
+        "path": "FatturaElettronicaHeader/DatiTrasmissione/ContattiTrasmittente/Telefono",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaHeader/DatiTrasmissione/ContattiTrasmittente/Telefono"
+      },
+      "1.1.5.2": {
+        "id": "fpa_10",
+        "name": "Email",
+        "business_term": "1.1.5.2",
+        "path": "FatturaElettronicaHeader/DatiTrasmissione/ContattiTrasmittente/Email",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaHeader/DatiTrasmissione/ContattiTrasmittente/Email"
+      },
+      "1.1.6": {
+        "id": "fpa_11",
+        "name": "PECDestinatario",
+        "business_term": "1.1.6",
+        "path": "FatturaElettronicaHeader/DatiTrasmissione/PECDestinatario",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaHeader/DatiTrasmissione/PECDestinatario"
+      },
+      "1.2": {
+        "id": "fpa_12",
+        "name": "CedentePrestatore",
+        "business_term": "1.2",
+        "path": "FatturaElettronicaHeader/CedentePrestatore",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaHeader/CedentePrestatore"
+      },
+      "1.2.1": {
+        "id": "fpa_13",
+        "name": "DatiAnagrafici",
+        "business_term": "1.2.1",
+        "path": "FatturaElettronicaHeader/CedentePrestatore/DatiAnagrafici",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaHeader/CedentePrestatore/DatiAnagrafici"
+      },
+      "1.2.1.1": {
+        "id": "fpa_14",
+        "name": "IdFiscaleIVA",
+        "business_term": "1.2.1.1",
+        "path": "FatturaElettronicaHeader/CedentePrestatore/DatiAnagrafici/IdFiscaleIVA",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaHeader/CedentePrestatore/DatiAnagrafici/IdFiscaleIVA"
+      },
+      "1.2.1.3": {
+        "id": "fpa_18",
+        "name": "Anagrafica",
+        "business_term": "1.2.1.3",
+        "path": "\nFatturaElettronicaHeader/CedentePrestatore/DatiAnagrafici/Anagrafica",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "\nFatturaElettronicaHeader/CedentePrestatore/DatiAnagrafici/Anagrafica"
+      },
+      "BT-27": {
+        "id": "fpa_21",
+        "name": "Cognome",
+        "business_term": "BT-27",
+        "path": "\nFatturaElettronicaHeader/CedentePrestatore/DatiAnagrafici/Anagrafica/Cognome",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "\nFatturaElettronicaHeader/CedentePrestatore/DatiAnagrafici/Anagrafica/Cognome"
+      },
+      "1.2.1.3.4": {
+        "id": "fpa_22",
+        "name": "Titolo",
+        "business_term": "1.2.1.3.4",
+        "path": "\nFatturaElettronicaHeader/CedentePrestatore/DatiAnagrafici/Anagrafica/Titolo",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "\nFatturaElettronicaHeader/CedentePrestatore/DatiAnagrafici/Anagrafica/Titolo"
+      },
+      "BT-29": {
+        "id": "fpa_45",
+        "name": "NumeroREA",
+        "business_term": "BT-29",
+        "path": "FatturaElettronicaHeader/CedentePrestatore/IscrizioneREA/NumeroREA",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaHeader/CedentePrestatore/IscrizioneREA/NumeroREA"
+      },
+      "1.2.1.5": {
+        "id": "fpa_25",
+        "name": "ProvinciaAlbo",
+        "business_term": "1.2.1.5",
+        "path": "\nFatturaElettronicaHeader/CedentePrestatore/DatiAnagrafici/ProvinciaAlbo",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "\nFatturaElettronicaHeader/CedentePrestatore/DatiAnagrafici/ProvinciaAlbo"
+      },
+      "1.2.1.8": {
+        "id": "fpa_28",
+        "name": "RegimeFiscale",
+        "business_term": "1.2.1.8",
+        "path": "FatturaElettronicaHeader/CedentePrestatore/DatiAnagrafici/RegimeFiscale",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaHeader/CedentePrestatore/DatiAnagrafici/RegimeFiscale"
+      },
+      "1.2.2": {
+        "id": "fpa_29",
+        "name": "Sede",
+        "business_term": "1.2.2",
+        "path": "FatturaElettronicaHeader/CedentePrestatore/Sede",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaHeader/CedentePrestatore/Sede"
+      },
+      "BT-35": {
+        "id": "fpa_30",
+        "name": "Indirizzo",
+        "business_term": "BT-35",
+        "path": "FatturaElettronicaHeader/CedentePrestatore/Sede/Indirizzo",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaHeader/CedentePrestatore/Sede/Indirizzo"
+      },
+      "BT-36": {
+        "id": "fpa_31",
+        "name": "NumeroCivico",
+        "business_term": "BT-36",
+        "path": "FatturaElettronicaHeader/CedentePrestatore/Sede/NumeroCivico",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaHeader/CedentePrestatore/Sede/NumeroCivico"
+      },
+      "BT-38": {
+        "id": "fpa_32",
+        "name": "CAP",
+        "business_term": "BT-38",
+        "path": "FatturaElettronicaHeader/CedentePrestatore/Sede/CAP",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaHeader/CedentePrestatore/Sede/CAP"
+      },
+      "BT-37": {
+        "id": "fpa_33",
+        "name": "Comune",
+        "business_term": "BT-37",
+        "path": "FatturaElettronicaHeader/CedentePrestatore/Sede/Comune",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaHeader/CedentePrestatore/Sede/Comune"
+      },
+      "BT-39": {
+        "id": "fpa_34",
+        "name": "Provincia",
+        "business_term": "BT-39",
+        "path": "FatturaElettronicaHeader/CedentePrestatore/Sede/Provincia",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaHeader/CedentePrestatore/Sede/Provincia"
+      },
+      "BT-40": {
+        "id": "fpa_35",
+        "name": "Nazione",
+        "business_term": "BT-40",
+        "path": "FatturaElettronicaHeader/CedentePrestatore/Sede/Nazione",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaHeader/CedentePrestatore/Sede/Nazione"
+      },
+      "1.2.3": {
+        "id": "fpa_36",
+        "name": "StabileOrganizzazione",
+        "business_term": "1.2.3",
+        "path": "FatturaElettronicaHeader/CedentePrestatore/StabileOrganizzazione",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaHeader/CedentePrestatore/StabileOrganizzazione"
+      },
+      "1.2.3.1": {
+        "id": "fpa_37",
+        "name": "Indirizzo",
+        "business_term": "1.2.3.1",
+        "path": "FatturaElettronicaHeader/CedentePrestatore/StabileOrganizzazione/Indirizzo",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaHeader/CedentePrestatore/StabileOrganizzazione/Indirizzo"
+      },
+      "1.2.3.2": {
+        "id": "fpa_38",
+        "name": "NumeroCivico",
+        "business_term": "1.2.3.2",
+        "path": "FatturaElettronicaHeader/CedentePrestatore/StabileOrganizzazione/NumeroCivico",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaHeader/CedentePrestatore/StabileOrganizzazione/NumeroCivico"
+      },
+      "1.2.3.3": {
+        "id": "fpa_39",
+        "name": "CAP",
+        "business_term": "1.2.3.3",
+        "path": "FatturaElettronicaHeader/CedentePrestatore/StabileOrganizzazione/CAP",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaHeader/CedentePrestatore/StabileOrganizzazione/CAP"
+      },
+      "1.2.3.4": {
+        "id": "fpa_40",
+        "name": "Comune",
+        "business_term": "1.2.3.4",
+        "path": "FatturaElettronicaHeader/CedentePrestatore/StabileOrganizzazione/Comune",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaHeader/CedentePrestatore/StabileOrganizzazione/Comune"
+      },
+      "1.2.3.5": {
+        "id": "fpa_41",
+        "name": "Provincia",
+        "business_term": "1.2.3.5",
+        "path": "FatturaElettronicaHeader/CedentePrestatore/StabileOrganizzazione/Provincia",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaHeader/CedentePrestatore/StabileOrganizzazione/Provincia"
+      },
+      "1.2.3.6": {
+        "id": "fpa_42",
+        "name": "Nazione",
+        "business_term": "1.2.3.6",
+        "path": "FatturaElettronicaHeader/CedentePrestatore/StabileOrganizzazione/Nazione",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaHeader/CedentePrestatore/StabileOrganizzazione/Nazione"
+      },
+      "1.2.4": {
+        "id": "fpa_43",
+        "name": "IscrizioneREA",
+        "business_term": "1.2.4",
+        "path": "FatturaElettronicaHeader/CedentePrestatore/IscrizioneREA",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaHeader/CedentePrestatore/IscrizioneREA"
+      },
+      "BT-33": {
+        "id": "fpa_48",
+        "name": "StatoLiquidazione",
+        "business_term": "BT-33",
+        "path": "FatturaElettronicaHeader/CedentePrestatore/IscrizioneREA/StatoLiquidazione",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaHeader/CedentePrestatore/IscrizioneREA/StatoLiquidazione"
+      },
+      "1.2.5": {
+        "id": "fpa_49",
+        "name": "Contatti",
+        "business_term": "1.2.5",
+        "path": "FatturaElettronicaHeader/CedentePrestatore/Contatti",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaHeader/CedentePrestatore/Contatti"
+      },
+      "BT-42": {
+        "id": "fpa_50",
+        "name": "Telefono",
+        "business_term": "BT-42",
+        "path": "FatturaElettronicaHeader/CedentePrestatore/Contatti/Telefono",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaHeader/CedentePrestatore/Contatti/Telefono"
+      },
+      "1.2.5.2": {
+        "id": "fpa_51",
+        "name": "Fax",
+        "business_term": "1.2.5.2",
+        "path": "FatturaElettronicaHeader/CedentePrestatore/Contatti/Fax",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaHeader/CedentePrestatore/Contatti/Fax"
+      },
+      "BT-43": {
+        "id": "fpa_52",
+        "name": "Email",
+        "business_term": "BT-43",
+        "path": "FatturaElettronicaHeader/CedentePrestatore/Contatti/Email",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaHeader/CedentePrestatore/Contatti/Email"
+      },
+      "BT-19": {
+        "id": "fpa_53",
+        "name": "RiferimentoAmministrazione",
+        "business_term": "BT-19",
+        "path": "FatturaElettronicaHeader/CedentePrestatore/RiferimentoAmministrazione",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaHeader/CedentePrestatore/RiferimentoAmministrazione"
+      },
+      "1.3": {
+        "id": "fpa_54",
+        "name": "RappresentanteFiscale",
+        "business_term": "1.3",
+        "path": "FatturaElettronicaHeader/RappresentanteFiscale ",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaHeader/RappresentanteFiscale "
+      },
+      "1.3.1": {
+        "id": "fpa_55",
+        "name": "DatiAnagrafici",
+        "business_term": "1.3.1",
+        "path": "FatturaElettronicaHeader/RappresentanteFiscale/DatiAnagrafici",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaHeader/RappresentanteFiscale/DatiAnagrafici"
+      },
+      "1.3.1.1": {
+        "id": "fpa_56",
+        "name": "IdFiscaleIVA",
+        "business_term": "1.3.1.1",
+        "path": "FatturaElettronicaHeader/RappresentanteFiscale/DatiAnagrafici/IdFiscaleIVA",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaHeader/RappresentanteFiscale/DatiAnagrafici/IdFiscaleIVA"
+      },
+      "BT-63": {
+        "id": "fpa_58",
+        "name": "IdCodice",
+        "business_term": "BT-63",
+        "path": "FatturaElettronicaHeader/RappresentanteFiscale/DatiAnagrafici/IdFiscaleIVA/IdCodice",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaHeader/RappresentanteFiscale/DatiAnagrafici/IdFiscaleIVA/IdCodice"
+      },
+      "1.3.1.2": {
+        "id": "fpa_59",
+        "name": "CodiceFiscale",
+        "business_term": "1.3.1.2",
+        "path": "FatturaElettronicaHeader/RappresentanteFiscale/DatiAnagrafici/CodiceFiscale",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaHeader/RappresentanteFiscale/DatiAnagrafici/CodiceFiscale"
+      },
+      "1.3.1.3": {
+        "id": "fpa_60",
+        "name": "Anagrafica",
+        "business_term": "1.3.1.3",
+        "path": "FatturaElettronicaHeader/RappresentanteFiscale/DatiAnagrafici/Anagrafica",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaHeader/RappresentanteFiscale/DatiAnagrafici/Anagrafica"
+      },
+      "BT-62": {
+        "id": "fpa_63",
+        "name": "Cognome",
+        "business_term": "BT-62",
+        "path": "FatturaElettronicaHeader/RappresentanteFiscale/DatiAnagrafici/Anagrafica/Cognome",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaHeader/RappresentanteFiscale/DatiAnagrafici/Anagrafica/Cognome"
+      },
+      "1.3.1.3.4": {
+        "id": "fpa_64",
+        "name": "Titolo",
+        "business_term": "1.3.1.3.4",
+        "path": "FatturaElettronicaHeader/RappresentanteFiscale/DatiAnagrafici/Anagrafica/Titolo",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaHeader/RappresentanteFiscale/DatiAnagrafici/Anagrafica/Titolo"
+      },
+      "1.3.1.3.5": {
+        "id": "fpa_65",
+        "name": "CodEORI",
+        "business_term": "1.3.1.3.5",
+        "path": "FatturaElettronicaHeader/RappresentanteFiscale/DatiAnagrafici/Anagrafica/CodEORI",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaHeader/RappresentanteFiscale/DatiAnagrafici/Anagrafica/CodEORI"
+      },
+      "1.4": {
+        "id": "fpa_66",
+        "name": "CessionarioCommittente",
+        "business_term": "1.4",
+        "path": "FatturaElettronicaHeader/CessionarioCommittente",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaHeader/CessionarioCommittente"
+      },
+      "1.4.1": {
+        "id": "fpa_67",
+        "name": "DatiAnagrafici",
+        "business_term": "1.4.1",
+        "path": "FatturaElettronicaHeaderCessionarioCommittente/DatiAnagrafici",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaHeaderCessionarioCommittente/DatiAnagrafici"
+      },
+      "1.4.1.1": {
+        "id": "fpa_68",
+        "name": "IdFiscaleIVA",
+        "business_term": "1.4.1.1",
+        "path": "FatturaElettronicaHeader/CessionarioCommittente/DatiAnagrafici/IdFiscaleIVA",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaHeader/CessionarioCommittente/DatiAnagrafici/IdFiscaleIVA"
+      },
+      "BT-48": {
+        "id": "fpa_70",
+        "name": "IdCodice",
+        "business_term": "BT-48",
+        "path": "FatturaElettronicaHeader/CessionarioCommittente/DatiAnagrafici/IdFiscaleIVA/IdCodice",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaHeader/CessionarioCommittente/DatiAnagrafici/IdFiscaleIVA/IdCodice"
+      },
+      "BT-47": {
+        "id": "fpa_71",
+        "name": "CodiceFiscale",
+        "business_term": "BT-47",
+        "path": "FatturaElettronicaHeader/CessionarioCommittente/DatiAnagrafici/CodiceFiscale",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaHeader/CessionarioCommittente/DatiAnagrafici/CodiceFiscale"
+      },
+      "1.4.1.3": {
+        "id": "fpa_72",
+        "name": "Anagrafica",
+        "business_term": "1.4.1.3",
+        "path": "FatturaElettronicaHeader/CessionarioCommittente/DatiAnagrafici/Anagrafica",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaHeader/CessionarioCommittente/DatiAnagrafici/Anagrafica"
+      },
+      "BT-44": {
+        "id": "fpa_75",
+        "name": "Cognome",
+        "business_term": "BT-44",
+        "path": "FatturaElettronicaHeader/CessionarioCommittente/DatiAnagrafici/Anagrafica/Cognome",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaHeader/CessionarioCommittente/DatiAnagrafici/Anagrafica/Cognome"
+      },
+      "1.4.1.3.4": {
+        "id": "fpa_76",
+        "name": "Titolo",
+        "business_term": "1.4.1.3.4",
+        "path": "FatturaElettronicaHeader/CessionarioCommittente/DatiAnagrafici/Anagrafica/Titolo",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaHeader/CessionarioCommittente/DatiAnagrafici/Anagrafica/Titolo"
+      },
+      "BT-46": {
+        "id": "fpa_77",
+        "name": "CodEORI",
+        "business_term": "BT-46",
+        "path": "FatturaElettronicaHeader/CessionarioCommittente/DatiAnagrafici/Anagrafica/CodEORI",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaHeader/CessionarioCommittente/DatiAnagrafici/Anagrafica/CodEORI"
+      },
+      "1.4.2": {
+        "id": "fpa_78",
+        "name": "Sede",
+        "business_term": "1.4.2",
+        "path": "FatturaElettronicaHeader/CessionarioCommittente/Sede",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaHeader/CessionarioCommittente/Sede"
+      },
+      "BT-50": {
+        "id": "fpa_79",
+        "name": "Indirizzo",
+        "business_term": "BT-50",
+        "path": "FatturaElettronicaHeader/CessionarioCommittente/Sede/Indirizzo",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaHeader/CessionarioCommittente/Sede/Indirizzo"
+      },
+      "BT-51": {
+        "id": "fpa_80",
+        "name": "NumeroCivico",
+        "business_term": "BT-51",
+        "path": "FatturaElettronicaHeader/CessionarioCommittente/Sede/NumeroCivico",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaHeader/CessionarioCommittente/Sede/NumeroCivico"
+      },
+      "BT-53": {
+        "id": "fpa_81",
+        "name": "CAP",
+        "business_term": "BT-53",
+        "path": "FatturaElettronicaHeader/CessionarioCommittente/Sede/CAP",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaHeader/CessionarioCommittente/Sede/CAP"
+      },
+      "BT-52": {
+        "id": "fpa_82",
+        "name": "Comune",
+        "business_term": "BT-52",
+        "path": "FatturaElettronicaHeader/CessionarioCommittente/Sede/Comune",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaHeader/CessionarioCommittente/Sede/Comune"
+      },
+      "BT-54": {
+        "id": "fpa_83",
+        "name": "Provincia",
+        "business_term": "BT-54",
+        "path": "FatturaElettronicaHeader/CessionarioCommittente/Sede/Provincia",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaHeader/CessionarioCommittente/Sede/Provincia"
+      },
+      "BT-55": {
+        "id": "fpa_84",
+        "name": "Nazione",
+        "business_term": "BT-55",
+        "path": "FatturaElettronicaHeader/CessionarioCommittente/Sede/Nazione",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaHeader/CessionarioCommittente/Sede/Nazione"
+      },
+      "1.4.3": {
+        "id": "fpa_85",
+        "name": "StabileOrganizzazione",
+        "business_term": "1.4.3",
+        "path": "FatturaElettronicaHeader/CessionarioCommittente/StabileOrganizzazione",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaHeader/CessionarioCommittente/StabileOrganizzazione"
+      },
+      "1.4.3.1": {
+        "id": "fpa_86",
+        "name": "Indirizzo",
+        "business_term": "1.4.3.1",
+        "path": "FatturaElettronicaHeader/CessionarioCommittente/StabileOrganizzazione/Indirizzo",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaHeader/CessionarioCommittente/StabileOrganizzazione/Indirizzo"
+      },
+      "1.4.3.2": {
+        "id": "fpa_87",
+        "name": "NumeroCivico",
+        "business_term": "1.4.3.2",
+        "path": "FatturaElettronicaHeader/CessionarioCommittente/StabileOrganizzazione/NumeroCivico",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaHeader/CessionarioCommittente/StabileOrganizzazione/NumeroCivico"
+      },
+      "1.4.3.3": {
+        "id": "fpa_88",
+        "name": "CAP",
+        "business_term": "1.4.3.3",
+        "path": "FatturaElettronicaHeader/CessionarioCommittente/StabileOrganizzazione/CAP",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaHeader/CessionarioCommittente/StabileOrganizzazione/CAP"
+      },
+      "1.4.3.4": {
+        "id": "fpa_89",
+        "name": "Comune",
+        "business_term": "1.4.3.4",
+        "path": "FatturaElettronicaHeader/CessionarioCommittente/StabileOrganizzazione/Comune",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaHeader/CessionarioCommittente/StabileOrganizzazione/Comune"
+      },
+      "1.4.3.5": {
+        "id": "fpa_90",
+        "name": "Provincia",
+        "business_term": "1.4.3.5",
+        "path": "FatturaElettronicaHeader/CessionarioCommittente/StabileOrganizzazione/Provincia",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaHeader/CessionarioCommittente/StabileOrganizzazione/Provincia"
+      },
+      "1.4.3.6": {
+        "id": "fpa_91",
+        "name": "Nazione",
+        "business_term": "1.4.3.6",
+        "path": "FatturaElettronicaHeader/CessionarioCommittente/StabileOrganizzazione/Nazione",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaHeader/CessionarioCommittente/StabileOrganizzazione/Nazione"
+      },
+      "1.4.4": {
+        "id": "fpa_92",
+        "name": "RappresentanteFiscale",
+        "business_term": "1.4.4",
+        "path": "FatturaElettronicaHeader/CessionarioCommittente/RappresentanteFiscale",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaHeader/CessionarioCommittente/RappresentanteFiscale"
+      },
+      "1.4.4.1": {
+        "id": "fpa_93",
+        "name": "IdFiscaleIVA",
+        "business_term": "1.4.4.1",
+        "path": "FatturaElettronicaHeader/CessionarioCommittente/RappresentanteFiscale/IdFiscale",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaHeader/CessionarioCommittente/RappresentanteFiscale/IdFiscale"
+      },
+      "1.4.4.1.1": {
+        "id": "fpa_94",
+        "name": "IdPaese",
+        "business_term": "1.4.4.1.1",
+        "path": "FatturaElettronicaHeader/CessionarioCommittente/RappresentanteFiscale/IdFiscale/IdPaese",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaHeader/CessionarioCommittente/RappresentanteFiscale/IdFiscale/IdPaese"
+      },
+      "1.4.4.1.2": {
+        "id": "fpa_95",
+        "name": "IdCodice",
+        "business_term": "1.4.4.1.2",
+        "path": "FatturaElettronicaHeader/CessionarioCommittente/RappresentanteFiscale/IdFiscale/IdCodice",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaHeader/CessionarioCommittente/RappresentanteFiscale/IdFiscale/IdCodice"
+      },
+      "1.4.4.2": {
+        "id": "fpa_96",
+        "name": "Denominazione",
+        "business_term": "1.4.4.2",
+        "path": "FatturaElettronicaHeader/CessionarioCommittente/RappresentanteFiscale/Denominazione",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaHeader/CessionarioCommittente/RappresentanteFiscale/Denominazione"
+      },
+      "1.4.4.3": {
+        "id": "fpa_97",
+        "name": "Nome",
+        "business_term": "1.4.4.3",
+        "path": "FatturaElettronicaHeader/CessionarioCommittente/RappresentanteFiscale/Nome",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaHeader/CessionarioCommittente/RappresentanteFiscale/Nome"
+      },
+      "1.4.4.4": {
+        "id": "fpa_98",
+        "name": "Cognome",
+        "business_term": "1.4.4.4",
+        "path": "FatturaElettronicaHeader/CessionarioCommittente/RappresentanteFiscale/Cognome",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaHeader/CessionarioCommittente/RappresentanteFiscale/Cognome"
+      },
+      "1.5": {
+        "id": "fpa_99",
+        "name": "TerzoIntermediarioOSoggettoEmittente",
+        "business_term": "1.5",
+        "path": "FatturaElettronicaHeader/TerzoIntermediarioOSoggettoEmittente",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaHeader/TerzoIntermediarioOSoggettoEmittente"
+      },
+      "1.5.1": {
+        "id": "fpa_100",
+        "name": "DatiAnagrafici",
+        "business_term": "1.5.1",
+        "path": "FatturaElettronicaHeader/TerzoIntermediarioOSoggettoEmittente/DatiAnagrafici",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaHeader/TerzoIntermediarioOSoggettoEmittente/DatiAnagrafici"
+      },
+      "1.5.1.1": {
+        "id": "fpa_101",
+        "name": "IdFiscaleIVA",
+        "business_term": "1.5.1.1",
+        "path": "FatturaElettronicaHeader/TerzoIntermediarioOSoggettoEmittente/DatiAnagrafici/IdFiscaleIVA",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaHeader/TerzoIntermediarioOSoggettoEmittente/DatiAnagrafici/IdFiscaleIVA"
+      },
+      "1.5.1.1.1": {
+        "id": "fpa_102",
+        "name": "IdPaese",
+        "business_term": "1.5.1.1.1",
+        "path": "FatturaElettronicaHeader/TerzoIntermediarioOSoggettoEmittente/DatiAnagrafici/IdFiscaleIVA/IdPaese",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaHeader/TerzoIntermediarioOSoggettoEmittente/DatiAnagrafici/IdFiscaleIVA/IdPaese"
+      },
+      "1.5.1.1.2": {
+        "id": "fpa_103",
+        "name": "IdCodice",
+        "business_term": "1.5.1.1.2",
+        "path": "FatturaElettronicaHeader/TerzoIntermediarioOSoggettoEmittente/DatiAnagrafici/IdFiscaleIVA/IdCodice",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaHeader/TerzoIntermediarioOSoggettoEmittente/DatiAnagrafici/IdFiscaleIVA/IdCodice"
+      },
+      "1.5.1.2": {
+        "id": "fpa_104",
+        "name": "CodiceFiscale",
+        "business_term": "1.5.1.2",
+        "path": "FatturaElettronicaHeader/TerzoIntermediarioOSoggettoEmittente/DatiAnagrafici/CodiceFiscale",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaHeader/TerzoIntermediarioOSoggettoEmittente/DatiAnagrafici/CodiceFiscale"
+      },
+      "1.5.1.3": {
+        "id": "fpa_105",
+        "name": "Anagrafica",
+        "business_term": "1.5.1.3",
+        "path": "FatturaElettronicaHeader/TerzoIntermediarioOSoggettoEmittente/DatiAnagrafici/Anagrafica",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaHeader/TerzoIntermediarioOSoggettoEmittente/DatiAnagrafici/Anagrafica"
+      },
+      "1.5.1.3.1": {
+        "id": "fpa_106",
+        "name": "Denominazione",
+        "business_term": "1.5.1.3.1",
+        "path": "FatturaElettronicaHeader/TerzoIntermediarioOSoggettoEmittente/DatiAnagrafici/Anagrafica/Denominazione",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaHeader/TerzoIntermediarioOSoggettoEmittente/DatiAnagrafici/Anagrafica/Denominazione"
+      },
+      "1.5.1.3.2": {
+        "id": "fpa_107",
+        "name": "Nome",
+        "business_term": "1.5.1.3.2",
+        "path": "FatturaElettronicaHeader/TerzoIntermediarioOSoggettoEmittente/DatiAnagrafici/Anagrafica/Nome",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaHeader/TerzoIntermediarioOSoggettoEmittente/DatiAnagrafici/Anagrafica/Nome"
+      },
+      "1.5.1.3.3": {
+        "id": "fpa_108",
+        "name": "Cognome",
+        "business_term": "1.5.1.3.3",
+        "path": "FatturaElettronicaHeader/TerzoIntermediarioOSoggettoEmittente/DatiAnagrafici/Anagrafica/Cognome",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaHeader/TerzoIntermediarioOSoggettoEmittente/DatiAnagrafici/Anagrafica/Cognome"
+      },
+      "1.5.1.3.4": {
+        "id": "fpa_109",
+        "name": "Titolo",
+        "business_term": "1.5.1.3.4",
+        "path": "FatturaElettronicaHeader/TerzoIntermediarioOSoggettoEmittente/DatiAnagrafici/Anagrafica/Titolo",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaHeader/TerzoIntermediarioOSoggettoEmittente/DatiAnagrafici/Anagrafica/Titolo"
+      },
+      "1.5.1.3.5": {
+        "id": "fpa_110",
+        "name": "CodEORI",
+        "business_term": "1.5.1.3.5",
+        "path": "FatturaElettronicaHeader/TerzoIntermediarioOSoggettoEmittente/DatiAnagrafici/Anagrafica/CodEORI",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaHeader/TerzoIntermediarioOSoggettoEmittente/DatiAnagrafici/Anagrafica/CodEORI"
+      },
+      "1.6": {
+        "id": "fpa_111",
+        "name": "SoggettoEmittente",
+        "business_term": "1.6",
+        "path": "FatturaElettronicaHeader/SoggettoEmittente",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaHeader/SoggettoEmittente"
+      },
+      "2": {
+        "id": "fpa_112",
+        "name": "FatturaElettronicaBody",
+        "business_term": "2",
+        "path": "FatturaElettronicaBody",
+        "cardinality": "1 ..n",
+        "required": false,
+        "offset": "FatturaElettronicaBody"
+      },
+      "2.1": {
+        "id": "fpa_113",
+        "name": "DatiGenerali",
+        "business_term": "2.1",
+        "path": "FatturaElettronicaBody/DatiGenerali",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaBody/DatiGenerali"
+      },
+      "2.1.1": {
+        "id": "fpa_114",
+        "name": "DatiGeneraliDocumento",
+        "business_term": "2.1.1",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento"
+      },
+      "2.1.1.1": {
+        "id": "fpa_115",
+        "name": "TipoDocumento",
+        "business_term": "2.1.1.1",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/TipoDocumento",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/TipoDocumento"
+      },
+      "BT-5": {
+        "id": "fpa_116",
+        "name": "Divisa",
+        "business_term": "BT-5",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/Divisa",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/Divisa"
+      },
+      "BT-2": {
+        "id": "fpa_117",
+        "name": "Data",
+        "business_term": "BT-2",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/Data",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/Data"
+      },
+      "BT-1": {
+        "id": "fpa_118",
+        "name": "Numero",
+        "business_term": "BT-1",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/Numero",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/Numero"
+      },
+      "2.1.1.5": {
+        "id": "fpa_119",
+        "name": "DatiRitenuta",
+        "business_term": "2.1.1.5",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/DatiRitenuta",
+        "cardinality": "0 ..n",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/DatiRitenuta"
+      },
+      "2.1.1.5.1": {
+        "id": "fpa_120",
+        "name": "TipoRitenuta",
+        "business_term": "2.1.1.5.1",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/DatiRitenuta/TipoRitenuta",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/DatiRitenuta/TipoRitenuta"
+      },
+      "2.1.1.5.2": {
+        "id": "fpa_121",
+        "name": "ImportoRitenuta",
+        "business_term": "2.1.1.5.2",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/DatiRitenuta/ImportoRitenuta",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/DatiRitenuta/ImportoRitenuta"
+      },
+      "2.1.1.5.3": {
+        "id": "fpa_122",
+        "name": "AliquotaRitenuta",
+        "business_term": "2.1.1.5.3",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/DatiRitenuta/AliquotaRitenuta",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/DatiRitenuta/AliquotaRitenuta"
+      },
+      "2.1.1.5.4": {
+        "id": "fpa_123",
+        "name": "CausalePagamento",
+        "business_term": "2.1.1.5.4",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/DatiRitenuta/CausalePagamento",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/DatiRitenuta/CausalePagamento"
+      },
+      "2.1.1.6": {
+        "id": "fpa_124",
+        "name": "DatiBollo",
+        "business_term": "2.1.1.6",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/DatiBollo",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/DatiBollo"
+      },
+      "BT-105": {
+        "id": "fpa_125",
+        "name": "BolloVirtuale",
+        "business_term": "BT-105",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/DatiBollo/BolloVirtuale",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/DatiBollo/BolloVirtuale"
+      },
+      "BT-99": {
+        "id": "fpa_130",
+        "name": "ImportoContributoCassa",
+        "business_term": "BT-99",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/DatiCassaPrevidenziale/ImportoContributoCassa",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/DatiCassaPrevidenziale/ImportoContributoCassa"
+      },
+      "2.1.1.7": {
+        "id": "fpa_127",
+        "name": "DatiCassaPrevidenziale",
+        "business_term": "2.1.1.7",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/DatiCassaPrevidenziale",
+        "cardinality": "0 ..n",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/DatiCassaPrevidenziale"
+      },
+      "BT-104": {
+        "id": "fpa_134",
+        "name": "Natura",
+        "business_term": "BT-104",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/DatiCassaPrevidenziale/Natura",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/DatiCassaPrevidenziale/Natura"
+      },
+      "BT-101": {
+        "id": "fpa_129",
+        "name": "AlCassa",
+        "business_term": "BT-101",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/DatiCassaPrevidenziale/AlCassa",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/DatiCassaPrevidenziale/AlCassa"
+      },
+      "BT-100": {
+        "id": "fpa_131",
+        "name": "ImponibileCassa",
+        "business_term": "BT-100",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/DatiCassaPrevidenziale/ImponibileCassa",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/DatiCassaPrevidenziale/ImponibileCassa"
+      },
+      "BT-103": {
+        "id": "fpa_132",
+        "name": "AliquotaIVA",
+        "business_term": "BT-103",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/DatiCassaPrevidenziale/AliquotaIVA",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/DatiCassaPrevidenziale/AliquotaIVA"
+      },
+      "2.1.1.7.8": {
+        "id": "fpa_135",
+        "name": "RiferimentoAmministrazione",
+        "business_term": "2.1.1.7.8",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/DatiCassaPrevidenziale/RiferimentoAmministrazione",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/DatiCassaPrevidenziale/RiferimentoAmministrazione"
+      },
+      "2.1.1.8": {
+        "id": "fpa_136",
+        "name": "ScontoMaggiorazione",
+        "business_term": "2.1.1.8",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/ScontoMaggiorazione",
+        "cardinality": "0 ..n",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/ScontoMaggiorazione"
+      },
+      "2.1.1.8.1": {
+        "id": "fpa_137",
+        "name": "Tipo",
+        "business_term": "2.1.1.8.1",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/ScontoMaggiorazione/Tipo",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/ScontoMaggiorazione/Tipo"
+      },
+      "2.1.1.8.2": {
+        "id": "fpa_138",
+        "name": "Percentuale",
+        "business_term": "2.1.1.8.2",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/ScontoMaggiorazione/Percentuale",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/ScontoMaggiorazione/Percentuale"
+      },
+      "2.1.1.8.3": {
+        "id": "fpa_139",
+        "name": "Importo",
+        "business_term": "2.1.1.8.3",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/ScontoMaggiorazione/Importo",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/ScontoMaggiorazione/Importo"
+      },
+      "BT-112": {
+        "id": "fpa_140",
+        "name": "ImportoTotaleDocumento",
+        "business_term": "BT-112",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/ImportoTotaleDocumento",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/ImportoTotaleDocumento"
+      },
+      "BT-114": {
+        "id": "fpa_141",
+        "name": "Arrotondamento",
+        "business_term": "BT-114",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/Arrotondamento",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/Arrotondamento"
+      },
+      "BT-22": {
+        "id": "fpa_142",
+        "name": "Causale",
+        "business_term": "BT-22",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/Causale",
+        "cardinality": "0 ..n",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/Causale"
+      },
+      "2.1.1.12": {
+        "id": "fpa_143",
+        "name": "Art73",
+        "business_term": "2.1.1.12",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/Art73",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/Art73"
+      },
+      "2.1.2": {
+        "id": "fpa_144",
+        "name": "DatiOrdineAcquisto",
+        "business_term": "2.1.2",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiOrdineAcquisto\n",
+        "cardinality": "0 ..n",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiOrdineAcquisto\n"
+      },
+      "BT-126": {
+        "id": "fpa_226",
+        "name": "NumeroLinea",
+        "business_term": "BT-126",
+        "path": "FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee/NumeroLinea",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee/NumeroLinea"
+      },
+      "BT-13": {
+        "id": "fpa_146",
+        "name": "IdDocumento",
+        "business_term": "BT-13",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiOrdineAcquisto/IdDocumento\n",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiOrdineAcquisto/IdDocumento\n"
+      },
+      "2.1.2.3": {
+        "id": "fpa_147",
+        "name": "Data",
+        "business_term": "2.1.2.3",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiOrdineAcquisto/Data\n",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiOrdineAcquisto/Data\n"
+      },
+      "BT-132": {
+        "id": "fpa_148",
+        "name": "NumItem",
+        "business_term": "BT-132",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiOrdineAcquisto/NumItem\n",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiOrdineAcquisto/NumItem\n"
+      },
+      "BT-10": {
+        "id": "fpa_149",
+        "name": "CodiceCommessaConvenzione",
+        "business_term": "BT-10",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiOrdineAcquisto/CodiceCommessaConvenzione\n",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiOrdineAcquisto/CodiceCommessaConvenzione\n"
+      },
+      "2.1.2.6": {
+        "id": "fpa_150",
+        "name": "CodiceCUP",
+        "business_term": "2.1.2.6",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiOrdineAcquisto/CodiceCUP\n",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiOrdineAcquisto/CodiceCUP\n"
+      },
+      "2.1.2.7": {
+        "id": "fpa_151",
+        "name": "CodiceCIG",
+        "business_term": "2.1.2.7",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiOrdineAcquisto/CodiceCIG\n",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiOrdineAcquisto/CodiceCIG\n"
+      },
+      "2.1.3": {
+        "id": "fpa_152",
+        "name": "DatiContratto",
+        "business_term": "2.1.3",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiContratto\n",
+        "cardinality": "0 ..n",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiContratto\n"
+      },
+      "BT-12": {
+        "id": "fpa_162",
+        "name": "IdDocumento",
+        "business_term": "BT-12",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiConvenzione/IdDocumento",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiConvenzione/IdDocumento"
+      },
+      "2.1.3.3": {
+        "id": "fpa_155",
+        "name": "Data",
+        "business_term": "2.1.3.3",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiContratto/Data\n",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiContratto/Data\n"
+      },
+      "2.1.3.4": {
+        "id": "fpa_156",
+        "name": "NumItem",
+        "business_term": "2.1.3.4",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiContratto/NumItem\n",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiContratto/NumItem\n"
+      },
+      "BT-128": {
+        "id": "fpa_157",
+        "name": "CodiceCommessaConvenzione",
+        "business_term": "BT-128",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiContratto/CodiceCommessaConvenzione\n",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiContratto/CodiceCommessaConvenzione\n"
+      },
+      "BT-11": {
+        "id": "fpa_158",
+        "name": "CodiceCUP",
+        "business_term": "BT-11",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiContratto/CodiceCUP\n",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiContratto/CodiceCUP\n"
+      },
+      "BT-17": {
+        "id": "fpa_159",
+        "name": "CodiceCIG",
+        "business_term": "BT-17",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiContratto/CodiceCIG\n",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiContratto/CodiceCIG\n"
+      },
+      "2.1.4": {
+        "id": "fpa_160",
+        "name": "DatiConvenzione",
+        "business_term": "2.1.4",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiConvenzione\n",
+        "cardinality": "0 ..n",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiConvenzione\n"
+      },
+      "2.1.4.3": {
+        "id": "fpa_163",
+        "name": "Data",
+        "business_term": "2.1.4.3",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiConvenzione/Data\n",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiConvenzione/Data\n"
+      },
+      "2.1.4.4": {
+        "id": "fpa_164",
+        "name": "NumItem",
+        "business_term": "2.1.4.4",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiConvenzione/NumItem\n",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiConvenzione/NumItem\n"
+      },
+      "2.1.4.5": {
+        "id": "fpa_165",
+        "name": "CodiceCommessaConvenzione",
+        "business_term": "2.1.4.5",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiConvenzione/CodiceCommessaConvenzione\n",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiConvenzione/CodiceCommessaConvenzione\n"
+      },
+      "2.1.4.6": {
+        "id": "fpa_166",
+        "name": "CodiceCUP",
+        "business_term": "2.1.4.6",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiConvenzione/CodiceCUP\n",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiConvenzione/CodiceCUP\n"
+      },
+      "2.1.4.7": {
+        "id": "fpa_167",
+        "name": "CodiceCIG",
+        "business_term": "2.1.4.7",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiConvenzione/CodiceCIG\n",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiConvenzione/CodiceCIG\n"
+      },
+      "2.1.5": {
+        "id": "fpa_168",
+        "name": "DatiRicezione",
+        "business_term": "2.1.5",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiRicezione",
+        "cardinality": "0 ..n",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiRicezione"
+      },
+      "2.1.5.1": {
+        "id": "fpa_169",
+        "name": "RiferimentoNumeroLinea",
+        "business_term": "2.1.5.1",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiRicezione/RiferimentoNumeroLinea",
+        "cardinality": "0 ..n",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiRicezione/RiferimentoNumeroLinea"
+      },
+      "BT-15": {
+        "id": "fpa_170",
+        "name": "IdDocumento",
+        "business_term": "BT-15",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiRicezione/IdDocumento",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiRicezione/IdDocumento"
+      },
+      "2.1.5.3": {
+        "id": "fpa_171",
+        "name": "Data",
+        "business_term": "2.1.5.3",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiRicezione/Data",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiRicezione/Data"
+      },
+      "2.1.5.4": {
+        "id": "fpa_172",
+        "name": "NumItem",
+        "business_term": "2.1.5.4",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiRicezione/NumItem",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiRicezione/NumItem"
+      },
+      "2.1.5.5": {
+        "id": "fpa_173",
+        "name": "CodiceCommessaConvenzione",
+        "business_term": "2.1.5.5",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiRicezione/CodiceCommessaConvenzione",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiRicezione/CodiceCommessaConvenzione"
+      },
+      "2.1.5.6": {
+        "id": "fpa_174",
+        "name": "CodiceCUP",
+        "business_term": "2.1.5.6",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiRicezione/CodiceCUP",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiRicezione/CodiceCUP"
+      },
+      "2.1.5.7": {
+        "id": "fpa_175",
+        "name": "CodiceCIG",
+        "business_term": "2.1.5.7",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiRicezione/CodiceCIG",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiRicezione/CodiceCIG"
+      },
+      "2.1.6": {
+        "id": "fpa_176",
+        "name": "DatiFattureCollegate",
+        "business_term": "2.1.6",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiFattureCollegate",
+        "cardinality": "0 ..n",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiFattureCollegate"
+      },
+      "2.1.6.1": {
+        "id": "fpa_177",
+        "name": "RiferimentoNumeroLinea",
+        "business_term": "2.1.6.1",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiFattureCollegate/RiferimentoNumeroLinea",
+        "cardinality": "0 ..n",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiFattureCollegate/RiferimentoNumeroLinea"
+      },
+      "BT-25": {
+        "id": "fpa_178",
+        "name": "IdDocumento",
+        "business_term": "BT-25",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiFattureCollegate/IdDocumento",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiFattureCollegate/IdDocumento"
+      },
+      "BT-26": {
+        "id": "fpa_179",
+        "name": "Data",
+        "business_term": "BT-26",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiFattureCollegate/Data",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiFattureCollegate/Data"
+      },
+      "2.1.6.4": {
+        "id": "fpa_180",
+        "name": "NumItem",
+        "business_term": "2.1.6.4",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiFattureCollegate/NumItem",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiFattureCollegate/NumItem"
+      },
+      "2.1.6.5": {
+        "id": "fpa_181",
+        "name": "CodiceCommessaConvenzione",
+        "business_term": "2.1.6.5",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiFattureCollegate/CodiceCommessaConvenzione",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiFattureCollegate/CodiceCommessaConvenzione"
+      },
+      "2.1.6.6": {
+        "id": "fpa_182",
+        "name": "CodiceCUP",
+        "business_term": "2.1.6.6",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiFattureCollegate/CodiceCUP",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiFattureCollegate/CodiceCUP"
+      },
+      "2.1.6.7": {
+        "id": "fpa_183",
+        "name": "CodiceCIG",
+        "business_term": "2.1.6.7",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiFattureCollegate/CodiceCIG",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiFattureCollegate/CodiceCIG"
+      },
+      "2.1.7": {
+        "id": "fpa_184",
+        "name": "DatiSAL",
+        "business_term": "2.1.7",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiSAL",
+        "cardinality": "0 ..n",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiSAL"
+      },
+      "BT-18": {
+        "id": "fpa_185",
+        "name": "RiferimentoFase",
+        "business_term": "BT-18",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiSAL/RiferimentoFase",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiSAL/RiferimentoFase"
+      },
+      "2.1.8": {
+        "id": "fpa_186",
+        "name": "DatiDDT",
+        "business_term": "2.1.8",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiDDT",
+        "cardinality": "0 ..n",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiDDT"
+      },
+      "BT-16": {
+        "id": "fpa_187",
+        "name": "NumeroDDT",
+        "business_term": "BT-16",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiDDT/NumeroDDT",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiDDT/NumeroDDT"
+      },
+      "2.1.8.2": {
+        "id": "fpa_188",
+        "name": "DataDDT",
+        "business_term": "2.1.8.2",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiDDT/DataDDT",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiDDT/DataDDT"
+      },
+      "2.1.9": {
+        "id": "fpa_190",
+        "name": "DatiTrasporto",
+        "business_term": "2.1.9",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiTrasporto",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiTrasporto"
+      },
+      "2.1.9.1": {
+        "id": "fpa_191",
+        "name": "DatiAnagraficiVettore",
+        "business_term": "2.1.9.1",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiTrasporto/DatiAnagraficiVettore",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiTrasporto/DatiAnagraficiVettore"
+      },
+      "2.1.9.1.1": {
+        "id": "fpa_192",
+        "name": "IdFiscaleIVA",
+        "business_term": "2.1.9.1.1",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiTrasporto/DatiAnagraficiVettore/IdFiscaleIVA",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiTrasporto/DatiAnagraficiVettore/IdFiscaleIVA"
+      },
+      "2.1.9.1.1.1": {
+        "id": "fpa_193",
+        "name": "IdPaese",
+        "business_term": "2.1.9.1.1.1",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiTrasporto/DatiAnagraficiVettore/IdFiscaleIVA/IdPaese",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiTrasporto/DatiAnagraficiVettore/IdFiscaleIVA/IdPaese"
+      },
+      "2.1.9.1.1.2": {
+        "id": "fpa_194",
+        "name": "IdCodice",
+        "business_term": "2.1.9.1.1.2",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiTrasporto/DatiAnagraficiVettore/IdFiscaleIVA/IdCodice",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiTrasporto/DatiAnagraficiVettore/IdFiscaleIVA/IdCodice"
+      },
+      "2.1.9.1.2": {
+        "id": "fpa_195",
+        "name": "CodiceFiscale",
+        "business_term": "2.1.9.1.2",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiTrasporto/DatiAnagraficiVettore/CodiceFiscale",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiTrasporto/DatiAnagraficiVettore/CodiceFiscale"
+      },
+      "2.1.9.1.3": {
+        "id": "fpa_196",
+        "name": "Anagrafica",
+        "business_term": "2.1.9.1.3",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiTrasporto/DatiAnagraficiVettore/Anagrafica",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiTrasporto/DatiAnagraficiVettore/Anagrafica"
+      },
+      "2.1.9.1.3.1": {
+        "id": "fpa_197",
+        "name": "Denominazione",
+        "business_term": "2.1.9.1.3.1",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiTrasporto/DatiAnagraficiVettore/Anagrafica/Denominazione",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiTrasporto/DatiAnagraficiVettore/Anagrafica/Denominazione"
+      },
+      "2.1.9.1.3.2": {
+        "id": "fpa_198",
+        "name": "Nome",
+        "business_term": "2.1.9.1.3.2",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiTrasporto/DatiAnagraficiVettore/Anagrafica/Nome",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiTrasporto/DatiAnagraficiVettore/Anagrafica/Nome"
+      },
+      "2.1.9.1.3.3": {
+        "id": "fpa_199",
+        "name": "Cognome",
+        "business_term": "2.1.9.1.3.3",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiTrasporto/DatiAnagraficiVettore/Anagrafica/Cognome",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiTrasporto/DatiAnagraficiVettore/Anagrafica/Cognome"
+      },
+      "2.1.9.1.3.4": {
+        "id": "fpa_200",
+        "name": "Titolo",
+        "business_term": "2.1.9.1.3.4",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiTrasporto/DatiAnagraficiVettore/Anagrafica/Titolo",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiTrasporto/DatiAnagraficiVettore/Anagrafica/Titolo"
+      },
+      "2.1.9.1.3.5": {
+        "id": "fpa_201",
+        "name": "CodEORI",
+        "business_term": "2.1.9.1.3.5",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiTrasporto/DatiAnagraficiVettore/Anagrafica/CodEORI",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiTrasporto/DatiAnagraficiVettore/Anagrafica/CodEORI"
+      },
+      "2.1.9.1.4": {
+        "id": "fpa_202",
+        "name": "NumeroLicenzaGuida",
+        "business_term": "2.1.9.1.4",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiTrasportoDatiAnagraficiVettore/NumeroLicenzaGuida",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiTrasportoDatiAnagraficiVettore/NumeroLicenzaGuida"
+      },
+      "2.1.9.2": {
+        "id": "fpa_203",
+        "name": "MezzoTrasporto",
+        "business_term": "2.1.9.2",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiTrasporto/MezzoTrasporto",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiTrasporto/MezzoTrasporto"
+      },
+      "2.1.9.3": {
+        "id": "fpa_204",
+        "name": "CausaleTrasporto",
+        "business_term": "2.1.9.3",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiTrasporto/CausaleTrasporto",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiTrasporto/CausaleTrasporto"
+      },
+      "2.1.9.4": {
+        "id": "fpa_205",
+        "name": "NumeroColli",
+        "business_term": "2.1.9.4",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiTrasporto/NumeroColli",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiTrasporto/NumeroColli"
+      },
+      "2.1.9.5": {
+        "id": "fpa_206",
+        "name": "Descrizione",
+        "business_term": "2.1.9.5",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiTrasporto/Descrizione",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiTrasporto/Descrizione"
+      },
+      "2.1.9.6": {
+        "id": "fpa_207",
+        "name": "UnitaMisuraPeso",
+        "business_term": "2.1.9.6",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiTrasporto/UnitaMisuraPeso",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiTrasporto/UnitaMisuraPeso"
+      },
+      "2.1.9.7": {
+        "id": "fpa_208",
+        "name": "PesoLordo",
+        "business_term": "2.1.9.7",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiTrasporto/PesoLordo",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiTrasporto/PesoLordo"
+      },
+      "2.1.9.8": {
+        "id": "fpa_209",
+        "name": "PesoNetto",
+        "business_term": "2.1.9.8",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiTrasporto/PesoNetto",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiTrasporto/PesoNetto"
+      },
+      "2.1.9.9": {
+        "id": "fpa_210",
+        "name": "DataOraRitiro",
+        "business_term": "2.1.9.9",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiTrasporto/DataOraRitiro",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiTrasporto/DataOraRitiro"
+      },
+      "2.1.9.10": {
+        "id": "fpa_211",
+        "name": "DataInizioTrasporto",
+        "business_term": "2.1.9.10",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiTrasporto/DataInizioTrasporto",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiTrasporto/DataInizioTrasporto"
+      },
+      "2.1.9.11": {
+        "id": "fpa_212",
+        "name": "TipoResa",
+        "business_term": "2.1.9.11",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiTrasporto/TipoResa",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiTrasporto/TipoResa"
+      },
+      "2.1.9.12": {
+        "id": "fpa_213",
+        "name": "IndirizzoResa",
+        "business_term": "2.1.9.12",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiTrasporto/IndirizzoResa",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiTrasporto/IndirizzoResa"
+      },
+      "BT-75": {
+        "id": "fpa_214",
+        "name": "Indirizzo",
+        "business_term": "BT-75",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiTrasporto/IndirizzoResa/Indirizzo",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiTrasporto/IndirizzoResa/Indirizzo"
+      },
+      "BT-76": {
+        "id": "fpa_215",
+        "name": "NumeroCivico",
+        "business_term": "BT-76",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiTrasporto/IndirizzoResa/NumeroCivico",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiTrasporto/IndirizzoResa/NumeroCivico"
+      },
+      "BT-78": {
+        "id": "fpa_216",
+        "name": "CAP",
+        "business_term": "BT-78",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiTrasporto/IndirizzoResa/CAP",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiTrasporto/IndirizzoResa/CAP"
+      },
+      "BT-77": {
+        "id": "fpa_217",
+        "name": "Comune",
+        "business_term": "BT-77",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiTrasporto/IndirizzoResa/Comune",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiTrasporto/IndirizzoResa/Comune"
+      },
+      "BT-79": {
+        "id": "fpa_218",
+        "name": "Provincia",
+        "business_term": "BT-79",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiTrasporto/IndirizzoResa/Provincia",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiTrasporto/IndirizzoResa/Provincia"
+      },
+      "BT-80": {
+        "id": "fpa_219",
+        "name": "Nazione",
+        "business_term": "BT-80",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiTrasporto/IndirizzoResa/Nazione",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiTrasporto/IndirizzoResa/Nazione"
+      },
+      "BT-72": {
+        "id": "fpa_220",
+        "name": "DataOraConsegna",
+        "business_term": "BT-72",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiTrasporto/DataOraConsegna",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiGenerali/DatiTrasporto/DataOraConsegna"
+      },
+      "2.1.10": {
+        "id": "fpa_221",
+        "name": "FatturaPrincipale",
+        "business_term": "2.1.10",
+        "path": "FatturaElettronicaBody/DatiGenerali/FatturaPrincipale",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiGenerali/FatturaPrincipale"
+      },
+      "2.1.10.1": {
+        "id": "fpa_222",
+        "name": "NumeroFatturaPrincipale",
+        "business_term": "2.1.10.1",
+        "path": "FatturaElettronicaBody/DatiGenerali/FatturaPrincipale/NumeroFatturaPrincipale",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaBody/DatiGenerali/FatturaPrincipale/NumeroFatturaPrincipale"
+      },
+      "2.1.10.2": {
+        "id": "fpa_223",
+        "name": "DataFatturaPrincipale",
+        "business_term": "2.1.10.2",
+        "path": "FatturaElettronicaBody/DatiGenerali/FatturaPrincipale/DataFatturaPrincipale",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaBody/DatiGenerali/FatturaPrincipale/DataFatturaPrincipale"
+      },
+      "2.2": {
+        "id": "fpa_224",
+        "name": "DatiBeniServizi",
+        "business_term": "2.2",
+        "path": "FatturaElettronicaBody//DatiBeniServizi ",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaBody//DatiBeniServizi "
+      },
+      "2.2.1": {
+        "id": "fpa_225",
+        "name": "DettaglioLinee",
+        "business_term": "2.2.1",
+        "path": "FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee",
+        "cardinality": "1 ..n",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee"
+      },
+      "BT-160": {
+        "id": "fpa_254",
+        "name": "SpeseAccessorie",
+        "business_term": "BT-160",
+        "path": "FatturaElettronicaBody/DatiBeniServizi/DatiRiepilogo/SpeseAccessorie",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiBeniServizi/DatiRiepilogo/SpeseAccessorie"
+      },
+      "2.2.1.3": {
+        "id": "fpa_228",
+        "name": "CodiceArticolo",
+        "business_term": "2.2.1.3",
+        "path": "FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee/CodiceArticolo",
+        "cardinality": "0 ..n",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee/CodiceArticolo"
+      },
+      "BT-155": {
+        "id": "fpa_230",
+        "name": "CodiceValore",
+        "business_term": "BT-155",
+        "path": "FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee/CodiceArticolo/CodiceValore",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee/CodiceArticolo/CodiceValore"
+      },
+      "BT-153": {
+        "id": "fpa_231",
+        "name": "Descrizione",
+        "business_term": "BT-153",
+        "path": "FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee/Descrizione",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee/Descrizione"
+      },
+      "BT-129": {
+        "id": "fpa_232",
+        "name": "Quantita",
+        "business_term": "BT-129",
+        "path": "FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee/Quantita",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee/Quantita"
+      },
+      "BT-130": {
+        "id": "fpa_233",
+        "name": "UnitaMisura",
+        "business_term": "BT-130",
+        "path": "FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee/UnitaMisura",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee/UnitaMisura"
+      },
+      "BT-134": {
+        "id": "fpa_234",
+        "name": "DataInizioPeriodo",
+        "business_term": "BT-134",
+        "path": "FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee/DataInizioPeriodo",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee/DataInizioPeriodo"
+      },
+      "BT-135": {
+        "id": "fpa_235",
+        "name": "DataFinePeriodo",
+        "business_term": "BT-135",
+        "path": "FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee/DataFinePeriodo",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee/DataFinePeriodo"
+      },
+      "BT-148": {
+        "id": "fpa_236",
+        "name": "PrezzoUnitario",
+        "business_term": "BT-148",
+        "path": "FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee/PrezzoUnitario",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee/PrezzoUnitario"
+      },
+      "2.2.1.10": {
+        "id": "fpa_237",
+        "name": "ScontoMaggiorazione",
+        "business_term": "2.2.1.10",
+        "path": "FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee/ScontoMaggiorazione",
+        "cardinality": "0 ..n",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee/ScontoMaggiorazione"
+      },
+      "2.2.1.10.1": {
+        "id": "fpa_238",
+        "name": "Tipo",
+        "business_term": "2.2.1.10.1",
+        "path": "FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee/ScontoMaggiorazione/Tipo",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee/ScontoMaggiorazione/Tipo"
+      },
+      "2.2.1.10.2": {
+        "id": "fpa_239",
+        "name": "Percentuale",
+        "business_term": "2.2.1.10.2",
+        "path": "FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee/ScontoMaggiorazione/Percentuale",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee/ScontoMaggiorazione/Percentuale"
+      },
+      "BT-147": {
+        "id": "fpa_240",
+        "name": "Importo",
+        "business_term": "BT-147",
+        "path": "FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee/ScontoMaggiorazione/Importo",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee/ScontoMaggiorazione/Importo"
+      },
+      "BT-131": {
+        "id": "fpa_241",
+        "name": "PrezzoTotale",
+        "business_term": "BT-131",
+        "path": "FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee/PrezzoTotale",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee/PrezzoTotale"
+      },
+      "BT-152": {
+        "id": "fpa_242",
+        "name": "AliquotaIVA",
+        "business_term": "BT-152",
+        "path": "FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee/AliquotaIVA",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee/AliquotaIVA"
+      },
+      "BT-161": {
+        "id": "fpa_262",
+        "name": "TotalePercorso",
+        "business_term": "BT-161",
+        "path": "FatturaElettronicaBody/DatiVeicoli/TotalePercorso",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaBody/DatiVeicoli/TotalePercorso"
+      },
+      "BT-133": {
+        "id": "fpa_245",
+        "name": "RiferimentoAmministrazione",
+        "business_term": "BT-133",
+        "path": "FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee/RiferimentoAmministrazione",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee/RiferimentoAmministrazione"
+      },
+      "2.2.1.16": {
+        "id": "fpa_246",
+        "name": "AltriDatiGestionali",
+        "business_term": "2.2.1.16",
+        "path": "FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee/AltriDatiGestionali",
+        "cardinality": "0 ..n",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee/AltriDatiGestionali"
+      },
+      "2.2.2": {
+        "id": "fpa_251",
+        "name": "DatiRiepilogo",
+        "business_term": "2.2.2",
+        "path": "FatturaElettronicaBody/DatiBeniServizi/DatiRiepilogo",
+        "cardinality": "1 ..n",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiBeniServizi/DatiRiepilogo"
+      },
+      "BT-119": {
+        "id": "fpa_252",
+        "name": "AliquotaIVA",
+        "business_term": "BT-119",
+        "path": "FatturaElettronicaBody/DatiBeniServizi/DatiRiepilogo/AliquotaIVA",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaBody/DatiBeniServizi/DatiRiepilogo/AliquotaIVA"
+      },
+      "BT-120": {
+        "id": "fpa_259",
+        "name": "RiferimentoNormativo",
+        "business_term": "BT-120",
+        "path": "FatturaElettronicaBody/DatiBeniServizi/DatiRiepilogo/RiferimentoNormativo",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiBeniServizi/DatiRiepilogo/RiferimentoNormativo"
+      },
+      "2.2.2.4": {
+        "id": "fpa_255",
+        "name": "Arrotondamento",
+        "business_term": "2.2.2.4",
+        "path": "FatturaElettronicaBody/DatiBeniServizi/DatiRiepilogo/Arrotondamento",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiBeniServizi/DatiRiepilogo/Arrotondamento"
+      },
+      "BT-116": {
+        "id": "fpa_256",
+        "name": "ImponibileImporto",
+        "business_term": "BT-116",
+        "path": "FatturaElettronicaBody/DatiBeniServizi/DatiRiepilogo/ImponibileImporto",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaBody/DatiBeniServizi/DatiRiepilogo/ImponibileImporto"
+      },
+      "BT-117": {
+        "id": "fpa_257",
+        "name": "Imposta",
+        "business_term": "BT-117",
+        "path": "FatturaElettronicaBody/DatiBeniServizi/DatiRiepilogo/Imposta",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaBody/DatiBeniServizi/DatiRiepilogo/Imposta"
+      },
+      "BT-8": {
+        "id": "fpa_258",
+        "name": "EsigibilitaIVA",
+        "business_term": "BT-8",
+        "path": "FatturaElettronicaBody/DatiBeniServizi/DatiRiepilogo/EsigibilitaIVA",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiBeniServizi/DatiRiepilogo/EsigibilitaIVA"
+      },
+      "2.3": {
+        "id": "fpa_260",
+        "name": "DatiVeicoli",
+        "business_term": "2.3",
+        "path": "FatturaElettronicaBody/DatiVeicoli",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiVeicoli"
+      },
+      "2.4": {
+        "id": "fpa_263",
+        "name": "DatiPagamento",
+        "business_term": "2.4",
+        "path": "FatturaElettronicaBody/DatiPagamento",
+        "cardinality": "0 ..n",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiPagamento"
+      },
+      "BT-20": {
+        "id": "fpa_269",
+        "name": "GiorniTerminiPagamento",
+        "business_term": "BT-20",
+        "path": "FatturaElettronicaBody/DatiPagamento/DettaglioPagamento/GiorniTerminiPagamento",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiPagamento/DettaglioPagamento/GiorniTerminiPagamento"
+      },
+      "2.4.2": {
+        "id": "fpa_265",
+        "name": "DettaglioPagamento",
+        "business_term": "2.4.2",
+        "path": "FatturaElettronicaBody/DatiPagamento/DettaglioPagamento",
+        "cardinality": "1 ..n",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiPagamento/DettaglioPagamento"
+      },
+      "BT-59": {
+        "id": "fpa_266",
+        "name": "Beneficiario",
+        "business_term": "BT-59",
+        "path": "FatturaElettronicaBody/DatiPagamento/DettaglioPagamento/Beneficiario",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiPagamento/DettaglioPagamento/Beneficiario"
+      },
+      "BT-81": {
+        "id": "fpa_267",
+        "name": "ModalitaPagamento",
+        "business_term": "BT-81",
+        "path": "FatturaElettronicaBody/DatiPagamento/DettaglioPagamento/ModalitaPagamento",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaBody/DatiPagamento/DettaglioPagamento/ModalitaPagamento"
+      },
+      "2.4.2.3": {
+        "id": "fpa_268",
+        "name": "DataRiferimentoTerminiPagamento",
+        "business_term": "2.4.2.3",
+        "path": "FatturaElettronicaBody/DatiPagamento/DettaglioPagamento/DataRiferimentoTerminiPagamento",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiPagamento/DettaglioPagamento/DataRiferimentoTerminiPagamento"
+      },
+      "BT-9": {
+        "id": "fpa_270",
+        "name": "DataScadenzaPagamento",
+        "business_term": "BT-9",
+        "path": "FatturaElettronicaBody/DatiPagamento/DettaglioPagamento/DataScadenzaPagamento",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiPagamento/DettaglioPagamento/DataScadenzaPagamento"
+      },
+      "BT-115": {
+        "id": "fpa_271",
+        "name": "ImportoPagamento",
+        "business_term": "BT-115",
+        "path": "FatturaElettronicaBody/DatiPagamento/DettaglioPagamento/ImportoPagamento",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaBody/DatiPagamento/DettaglioPagamento/ImportoPagamento"
+      },
+      "2.4.2.7": {
+        "id": "fpa_272",
+        "name": "CodUfficioPostale",
+        "business_term": "2.4.2.7",
+        "path": "FatturaElettronicaBody/DatiPagamento/DettaglioPagamento/CodUfficioPostale",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiPagamento/DettaglioPagamento/CodUfficioPostale"
+      },
+      "BT-60": {
+        "id": "fpa_274",
+        "name": "NomeQuietanzante",
+        "business_term": "BT-60",
+        "path": "FatturaElettronicaBody/DatiPagamento/DettaglioPagamento/NomeQuietanzante",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiPagamento/DettaglioPagamento/NomeQuietanzante"
+      },
+      "BT-61": {
+        "id": "fpa_275",
+        "name": "CFQuietanzante",
+        "business_term": "BT-61",
+        "path": "FatturaElettronicaBody/DatiPagamento/DettaglioPagamento/CGQuietanzante",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiPagamento/DettaglioPagamento/CGQuietanzante"
+      },
+      "2.4.2.11": {
+        "id": "fpa_276",
+        "name": "TitoloQuietanzante",
+        "business_term": "2.4.2.11",
+        "path": "FatturaElettronicaBody/DatiPagamento/DettaglioPagamento/TitoloQuietanzante",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiPagamento/DettaglioPagamento/TitoloQuietanzante"
+      },
+      "2.4.2.12": {
+        "id": "fpa_277",
+        "name": "IstitutoFinanziario",
+        "business_term": "2.4.2.12",
+        "path": "FatturaElettronicaBody/DatiPagamento/DettaglioPagamento/IstitutoFinanziario",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiPagamento/DettaglioPagamento/IstitutoFinanziario"
+      },
+      "BT-84": {
+        "id": "fpa_278",
+        "name": "IBAN",
+        "business_term": "BT-84",
+        "path": "FatturaElettronicaBody/DatiPagamento/DettaglioPagamento/IBAN",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiPagamento/DettaglioPagamento/IBAN"
+      },
+      "2.4.2.14": {
+        "id": "fpa_279",
+        "name": "ABI",
+        "business_term": "2.4.2.14",
+        "path": "FatturaElettronicaBody/DatiPagamento/DettaglioPagamento/ABI",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiPagamento/DettaglioPagamento/ABI"
+      },
+      "2.4.2.15": {
+        "id": "fpa_280",
+        "name": "CAB",
+        "business_term": "2.4.2.15",
+        "path": "FatturaElettronicaBody/DatiPagamento/DettaglioPagamento/CAB",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiPagamento/DettaglioPagamento/CAB"
+      },
+      "BT-86": {
+        "id": "fpa_281",
+        "name": "BIC",
+        "business_term": "BT-86",
+        "path": "FatturaElettronicaBody/DatiPagamento/DettaglioPagamento/BIC",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiPagamento/DettaglioPagamento/BIC"
+      },
+      "2.4.2.17": {
+        "id": "fpa_282",
+        "name": "ScontoPagamentoAnticipato",
+        "business_term": "2.4.2.17",
+        "path": "FatturaElettronicaBody/DatiPagamento/DettaglioPagamento/ScontoPagamentoAnticipato",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiPagamento/DettaglioPagamento/ScontoPagamentoAnticipato"
+      },
+      "2.4.2.18": {
+        "id": "fpa_283",
+        "name": "DataLimitePagamentoAnticipato",
+        "business_term": "2.4.2.18",
+        "path": "FatturaElettronicaBody/DatiPagamento/DettaglioPagamento/DataLimitePagamentoAnticipato",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiPagamento/DettaglioPagamento/DataLimitePagamentoAnticipato"
+      },
+      "2.4.2.19": {
+        "id": "fpa_284",
+        "name": "PenalitaPagamentiRitardati",
+        "business_term": "2.4.2.19",
+        "path": "FatturaElettronicaBody/DatiPagamento/DettaglioPagamento/PenalitaPagamentiRitardati",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiPagamento/DettaglioPagamento/PenalitaPagamentiRitardati"
+      },
+      "2.4.2.20": {
+        "id": "fpa_285",
+        "name": "DataDecorrenzaPenale",
+        "business_term": "2.4.2.20",
+        "path": "FatturaElettronicaBody/DatiPagamento/DettaglioPagamento/DataDecorrenzaPenale",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiPagamento/DettaglioPagamento/DataDecorrenzaPenale"
+      },
+      "BT-83": {
+        "id": "fpa_286",
+        "name": "CodicePagamento",
+        "business_term": "BT-83",
+        "path": "FatturaElettronicaBody/DatiPagamento/DettaglioPagamento/CodicePagamento",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/DatiPagamento/DettaglioPagamento/CodicePagamento"
+      },
+      "2.5": {
+        "id": "fpa_287",
+        "name": "Allegati",
+        "business_term": "2.5",
+        "path": "FatturaElettronicaBody/Allegati",
+        "cardinality": "0 ..n",
+        "required": false,
+        "offset": "FatturaElettronicaBody/Allegati"
+      },
+      "BT-122": {
+        "id": "fpa_288",
+        "name": "NomeAttachment",
+        "business_term": "BT-122",
+        "path": "FatturaElettronicaBody/Allegati/NomeAttachment",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaBody/Allegati/NomeAttachment"
+      },
+      "2.5.2": {
+        "id": "fpa_289",
+        "name": "AlgoritmoCompressione",
+        "business_term": "2.5.2",
+        "path": "FatturaElettronicaBody/Allegati/AlgoritmoCompressione",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/Allegati/AlgoritmoCompressione"
+      },
+      "BT-125": {
+        "id": "fpa_292",
+        "name": "Attachment",
+        "business_term": "BT-125",
+        "path": "FatturaElettronicaBody/Allegati/Attachment",
+        "cardinality": "1 ..1",
+        "required": true,
+        "offset": "FatturaElettronicaBody/Allegati/Attachment"
+      },
+      "BT-123": {
+        "id": "fpa_291",
+        "name": "DescrizioneAttachment",
+        "business_term": "BT-123",
+        "path": "FatturaElettronicaBody/Allegati/DescrizioneAttachment",
+        "cardinality": "0 ..1",
+        "required": false,
+        "offset": "FatturaElettronicaBody/Allegati/DescrizioneAttachment"
+      }
+    }
+  },
+  "outputSchema": {
+    "name": "UBL_PEPPOL_BIS_3",
+    "format": "xml",
+    "namespace": "urn:oasis:names:specification:ubl:schema:xsd:Invoice-2",
+    "rootElement": "Invoice",
+    "fields": {
+      "EXT": {
+        "id": "ubl_375",
+        "name": "cbc.IssueDate",
+        "business_term": "EXT",
+        "path": "cac:InvoiceLine/cac:DespatchLineReference/cac:DocumentReference/cbc:IssueDate",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cac:InvoiceLine/cac:DespatchLineReference/cac:DocumentReference/cbc:IssueDate"
+      },
+      "BT-24": {
+        "id": "ubl_34",
+        "name": "cbc.CustomizationID",
+        "business_term": "BT-24",
+        "path": "cbc:CustomizationID",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cbc:CustomizationID"
+      },
+      "BT-23": {
+        "id": "ubl_35",
+        "name": "cbc.ProfileID",
+        "business_term": "BT-23",
+        "path": "cbc:ProfileID",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cbc:ProfileID"
+      },
+      "BT-1": {
+        "id": "ubl_36",
+        "name": "cbc.ID",
+        "business_term": "BT-1",
+        "path": "cbc:ID",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cbc:ID"
+      },
+      "BT-2": {
+        "id": "ubl_37",
+        "name": "cbc.IssueDate",
+        "business_term": "BT-2",
+        "path": "cbc:IssueDate",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cbc:IssueDate"
+      },
+      "BT-9": {
+        "id": "ubl_38",
+        "name": "cbc.DueDate",
+        "business_term": "BT-9",
+        "path": "cbc:DueDate",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cbc:DueDate"
+      },
+      "BT-3": {
+        "id": "ubl_39",
+        "name": "cbc.InvoiceTypeCode",
+        "business_term": "BT-3",
+        "path": "cbc:InvoiceTypeCode",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cbc:InvoiceTypeCode"
+      },
+      "BT-22": {
+        "id": "ubl_40",
+        "name": "cbc.Note",
+        "business_term": "BT-22",
+        "path": "cbc:Note",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cbc:Note"
+      },
+      "BT-7": {
+        "id": "ubl_41",
+        "name": "cbc.TaxPointDate",
+        "business_term": "BT-7",
+        "path": "cbc:TaxPointDate",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cbc:TaxPointDate"
+      },
+      "BT-5": {
+        "id": "ubl_42",
+        "name": "cbc.DocumentCurrencyCode",
+        "business_term": "BT-5",
+        "path": "cbc:DocumentCurrencyCode",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cbc:DocumentCurrencyCode"
+      },
+      "BT-6": {
+        "id": "ubl_43",
+        "name": "cbc.TaxCurrencyCode",
+        "business_term": "BT-6",
+        "path": "cbc:TaxCurrencyCode",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cbc:TaxCurrencyCode"
+      },
+      "BT-19": {
+        "id": "ubl_44",
+        "name": "cbc.AccountingCost",
+        "business_term": "BT-19",
+        "path": "cbc:AccountingCost",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cbc:AccountingCost"
+      },
+      "BT-10": {
+        "id": "ubl_45",
+        "name": "cbc.BuyerReference",
+        "business_term": "BT-10",
+        "path": "cbc:BuyerReference",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cbc:BuyerReference"
+      },
+      "BG-14": {
+        "id": "ubl_46",
+        "name": "cac.InvoicePeriod",
+        "business_term": "BG-14",
+        "path": "cac:InvoicePeriod",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cac:InvoicePeriod"
+      },
+      "BT-73": {
+        "id": "ubl_47",
+        "name": "cbc.StartDate",
+        "business_term": "BT-73",
+        "path": "cac:InvoicePeriod/cbc:StartDate",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cac:InvoicePeriod/cbc:StartDate"
+      },
+      "BT-74": {
+        "id": "ubl_48",
+        "name": "cbc.EndDate",
+        "business_term": "BT-74",
+        "path": "cac:InvoicePeriod/cbc:EndDate",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cac:InvoicePeriod/cbc:EndDate"
+      },
+      "BT-8": {
+        "id": "ubl_49",
+        "name": "cbc.DescriptionCode",
+        "business_term": "BT-8",
+        "path": "cac:InvoicePeriod/cbc:DescriptionCode",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cac:InvoicePeriod/cbc:DescriptionCode"
+      },
+      "": {
+        "id": "ubl_423",
+        "name": "@currencyID",
+        "business_term": "",
+        "path": "cac:InvoiceLine/cac:Price/cac:AllowanceCharge/cbc:BaseAmount/@currencyID",
+        "cardinality": "M",
+        "required": false,
+        "offset": "cac:InvoiceLine/cac:Price/cac:AllowanceCharge/cbc:BaseAmount/@currencyID"
+      },
+      "BT-13": {
+        "id": "ubl_51",
+        "name": "cbc.ID",
+        "business_term": "BT-13",
+        "path": "cac:OrderReference/cbc:ID",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cac:OrderReference/cbc:ID"
+      },
+      "BT-14": {
+        "id": "ubl_52",
+        "name": "cbc.SalesOrderID",
+        "business_term": "BT-14",
+        "path": "cac:OrderReference/cbc:SalesOrderID",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cac:OrderReference/cbc:SalesOrderID"
+      },
+      "BG-3": {
+        "id": "ubl_54",
+        "name": "cac.BillingReference",
+        "business_term": "BG-3",
+        "path": "cac:BillingReference",
+        "cardinality": "0..n",
+        "required": false,
+        "offset": "cac:BillingReference"
+      },
+      "BT-25": {
+        "id": "ubl_56",
+        "name": "cbc.ID",
+        "business_term": "BT-25",
+        "path": "cac:BillingReference/cac:InvoiceDocumentReference/cbc:ID",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cac:BillingReference/cac:InvoiceDocumentReference/cbc:ID"
+      },
+      "BT-26": {
+        "id": "ubl_57",
+        "name": "cbc.IssueDate",
+        "business_term": "BT-26",
+        "path": "cac:BillingReference/cac:InvoiceDocumentReference/cbc:IssueDate",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cac:BillingReference/cac:InvoiceDocumentReference/cbc:IssueDate"
+      },
+      "BT-16": {
+        "id": "ubl_62",
+        "name": "cbc.ID",
+        "business_term": "BT-16",
+        "path": "cac:DespatchDocumentReference/cbc:ID",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cac:DespatchDocumentReference/cbc:ID"
+      },
+      "BT-15": {
+        "id": "ubl_65",
+        "name": "cbc.ID",
+        "business_term": "BT-15",
+        "path": "cac:ReceiptDocumentReference/cbc:ID",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cac:ReceiptDocumentReference/cbc:ID"
+      },
+      "BT-17": {
+        "id": "ubl_67",
+        "name": "cbc.ID",
+        "business_term": "BT-17",
+        "path": "cac:OriginatorDocumentReference/cbc:ID",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cac:OriginatorDocumentReference/cbc:ID"
+      },
+      "BT-12": {
+        "id": "ubl_69",
+        "name": "cbc.ID",
+        "business_term": "BT-12",
+        "path": "cac:ContractDocumentReference/cbc:ID",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cac:ContractDocumentReference/cbc:ID"
+      },
+      "BG-24": {
+        "id": "ubl_70",
+        "name": "cac.AdditionalDocumentReference",
+        "business_term": "BG-24",
+        "path": "cac:AdditionalDocumentReference",
+        "cardinality": "0..n",
+        "required": false,
+        "offset": "cac:AdditionalDocumentReference"
+      },
+      "BT-18": {
+        "id": "ubl_73",
+        "name": "cbc.DocumentTypeCode",
+        "business_term": "BT-18",
+        "path": "cac:AdditionalDocumentReference/cbc:DocumentTypeCode",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cac:AdditionalDocumentReference/cbc:DocumentTypeCode"
+      },
+      "BT-123": {
+        "id": "ubl_74",
+        "name": "cbc.DocumentDescription",
+        "business_term": "BT-123",
+        "path": "cac:AdditionalDocumentReference/cbc:DocumentDescription",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cac:AdditionalDocumentReference/cbc:DocumentDescription"
+      },
+      "BT-125": {
+        "id": "ubl_77",
+        "name": "@mimeCode",
+        "business_term": "BT-125",
+        "path": "cac:AdditionalDocumentReference/cac:Attachment/cbc:EmbeddedDocumentBinaryObject/@mimeCode",
+        "cardinality": "M",
+        "required": false,
+        "offset": "cac:AdditionalDocumentReference/cac:Attachment/cbc:EmbeddedDocumentBinaryObject/@mimeCode"
+      },
+      "BT-124": {
+        "id": "ubl_80",
+        "name": "cbc.URI",
+        "business_term": "BT-124",
+        "path": "cac:AdditionalDocumentReference/cac:Attachment/cac:ExternalReference/cbc:URI",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cac:AdditionalDocumentReference/cac:Attachment/cac:ExternalReference/cbc:URI"
+      },
+      "BT-11": {
+        "id": "ubl_82",
+        "name": "cbc.ID",
+        "business_term": "BT-11",
+        "path": "cac:ProjectReference/cbc:ID",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cac:ProjectReference/cbc:ID"
+      },
+      "BG-4": {
+        "id": "ubl_83",
+        "name": "cac.AccountingSupplierParty",
+        "business_term": "BG-4",
+        "path": "cac:AccountingSupplierParty",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cac:AccountingSupplierParty"
+      },
+      "BT-34": {
+        "id": "ubl_85",
+        "name": "cbc.EndpointID",
+        "business_term": "BT-34",
+        "path": "cac:AccountingSupplierParty/cac:Party/cbc:EndpointID",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cac:AccountingSupplierParty/cac:Party/cbc:EndpointID"
+      },
+      "BT-29": {
+        "id": "ubl_88",
+        "name": "cbc.ID",
+        "business_term": "BT-29",
+        "path": "cac:AccountingSupplierParty/cac:Party/cac:PartyIdentification/cbc:ID",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cac:AccountingSupplierParty/cac:Party/cac:PartyIdentification/cbc:ID"
+      },
+      "BT-28": {
+        "id": "ubl_91",
+        "name": "cbc.Name",
+        "business_term": "BT-28",
+        "path": "cac:AccountingSupplierParty/cac:Party/cac:PartyName/cbc:Name",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cac:AccountingSupplierParty/cac:Party/cac:PartyName/cbc:Name"
+      },
+      "BG-5": {
+        "id": "ubl_92",
+        "name": "cac.PostalAddress",
+        "business_term": "BG-5",
+        "path": "cac:AccountingSupplierParty/cac:Party/cac:PostalAddress",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cac:AccountingSupplierParty/cac:Party/cac:PostalAddress"
+      },
+      "BT-35": {
+        "id": "ubl_93",
+        "name": "cbc.StreetName",
+        "business_term": "BT-35",
+        "path": "cac:AccountingSupplierParty/cac:Party/cac:PostalAddress/cbc:StreetName",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cac:AccountingSupplierParty/cac:Party/cac:PostalAddress/cbc:StreetName"
+      },
+      "BT-36": {
+        "id": "ubl_94",
+        "name": "cbc.AdditionalStreetName",
+        "business_term": "BT-36",
+        "path": "cac:AccountingSupplierParty/cac:Party/cac:PostalAddress/cbc:AdditionalStreetName",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cac:AccountingSupplierParty/cac:Party/cac:PostalAddress/cbc:AdditionalStreetName"
+      },
+      "BT-37": {
+        "id": "ubl_95",
+        "name": "cbc.CityName",
+        "business_term": "BT-37",
+        "path": "cac:AccountingSupplierParty/cac:Party/cac:PostalAddress/cbc:CityName",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cac:AccountingSupplierParty/cac:Party/cac:PostalAddress/cbc:CityName"
+      },
+      "BT-38": {
+        "id": "ubl_96",
+        "name": "cbc.PostalZone",
+        "business_term": "BT-38",
+        "path": "cac:AccountingSupplierParty/cac:Party/cac:PostalAddress/cbc:PostalZone",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cac:AccountingSupplierParty/cac:Party/cac:PostalAddress/cbc:PostalZone"
+      },
+      "BT-39": {
+        "id": "ubl_97",
+        "name": "cbc.CountrySubentity",
+        "business_term": "BT-39",
+        "path": "cac:AccountingSupplierParty/cac:Party/cac:PostalAddress/cbc:CountrySubentity",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cac:AccountingSupplierParty/cac:Party/cac:PostalAddress/cbc:CountrySubentity"
+      },
+      "BT-162": {
+        "id": "ubl_99",
+        "name": "cbc.Line",
+        "business_term": "BT-162",
+        "path": "cac:AccountingSupplierParty/cac:Party/cac:PostalAddress/cac:AddressLine/cbc:Line",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cac:AccountingSupplierParty/cac:Party/cac:PostalAddress/cac:AddressLine/cbc:Line"
+      },
+      "BT-40": {
+        "id": "ubl_101",
+        "name": "cbc.IdentificationCode",
+        "business_term": "BT-40",
+        "path": "cac:AccountingSupplierParty/cac:Party/cac:PostalAddress/cac:Country/cbc:IdentificationCode",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cac:AccountingSupplierParty/cac:Party/cac:PostalAddress/cac:Country/cbc:IdentificationCode"
+      },
+      "BT-31": {
+        "id": "ubl_103",
+        "name": "cbc.CompanyID",
+        "business_term": "BT-31",
+        "path": "cac:AccountingSupplierParty/cac:Party/cac:PartyTaxScheme/cbc:CompanyID",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cac:AccountingSupplierParty/cac:Party/cac:PartyTaxScheme/cbc:CompanyID"
+      },
+      "BT-27": {
+        "id": "ubl_108",
+        "name": "cbc.RegistrationName",
+        "business_term": "BT-27",
+        "path": "cac:AccountingSupplierParty/cac:Party/cac:PartyLegalEntity/cbc:RegistrationName",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cac:AccountingSupplierParty/cac:Party/cac:PartyLegalEntity/cbc:RegistrationName"
+      },
+      "BT-30": {
+        "id": "ubl_109",
+        "name": "cbc.CompanyID",
+        "business_term": "BT-30",
+        "path": "cac:AccountingSupplierParty/cac:Party/cac:PartyLegalEntity/cbc:CompanyID",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cac:AccountingSupplierParty/cac:Party/cac:PartyLegalEntity/cbc:CompanyID"
+      },
+      "BT-33": {
+        "id": "ubl_111",
+        "name": "cbc.CompanyLegalForm",
+        "business_term": "BT-33",
+        "path": "cac:AccountingSupplierParty/cac:Party/cac:PartyLegalEntity/cbc:CompanyLegalForm",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cac:AccountingSupplierParty/cac:Party/cac:PartyLegalEntity/cbc:CompanyLegalForm"
+      },
+      "BG-6": {
+        "id": "ubl_112",
+        "name": "cac.Contact",
+        "business_term": "BG-6",
+        "path": "cac:AccountingSupplierParty/cac:Party/cac:Contact",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cac:AccountingSupplierParty/cac:Party/cac:Contact"
+      },
+      "BT-41": {
+        "id": "ubl_113",
+        "name": "cbc.Name",
+        "business_term": "BT-41",
+        "path": "cac:AccountingSupplierParty/cac:Party/cac:Contact/cbc:Name",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cac:AccountingSupplierParty/cac:Party/cac:Contact/cbc:Name"
+      },
+      "BT-42": {
+        "id": "ubl_114",
+        "name": "cbc.Telephone",
+        "business_term": "BT-42",
+        "path": "cac:AccountingSupplierParty/cac:Party/cac:Contact/cbc:Telephone",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cac:AccountingSupplierParty/cac:Party/cac:Contact/cbc:Telephone"
+      },
+      "BT-43": {
+        "id": "ubl_115",
+        "name": "cbc.ElectronicMail",
+        "business_term": "BT-43",
+        "path": "cac:AccountingSupplierParty/cac:Party/cac:Contact/cbc:ElectronicMail",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cac:AccountingSupplierParty/cac:Party/cac:Contact/cbc:ElectronicMail"
+      },
+      "BG-7": {
+        "id": "ubl_137",
+        "name": "cac.AccountingCustomerParty",
+        "business_term": "BG-7",
+        "path": "cac:AccountingCustomerParty",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cac:AccountingCustomerParty"
+      },
+      "BT-49": {
+        "id": "ubl_140",
+        "name": "@schemeID",
+        "business_term": "BT-49",
+        "path": "cac:AccountingCustomerParty/cac:Party/cbc:EndpointID/@schemeID",
+        "cardinality": "M",
+        "required": false,
+        "offset": "cac:AccountingCustomerParty/cac:Party/cbc:EndpointID/@schemeID"
+      },
+      "BT-46": {
+        "id": "ubl_142",
+        "name": "cbc.ID",
+        "business_term": "BT-46",
+        "path": "cac:AccountingCustomerParty/cac:Party/cac:PartyIdentification/cbc:ID",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cac:AccountingCustomerParty/cac:Party/cac:PartyIdentification/cbc:ID"
+      },
+      "BT-45": {
+        "id": "ubl_145",
+        "name": "cbc.Name",
+        "business_term": "BT-45",
+        "path": "cac:AccountingCustomerParty/cac:Party/cac:PartyName/cbc:Name",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cac:AccountingCustomerParty/cac:Party/cac:PartyName/cbc:Name"
+      },
+      "BG-8": {
+        "id": "ubl_146",
+        "name": "cac.PostalAddress",
+        "business_term": "BG-8",
+        "path": "cac:AccountingCustomerParty/cac:Party/cac:PostalAddress",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cac:AccountingCustomerParty/cac:Party/cac:PostalAddress"
+      },
+      "BT-50": {
+        "id": "ubl_147",
+        "name": "cbc.StreetName",
+        "business_term": "BT-50",
+        "path": "cac:AccountingCustomerParty/cac:Party/cac:PostalAddress/cbc:StreetName",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cac:AccountingCustomerParty/cac:Party/cac:PostalAddress/cbc:StreetName"
+      },
+      "BT-51": {
+        "id": "ubl_148",
+        "name": "cbc.AdditionalStreetName",
+        "business_term": "BT-51",
+        "path": "cac:AccountingCustomerParty/cac:Party/cac:PostalAddress/cbc:AdditionalStreetName",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cac:AccountingCustomerParty/cac:Party/cac:PostalAddress/cbc:AdditionalStreetName"
+      },
+      "BT-52": {
+        "id": "ubl_149",
+        "name": "cbc.CityName",
+        "business_term": "BT-52",
+        "path": "cac:AccountingCustomerParty/cac:Party/cac:PostalAddress/cbc:CityName",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cac:AccountingCustomerParty/cac:Party/cac:PostalAddress/cbc:CityName"
+      },
+      "BT-53": {
+        "id": "ubl_150",
+        "name": "cbc.PostalZone",
+        "business_term": "BT-53",
+        "path": "cac:AccountingCustomerParty/cac:Party/cac:PostalAddress/cbc:PostalZone",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cac:AccountingCustomerParty/cac:Party/cac:PostalAddress/cbc:PostalZone"
+      },
+      "BT-54": {
+        "id": "ubl_151",
+        "name": "cbc.CountrySubentity",
+        "business_term": "BT-54",
+        "path": "cac:AccountingCustomerParty/cac:Party/cac:PostalAddress/cbc:CountrySubentity",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cac:AccountingCustomerParty/cac:Party/cac:PostalAddress/cbc:CountrySubentity"
+      },
+      "BT-163": {
+        "id": "ubl_153",
+        "name": "cbc.Line",
+        "business_term": "BT-163",
+        "path": "cac:AccountingCustomerParty/cac:Party/cac:PostalAddress/cac:AddressLine/cbc:Line",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cac:AccountingCustomerParty/cac:Party/cac:PostalAddress/cac:AddressLine/cbc:Line"
+      },
+      "BT-55": {
+        "id": "ubl_155",
+        "name": "cbc.IdentificationCode",
+        "business_term": "BT-55",
+        "path": "cac:AccountingCustomerParty/cac:Party/cac:PostalAddress/cac:Country/cbc:IdentificationCode",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cac:AccountingCustomerParty/cac:Party/cac:PostalAddress/cac:Country/cbc:IdentificationCode"
+      },
+      "BT-48": {
+        "id": "ubl_157",
+        "name": "cbc.CompanyID",
+        "business_term": "BT-48",
+        "path": "cac:AccountingCustomerParty/cac:Party/cac:PartyTaxScheme/cbc:CompanyID",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cac:AccountingCustomerParty/cac:Party/cac:PartyTaxScheme/cbc:CompanyID"
+      },
+      "BT-44": {
+        "id": "ubl_161",
+        "name": "cbc.RegistrationName",
+        "business_term": "BT-44",
+        "path": "cac:AccountingCustomerParty/cac:Party/cac:PartyLegalEntity/cbc:RegistrationName",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cac:AccountingCustomerParty/cac:Party/cac:PartyLegalEntity/cbc:RegistrationName"
+      },
+      "BT-47": {
+        "id": "ubl_163",
+        "name": "@schemeID",
+        "business_term": "BT-47",
+        "path": "cac:AccountingCustomerParty/cac:Party/cac:PartyLegalEntity/cbc:CompanyID/@schemeID",
+        "cardinality": "M",
+        "required": false,
+        "offset": "cac:AccountingCustomerParty/cac:Party/cac:PartyLegalEntity/cbc:CompanyID/@schemeID"
+      },
+      "BG-9": {
+        "id": "ubl_164",
+        "name": "cac.Contact",
+        "business_term": "BG-9",
+        "path": "cac:AccountingCustomerParty/cac:Party/cac:Contact",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cac:AccountingCustomerParty/cac:Party/cac:Contact"
+      },
+      "BT-56": {
+        "id": "ubl_165",
+        "name": "cbc.Name",
+        "business_term": "BT-56",
+        "path": "cac:AccountingCustomerParty/cac:Party/cac:Contact/cbc:Name",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cac:AccountingCustomerParty/cac:Party/cac:Contact/cbc:Name"
+      },
+      "BT-57": {
+        "id": "ubl_166",
+        "name": "cbc.Telephone",
+        "business_term": "BT-57",
+        "path": "cac:AccountingCustomerParty/cac:Party/cac:Contact/cbc:Telephone",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cac:AccountingCustomerParty/cac:Party/cac:Contact/cbc:Telephone"
+      },
+      "BT-58": {
+        "id": "ubl_167",
+        "name": "cbc.ElectronicMail",
+        "business_term": "BT-58",
+        "path": "cac:AccountingCustomerParty/cac:Party/cac:Contact/cbc:ElectronicMail",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cac:AccountingCustomerParty/cac:Party/cac:Contact/cbc:ElectronicMail"
+      },
+      "BG-10": {
+        "id": "ubl_188",
+        "name": "cac.PayeeParty",
+        "business_term": "BG-10",
+        "path": "cac:PayeeParty",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cac:PayeeParty"
+      },
+      "BT-60": {
+        "id": "ubl_190",
+        "name": "cbc.ID",
+        "business_term": "BT-60",
+        "path": "cac:PayeeParty/cac:PartyIdentification/cbc:ID",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cac:PayeeParty/cac:PartyIdentification/cbc:ID"
+      },
+      "BT-59": {
+        "id": "ubl_193",
+        "name": "cbc.Name",
+        "business_term": "BT-59",
+        "path": "cac:PayeeParty/cac:PartyName/cbc:Name",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cac:PayeeParty/cac:PartyName/cbc:Name"
+      },
+      "BT-61": {
+        "id": "ubl_195",
+        "name": "cbc.CompanyID",
+        "business_term": "BT-61",
+        "path": "cac:PayeeParty/cac:PartyLegalEntity/cbc:CompanyID",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cac:PayeeParty/cac:PartyLegalEntity/cbc:CompanyID"
+      },
+      "BG-11": {
+        "id": "ubl_197",
+        "name": "cac.TaxRepresentativeParty",
+        "business_term": "BG-11",
+        "path": "cac:TaxRepresentativeParty",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cac:TaxRepresentativeParty"
+      },
+      "BT-62": {
+        "id": "ubl_201",
+        "name": "cbc.Name",
+        "business_term": "BT-62",
+        "path": "cac:TaxRepresentativeParty/cac:PartyName/cbc:Name",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cac:TaxRepresentativeParty/cac:PartyName/cbc:Name"
+      },
+      "BG-12": {
+        "id": "ubl_202",
+        "name": "cac.PostalAddress",
+        "business_term": "BG-12",
+        "path": "cac:TaxRepresentativeParty/cac:PostalAddress",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cac:TaxRepresentativeParty/cac:PostalAddress"
+      },
+      "BT-64": {
+        "id": "ubl_203",
+        "name": "cbc.StreetName",
+        "business_term": "BT-64",
+        "path": "cac:TaxRepresentativeParty/cac:PostalAddress/cbc:StreetName",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cac:TaxRepresentativeParty/cac:PostalAddress/cbc:StreetName"
+      },
+      "BT-65": {
+        "id": "ubl_204",
+        "name": "cbc.AdditionalStreetName",
+        "business_term": "BT-65",
+        "path": "cac:TaxRepresentativeParty/cac:PostalAddress/cbc:AdditionalStreetName",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cac:TaxRepresentativeParty/cac:PostalAddress/cbc:AdditionalStreetName"
+      },
+      "BT-66": {
+        "id": "ubl_205",
+        "name": "cbc.CityName",
+        "business_term": "BT-66",
+        "path": "cac:TaxRepresentativeParty/cac:PostalAddress/cbc:CityName",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cac:TaxRepresentativeParty/cac:PostalAddress/cbc:CityName"
+      },
+      "BT-67": {
+        "id": "ubl_206",
+        "name": "cbc.PostalZone",
+        "business_term": "BT-67",
+        "path": "cac:TaxRepresentativeParty/cac:PostalAddress/cbc:PostalZone",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cac:TaxRepresentativeParty/cac:PostalAddress/cbc:PostalZone"
+      },
+      "BT-68": {
+        "id": "ubl_207",
+        "name": "cbc.CountrySubentity",
+        "business_term": "BT-68",
+        "path": "cac:TaxRepresentativeParty/cac:PostalAddress/cbc:CountrySubentity",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cac:TaxRepresentativeParty/cac:PostalAddress/cbc:CountrySubentity"
+      },
+      "BT-164": {
+        "id": "ubl_209",
+        "name": "cbc.Line",
+        "business_term": "BT-164",
+        "path": "cac:TaxRepresentativeParty/cac:PostalAddress/cac:AddressLine/cbc:Line",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cac:TaxRepresentativeParty/cac:PostalAddress/cac:AddressLine/cbc:Line"
+      },
+      "BT-69": {
+        "id": "ubl_211",
+        "name": "cbc.IdentificationCode",
+        "business_term": "BT-69",
+        "path": "cac:TaxRepresentativeParty/cac:PostalAddress/cac:Country/cbc:IdentificationCode",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cac:TaxRepresentativeParty/cac:PostalAddress/cac:Country/cbc:IdentificationCode"
+      },
+      "BT-63": {
+        "id": "ubl_213",
+        "name": "cbc.CompanyID",
+        "business_term": "BT-63",
+        "path": "cac:TaxRepresentativeParty/cac:PartyTaxScheme/cbc:CompanyID",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cac:TaxRepresentativeParty/cac:PartyTaxScheme/cbc:CompanyID"
+      },
+      "BG-13": {
+        "id": "ubl_216",
+        "name": "cac.Delivery",
+        "business_term": "BG-13",
+        "path": "cac:Delivery",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cac:Delivery"
+      },
+      "BT-72": {
+        "id": "ubl_217",
+        "name": "cbc.ActualDeliveryDate",
+        "business_term": "BT-72",
+        "path": "cac:Delivery/cbc:ActualDeliveryDate",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cac:Delivery/cbc:ActualDeliveryDate"
+      },
+      "BT-71": {
+        "id": "ubl_219",
+        "name": "cbc.ID",
+        "business_term": "BT-71",
+        "path": "cac:Delivery/cac:DeliveryLocation/cbc:ID",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cac:Delivery/cac:DeliveryLocation/cbc:ID"
+      },
+      "BG-15": {
+        "id": "ubl_221",
+        "name": "cac.Address",
+        "business_term": "BG-15",
+        "path": "cac:Delivery/cac:DeliveryLocation/cac:Address",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cac:Delivery/cac:DeliveryLocation/cac:Address"
+      },
+      "BT-75": {
+        "id": "ubl_222",
+        "name": "cbc.StreetName",
+        "business_term": "BT-75",
+        "path": "cac:Delivery/cac:DeliveryLocation/cac:Address/cbc:StreetName",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cac:Delivery/cac:DeliveryLocation/cac:Address/cbc:StreetName"
+      },
+      "BT-76": {
+        "id": "ubl_223",
+        "name": "cbc.AdditionalStreetName",
+        "business_term": "BT-76",
+        "path": "cac:Delivery/cac:DeliveryLocation/cac:Address/cbc:AdditionalStreetName",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cac:Delivery/cac:DeliveryLocation/cac:Address/cbc:AdditionalStreetName"
+      },
+      "BT-77": {
+        "id": "ubl_224",
+        "name": "cbc.CityName",
+        "business_term": "BT-77",
+        "path": "cac:Delivery/cac:DeliveryLocation/cac:Address/cbc:CityName",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cac:Delivery/cac:DeliveryLocation/cac:Address/cbc:CityName"
+      },
+      "BT-78": {
+        "id": "ubl_225",
+        "name": "cbc.PostalZone",
+        "business_term": "BT-78",
+        "path": "cac:Delivery/cac:DeliveryLocation/cac:Address/cbc:PostalZone",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cac:Delivery/cac:DeliveryLocation/cac:Address/cbc:PostalZone"
+      },
+      "BT-79": {
+        "id": "ubl_226",
+        "name": "cbc.CountrySubentity",
+        "business_term": "BT-79",
+        "path": "cac:Delivery/cac:DeliveryLocation/cac:Address/cbc:CountrySubentity",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cac:Delivery/cac:DeliveryLocation/cac:Address/cbc:CountrySubentity"
+      },
+      "BT-165": {
+        "id": "ubl_228",
+        "name": "cbc.Line",
+        "business_term": "BT-165",
+        "path": "cac:Delivery/cac:DeliveryLocation/cac:Address/cac:AddressLine/cbc:Line",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cac:Delivery/cac:DeliveryLocation/cac:Address/cac:AddressLine/cbc:Line"
+      },
+      "BT-80": {
+        "id": "ubl_230",
+        "name": "cbc.IdentificationCode",
+        "business_term": "BT-80",
+        "path": "cac:Delivery/cac:DeliveryLocation/cac:Address/cac:Country/cbc:IdentificationCode",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cac:Delivery/cac:DeliveryLocation/cac:Address/cac:Country/cbc:IdentificationCode"
+      },
+      "BT-70": {
+        "id": "ubl_236",
+        "name": "cbc.Name",
+        "business_term": "BT-70",
+        "path": "cac:Delivery/cac:CarrierParty/cac:PartyName/cbc:Name",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cac:Delivery/cac:CarrierParty/cac:PartyName/cbc:Name"
+      },
+      "BG-16": {
+        "id": "ubl_270",
+        "name": "cac.PaymentMeans",
+        "business_term": "BG-16",
+        "path": "cac:PaymentMeans",
+        "cardinality": "1..n",
+        "required": false,
+        "offset": "cac:PaymentMeans"
+      },
+      "BT-81": {
+        "id": "ubl_271",
+        "name": "cbc.PaymentMeansCode",
+        "business_term": "BT-81",
+        "path": "cac:PaymentMeans/cbc:PaymentMeansCode",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cac:PaymentMeans/cbc:PaymentMeansCode"
+      },
+      "BT-82": {
+        "id": "ubl_272",
+        "name": "@name",
+        "business_term": "BT-82",
+        "path": "cac:PaymentMeans/cbc:PaymentMeansCode/@name",
+        "cardinality": "O",
+        "required": false,
+        "offset": "cac:PaymentMeans/cbc:PaymentMeansCode/@name"
+      },
+      "BT-83": {
+        "id": "ubl_273",
+        "name": "cbc.PaymentID",
+        "business_term": "BT-83",
+        "path": "cac:PaymentMeans/cbc:PaymentID",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cac:PaymentMeans/cbc:PaymentID"
+      },
+      "BG-18": {
+        "id": "ubl_274",
+        "name": "cac.CardAccount",
+        "business_term": "BG-18",
+        "path": "cac:PaymentMeans/cac:CardAccount",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cac:PaymentMeans/cac:CardAccount"
+      },
+      "BT-87": {
+        "id": "ubl_275",
+        "name": "cbc.PrimaryAccountNumberID",
+        "business_term": "BT-87",
+        "path": "cac:PaymentMeans/cac:CardAccount/cbc:PrimaryAccountNumberID",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cac:PaymentMeans/cac:CardAccount/cbc:PrimaryAccountNumberID"
+      },
+      "BT-88": {
+        "id": "ubl_277",
+        "name": "cbc.HolderName",
+        "business_term": "BT-88",
+        "path": "cac:PaymentMeans/cac:CardAccount/cbc:HolderName",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cac:PaymentMeans/cac:CardAccount/cbc:HolderName"
+      },
+      "BG-17": {
+        "id": "ubl_278",
+        "name": "cac.PayeeFinancialAccount",
+        "business_term": "BG-17",
+        "path": "cac:PaymentMeans/cac:PayeeFinancialAccount",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cac:PaymentMeans/cac:PayeeFinancialAccount"
+      },
+      "BT-84": {
+        "id": "ubl_279",
+        "name": "cbc.ID",
+        "business_term": "BT-84",
+        "path": "cac:PaymentMeans/cac:PayeeFinancialAccount/cbc:ID",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cac:PaymentMeans/cac:PayeeFinancialAccount/cbc:ID"
+      },
+      "BT-85": {
+        "id": "ubl_280",
+        "name": "cbc.Name",
+        "business_term": "BT-85",
+        "path": "cac:PaymentMeans/cac:PayeeFinancialAccount/cbc:Name",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cac:PaymentMeans/cac:PayeeFinancialAccount/cbc:Name"
+      },
+      "BT-86": {
+        "id": "ubl_282",
+        "name": "cbc.ID",
+        "business_term": "BT-86",
+        "path": "cac:PaymentMeans/cac:PayeeFinancialAccount/cac:FinancialInstitutionBranch/cbc:ID",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cac:PaymentMeans/cac:PayeeFinancialAccount/cac:FinancialInstitutionBranch/cbc:ID"
+      },
+      "BG-19": {
+        "id": "ubl_283",
+        "name": "cac.PaymentMandate",
+        "business_term": "BG-19",
+        "path": "cac:PaymentMeans/cac:PaymentMandate",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cac:PaymentMeans/cac:PaymentMandate"
+      },
+      "BT-89": {
+        "id": "ubl_284",
+        "name": "cbc.ID",
+        "business_term": "BT-89",
+        "path": "cac:PaymentMeans/cac:PaymentMandate/cbc:ID",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cac:PaymentMeans/cac:PaymentMandate/cbc:ID"
+      },
+      "BT-91": {
+        "id": "ubl_286",
+        "name": "cbc.ID",
+        "business_term": "BT-91",
+        "path": "cac:PaymentMeans/cac:PaymentMandate/cac:PayerFinancialAccount/cbc:ID",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cac:PaymentMeans/cac:PaymentMandate/cac:PayerFinancialAccount/cbc:ID"
+      },
+      "BT-20": {
+        "id": "ubl_288",
+        "name": "cbc.Note",
+        "business_term": "BT-20",
+        "path": "cac:PaymentTerms/cbc:Note",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cac:PaymentTerms/cbc:Note"
+      },
+      "BG-20, BG-21": {
+        "id": "ubl_297",
+        "name": "cac.AllowanceCharge",
+        "business_term": "BG-20, BG-21",
+        "path": "cac:AllowanceCharge",
+        "cardinality": "0..n",
+        "required": false,
+        "offset": "cac:AllowanceCharge"
+      },
+      "BT-98": {
+        "id": "ubl_299",
+        "name": "cbc.AllowanceChargeReasonCode",
+        "business_term": "BT-98",
+        "path": "cac:AllowanceCharge/cbc:AllowanceChargeReasonCode",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cac:AllowanceCharge/cbc:AllowanceChargeReasonCode"
+      },
+      "BT-97": {
+        "id": "ubl_300",
+        "name": "cbc.AllowanceChargeReason",
+        "business_term": "BT-97",
+        "path": "cac:AllowanceCharge/cbc:AllowanceChargeReason",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cac:AllowanceCharge/cbc:AllowanceChargeReason"
+      },
+      "BT-94": {
+        "id": "ubl_301",
+        "name": "cbc.MultiplierFactorNumeric",
+        "business_term": "BT-94",
+        "path": "cac:AllowanceCharge/cbc:MultiplierFactorNumeric",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cac:AllowanceCharge/cbc:MultiplierFactorNumeric"
+      },
+      "BT-92": {
+        "id": "ubl_302",
+        "name": "cbc.Amount",
+        "business_term": "BT-92",
+        "path": "cac:AllowanceCharge/cbc:Amount",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cac:AllowanceCharge/cbc:Amount"
+      },
+      "BT-93": {
+        "id": "ubl_304",
+        "name": "cbc.BaseAmount",
+        "business_term": "BT-93",
+        "path": "cac:AllowanceCharge/cbc:BaseAmount",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cac:AllowanceCharge/cbc:BaseAmount"
+      },
+      "BT-95": {
+        "id": "ubl_307",
+        "name": "cbc.ID",
+        "business_term": "BT-95",
+        "path": "cac:AllowanceCharge/cac:TaxCategory/cbc:ID",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cac:AllowanceCharge/cac:TaxCategory/cbc:ID"
+      },
+      "BT-96": {
+        "id": "ubl_308",
+        "name": "cbc.Percent",
+        "business_term": "BT-96",
+        "path": "cac:AllowanceCharge/cac:TaxCategory/cbc:Percent",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cac:AllowanceCharge/cac:TaxCategory/cbc:Percent"
+      },
+      "BT-110": {
+        "id": "ubl_312",
+        "name": "cbc.TaxAmount",
+        "business_term": "BT-110",
+        "path": "cac:TaxTotal/cbc:TaxAmount",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cac:TaxTotal/cbc:TaxAmount"
+      },
+      "BG-23": {
+        "id": "ubl_314",
+        "name": "cac.TaxSubtotal",
+        "business_term": "BG-23",
+        "path": "cac:TaxTotal/cac:TaxSubtotal",
+        "cardinality": "0..n",
+        "required": false,
+        "offset": "cac:TaxTotal/cac:TaxSubtotal"
+      },
+      "BT-116": {
+        "id": "ubl_315",
+        "name": "cbc.TaxableAmount",
+        "business_term": "BT-116",
+        "path": "cac:TaxTotal/cac:TaxSubtotal/cbc:TaxableAmount",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cac:TaxTotal/cac:TaxSubtotal/cbc:TaxableAmount"
+      },
+      "BT-117": {
+        "id": "ubl_317",
+        "name": "cbc.TaxAmount",
+        "business_term": "BT-117",
+        "path": "cac:TaxTotal/cac:TaxSubtotal/cbc:TaxAmount",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cac:TaxTotal/cac:TaxSubtotal/cbc:TaxAmount"
+      },
+      "BT-118": {
+        "id": "ubl_320",
+        "name": "cbc.ID",
+        "business_term": "BT-118",
+        "path": "cac:TaxTotal/cac:TaxSubtotal/cac:TaxCategory/cbc:ID",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cac:TaxTotal/cac:TaxSubtotal/cac:TaxCategory/cbc:ID"
+      },
+      "BT-119": {
+        "id": "ubl_321",
+        "name": "cbc.Percent",
+        "business_term": "BT-119",
+        "path": "cac:TaxTotal/cac:TaxSubtotal/cac:TaxCategory/cbc:Percent",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cac:TaxTotal/cac:TaxSubtotal/cac:TaxCategory/cbc:Percent"
+      },
+      "BT-121": {
+        "id": "ubl_322",
+        "name": "cbc.TaxExemptionReasonCode",
+        "business_term": "BT-121",
+        "path": "cac:TaxTotal/cac:TaxSubtotal/cac:TaxCategory/cbc:TaxExemptionReasonCode",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cac:TaxTotal/cac:TaxSubtotal/cac:TaxCategory/cbc:TaxExemptionReasonCode"
+      },
+      "BT-120": {
+        "id": "ubl_323",
+        "name": "cbc.TaxExemptionReason",
+        "business_term": "BT-120",
+        "path": "cac:TaxTotal/cac:TaxSubtotal/cac:TaxCategory/cbc:TaxExemptionReason",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cac:TaxTotal/cac:TaxSubtotal/cac:TaxCategory/cbc:TaxExemptionReason"
+      },
+      "BG-22": {
+        "id": "ubl_338",
+        "name": "cac.LegalMonetaryTotal",
+        "business_term": "BG-22",
+        "path": "cac:LegalMonetaryTotal",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cac:LegalMonetaryTotal"
+      },
+      "BT-106": {
+        "id": "ubl_339",
+        "name": "cbc.LineExtensionAmount",
+        "business_term": "BT-106",
+        "path": "cac:LegalMonetaryTotal/cbc:LineExtensionAmount",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cac:LegalMonetaryTotal/cbc:LineExtensionAmount"
+      },
+      "BT-109": {
+        "id": "ubl_341",
+        "name": "cbc.TaxExclusiveAmount",
+        "business_term": "BT-109",
+        "path": "cac:LegalMonetaryTotal/cbc:TaxExclusiveAmount",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cac:LegalMonetaryTotal/cbc:TaxExclusiveAmount"
+      },
+      "BT-112": {
+        "id": "ubl_343",
+        "name": "cbc.TaxInclusiveAmount",
+        "business_term": "BT-112",
+        "path": "cac:LegalMonetaryTotal/cbc:TaxInclusiveAmount",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cac:LegalMonetaryTotal/cbc:TaxInclusiveAmount"
+      },
+      "BT-107": {
+        "id": "ubl_345",
+        "name": "cbc.AllowanceTotalAmount",
+        "business_term": "BT-107",
+        "path": "cac:LegalMonetaryTotal/cbc:AllowanceTotalAmount",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cac:LegalMonetaryTotal/cbc:AllowanceTotalAmount"
+      },
+      "BT-108": {
+        "id": "ubl_347",
+        "name": "cbc.ChargeTotalAmount",
+        "business_term": "BT-108",
+        "path": "cac:LegalMonetaryTotal/cbc:ChargeTotalAmount",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cac:LegalMonetaryTotal/cbc:ChargeTotalAmount"
+      },
+      "BT-113": {
+        "id": "ubl_349",
+        "name": "cbc.PrepaidAmount",
+        "business_term": "BT-113",
+        "path": "cac:LegalMonetaryTotal/cbc:PrepaidAmount",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cac:LegalMonetaryTotal/cbc:PrepaidAmount"
+      },
+      "BT-114": {
+        "id": "ubl_351",
+        "name": "cbc.PayableRoundingAmount",
+        "business_term": "BT-114",
+        "path": "cac:LegalMonetaryTotal/cbc:PayableRoundingAmount",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cac:LegalMonetaryTotal/cbc:PayableRoundingAmount"
+      },
+      "BT-115": {
+        "id": "ubl_353",
+        "name": "cbc.PayableAmount",
+        "business_term": "BT-115",
+        "path": "cac:LegalMonetaryTotal/cbc:PayableAmount",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cac:LegalMonetaryTotal/cbc:PayableAmount"
+      },
+      "BG-25": {
+        "id": "ubl_355",
+        "name": "cac.InvoiceLine",
+        "business_term": "BG-25",
+        "path": "cac:InvoiceLine",
+        "cardinality": "1..n",
+        "required": false,
+        "offset": "cac:InvoiceLine"
+      },
+      "BT-126": {
+        "id": "ubl_356",
+        "name": "cbc.ID",
+        "business_term": "BT-126",
+        "path": "cac:InvoiceLine/cbc:ID",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cac:InvoiceLine/cbc:ID"
+      },
+      "BT-127": {
+        "id": "ubl_357",
+        "name": "cbc.Note",
+        "business_term": "BT-127",
+        "path": "cac:InvoiceLine/cbc:Note",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cac:InvoiceLine/cbc:Note"
+      },
+      "BT-129": {
+        "id": "ubl_358",
+        "name": "cbc.InvoicedQuantity",
+        "business_term": "BT-129",
+        "path": "cac:InvoiceLine/cbc:InvoicedQuantity",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cac:InvoiceLine/cbc:InvoicedQuantity"
+      },
+      "BT-130": {
+        "id": "ubl_359",
+        "name": "@unitCode",
+        "business_term": "BT-130",
+        "path": "cac:InvoiceLine/cbc:InvoicedQuantity/@unitCode",
+        "cardinality": "M",
+        "required": false,
+        "offset": "cac:InvoiceLine/cbc:InvoicedQuantity/@unitCode"
+      },
+      "BT-131": {
+        "id": "ubl_360",
+        "name": "cbc.LineExtensionAmount",
+        "business_term": "BT-131",
+        "path": "cac:InvoiceLine/cbc:LineExtensionAmount",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cac:InvoiceLine/cbc:LineExtensionAmount"
+      },
+      "BT-133": {
+        "id": "ubl_362",
+        "name": "cbc.AccountingCost",
+        "business_term": "BT-133",
+        "path": "cac:InvoiceLine/cbc:AccountingCost",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cac:InvoiceLine/cbc:AccountingCost"
+      },
+      "BG-26": {
+        "id": "ubl_363",
+        "name": "cac.InvoicePeriod",
+        "business_term": "BG-26",
+        "path": "cac:InvoiceLine/cac:InvoicePeriod",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cac:InvoiceLine/cac:InvoicePeriod"
+      },
+      "BT-134": {
+        "id": "ubl_364",
+        "name": "cbc.StartDate",
+        "business_term": "BT-134",
+        "path": "cac:InvoiceLine/cac:InvoicePeriod/cbc:StartDate",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cac:InvoiceLine/cac:InvoicePeriod/cbc:StartDate"
+      },
+      "BT-135": {
+        "id": "ubl_365",
+        "name": "cbc.EndDate",
+        "business_term": "BT-135",
+        "path": "cac:InvoiceLine/cac:InvoicePeriod/cbc:EndDate",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cac:InvoiceLine/cac:InvoicePeriod/cbc:EndDate"
+      },
+      "BT-132": {
+        "id": "ubl_367",
+        "name": "cbc.LineID",
+        "business_term": "BT-132",
+        "path": "cac:InvoiceLine/cac:OrderLineReference/cbc:LineID",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cac:InvoiceLine/cac:OrderLineReference/cbc:LineID"
+      },
+      "BT-128": {
+        "id": "ubl_379",
+        "name": "cbc.DocumentTypeCode",
+        "business_term": "BT-128",
+        "path": "cac:InvoiceLine/cac:DocumentReference/cbc:DocumentTypeCode",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cac:InvoiceLine/cac:DocumentReference/cbc:DocumentTypeCode"
+      },
+      "BG-27, BG-28": {
+        "id": "ubl_380",
+        "name": "cac.AllowanceCharge",
+        "business_term": "BG-27, BG-28",
+        "path": "cac:InvoiceLine/cac:AllowanceCharge",
+        "cardinality": "0..n",
+        "required": false,
+        "offset": "cac:InvoiceLine/cac:AllowanceCharge"
+      },
+      "BT-140": {
+        "id": "ubl_382",
+        "name": "cbc.AllowanceChargeReasonCode",
+        "business_term": "BT-140",
+        "path": "cac:InvoiceLine/cac:AllowanceCharge/cbc:AllowanceChargeReasonCode",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cac:InvoiceLine/cac:AllowanceCharge/cbc:AllowanceChargeReasonCode"
+      },
+      "BT-139": {
+        "id": "ubl_383",
+        "name": "cbc.AllowanceChargeReason",
+        "business_term": "BT-139",
+        "path": "cac:InvoiceLine/cac:AllowanceCharge/cbc:AllowanceChargeReason",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cac:InvoiceLine/cac:AllowanceCharge/cbc:AllowanceChargeReason"
+      },
+      "BT-138": {
+        "id": "ubl_384",
+        "name": "cbc.MultiplierFactorNumeric",
+        "business_term": "BT-138",
+        "path": "cac:InvoiceLine/cac:AllowanceCharge/cbc:MultiplierFactorNumeric",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cac:InvoiceLine/cac:AllowanceCharge/cbc:MultiplierFactorNumeric"
+      },
+      "BT-136": {
+        "id": "ubl_385",
+        "name": "cbc.Amount",
+        "business_term": "BT-136",
+        "path": "cac:InvoiceLine/cac:AllowanceCharge/cbc:Amount",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cac:InvoiceLine/cac:AllowanceCharge/cbc:Amount"
+      },
+      "BT-137": {
+        "id": "ubl_387",
+        "name": "cbc.BaseAmount",
+        "business_term": "BT-137",
+        "path": "cac:InvoiceLine/cac:AllowanceCharge/cbc:BaseAmount",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cac:InvoiceLine/cac:AllowanceCharge/cbc:BaseAmount"
+      },
+      "BG-31": {
+        "id": "ubl_389",
+        "name": "cac.Item",
+        "business_term": "BG-31",
+        "path": "cac:InvoiceLine/cac:Item",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cac:InvoiceLine/cac:Item"
+      },
+      "BT-154": {
+        "id": "ubl_390",
+        "name": "cbc.Description",
+        "business_term": "BT-154",
+        "path": "cac:InvoiceLine/cac:Item/cbc:Description",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cac:InvoiceLine/cac:Item/cbc:Description"
+      },
+      "BT-153": {
+        "id": "ubl_391",
+        "name": "cbc.Name",
+        "business_term": "BT-153",
+        "path": "cac:InvoiceLine/cac:Item/cbc:Name",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cac:InvoiceLine/cac:Item/cbc:Name"
+      },
+      "BT-156": {
+        "id": "ubl_393",
+        "name": "cbc.ID",
+        "business_term": "BT-156",
+        "path": "cac:InvoiceLine/cac:Item/cac:BuyersItemIdentification/cbc:ID",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cac:InvoiceLine/cac:Item/cac:BuyersItemIdentification/cbc:ID"
+      },
+      "BT-155": {
+        "id": "ubl_395",
+        "name": "cbc.ID",
+        "business_term": "BT-155",
+        "path": "cac:InvoiceLine/cac:Item/cac:SellersItemIdentification/cbc:ID",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cac:InvoiceLine/cac:Item/cac:SellersItemIdentification/cbc:ID"
+      },
+      "BT-157": {
+        "id": "ubl_398",
+        "name": "@schemeID",
+        "business_term": "BT-157",
+        "path": "cac:InvoiceLine/cac:Item/cac:StandardItemIdentification/cbc:ID/@schemeID",
+        "cardinality": "M",
+        "required": false,
+        "offset": "cac:InvoiceLine/cac:Item/cac:StandardItemIdentification/cbc:ID/@schemeID"
+      },
+      "BT-159": {
+        "id": "ubl_400",
+        "name": "cbc.IdentificationCode",
+        "business_term": "BT-159",
+        "path": "cac:InvoiceLine/cac:Item/cac:OriginCountry/cbc:IdentificationCode",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cac:InvoiceLine/cac:Item/cac:OriginCountry/cbc:IdentificationCode"
+      },
+      "BT-158": {
+        "id": "ubl_403",
+        "name": "@listID",
+        "business_term": "BT-158",
+        "path": "cac:InvoiceLine/cac:Item/cac:CommodityClassification/cbc:ItemClassificationCode/@listID",
+        "cardinality": "M",
+        "required": false,
+        "offset": "cac:InvoiceLine/cac:Item/cac:CommodityClassification/cbc:ItemClassificationCode/@listID"
+      },
+      "BG-30": {
+        "id": "ubl_405",
+        "name": "cac.ClassifiedTaxCategory",
+        "business_term": "BG-30",
+        "path": "cac:InvoiceLine/cac:Item/cac:ClassifiedTaxCategory",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cac:InvoiceLine/cac:Item/cac:ClassifiedTaxCategory"
+      },
+      "BT-151": {
+        "id": "ubl_406",
+        "name": "cbc.ID",
+        "business_term": "BT-151",
+        "path": "cac:InvoiceLine/cac:Item/cac:ClassifiedTaxCategory/cbc:ID",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cac:InvoiceLine/cac:Item/cac:ClassifiedTaxCategory/cbc:ID"
+      },
+      "BT-152": {
+        "id": "ubl_407",
+        "name": "cbc.Percent",
+        "business_term": "BT-152",
+        "path": "cac:InvoiceLine/cac:Item/cac:ClassifiedTaxCategory/cbc:Percent",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cac:InvoiceLine/cac:Item/cac:ClassifiedTaxCategory/cbc:Percent"
+      },
+      "BG-32": {
+        "id": "ubl_410",
+        "name": "cac.AdditionalItemProperty",
+        "business_term": "BG-32",
+        "path": "cac:InvoiceLine/cac:Item/cac:AdditionalItemProperty",
+        "cardinality": "0..n",
+        "required": false,
+        "offset": "cac:InvoiceLine/cac:Item/cac:AdditionalItemProperty"
+      },
+      "BT-160": {
+        "id": "ubl_411",
+        "name": "cbc.Name",
+        "business_term": "BT-160",
+        "path": "cac:InvoiceLine/cac:Item/cac:AdditionalItemProperty/cbc:Name",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cac:InvoiceLine/cac:Item/cac:AdditionalItemProperty/cbc:Name"
+      },
+      "BT-161": {
+        "id": "ubl_412",
+        "name": "cbc.Value",
+        "business_term": "BT-161",
+        "path": "cac:InvoiceLine/cac:Item/cac:AdditionalItemProperty/cbc:Value",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cac:InvoiceLine/cac:Item/cac:AdditionalItemProperty/cbc:Value"
+      },
+      "BG-29": {
+        "id": "ubl_413",
+        "name": "cac.Price",
+        "business_term": "BG-29",
+        "path": "cac:InvoiceLine/cac:Price",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cac:InvoiceLine/cac:Price"
+      },
+      "BT-146": {
+        "id": "ubl_414",
+        "name": "cbc.PriceAmount",
+        "business_term": "BT-146",
+        "path": "cac:InvoiceLine/cac:Price/cbc:PriceAmount",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cac:InvoiceLine/cac:Price/cbc:PriceAmount"
+      },
+      "BT-149": {
+        "id": "ubl_416",
+        "name": "cbc.BaseQuantity",
+        "business_term": "BT-149",
+        "path": "cac:InvoiceLine/cac:Price/cbc:BaseQuantity",
+        "cardinality": "0..1",
+        "required": false,
+        "offset": "cac:InvoiceLine/cac:Price/cbc:BaseQuantity"
+      },
+      "BT-147": {
+        "id": "ubl_420",
+        "name": "cbc.Amount",
+        "business_term": "BT-147",
+        "path": "cac:InvoiceLine/cac:Price/cac:AllowanceCharge/cbc:Amount",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cac:InvoiceLine/cac:Price/cac:AllowanceCharge/cbc:Amount"
+      },
+      "BT-148": {
+        "id": "ubl_422",
+        "name": "cbc.BaseAmount",
+        "business_term": "BT-148",
+        "path": "cac:InvoiceLine/cac:Price/cac:AllowanceCharge/cbc:BaseAmount",
+        "cardinality": "1..1",
+        "required": true,
+        "offset": "cac:InvoiceLine/cac:Price/cac:AllowanceCharge/cbc:BaseAmount"
+      }
+    }
+  },
+  "connections": [
+    {
+      "id": "conn_0",
+      "sources": [
+        "fpa_16",
+        "fpa_16",
+        "fpa_16"
+      ],
+      "target": "ubl_103",
+      "targetPath": "cac:AccountingSupplierParty/cac:Party/cac:PartyTaxScheme/cbc:CompanyID",
+      "businessTerm": "BT-31",
+      "sourceNames": [
+        "IdPaese",
+        "IdPaese",
+        "IdCodice"
+      ],
+      "transformation": {
+        "type": "CONCAT",
+        "formula": {
+          "operation": "concat",
+          "inputs": [
+            {
+              "field": "IdPaese",
+              "source": "fpa_16"
+            },
+            {
+              "field": "IdCodice",
+              "source": "fpa_16"
+            }
+          ],
+          "separator": "",
+          "template": "{IdPaese}{IdCodice}"
+        },
+        "description": "Concatenate country code + VAT number"
+      }
+    },
+    {
+      "id": "conn_1",
+      "sources": [
+        "fpa_17",
+        "fpa_17"
+      ],
+      "target": "ubl_109",
+      "targetPath": "cac:AccountingSupplierParty/cac:Party/cac:PartyLegalEntity/cbc:CompanyID",
+      "businessTerm": "BT-30",
+      "sourceNames": [
+        "IdCodice",
+        "CodiceFiscale"
+      ],
+      "transformation": {
+        "type": "CONCAT",
+        "formula": {
+          "operation": "concat",
+          "inputs": [
+            {
+              "field": "IdCodice",
+              "source": "fpa_17"
+            },
+            {
+              "field": "CodiceFiscale",
+              "source": "fpa_17"
+            }
+          ],
+          "separator": " ",
+          "template": "{IdCodice} {CodiceFiscale}"
+        },
+        "description": "Concatenate 2 fields"
+      }
+    },
+    {
+      "id": "conn_2",
+      "source": "fpa_7",
+      "target": "ubl_140",
+      "sourcePath": "FatturaElettronicaHeader/DatiTrasmissione/CodiceDestinatario",
+      "targetPath": "cac:AccountingCustomerParty/cac:Party/cbc:EndpointID/@schemeID",
+      "businessTerm": "BT-49",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      }
+    },
+    {
+      "id": "conn_3",
+      "sources": [
+        "fpa_21",
+        "fpa_21",
+        "fpa_21"
+      ],
+      "target": "ubl_108",
+      "targetPath": "cac:AccountingSupplierParty/cac:Party/cac:PartyLegalEntity/cbc:RegistrationName",
+      "businessTerm": "BT-27",
+      "sourceNames": [
+        "Denominazione",
+        "Nome",
+        "Cognome"
+      ],
+      "transformation": {
+        "type": "CONCAT",
+        "formula": {
+          "operation": "concat",
+          "inputs": [
+            {
+              "literal": "Nome&Cognome: "
+            },
+            {
+              "field": "Nome",
+              "source": "fpa_21"
+            },
+            {
+              "literal": " "
+            },
+            {
+              "field": "Cognome",
+              "source": "fpa_21"
+            }
+          ],
+          "separator": "",
+          "template": "Nome&Cognome: {Nome} {Cognome}"
+        },
+        "description": "Concatenate first name + last name with prefix"
+      }
+    },
+    {
+      "id": "conn_4",
+      "sources": [
+        "fpa_45",
+        "fpa_45",
+        "fpa_45",
+        "fpa_45",
+        "fpa_45",
+        "fpa_45"
+      ],
+      "target": "ubl_88",
+      "targetPath": "cac:AccountingSupplierParty/cac:Party/cac:PartyIdentification/cbc:ID",
+      "businessTerm": "BT-29",
+      "sourceNames": [
+        "CodEORI",
+        "AlboProfessionale",
+        "NumeroIscrizioneAlbo",
+        "DataIscrizioneAlbo",
+        "Ufficio",
+        "NumeroREA"
+      ],
+      "transformation": {
+        "type": "CONCAT",
+        "formula": {
+          "operation": "concat",
+          "inputs": [
+            {
+              "literal": "REA:"
+            },
+            {
+              "field": "Ufficio",
+              "source": "fpa_45"
+            },
+            {
+              "field": "NumeroREA",
+              "source": "fpa_45"
+            }
+          ],
+          "separator": "",
+          "template": "REA:{Ufficio}{NumeroREA}"
+        },
+        "description": "Economic registry concatenation"
+      }
+    },
+    {
+      "id": "conn_5",
+      "source": "fpa_30",
+      "target": "ubl_93",
+      "sourcePath": "FatturaElettronicaHeader/CedentePrestatore/Sede/Indirizzo",
+      "targetPath": "cac:AccountingSupplierParty/cac:Party/cac:PostalAddress/cbc:StreetName",
+      "businessTerm": "BT-35",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      }
+    },
+    {
+      "id": "conn_6",
+      "source": "fpa_31",
+      "target": "ubl_94",
+      "sourcePath": "FatturaElettronicaHeader/CedentePrestatore/Sede/NumeroCivico",
+      "targetPath": "cac:AccountingSupplierParty/cac:Party/cac:PostalAddress/cbc:AdditionalStreetName",
+      "businessTerm": "BT-36",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      }
+    },
+    {
+      "id": "conn_7",
+      "source": "fpa_32",
+      "target": "ubl_96",
+      "sourcePath": "FatturaElettronicaHeader/CedentePrestatore/Sede/CAP",
+      "targetPath": "cac:AccountingSupplierParty/cac:Party/cac:PostalAddress/cbc:PostalZone",
+      "businessTerm": "BT-38",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      }
+    },
+    {
+      "id": "conn_8",
+      "source": "fpa_33",
+      "target": "ubl_95",
+      "sourcePath": "FatturaElettronicaHeader/CedentePrestatore/Sede/Comune",
+      "targetPath": "cac:AccountingSupplierParty/cac:Party/cac:PostalAddress/cbc:CityName",
+      "businessTerm": "BT-37",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      }
+    },
+    {
+      "id": "conn_9",
+      "source": "fpa_34",
+      "target": "ubl_97",
+      "sourcePath": "FatturaElettronicaHeader/CedentePrestatore/Sede/Provincia",
+      "targetPath": "cac:AccountingSupplierParty/cac:Party/cac:PostalAddress/cbc:CountrySubentity",
+      "businessTerm": "BT-39",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      }
+    },
+    {
+      "id": "conn_10",
+      "source": "fpa_35",
+      "target": "ubl_101",
+      "sourcePath": "FatturaElettronicaHeader/CedentePrestatore/Sede/Nazione",
+      "targetPath": "cac:AccountingSupplierParty/cac:Party/cac:PostalAddress/cac:Country/cbc:IdentificationCode",
+      "businessTerm": "BT-40",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      }
+    },
+    {
+      "id": "conn_11",
+      "sources": [
+        "fpa_48",
+        "fpa_48",
+        "fpa_48"
+      ],
+      "target": "ubl_111",
+      "targetPath": "cac:AccountingSupplierParty/cac:Party/cac:PartyLegalEntity/cbc:CompanyLegalForm",
+      "businessTerm": "BT-33",
+      "sourceNames": [
+        "CapitaleSociale",
+        "SocioUnico",
+        "StatoLiquidazione"
+      ],
+      "transformation": {
+        "type": "CONCAT",
+        "formula": {
+          "operation": "concat",
+          "inputs": [
+            {
+              "field": "CapitaleSociale",
+              "source": "fpa_48"
+            },
+            {
+              "field": "SocioUnico",
+              "source": "fpa_48"
+            },
+            {
+              "field": "StatoLiquidazione",
+              "source": "fpa_48"
+            }
+          ],
+          "separator": " ",
+          "template": "{CapitaleSociale} {SocioUnico} {StatoLiquidazione}"
+        },
+        "description": "Concatenate 3 fields"
+      }
+    },
+    {
+      "id": "conn_12",
+      "source": "fpa_50",
+      "target": "ubl_114",
+      "sourcePath": "FatturaElettronicaHeader/CedentePrestatore/Contatti/Telefono",
+      "targetPath": "cac:AccountingSupplierParty/cac:Party/cac:Contact/cbc:Telephone",
+      "businessTerm": "BT-42",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      }
+    },
+    {
+      "id": "conn_13",
+      "source": "fpa_52",
+      "target": "ubl_115",
+      "sourcePath": "FatturaElettronicaHeader/CedentePrestatore/Contatti/Email",
+      "targetPath": "cac:AccountingSupplierParty/cac:Party/cac:Contact/cbc:ElectronicMail",
+      "businessTerm": "BT-43",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      }
+    },
+    {
+      "id": "conn_14",
+      "source": "fpa_53",
+      "target": "ubl_44",
+      "sourcePath": "FatturaElettronicaHeader/CedentePrestatore/RiferimentoAmministrazione",
+      "targetPath": "cbc:AccountingCost",
+      "businessTerm": "BT-19",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      }
+    },
+    {
+      "id": "conn_15",
+      "sources": [
+        "fpa_58",
+        "fpa_58"
+      ],
+      "target": "ubl_213",
+      "targetPath": "cac:TaxRepresentativeParty/cac:PartyTaxScheme/cbc:CompanyID",
+      "businessTerm": "BT-63",
+      "sourceNames": [
+        "IdPaese",
+        "IdCodice"
+      ],
+      "transformation": {
+        "type": "CONCAT",
+        "formula": {
+          "operation": "concat",
+          "inputs": [
+            {
+              "field": "IdPaese",
+              "source": "fpa_58"
+            },
+            {
+              "field": "IdCodice",
+              "source": "fpa_58"
+            }
+          ],
+          "separator": "",
+          "template": "{IdPaese}{IdCodice}"
+        },
+        "description": "Concatenate country code + VAT number"
+      }
+    },
+    {
+      "id": "conn_16",
+      "sources": [
+        "fpa_63",
+        "fpa_63",
+        "fpa_63"
+      ],
+      "target": "ubl_201",
+      "targetPath": "cac:TaxRepresentativeParty/cac:PartyName/cbc:Name",
+      "businessTerm": "BT-62",
+      "sourceNames": [
+        "Denominazione",
+        "Nome",
+        "Cognome"
+      ],
+      "transformation": {
+        "type": "CONCAT",
+        "formula": {
+          "operation": "concat",
+          "inputs": [
+            {
+              "literal": "Nome&Cognome: "
+            },
+            {
+              "field": "Nome",
+              "source": "fpa_63"
+            },
+            {
+              "literal": " "
+            },
+            {
+              "field": "Cognome",
+              "source": "fpa_63"
+            }
+          ],
+          "separator": "",
+          "template": "Nome&Cognome: {Nome} {Cognome}"
+        },
+        "description": "Concatenate first name + last name with prefix"
+      }
+    },
+    {
+      "id": "conn_17",
+      "sources": [
+        "fpa_70",
+        "fpa_70"
+      ],
+      "target": "ubl_157",
+      "targetPath": "cac:AccountingCustomerParty/cac:Party/cac:PartyTaxScheme/cbc:CompanyID",
+      "businessTerm": "BT-48",
+      "sourceNames": [
+        "IdPaese",
+        "IdCodice"
+      ],
+      "transformation": {
+        "type": "CONCAT",
+        "formula": {
+          "operation": "concat",
+          "inputs": [
+            {
+              "field": "IdPaese",
+              "source": "fpa_70"
+            },
+            {
+              "field": "IdCodice",
+              "source": "fpa_70"
+            }
+          ],
+          "separator": "",
+          "template": "{IdPaese}{IdCodice}"
+        },
+        "description": "Concatenate country code + VAT number"
+      }
+    },
+    {
+      "id": "conn_18",
+      "source": "fpa_71",
+      "target": "ubl_163",
+      "sourcePath": "FatturaElettronicaHeader/CessionarioCommittente/DatiAnagrafici/CodiceFiscale",
+      "targetPath": "cac:AccountingCustomerParty/cac:Party/cac:PartyLegalEntity/cbc:CompanyID/@schemeID",
+      "businessTerm": "BT-47",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      }
+    },
+    {
+      "id": "conn_19",
+      "sources": [
+        "fpa_75",
+        "fpa_75",
+        "fpa_75"
+      ],
+      "target": "ubl_161",
+      "targetPath": "cac:AccountingCustomerParty/cac:Party/cac:PartyLegalEntity/cbc:RegistrationName",
+      "businessTerm": "BT-44",
+      "sourceNames": [
+        "Denominazione",
+        "Nome",
+        "Cognome"
+      ],
+      "transformation": {
+        "type": "CONCAT",
+        "formula": {
+          "operation": "concat",
+          "inputs": [
+            {
+              "literal": "Nome&Cognome: "
+            },
+            {
+              "field": "Nome",
+              "source": "fpa_75"
+            },
+            {
+              "literal": " "
+            },
+            {
+              "field": "Cognome",
+              "source": "fpa_75"
+            }
+          ],
+          "separator": "",
+          "template": "Nome&Cognome: {Nome} {Cognome}"
+        },
+        "description": "Concatenate first name + last name with prefix"
+      }
+    },
+    {
+      "id": "conn_20",
+      "source": "fpa_77",
+      "target": "ubl_142",
+      "sourcePath": "FatturaElettronicaHeader/CessionarioCommittente/DatiAnagrafici/Anagrafica/CodEORI",
+      "targetPath": "cac:AccountingCustomerParty/cac:Party/cac:PartyIdentification/cbc:ID",
+      "businessTerm": "BT-46",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      }
+    },
+    {
+      "id": "conn_21",
+      "source": "fpa_79",
+      "target": "ubl_147",
+      "sourcePath": "FatturaElettronicaHeader/CessionarioCommittente/Sede/Indirizzo",
+      "targetPath": "cac:AccountingCustomerParty/cac:Party/cac:PostalAddress/cbc:StreetName",
+      "businessTerm": "BT-50",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      }
+    },
+    {
+      "id": "conn_22",
+      "source": "fpa_80",
+      "target": "ubl_148",
+      "sourcePath": "FatturaElettronicaHeader/CessionarioCommittente/Sede/NumeroCivico",
+      "targetPath": "cac:AccountingCustomerParty/cac:Party/cac:PostalAddress/cbc:AdditionalStreetName",
+      "businessTerm": "BT-51",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      }
+    },
+    {
+      "id": "conn_23",
+      "source": "fpa_81",
+      "target": "ubl_150",
+      "sourcePath": "FatturaElettronicaHeader/CessionarioCommittente/Sede/CAP",
+      "targetPath": "cac:AccountingCustomerParty/cac:Party/cac:PostalAddress/cbc:PostalZone",
+      "businessTerm": "BT-53",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      }
+    },
+    {
+      "id": "conn_24",
+      "source": "fpa_82",
+      "target": "ubl_149",
+      "sourcePath": "FatturaElettronicaHeader/CessionarioCommittente/Sede/Comune",
+      "targetPath": "cac:AccountingCustomerParty/cac:Party/cac:PostalAddress/cbc:CityName",
+      "businessTerm": "BT-52",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      }
+    },
+    {
+      "id": "conn_25",
+      "source": "fpa_83",
+      "target": "ubl_151",
+      "sourcePath": "FatturaElettronicaHeader/CessionarioCommittente/Sede/Provincia",
+      "targetPath": "cac:AccountingCustomerParty/cac:Party/cac:PostalAddress/cbc:CountrySubentity",
+      "businessTerm": "BT-54",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      }
+    },
+    {
+      "id": "conn_26",
+      "source": "fpa_84",
+      "target": "ubl_155",
+      "sourcePath": "FatturaElettronicaHeader/CessionarioCommittente/Sede/Nazione",
+      "targetPath": "cac:AccountingCustomerParty/cac:Party/cac:PostalAddress/cac:Country/cbc:IdentificationCode",
+      "businessTerm": "BT-55",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      }
+    },
+    {
+      "id": "conn_27",
+      "source": "fpa_116",
+      "target": "ubl_42",
+      "sourcePath": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/Divisa",
+      "targetPath": "cbc:DocumentCurrencyCode",
+      "businessTerm": "BT-5",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      }
+    },
+    {
+      "id": "conn_28",
+      "source": "fpa_117",
+      "target": "ubl_37",
+      "sourcePath": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/Data",
+      "targetPath": "cbc:IssueDate",
+      "businessTerm": "BT-2",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      }
+    },
+    {
+      "id": "conn_29",
+      "source": "fpa_118",
+      "target": "ubl_36",
+      "sourcePath": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/Numero",
+      "targetPath": "cbc:ID",
+      "businessTerm": "BT-1",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      }
+    },
+    {
+      "id": "conn_30",
+      "source": "fpa_140",
+      "target": "ubl_343",
+      "sourcePath": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/ImportoTotaleDocumento",
+      "targetPath": "cac:LegalMonetaryTotal/cbc:TaxInclusiveAmount",
+      "businessTerm": "BT-112",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      }
+    },
+    {
+      "id": "conn_31",
+      "source": "fpa_141",
+      "target": "ubl_351",
+      "sourcePath": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/Arrotondamento",
+      "targetPath": "cac:LegalMonetaryTotal/cbc:PayableRoundingAmount",
+      "businessTerm": "BT-114",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      }
+    },
+    {
+      "id": "conn_32",
+      "source": "fpa_142",
+      "target": "ubl_40",
+      "sourcePath": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/Causale",
+      "targetPath": "cbc:Note",
+      "businessTerm": "BT-22",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      }
+    },
+    {
+      "id": "conn_33",
+      "sources": [
+        "fpa_226",
+        "fpa_226",
+        "fpa_226",
+        "fpa_226",
+        "fpa_226"
+      ],
+      "target": "ubl_356",
+      "targetPath": "cac:InvoiceLine/cbc:ID",
+      "businessTerm": "BT-126",
+      "sourceNames": [
+        "RiferimentoNumeroLinea",
+        "RiferimentoNumeroLinea",
+        "RiferimentoNumeroLinea",
+        "RiferimentoNumeroLinea",
+        "NumeroLinea"
+      ],
+      "transformation": {
+        "type": "CONCAT",
+        "formula": {
+          "operation": "concat",
+          "inputs": [
+            {
+              "field": "RiferimentoNumeroLinea",
+              "source": "fpa_226"
+            },
+            {
+              "field": "RiferimentoNumeroLinea",
+              "source": "fpa_226"
+            },
+            {
+              "field": "RiferimentoNumeroLinea",
+              "source": "fpa_226"
+            },
+            {
+              "field": "RiferimentoNumeroLinea",
+              "source": "fpa_226"
+            },
+            {
+              "field": "NumeroLinea",
+              "source": "fpa_226"
+            }
+          ],
+          "separator": " ",
+          "template": "{RiferimentoNumeroLinea} {RiferimentoNumeroLinea} {RiferimentoNumeroLinea} {RiferimentoNumeroLinea} {NumeroLinea}"
+        },
+        "description": "Concatenate 5 fields"
+      }
+    },
+    {
+      "id": "conn_34",
+      "source": "fpa_146",
+      "target": "ubl_51",
+      "sourcePath": "FatturaElettronicaBody/DatiGenerali/DatiOrdineAcquisto/IdDocumento\n",
+      "targetPath": "cac:OrderReference/cbc:ID",
+      "businessTerm": "BT-13",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      }
+    },
+    {
+      "id": "conn_35",
+      "source": "fpa_148",
+      "target": "ubl_367",
+      "sourcePath": "FatturaElettronicaBody/DatiGenerali/DatiOrdineAcquisto/NumItem\n",
+      "targetPath": "cac:InvoiceLine/cac:OrderLineReference/cbc:LineID",
+      "businessTerm": "BT-132",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      }
+    },
+    {
+      "id": "conn_36",
+      "source": "fpa_149",
+      "target": "ubl_45",
+      "sourcePath": "FatturaElettronicaBody/DatiGenerali/DatiOrdineAcquisto/CodiceCommessaConvenzione\n",
+      "targetPath": "cbc:BuyerReference",
+      "businessTerm": "BT-10",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      }
+    },
+    {
+      "id": "conn_37",
+      "sources": [
+        "fpa_162",
+        "fpa_162"
+      ],
+      "target": "ubl_69",
+      "targetPath": "cac:ContractDocumentReference/cbc:ID",
+      "businessTerm": "BT-12",
+      "sourceNames": [
+        "IdDocumento",
+        "IdDocumento"
+      ],
+      "transformation": {
+        "type": "CONCAT",
+        "formula": {
+          "operation": "concat",
+          "inputs": [
+            {
+              "field": "IdDocumento",
+              "source": "fpa_162"
+            },
+            {
+              "field": "IdDocumento",
+              "source": "fpa_162"
+            }
+          ],
+          "separator": " ",
+          "template": "{IdDocumento} {IdDocumento}"
+        },
+        "description": "Concatenate 2 fields"
+      }
+    },
+    {
+      "id": "conn_38",
+      "source": "fpa_157",
+      "target": "ubl_379",
+      "sourcePath": "FatturaElettronicaBody/DatiGenerali/DatiContratto/CodiceCommessaConvenzione\n",
+      "targetPath": "cac:InvoiceLine/cac:DocumentReference/cbc:DocumentTypeCode",
+      "businessTerm": "BT-128",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      }
+    },
+    {
+      "id": "conn_39",
+      "source": "fpa_158",
+      "target": "ubl_82",
+      "sourcePath": "FatturaElettronicaBody/DatiGenerali/DatiContratto/CodiceCUP\n",
+      "targetPath": "cac:ProjectReference/cbc:ID",
+      "businessTerm": "BT-11",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      }
+    },
+    {
+      "id": "conn_40",
+      "source": "fpa_159",
+      "target": "ubl_67",
+      "sourcePath": "FatturaElettronicaBody/DatiGenerali/DatiContratto/CodiceCIG\n",
+      "targetPath": "cac:OriginatorDocumentReference/cbc:ID",
+      "businessTerm": "BT-17",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      }
+    },
+    {
+      "id": "conn_41",
+      "source": "fpa_170",
+      "target": "ubl_65",
+      "sourcePath": "FatturaElettronicaBody/DatiGenerali/DatiRicezione/IdDocumento",
+      "targetPath": "cac:ReceiptDocumentReference/cbc:ID",
+      "businessTerm": "BT-15",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      }
+    },
+    {
+      "id": "conn_42",
+      "source": "fpa_178",
+      "target": "ubl_56",
+      "sourcePath": "FatturaElettronicaBody/DatiGenerali/DatiFattureCollegate/IdDocumento",
+      "targetPath": "cac:BillingReference/cac:InvoiceDocumentReference/cbc:ID",
+      "businessTerm": "BT-25",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      }
+    },
+    {
+      "id": "conn_43",
+      "source": "fpa_179",
+      "target": "ubl_57",
+      "sourcePath": "FatturaElettronicaBody/DatiGenerali/DatiFattureCollegate/Data",
+      "targetPath": "cac:BillingReference/cac:InvoiceDocumentReference/cbc:IssueDate",
+      "businessTerm": "BT-26",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      }
+    },
+    {
+      "id": "conn_44",
+      "source": "fpa_185",
+      "target": "ubl_73",
+      "sourcePath": "FatturaElettronicaBody/DatiGenerali/DatiSAL/RiferimentoFase",
+      "targetPath": "cac:AdditionalDocumentReference/cbc:DocumentTypeCode",
+      "businessTerm": "BT-18",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      }
+    },
+    {
+      "id": "conn_45",
+      "source": "fpa_187",
+      "target": "ubl_62",
+      "sourcePath": "FatturaElettronicaBody/DatiGenerali/DatiDDT/NumeroDDT",
+      "targetPath": "cac:DespatchDocumentReference/cbc:ID",
+      "businessTerm": "BT-16",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      }
+    },
+    {
+      "id": "conn_46",
+      "source": "fpa_214",
+      "target": "ubl_222",
+      "sourcePath": "FatturaElettronicaBody/DatiGenerali/DatiTrasporto/IndirizzoResa/Indirizzo",
+      "targetPath": "cac:Delivery/cac:DeliveryLocation/cac:Address/cbc:StreetName",
+      "businessTerm": "BT-75",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      }
+    },
+    {
+      "id": "conn_47",
+      "source": "fpa_215",
+      "target": "ubl_223",
+      "sourcePath": "FatturaElettronicaBody/DatiGenerali/DatiTrasporto/IndirizzoResa/NumeroCivico",
+      "targetPath": "cac:Delivery/cac:DeliveryLocation/cac:Address/cbc:AdditionalStreetName",
+      "businessTerm": "BT-76",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      }
+    },
+    {
+      "id": "conn_48",
+      "source": "fpa_216",
+      "target": "ubl_225",
+      "sourcePath": "FatturaElettronicaBody/DatiGenerali/DatiTrasporto/IndirizzoResa/CAP",
+      "targetPath": "cac:Delivery/cac:DeliveryLocation/cac:Address/cbc:PostalZone",
+      "businessTerm": "BT-78",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      }
+    },
+    {
+      "id": "conn_49",
+      "source": "fpa_217",
+      "target": "ubl_224",
+      "sourcePath": "FatturaElettronicaBody/DatiGenerali/DatiTrasporto/IndirizzoResa/Comune",
+      "targetPath": "cac:Delivery/cac:DeliveryLocation/cac:Address/cbc:CityName",
+      "businessTerm": "BT-77",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      }
+    },
+    {
+      "id": "conn_50",
+      "source": "fpa_218",
+      "target": "ubl_226",
+      "sourcePath": "FatturaElettronicaBody/DatiGenerali/DatiTrasporto/IndirizzoResa/Provincia",
+      "targetPath": "cac:Delivery/cac:DeliveryLocation/cac:Address/cbc:CountrySubentity",
+      "businessTerm": "BT-79",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      }
+    },
+    {
+      "id": "conn_51",
+      "source": "fpa_219",
+      "target": "ubl_230",
+      "sourcePath": "FatturaElettronicaBody/DatiGenerali/DatiTrasporto/IndirizzoResa/Nazione",
+      "targetPath": "cac:Delivery/cac:DeliveryLocation/cac:Address/cac:Country/cbc:IdentificationCode",
+      "businessTerm": "BT-80",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      }
+    },
+    {
+      "id": "conn_52",
+      "source": "fpa_220",
+      "target": "ubl_217",
+      "sourcePath": "FatturaElettronicaBody/DatiGenerali/DatiTrasporto/DataOraConsegna",
+      "targetPath": "cac:Delivery/cbc:ActualDeliveryDate",
+      "businessTerm": "BT-72",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      }
+    },
+    {
+      "id": "conn_53",
+      "sources": [
+        "fpa_254",
+        "fpa_254",
+        "fpa_254",
+        "fpa_254"
+      ],
+      "target": "ubl_411",
+      "targetPath": "cac:InvoiceLine/cac:Item/cac:AdditionalItemProperty/cbc:Name",
+      "businessTerm": "BT-160",
+      "sourceNames": [
+        "TipoCessionePrestazione",
+        "Natura",
+        "TipoDato",
+        "SpeseAccessorie"
+      ],
+      "transformation": {
+        "type": "CONCAT",
+        "formula": {
+          "operation": "concat",
+          "inputs": [
+            {
+              "field": "TipoCessionePrestazione",
+              "source": "fpa_254"
+            },
+            {
+              "field": "Natura",
+              "source": "fpa_254"
+            },
+            {
+              "field": "TipoDato",
+              "source": "fpa_254"
+            },
+            {
+              "field": "SpeseAccessorie",
+              "source": "fpa_254"
+            }
+          ],
+          "separator": " ",
+          "template": "{TipoCessionePrestazione} {Natura} {TipoDato} {SpeseAccessorie}"
+        },
+        "description": "Concatenate 4 fields"
+      }
+    },
+    {
+      "id": "conn_54",
+      "sources": [
+        "fpa_230",
+        "fpa_230"
+      ],
+      "target": "ubl_395",
+      "targetPath": "cac:InvoiceLine/cac:Item/cac:SellersItemIdentification/cbc:ID",
+      "businessTerm": "BT-155",
+      "sourceNames": [
+        "CodiceTipo",
+        "CodiceValore"
+      ],
+      "transformation": {
+        "type": "CONCAT",
+        "formula": {
+          "operation": "concat",
+          "inputs": [
+            {
+              "field": "CodiceTipo",
+              "source": "fpa_230"
+            },
+            {
+              "field": "CodiceValore",
+              "source": "fpa_230"
+            }
+          ],
+          "separator": " ",
+          "template": "{CodiceTipo} {CodiceValore}"
+        },
+        "description": "Concatenate 2 fields"
+      }
+    },
+    {
+      "id": "conn_55",
+      "source": "fpa_231",
+      "target": "ubl_391",
+      "sourcePath": "FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee/Descrizione",
+      "targetPath": "cac:InvoiceLine/cac:Item/cbc:Name",
+      "businessTerm": "BT-153",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      }
+    },
+    {
+      "id": "conn_56",
+      "source": "fpa_232",
+      "target": "ubl_358",
+      "sourcePath": "FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee/Quantita",
+      "targetPath": "cac:InvoiceLine/cbc:InvoicedQuantity",
+      "businessTerm": "BT-129",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      }
+    },
+    {
+      "id": "conn_57",
+      "source": "fpa_233",
+      "target": "ubl_359",
+      "sourcePath": "FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee/UnitaMisura",
+      "targetPath": "cac:InvoiceLine/cbc:InvoicedQuantity/@unitCode",
+      "businessTerm": "BT-130",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      }
+    },
+    {
+      "id": "conn_58",
+      "source": "fpa_234",
+      "target": "ubl_364",
+      "sourcePath": "FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee/DataInizioPeriodo",
+      "targetPath": "cac:InvoiceLine/cac:InvoicePeriod/cbc:StartDate",
+      "businessTerm": "BT-134",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      }
+    },
+    {
+      "id": "conn_59",
+      "source": "fpa_235",
+      "target": "ubl_365",
+      "sourcePath": "FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee/DataFinePeriodo",
+      "targetPath": "cac:InvoiceLine/cac:InvoicePeriod/cbc:EndDate",
+      "businessTerm": "BT-135",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      }
+    },
+    {
+      "id": "conn_60",
+      "source": "fpa_236",
+      "target": "ubl_422",
+      "sourcePath": "FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee/PrezzoUnitario",
+      "targetPath": "cac:InvoiceLine/cac:Price/cac:AllowanceCharge/cbc:BaseAmount",
+      "businessTerm": "BT-148",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      }
+    },
+    {
+      "id": "conn_61",
+      "source": "fpa_240",
+      "target": "ubl_420",
+      "sourcePath": "FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee/ScontoMaggiorazione/Importo",
+      "targetPath": "cac:InvoiceLine/cac:Price/cac:AllowanceCharge/cbc:Amount",
+      "businessTerm": "BT-147",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      }
+    },
+    {
+      "id": "conn_62",
+      "source": "fpa_241",
+      "target": "ubl_360",
+      "sourcePath": "FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee/PrezzoTotale",
+      "targetPath": "cac:InvoiceLine/cbc:LineExtensionAmount",
+      "businessTerm": "BT-131",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      }
+    },
+    {
+      "id": "conn_63",
+      "source": "fpa_242",
+      "target": "ubl_407",
+      "sourcePath": "FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee/AliquotaIVA",
+      "targetPath": "cac:InvoiceLine/cac:Item/cac:ClassifiedTaxCategory/cbc:Percent",
+      "businessTerm": "BT-152",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      }
+    },
+    {
+      "id": "conn_64",
+      "sources": [
+        "fpa_262",
+        "fpa_262",
+        "fpa_262",
+        "fpa_262",
+        "fpa_262",
+        "fpa_262"
+      ],
+      "target": "ubl_412",
+      "targetPath": "cac:InvoiceLine/cac:Item/cac:AdditionalItemProperty/cbc:Value",
+      "businessTerm": "BT-161",
+      "sourceNames": [
+        "Ritenuta",
+        "RiferimentoTesto",
+        "RiferimentoNumero",
+        "RiferimentoData",
+        "Data",
+        "TotalePercorso"
+      ],
+      "transformation": {
+        "type": "CONCAT",
+        "formula": {
+          "operation": "concat",
+          "inputs": [
+            {
+              "field": "Ritenuta",
+              "source": "fpa_262"
+            },
+            {
+              "field": "RiferimentoTesto",
+              "source": "fpa_262"
+            },
+            {
+              "field": "RiferimentoNumero",
+              "source": "fpa_262"
+            },
+            {
+              "field": "RiferimentoData",
+              "source": "fpa_262"
+            },
+            {
+              "field": "Data",
+              "source": "fpa_262"
+            },
+            {
+              "field": "TotalePercorso",
+              "source": "fpa_262"
+            }
+          ],
+          "separator": " ",
+          "template": "{Ritenuta} {RiferimentoTesto} {RiferimentoNumero} {RiferimentoData} {Data} {TotalePercorso}"
+        },
+        "description": "Concatenate 6 fields"
+      }
+    },
+    {
+      "id": "conn_65",
+      "source": "fpa_245",
+      "target": "ubl_362",
+      "sourcePath": "FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee/RiferimentoAmministrazione",
+      "targetPath": "cac:InvoiceLine/cbc:AccountingCost",
+      "businessTerm": "BT-133",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      }
+    },
+    {
+      "id": "conn_66",
+      "source": "fpa_252",
+      "target": "ubl_321",
+      "sourcePath": "FatturaElettronicaBody/DatiBeniServizi/DatiRiepilogo/AliquotaIVA",
+      "targetPath": "cac:TaxTotal/cac:TaxSubtotal/cac:TaxCategory/cbc:Percent",
+      "businessTerm": "BT-119",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      }
+    },
+    {
+      "id": "conn_67",
+      "sources": [
+        "fpa_259",
+        "fpa_259"
+      ],
+      "target": "ubl_323",
+      "targetPath": "cac:TaxTotal/cac:TaxSubtotal/cac:TaxCategory/cbc:TaxExemptionReason",
+      "businessTerm": "BT-120",
+      "sourceNames": [
+        "Natura",
+        "RiferimentoNormativo"
+      ],
+      "transformation": {
+        "type": "CONCAT",
+        "formula": {
+          "operation": "concat",
+          "inputs": [
+            {
+              "field": "Natura",
+              "source": "fpa_259"
+            },
+            {
+              "field": "RiferimentoNormativo",
+              "source": "fpa_259"
+            }
+          ],
+          "separator": " ",
+          "template": "{Natura} {RiferimentoNormativo}"
+        },
+        "description": "Concatenate 2 fields"
+      }
+    },
+    {
+      "id": "conn_68",
+      "source": "fpa_256",
+      "target": "ubl_315",
+      "sourcePath": "FatturaElettronicaBody/DatiBeniServizi/DatiRiepilogo/ImponibileImporto",
+      "targetPath": "cac:TaxTotal/cac:TaxSubtotal/cbc:TaxableAmount",
+      "businessTerm": "BT-116",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      }
+    },
+    {
+      "id": "conn_69",
+      "source": "fpa_257",
+      "target": "ubl_317",
+      "sourcePath": "FatturaElettronicaBody/DatiBeniServizi/DatiRiepilogo/Imposta",
+      "targetPath": "cac:TaxTotal/cac:TaxSubtotal/cbc:TaxAmount",
+      "businessTerm": "BT-117",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      }
+    },
+    {
+      "id": "conn_70",
+      "source": "fpa_258",
+      "target": "ubl_49",
+      "sourcePath": "FatturaElettronicaBody/DatiBeniServizi/DatiRiepilogo/EsigibilitaIVA",
+      "targetPath": "cac:InvoicePeriod/cbc:DescriptionCode",
+      "businessTerm": "BT-8",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      }
+    },
+    {
+      "id": "conn_71",
+      "sources": [
+        "fpa_269",
+        "fpa_269"
+      ],
+      "target": "ubl_288",
+      "targetPath": "cac:PaymentTerms/cbc:Note",
+      "businessTerm": "BT-20",
+      "sourceNames": [
+        "CondizioniPagamento",
+        "GiorniTerminiPagamento"
+      ],
+      "transformation": {
+        "type": "CONCAT",
+        "formula": {
+          "operation": "concat",
+          "inputs": [
+            {
+              "field": "CondizioniPagamento",
+              "source": "fpa_269"
+            },
+            {
+              "field": "GiorniTerminiPagamento",
+              "source": "fpa_269"
+            }
+          ],
+          "separator": " ",
+          "template": "{CondizioniPagamento} {GiorniTerminiPagamento}"
+        },
+        "description": "Concatenate 2 fields"
+      }
+    },
+    {
+      "id": "conn_72",
+      "source": "fpa_266",
+      "target": "ubl_193",
+      "sourcePath": "FatturaElettronicaBody/DatiPagamento/DettaglioPagamento/Beneficiario",
+      "targetPath": "cac:PayeeParty/cac:PartyName/cbc:Name",
+      "businessTerm": "BT-59",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      }
+    },
+    {
+      "id": "conn_73",
+      "source": "fpa_267",
+      "target": "ubl_271",
+      "sourcePath": "FatturaElettronicaBody/DatiPagamento/DettaglioPagamento/ModalitaPagamento",
+      "targetPath": "cac:PaymentMeans/cbc:PaymentMeansCode",
+      "businessTerm": "BT-81",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      }
+    },
+    {
+      "id": "conn_74",
+      "source": "fpa_270",
+      "target": "ubl_38",
+      "sourcePath": "FatturaElettronicaBody/DatiPagamento/DettaglioPagamento/DataScadenzaPagamento",
+      "targetPath": "cbc:DueDate",
+      "businessTerm": "BT-9",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      }
+    },
+    {
+      "id": "conn_75",
+      "source": "fpa_271",
+      "target": "ubl_353",
+      "sourcePath": "FatturaElettronicaBody/DatiPagamento/DettaglioPagamento/ImportoPagamento",
+      "targetPath": "cac:LegalMonetaryTotal/cbc:PayableAmount",
+      "businessTerm": "BT-115",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      }
+    },
+    {
+      "id": "conn_76",
+      "sources": [
+        "fpa_274",
+        "fpa_274"
+      ],
+      "target": "ubl_190",
+      "targetPath": "cac:PayeeParty/cac:PartyIdentification/cbc:ID",
+      "businessTerm": "BT-60",
+      "sourceNames": [
+        "CognomeQuietanzante",
+        "NomeQuietanzante"
+      ],
+      "transformation": {
+        "type": "CONCAT",
+        "formula": {
+          "operation": "concat",
+          "inputs": [
+            {
+              "literal": "Nome&Cognome: "
+            },
+            {
+              "field": "Nome",
+              "source": "fpa_274"
+            },
+            {
+              "literal": " "
+            },
+            {
+              "field": "Cognome",
+              "source": "fpa_274"
+            }
+          ],
+          "separator": "",
+          "template": "Nome&Cognome: {Nome} {Cognome}"
+        },
+        "description": "Concatenate first name + last name with prefix"
+      }
+    },
+    {
+      "id": "conn_77",
+      "source": "fpa_275",
+      "target": "ubl_195",
+      "sourcePath": "FatturaElettronicaBody/DatiPagamento/DettaglioPagamento/CGQuietanzante",
+      "targetPath": "cac:PayeeParty/cac:PartyLegalEntity/cbc:CompanyID",
+      "businessTerm": "BT-61",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      }
+    },
+    {
+      "id": "conn_78",
+      "source": "fpa_278",
+      "target": "ubl_279",
+      "sourcePath": "FatturaElettronicaBody/DatiPagamento/DettaglioPagamento/IBAN",
+      "targetPath": "cac:PaymentMeans/cac:PayeeFinancialAccount/cbc:ID",
+      "businessTerm": "BT-84",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      }
+    },
+    {
+      "id": "conn_79",
+      "source": "fpa_281",
+      "target": "ubl_282",
+      "sourcePath": "FatturaElettronicaBody/DatiPagamento/DettaglioPagamento/BIC",
+      "targetPath": "cac:PaymentMeans/cac:PayeeFinancialAccount/cac:FinancialInstitutionBranch/cbc:ID",
+      "businessTerm": "BT-86",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      }
+    },
+    {
+      "id": "conn_80",
+      "source": "fpa_286",
+      "target": "ubl_273",
+      "sourcePath": "FatturaElettronicaBody/DatiPagamento/DettaglioPagamento/CodicePagamento",
+      "targetPath": "cac:PaymentMeans/cbc:PaymentID",
+      "businessTerm": "BT-83",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      }
+    },
+    {
+      "id": "conn_81",
+      "sources": [
+        "fpa_292",
+        "fpa_292"
+      ],
+      "target": "ubl_77",
+      "targetPath": "cac:AdditionalDocumentReference/cac:Attachment/cbc:EmbeddedDocumentBinaryObject/@mimeCode",
+      "businessTerm": "BT-125",
+      "sourceNames": [
+        "FormatoAttachment",
+        "Attachment"
+      ],
+      "transformation": {
+        "type": "CONCAT",
+        "formula": {
+          "operation": "concat",
+          "inputs": [
+            {
+              "field": "FormatoAttachment",
+              "source": "fpa_292"
+            },
+            {
+              "field": "Attachment",
+              "source": "fpa_292"
+            }
+          ],
+          "separator": " ",
+          "template": "{FormatoAttachment} {Attachment}"
+        },
+        "description": "Concatenate 2 fields"
+      }
+    },
+    {
+      "id": "conn_82",
+      "source": "fpa_291",
+      "target": "ubl_74",
+      "sourcePath": "FatturaElettronicaBody/Allegati/DescrizioneAttachment",
+      "targetPath": "cac:AdditionalDocumentReference/cbc:DocumentDescription",
+      "businessTerm": "BT-123",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      }
+    }
+  ],
+  "transformationTypes": {
+    "DIRECT": "Direct 1:1 field mapping",
+    "CONCAT": "Concatenate multiple fields",
+    "SPLIT": "Split field into multiple outputs",
+    "LOOKUP": "Value conversion via lookup table",
+    "FORMULA": "Custom formula (math, date, string)",
+    "CONDITIONAL": "Conditional logic (IF/THEN/ELSE)"
+  },
+  "metadata": {
+    "source_standard": "FatturaPA v1.2.1",
+    "target_standard": "PEPPOL BIS 3.0",
+    "total_mappings": 83,
+    "direct_mappings": 65,
+    "concat_mappings": 18,
+    "formulas_executable": true
+  }
+}

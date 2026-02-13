@@ -1,0 +1,1226 @@
+{
+  "name": "PEPPOL-FatturaPA",
+  "input_schema": "UBL_PEPPOL_BIS_3",
+  "output_schema": "FatturaPA",
+  "rules": [
+    {
+      "id": "conn_0",
+      "source": "ubl_36",
+      "target": "fpa_118",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_1",
+      "source": "ubl_37",
+      "target": "fpa_117",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_2",
+      "source": "ubl_38",
+      "target": "fpa_270",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_3",
+      "source": "ubl_40",
+      "target": "fpa_142",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_4",
+      "source": "ubl_42",
+      "target": "fpa_116",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_5",
+      "source": "ubl_44",
+      "target": "fpa_53",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_6",
+      "source": "ubl_45",
+      "target": "fpa_149",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_7",
+      "source": "ubl_49",
+      "target": "fpa_258",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_8",
+      "source": "ubl_51",
+      "target": "fpa_146",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_9",
+      "source": "ubl_56",
+      "target": "fpa_178",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_10",
+      "source": "ubl_57",
+      "target": "fpa_179",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_11",
+      "source": "ubl_62",
+      "target": "fpa_187",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_12",
+      "source": "ubl_65",
+      "target": "fpa_170",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_13",
+      "source": "ubl_67",
+      "target": "fpa_159",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_14",
+      "source": "ubl_69",
+      "target": "fpa_162",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_15",
+      "source": "ubl_73",
+      "target": "fpa_185",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_16",
+      "source": "ubl_73",
+      "target": "fpa_185",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_17",
+      "source": "ubl_74",
+      "target": "fpa_291",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_18",
+      "source": "ubl_77",
+      "target": "fpa_292",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_19",
+      "source": "ubl_77",
+      "target": "fpa_292",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_20",
+      "source": "ubl_82",
+      "target": "fpa_158",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_21",
+      "source": "ubl_88",
+      "target": "fpa_45",
+      "transformation": {
+        "type": "CONDITIONAL",
+        "formula": {
+          "operation": "conditional_extract",
+          "conditions": [
+            {
+              "if": "starts_with(\"EORI:\")",
+              "then": {
+                "operation": "extract",
+                "regex": "^EORI:(.+)$",
+                "target": "CodEORI",
+                "group": 1
+              }
+            },
+            {
+              "if": "starts_with(\"ALBO:\")",
+              "then": {
+                "operation": "extract",
+                "regex": "^ALBO:(.+?) (\\d+) (.+)$",
+                "targets": [
+                  "AlboProfessionale",
+                  "NumeroIscrizioneAlbo",
+                  "DataIscrizioneAlbo"
+                ]
+              }
+            },
+            {
+              "if": "starts_with(\"REA:\")",
+              "then": {
+                "operation": "extract",
+                "regex": "^REA:(.+?)(\\d+)$",
+                "targets": [
+                  "Ufficio",
+                  "NumeroREA"
+                ]
+              }
+            }
+          ],
+          "default": "pass_through"
+        },
+        "description": "Parse identifier based on prefix type"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_22",
+      "source": "ubl_93",
+      "target": "fpa_30",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_23",
+      "source": "ubl_94",
+      "target": "fpa_31",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_24",
+      "source": "ubl_95",
+      "target": "fpa_33",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_25",
+      "source": "ubl_96",
+      "target": "fpa_32",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_26",
+      "source": "ubl_97",
+      "target": "fpa_34",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_27",
+      "source": "ubl_101",
+      "target": "fpa_35",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_28",
+      "source": "ubl_103",
+      "target": "fpa_16",
+      "transformation": {
+        "type": "SPLIT",
+        "formula": {
+          "operation": "extract",
+          "pattern": "regex",
+          "regex": "^([A-Z]{2})(.+)$",
+          "outputs": [
+            {
+              "name": "IdPaese",
+              "group": 1,
+              "target": "fpa_country"
+            },
+            {
+              "name": "IdCodice",
+              "group": 2,
+              "target": "fpa_vat"
+            }
+          ],
+          "description": "Extract country code (first 2 chars) and VAT number"
+        },
+        "description": "Split VAT identifier into country and number"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_29",
+      "source": "ubl_108",
+      "target": "fpa_21",
+      "transformation": {
+        "type": "SPLIT",
+        "formula": {
+          "operation": "extract",
+          "pattern": "regex",
+          "regex": "^(?:Nome&Cognome: )?(.+?)\\s+(.+)$",
+          "outputs": [
+            {
+              "name": "Nome",
+              "group": 1
+            },
+            {
+              "name": "Cognome",
+              "group": 2
+            }
+          ],
+          "fallback": {
+            "operation": "direct",
+            "target": "Denominazione"
+          },
+          "description": "Extract first and last name, or use as company name"
+        },
+        "description": "Parse name into components or use as denomination"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_30",
+      "source": "ubl_109",
+      "target": "fpa_17",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_31",
+      "source": "ubl_111",
+      "target": "fpa_48",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_32",
+      "source": "ubl_114",
+      "target": "fpa_50",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_33",
+      "source": "ubl_115",
+      "target": "fpa_52",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_34",
+      "source": "ubl_140",
+      "target": "fpa_7",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_35",
+      "source": "ubl_140",
+      "target": "fpa_7",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_36",
+      "source": "ubl_142",
+      "target": "fpa_77",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_37",
+      "source": "ubl_147",
+      "target": "fpa_79",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_38",
+      "source": "ubl_148",
+      "target": "fpa_80",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_39",
+      "source": "ubl_149",
+      "target": "fpa_82",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_40",
+      "source": "ubl_150",
+      "target": "fpa_81",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_41",
+      "source": "ubl_151",
+      "target": "fpa_83",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_42",
+      "source": "ubl_155",
+      "target": "fpa_84",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_43",
+      "source": "ubl_157",
+      "target": "fpa_70",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_44",
+      "source": "ubl_161",
+      "target": "fpa_75",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_45",
+      "source": "ubl_163",
+      "target": "fpa_71",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_46",
+      "source": "ubl_163",
+      "target": "fpa_71",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_47",
+      "source": "ubl_190",
+      "target": "fpa_274",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_48",
+      "source": "ubl_193",
+      "target": "fpa_266",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_49",
+      "source": "ubl_195",
+      "target": "fpa_275",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_50",
+      "source": "ubl_201",
+      "target": "fpa_63",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_51",
+      "source": "ubl_213",
+      "target": "fpa_58",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_52",
+      "source": "ubl_217",
+      "target": "fpa_220",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_53",
+      "source": "ubl_222",
+      "target": "fpa_214",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_54",
+      "source": "ubl_223",
+      "target": "fpa_215",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_55",
+      "source": "ubl_224",
+      "target": "fpa_217",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_56",
+      "source": "ubl_225",
+      "target": "fpa_216",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_57",
+      "source": "ubl_226",
+      "target": "fpa_218",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_58",
+      "source": "ubl_230",
+      "target": "fpa_219",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_59",
+      "source": "ubl_271",
+      "target": "fpa_267",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_60",
+      "source": "ubl_273",
+      "target": "fpa_286",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_61",
+      "source": "ubl_279",
+      "target": "fpa_278",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_62",
+      "source": "ubl_282",
+      "target": "fpa_281",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_63",
+      "source": "ubl_288",
+      "target": "fpa_269",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_64",
+      "source": "ubl_315",
+      "target": "fpa_256",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_65",
+      "source": "ubl_317",
+      "target": "fpa_257",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_66",
+      "source": "ubl_321",
+      "target": "fpa_252",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_67",
+      "source": "ubl_323",
+      "target": "fpa_259",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_68",
+      "source": "ubl_343",
+      "target": "fpa_140",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_69",
+      "source": "ubl_351",
+      "target": "fpa_141",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_70",
+      "source": "ubl_353",
+      "target": "fpa_271",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_71",
+      "source": "ubl_356",
+      "target": "fpa_226",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_72",
+      "source": "ubl_358",
+      "target": "fpa_232",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_73",
+      "source": "ubl_359",
+      "target": "fpa_233",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_74",
+      "source": "ubl_360",
+      "target": "fpa_241",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_75",
+      "source": "ubl_362",
+      "target": "fpa_245",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_76",
+      "source": "ubl_364",
+      "target": "fpa_234",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_77",
+      "source": "ubl_365",
+      "target": "fpa_235",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_78",
+      "source": "ubl_367",
+      "target": "fpa_148",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_79",
+      "source": "ubl_379",
+      "target": "fpa_157",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_80",
+      "source": "ubl_379",
+      "target": "fpa_157",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_81",
+      "source": "ubl_391",
+      "target": "fpa_231",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_82",
+      "source": "ubl_395",
+      "target": "fpa_230",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_83",
+      "source": "ubl_407",
+      "target": "fpa_242",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_84",
+      "source": "ubl_411",
+      "target": "fpa_254",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_85",
+      "source": "ubl_412",
+      "target": "fpa_262",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_86",
+      "source": "ubl_420",
+      "target": "fpa_240",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    },
+    {
+      "id": "conn_87",
+      "source": "ubl_422",
+      "target": "fpa_236",
+      "transformation": {
+        "type": "DIRECT",
+        "formula": null,
+        "description": "Direct 1:1 mapping"
+      },
+      "condition": null,
+      "cardinality_handling": "direct",
+      "enabled": true
+    }
+  ],
+  "lookup_tables": {},
+  "metadata": {}
+}

@@ -1,0 +1,2133 @@
+{
+  "projectName": "FatturaPA_to_UBL_PEPPOL",
+  "version": "2.0",
+  "created": "2026-02-13T17:45:55.777415",
+  "inputSchema": {
+    "name": "FatturaPA",
+    "format": "xml",
+    "field_count": 148,
+    "fields": {
+      "field_0": {
+        "id": "field_0",
+        "name": "FatturaElettronicaHeader",
+        "path": "FatturaElettronicaHeader",
+        "business_term": "1",
+        "type": "string",
+        "cardinality": "1 ..1"
+      },
+      "field_1": {
+        "id": "field_1",
+        "name": "DatiTrasmissione",
+        "path": "FatturaElettronicaHeader/DatiTrasmissione",
+        "business_term": "1.1",
+        "type": "string",
+        "cardinality": "1 ..1"
+      },
+      "field_2": {
+        "id": "field_2",
+        "name": "IdTrasmittente",
+        "path": "FatturaElettronicaHeader/DatiTrasmissione/IdTrasmittente",
+        "business_term": "1.1.1",
+        "type": "string",
+        "cardinality": "1 ..1"
+      },
+      "field_3": {
+        "id": "field_3",
+        "name": "IdPaese",
+        "path": "FatturaElettronicaHeader/DatiTrasmissione/IdTrasmittente/IdPaese",
+        "business_term": "1.1.1.1",
+        "type": "string",
+        "cardinality": "1 ..1"
+      },
+      "field_4": {
+        "id": "field_4",
+        "name": "IdCodice",
+        "path": "FatturaElettronicaHeader/DatiTrasmissione/IdTrasmittente/IdCodice",
+        "business_term": "1.1.1.2",
+        "type": "string",
+        "cardinality": "1 ..1"
+      },
+      "field_5": {
+        "id": "field_5",
+        "name": "ProgressivoInvio",
+        "path": "FatturaElettronicaHeader/DatiTrasmissione/ProgessivoInvio",
+        "business_term": "1.1.2",
+        "type": "string",
+        "cardinality": "1 ..1"
+      },
+      "field_6": {
+        "id": "field_6",
+        "name": "FormatoTrasmissione",
+        "path": "FatturaElettronicaHeader/DatiTrasmissione/FormatoTrasmissione",
+        "business_term": "1.1.3",
+        "type": "string",
+        "cardinality": "1 ..1"
+      },
+      "field_7": {
+        "id": "field_7",
+        "name": "CodiceDestinatario",
+        "path": "FatturaElettronicaHeader/DatiTrasmissione/CodiceDestinatario",
+        "business_term": "1.1.4",
+        "type": "string",
+        "cardinality": "1 ..1"
+      },
+      "field_8": {
+        "id": "field_8",
+        "name": "ContattiTrasmittente",
+        "path": "FatturaElettronicaHeader/DatiTrasmissione/ContattiTrasmittente",
+        "business_term": "1.1.5",
+        "type": "string",
+        "cardinality": "0 ..1"
+      },
+      "field_9": {
+        "id": "field_9",
+        "name": "Telefono",
+        "path": "FatturaElettronicaHeader/DatiTrasmissione/ContattiTrasmittente/Telefono",
+        "business_term": "1.1.5.1",
+        "type": "string",
+        "cardinality": "0 ..1"
+      },
+      "field_10": {
+        "id": "field_10",
+        "name": "Email",
+        "path": "FatturaElettronicaHeader/DatiTrasmissione/ContattiTrasmittente/Email",
+        "business_term": "1.1.5.2",
+        "type": "string",
+        "cardinality": "0 ..1"
+      },
+      "field_11": {
+        "id": "field_11",
+        "name": "PECDestinatario",
+        "path": "FatturaElettronicaHeader/DatiTrasmissione/PECDestinatario",
+        "business_term": "1.1.6",
+        "type": "string",
+        "cardinality": "0 ..1"
+      },
+      "field_12": {
+        "id": "field_12",
+        "name": "CedentePrestatore",
+        "path": "FatturaElettronicaHeader/CedentePrestatore",
+        "business_term": "1.2",
+        "type": "string",
+        "cardinality": "1 ..1"
+      },
+      "field_13": {
+        "id": "field_13",
+        "name": "DatiAnagrafici",
+        "path": "FatturaElettronicaHeader/CedentePrestatore/DatiAnagrafici",
+        "business_term": "1.2.1",
+        "type": "string",
+        "cardinality": "1 ..1"
+      },
+      "field_14": {
+        "id": "field_14",
+        "name": "IdFiscaleIVA",
+        "path": "FatturaElettronicaHeader/CedentePrestatore/DatiAnagrafici/IdFiscaleIVA",
+        "business_term": "1.2.1.1",
+        "type": "string",
+        "cardinality": "1 ..1"
+      },
+      "field_15": {
+        "id": "field_15",
+        "name": "IdPaese",
+        "path": "FatturaElettronicaHeader/CedentePrestatore/DatiAnagrafici/IdFiscaleIVA/IdPaese",
+        "business_term": "1.2.1.1.1",
+        "type": "string",
+        "cardinality": "1 ..1"
+      },
+      "field_16": {
+        "id": "field_16",
+        "name": "IdCodice",
+        "path": "FatturaElettronicaHeader/CedentePrestatore/DatiAnagrafici/IdFiscaleIVA/IdCodice",
+        "business_term": "1.2.1.1.2",
+        "type": "string",
+        "cardinality": "1 ..1"
+      },
+      "field_17": {
+        "id": "field_17",
+        "name": "CodiceFiscale",
+        "path": "FatturaElettronicaHeader/CedentePrestatore/DatiAnagrafici/CodiceFiscale",
+        "business_term": "1.2.1.2",
+        "type": "string",
+        "cardinality": "0 ..1"
+      },
+      "field_18": {
+        "id": "field_18",
+        "name": "Anagrafica",
+        "path": "\nFatturaElettronicaHeader/CedentePrestatore/DatiAnagrafici/Anagrafica",
+        "business_term": "1.2.1.3",
+        "type": "string",
+        "cardinality": "1 ..1"
+      },
+      "field_19": {
+        "id": "field_19",
+        "name": "Denominazione",
+        "path": "\nFatturaElettronicaHeader/CedentePrestatore/DatiAnagrafici/Anagrafica/Denominazione",
+        "business_term": "1.2.1.3.1",
+        "type": "string",
+        "cardinality": "0 ..1"
+      },
+      "field_20": {
+        "id": "field_20",
+        "name": "Nome",
+        "path": "\nFatturaElettronicaHeader/CedentePrestatore/DatiAnagrafici/Anagrafica/Nome",
+        "business_term": "1.2.1.3.2",
+        "type": "string",
+        "cardinality": "0 ..1"
+      },
+      "field_21": {
+        "id": "field_21",
+        "name": "Cognome",
+        "path": "\nFatturaElettronicaHeader/CedentePrestatore/DatiAnagrafici/Anagrafica/Cognome",
+        "business_term": "1.2.1.3.3",
+        "type": "string",
+        "cardinality": "0 ..1"
+      },
+      "field_22": {
+        "id": "field_22",
+        "name": "Titolo",
+        "path": "\nFatturaElettronicaHeader/CedentePrestatore/DatiAnagrafici/Anagrafica/Titolo",
+        "business_term": "1.2.1.3.4",
+        "type": "string",
+        "cardinality": "0 ..1"
+      },
+      "field_23": {
+        "id": "field_23",
+        "name": "CodEORI",
+        "path": "FatturaElettronicaHeader/CedentePrestatore/DatiAnagrafici/Anagrafica/CodEORI",
+        "business_term": "1.2.1.3.5",
+        "type": "string",
+        "cardinality": "0 ..1"
+      },
+      "field_24": {
+        "id": "field_24",
+        "name": "AlboProfessionale",
+        "path": "\nFatturaElettronicaHeader/CedentePrestatore/DatiAnagrafici/AlboProfessionale",
+        "business_term": "1.2.1.4",
+        "type": "string",
+        "cardinality": "0 ..1"
+      },
+      "field_25": {
+        "id": "field_25",
+        "name": "ProvinciaAlbo",
+        "path": "\nFatturaElettronicaHeader/CedentePrestatore/DatiAnagrafici/ProvinciaAlbo",
+        "business_term": "1.2.1.5",
+        "type": "string",
+        "cardinality": "0 ..1"
+      },
+      "field_26": {
+        "id": "field_26",
+        "name": "NumeroIscrizioneAlbo",
+        "path": "\nFatturaElettronicaHeader/CedentePrestatore/DatiAnagrafici/NumeroIscrizioneAlbo",
+        "business_term": "1.2.1.6",
+        "type": "string",
+        "cardinality": "0 ..1"
+      },
+      "field_27": {
+        "id": "field_27",
+        "name": "DataIscrizioneAlbo",
+        "path": "\nFatturaElettronicaHeader/CedentePrestatore/DatiAnagrafici/DataIscrizioneAlbo",
+        "business_term": "1.2.1.7",
+        "type": "string",
+        "cardinality": "0 ..1"
+      },
+      "field_28": {
+        "id": "field_28",
+        "name": "RegimeFiscale",
+        "path": "FatturaElettronicaHeader/CedentePrestatore/DatiAnagrafici/RegimeFiscale",
+        "business_term": "1.2.1.8",
+        "type": "string",
+        "cardinality": "1 ..1"
+      },
+      "field_29": {
+        "id": "field_29",
+        "name": "Sede",
+        "path": "FatturaElettronicaHeader/CedentePrestatore/Sede",
+        "business_term": "1.2.2",
+        "type": "string",
+        "cardinality": "1 ..1"
+      },
+      "field_30": {
+        "id": "field_30",
+        "name": "Indirizzo",
+        "path": "FatturaElettronicaHeader/CedentePrestatore/Sede/Indirizzo",
+        "business_term": "1.2.2.1",
+        "type": "string",
+        "cardinality": "1 ..1"
+      },
+      "field_31": {
+        "id": "field_31",
+        "name": "NumeroCivico",
+        "path": "FatturaElettronicaHeader/CedentePrestatore/Sede/NumeroCivico",
+        "business_term": "1.2.2.2",
+        "type": "string",
+        "cardinality": "0 ..1"
+      },
+      "field_32": {
+        "id": "field_32",
+        "name": "CAP",
+        "path": "FatturaElettronicaHeader/CedentePrestatore/Sede/CAP",
+        "business_term": "1.2.2.3",
+        "type": "string",
+        "cardinality": "1 ..1"
+      },
+      "field_33": {
+        "id": "field_33",
+        "name": "Comune",
+        "path": "FatturaElettronicaHeader/CedentePrestatore/Sede/Comune",
+        "business_term": "1.2.2.4",
+        "type": "string",
+        "cardinality": "1 ..1"
+      },
+      "field_34": {
+        "id": "field_34",
+        "name": "Provincia",
+        "path": "FatturaElettronicaHeader/CedentePrestatore/Sede/Provincia",
+        "business_term": "1.2.2.5",
+        "type": "string",
+        "cardinality": "0 ..1"
+      },
+      "field_35": {
+        "id": "field_35",
+        "name": "Nazione",
+        "path": "FatturaElettronicaHeader/CedentePrestatore/Sede/Nazione",
+        "business_term": "1.2.2.6",
+        "type": "string",
+        "cardinality": "1 ..1"
+      },
+      "field_36": {
+        "id": "field_36",
+        "name": "StabileOrganizzazione",
+        "path": "FatturaElettronicaHeader/CedentePrestatore/StabileOrganizzazione",
+        "business_term": "1.2.3",
+        "type": "string",
+        "cardinality": "0 ..1"
+      },
+      "field_37": {
+        "id": "field_37",
+        "name": "Indirizzo",
+        "path": "FatturaElettronicaHeader/CedentePrestatore/StabileOrganizzazione/Indirizzo",
+        "business_term": "1.2.3.1",
+        "type": "string",
+        "cardinality": "1 ..1"
+      },
+      "field_38": {
+        "id": "field_38",
+        "name": "NumeroCivico",
+        "path": "FatturaElettronicaHeader/CedentePrestatore/StabileOrganizzazione/NumeroCivico",
+        "business_term": "1.2.3.2",
+        "type": "string",
+        "cardinality": "0 ..1"
+      },
+      "field_39": {
+        "id": "field_39",
+        "name": "CAP",
+        "path": "FatturaElettronicaHeader/CedentePrestatore/StabileOrganizzazione/CAP",
+        "business_term": "1.2.3.3",
+        "type": "string",
+        "cardinality": "1 ..1"
+      },
+      "field_40": {
+        "id": "field_40",
+        "name": "Comune",
+        "path": "FatturaElettronicaHeader/CedentePrestatore/StabileOrganizzazione/Comune",
+        "business_term": "1.2.3.4",
+        "type": "string",
+        "cardinality": "1 ..1"
+      },
+      "field_41": {
+        "id": "field_41",
+        "name": "Provincia",
+        "path": "FatturaElettronicaHeader/CedentePrestatore/StabileOrganizzazione/Provincia",
+        "business_term": "1.2.3.5",
+        "type": "string",
+        "cardinality": "0 ..1"
+      },
+      "field_42": {
+        "id": "field_42",
+        "name": "Nazione",
+        "path": "FatturaElettronicaHeader/CedentePrestatore/StabileOrganizzazione/Nazione",
+        "business_term": "1.2.3.6",
+        "type": "string",
+        "cardinality": "1 ..1"
+      },
+      "field_43": {
+        "id": "field_43",
+        "name": "IscrizioneREA",
+        "path": "FatturaElettronicaHeader/CedentePrestatore/IscrizioneREA",
+        "business_term": "1.2.4",
+        "type": "string",
+        "cardinality": "0 ..1"
+      },
+      "field_44": {
+        "id": "field_44",
+        "name": "Ufficio",
+        "path": "FatturaElettronicaHeader/CedentePrestatore/IscrizioneREA/Ufficio",
+        "business_term": "1.2.4.1",
+        "type": "string",
+        "cardinality": "1 ..1"
+      },
+      "field_45": {
+        "id": "field_45",
+        "name": "NumeroREA",
+        "path": "FatturaElettronicaHeader/CedentePrestatore/IscrizioneREA/NumeroREA",
+        "business_term": "1.2.4.2",
+        "type": "string",
+        "cardinality": "1 ..1"
+      },
+      "field_46": {
+        "id": "field_46",
+        "name": "CapitaleSociale",
+        "path": "FatturaElettronicaHeader/CedentePrestatore/IscrizioneREA/CapitaleSociale",
+        "business_term": "1.2.4.3",
+        "type": "string",
+        "cardinality": "0 ..1"
+      },
+      "field_47": {
+        "id": "field_47",
+        "name": "SocioUnico",
+        "path": "FatturaElettronicaHeader/CedentePrestatore/IscrizioneREA/SocioUnico ",
+        "business_term": "1.2.4.4",
+        "type": "string",
+        "cardinality": "0 ..1"
+      },
+      "field_48": {
+        "id": "field_48",
+        "name": "StatoLiquidazione",
+        "path": "FatturaElettronicaHeader/CedentePrestatore/IscrizioneREA/StatoLiquidazione",
+        "business_term": "1.2.4.5",
+        "type": "string",
+        "cardinality": "1 ..1"
+      },
+      "field_49": {
+        "id": "field_49",
+        "name": "Contatti",
+        "path": "FatturaElettronicaHeader/CedentePrestatore/Contatti",
+        "business_term": "1.2.5",
+        "type": "string",
+        "cardinality": "0 ..1"
+      },
+      "field_50": {
+        "id": "field_50",
+        "name": "Telefono",
+        "path": "FatturaElettronicaHeader/CedentePrestatore/Contatti/Telefono",
+        "business_term": "1.2.5.1",
+        "type": "string",
+        "cardinality": "0 ..1"
+      },
+      "field_51": {
+        "id": "field_51",
+        "name": "Fax",
+        "path": "FatturaElettronicaHeader/CedentePrestatore/Contatti/Fax",
+        "business_term": "1.2.5.2",
+        "type": "string",
+        "cardinality": "0 ..1"
+      },
+      "field_52": {
+        "id": "field_52",
+        "name": "Email",
+        "path": "FatturaElettronicaHeader/CedentePrestatore/Contatti/Email",
+        "business_term": "1.2.5.3",
+        "type": "string",
+        "cardinality": "0 ..1"
+      },
+      "field_53": {
+        "id": "field_53",
+        "name": "RiferimentoAmministrazione",
+        "path": "FatturaElettronicaHeader/CedentePrestatore/RiferimentoAmministrazione",
+        "business_term": "1.2.6",
+        "type": "string",
+        "cardinality": "0 ..1"
+      },
+      "field_54": {
+        "id": "field_54",
+        "name": "RappresentanteFiscale",
+        "path": "FatturaElettronicaHeader/RappresentanteFiscale ",
+        "business_term": "1.3",
+        "type": "string",
+        "cardinality": "0 ..1"
+      },
+      "field_55": {
+        "id": "field_55",
+        "name": "DatiAnagrafici",
+        "path": "FatturaElettronicaHeader/RappresentanteFiscale/DatiAnagrafici",
+        "business_term": "1.3.1",
+        "type": "string",
+        "cardinality": "1 ..1"
+      },
+      "field_56": {
+        "id": "field_56",
+        "name": "IdFiscaleIVA",
+        "path": "FatturaElettronicaHeader/RappresentanteFiscale/DatiAnagrafici/IdFiscaleIVA",
+        "business_term": "1.3.1.1",
+        "type": "string",
+        "cardinality": "1 ..1"
+      },
+      "field_57": {
+        "id": "field_57",
+        "name": "IdPaese",
+        "path": "FatturaElettronicaHeader/RappresentanteFiscale/DatiAnagrafici/IdFiscaleIVA/IdPaese",
+        "business_term": "1.3.1.1.1",
+        "type": "string",
+        "cardinality": "1 ..1"
+      },
+      "field_58": {
+        "id": "field_58",
+        "name": "IdCodice",
+        "path": "FatturaElettronicaHeader/RappresentanteFiscale/DatiAnagrafici/IdFiscaleIVA/IdCodice",
+        "business_term": "1.3.1.1.2",
+        "type": "string",
+        "cardinality": "1 ..1"
+      },
+      "field_59": {
+        "id": "field_59",
+        "name": "CodiceFiscale",
+        "path": "FatturaElettronicaHeader/RappresentanteFiscale/DatiAnagrafici/CodiceFiscale",
+        "business_term": "1.3.1.2",
+        "type": "string",
+        "cardinality": "0 ..1"
+      },
+      "field_60": {
+        "id": "field_60",
+        "name": "Anagrafica",
+        "path": "FatturaElettronicaHeader/RappresentanteFiscale/DatiAnagrafici/Anagrafica",
+        "business_term": "1.3.1.3",
+        "type": "string",
+        "cardinality": "1 ..1"
+      },
+      "field_61": {
+        "id": "field_61",
+        "name": "Denominazione",
+        "path": "FatturaElettronicaHeader/RappresentanteFiscale/DatiAnagrafici/Anagrafica/Denominazione",
+        "business_term": "1.3.1.3.1",
+        "type": "string",
+        "cardinality": "0 ..1"
+      },
+      "field_62": {
+        "id": "field_62",
+        "name": "Nome",
+        "path": "FatturaElettronicaHeader/RappresentanteFiscale/DatiAnagrafici/Anagrafica/Nome",
+        "business_term": "1.3.1.3.2",
+        "type": "string",
+        "cardinality": "0 ..1"
+      },
+      "field_63": {
+        "id": "field_63",
+        "name": "Cognome",
+        "path": "FatturaElettronicaHeader/RappresentanteFiscale/DatiAnagrafici/Anagrafica/Cognome",
+        "business_term": "1.3.1.3.3",
+        "type": "string",
+        "cardinality": "0 ..1"
+      },
+      "field_64": {
+        "id": "field_64",
+        "name": "Titolo",
+        "path": "FatturaElettronicaHeader/RappresentanteFiscale/DatiAnagrafici/Anagrafica/Titolo",
+        "business_term": "1.3.1.3.4",
+        "type": "string",
+        "cardinality": "0 ..1"
+      },
+      "field_65": {
+        "id": "field_65",
+        "name": "CodEORI",
+        "path": "FatturaElettronicaHeader/RappresentanteFiscale/DatiAnagrafici/Anagrafica/CodEORI",
+        "business_term": "1.3.1.3.5",
+        "type": "string",
+        "cardinality": "0 ..1"
+      },
+      "field_66": {
+        "id": "field_66",
+        "name": "CessionarioCommittente",
+        "path": "FatturaElettronicaHeader/CessionarioCommittente",
+        "business_term": "1.4",
+        "type": "string",
+        "cardinality": "1 ..1"
+      },
+      "field_67": {
+        "id": "field_67",
+        "name": "DatiAnagrafici",
+        "path": "FatturaElettronicaHeaderCessionarioCommittente/DatiAnagrafici",
+        "business_term": "1.4.1",
+        "type": "string",
+        "cardinality": "1 ..1"
+      },
+      "field_68": {
+        "id": "field_68",
+        "name": "IdFiscaleIVA",
+        "path": "FatturaElettronicaHeader/CessionarioCommittente/DatiAnagrafici/IdFiscaleIVA",
+        "business_term": "1.4.1.1",
+        "type": "string",
+        "cardinality": "0 ..1"
+      },
+      "field_69": {
+        "id": "field_69",
+        "name": "IdPaese",
+        "path": "FatturaElettronicaHeader/CessionarioCommittente/DatiAnagrafici/IdFiscaleIVA/IdPaese",
+        "business_term": "1.4.1.1.1",
+        "type": "string",
+        "cardinality": "1 ..1"
+      },
+      "field_70": {
+        "id": "field_70",
+        "name": "IdCodice",
+        "path": "FatturaElettronicaHeader/CessionarioCommittente/DatiAnagrafici/IdFiscaleIVA/IdCodice",
+        "business_term": "1.4.1.1.2",
+        "type": "string",
+        "cardinality": "1 ..1"
+      },
+      "field_71": {
+        "id": "field_71",
+        "name": "CodiceFiscale",
+        "path": "FatturaElettronicaHeader/CessionarioCommittente/DatiAnagrafici/CodiceFiscale",
+        "business_term": "1.4.1.2",
+        "type": "string",
+        "cardinality": "0 ..1"
+      },
+      "field_72": {
+        "id": "field_72",
+        "name": "Anagrafica",
+        "path": "FatturaElettronicaHeader/CessionarioCommittente/DatiAnagrafici/Anagrafica",
+        "business_term": "1.4.1.3",
+        "type": "string",
+        "cardinality": "1 ..1"
+      },
+      "field_73": {
+        "id": "field_73",
+        "name": "Denominazione",
+        "path": "FatturaElettronicaHeader/CessionarioCommittente/DatiAnagrafici/Anagrafica/Denominazione",
+        "business_term": "1.4.1.3.1",
+        "type": "string",
+        "cardinality": "0 ..1"
+      },
+      "field_74": {
+        "id": "field_74",
+        "name": "Nome",
+        "path": "FatturaElettronicaHeader/CessionarioCommittente/DatiAnagrafici/Anagrafica/Nome",
+        "business_term": "1.4.1.3.2",
+        "type": "string",
+        "cardinality": "0 ..1"
+      },
+      "field_75": {
+        "id": "field_75",
+        "name": "Cognome",
+        "path": "FatturaElettronicaHeader/CessionarioCommittente/DatiAnagrafici/Anagrafica/Cognome",
+        "business_term": "1.4.1.3.3",
+        "type": "string",
+        "cardinality": "0 ..1"
+      },
+      "field_76": {
+        "id": "field_76",
+        "name": "Titolo",
+        "path": "FatturaElettronicaHeader/CessionarioCommittente/DatiAnagrafici/Anagrafica/Titolo",
+        "business_term": "1.4.1.3.4",
+        "type": "string",
+        "cardinality": "0 ..1"
+      },
+      "field_77": {
+        "id": "field_77",
+        "name": "CodEORI",
+        "path": "FatturaElettronicaHeader/CessionarioCommittente/DatiAnagrafici/Anagrafica/CodEORI",
+        "business_term": "1.4.1.3.5",
+        "type": "string",
+        "cardinality": "0 ..1"
+      },
+      "field_78": {
+        "id": "field_78",
+        "name": "Sede",
+        "path": "FatturaElettronicaHeader/CessionarioCommittente/Sede",
+        "business_term": "1.4.2",
+        "type": "string",
+        "cardinality": "1 ..1"
+      },
+      "field_79": {
+        "id": "field_79",
+        "name": "Indirizzo",
+        "path": "FatturaElettronicaHeader/CessionarioCommittente/Sede/Indirizzo",
+        "business_term": "1.4.2.1",
+        "type": "string",
+        "cardinality": "1 ..1"
+      },
+      "field_80": {
+        "id": "field_80",
+        "name": "NumeroCivico",
+        "path": "FatturaElettronicaHeader/CessionarioCommittente/Sede/NumeroCivico",
+        "business_term": "1.4.2.2",
+        "type": "string",
+        "cardinality": "0 ..1"
+      },
+      "field_81": {
+        "id": "field_81",
+        "name": "CAP",
+        "path": "FatturaElettronicaHeader/CessionarioCommittente/Sede/CAP",
+        "business_term": "1.4.2.3",
+        "type": "string",
+        "cardinality": "1 ..1"
+      },
+      "field_82": {
+        "id": "field_82",
+        "name": "Comune",
+        "path": "FatturaElettronicaHeader/CessionarioCommittente/Sede/Comune",
+        "business_term": "1.4.2.4",
+        "type": "string",
+        "cardinality": "1 ..1"
+      },
+      "field_83": {
+        "id": "field_83",
+        "name": "Provincia",
+        "path": "FatturaElettronicaHeader/CessionarioCommittente/Sede/Provincia",
+        "business_term": "1.4.2.5",
+        "type": "string",
+        "cardinality": "0 ..1"
+      },
+      "field_84": {
+        "id": "field_84",
+        "name": "Nazione",
+        "path": "FatturaElettronicaHeader/CessionarioCommittente/Sede/Nazione",
+        "business_term": "1.4.2.6",
+        "type": "string",
+        "cardinality": "1 ..1"
+      },
+      "field_85": {
+        "id": "field_85",
+        "name": "StabileOrganizzazione",
+        "path": "FatturaElettronicaHeader/CessionarioCommittente/StabileOrganizzazione",
+        "business_term": "1.4.3",
+        "type": "string",
+        "cardinality": "0 ..1"
+      },
+      "field_86": {
+        "id": "field_86",
+        "name": "Indirizzo",
+        "path": "FatturaElettronicaHeader/CessionarioCommittente/StabileOrganizzazione/Indirizzo",
+        "business_term": "1.4.3.1",
+        "type": "string",
+        "cardinality": "1 ..1"
+      },
+      "field_87": {
+        "id": "field_87",
+        "name": "NumeroCivico",
+        "path": "FatturaElettronicaHeader/CessionarioCommittente/StabileOrganizzazione/NumeroCivico",
+        "business_term": "1.4.3.2",
+        "type": "string",
+        "cardinality": "0 ..1"
+      },
+      "field_88": {
+        "id": "field_88",
+        "name": "CAP",
+        "path": "FatturaElettronicaHeader/CessionarioCommittente/StabileOrganizzazione/CAP",
+        "business_term": "1.4.3.3",
+        "type": "string",
+        "cardinality": "1 ..1"
+      },
+      "field_89": {
+        "id": "field_89",
+        "name": "Comune",
+        "path": "FatturaElettronicaHeader/CessionarioCommittente/StabileOrganizzazione/Comune",
+        "business_term": "1.4.3.4",
+        "type": "string",
+        "cardinality": "1 ..1"
+      },
+      "field_90": {
+        "id": "field_90",
+        "name": "Provincia",
+        "path": "FatturaElettronicaHeader/CessionarioCommittente/StabileOrganizzazione/Provincia",
+        "business_term": "1.4.3.5",
+        "type": "string",
+        "cardinality": "0 ..1"
+      },
+      "field_91": {
+        "id": "field_91",
+        "name": "Nazione",
+        "path": "FatturaElettronicaHeader/CessionarioCommittente/StabileOrganizzazione/Nazione",
+        "business_term": "1.4.3.6",
+        "type": "string",
+        "cardinality": "1 ..1"
+      },
+      "field_92": {
+        "id": "field_92",
+        "name": "RappresentanteFiscale",
+        "path": "FatturaElettronicaHeader/CessionarioCommittente/RappresentanteFiscale",
+        "business_term": "1.4.4",
+        "type": "string",
+        "cardinality": "0 ..1"
+      },
+      "field_93": {
+        "id": "field_93",
+        "name": "IdFiscaleIVA",
+        "path": "FatturaElettronicaHeader/CessionarioCommittente/RappresentanteFiscale/IdFiscale",
+        "business_term": "1.4.4.1",
+        "type": "string",
+        "cardinality": "1 ..1"
+      },
+      "field_94": {
+        "id": "field_94",
+        "name": "IdPaese",
+        "path": "FatturaElettronicaHeader/CessionarioCommittente/RappresentanteFiscale/IdFiscale/IdPaese",
+        "business_term": "1.4.4.1.1",
+        "type": "string",
+        "cardinality": "1 ..1"
+      },
+      "field_95": {
+        "id": "field_95",
+        "name": "IdCodice",
+        "path": "FatturaElettronicaHeader/CessionarioCommittente/RappresentanteFiscale/IdFiscale/IdCodice",
+        "business_term": "1.4.4.1.2",
+        "type": "string",
+        "cardinality": "1 ..1"
+      },
+      "field_96": {
+        "id": "field_96",
+        "name": "Denominazione",
+        "path": "FatturaElettronicaHeader/CessionarioCommittente/RappresentanteFiscale/Denominazione",
+        "business_term": "1.4.4.2",
+        "type": "string",
+        "cardinality": "0 ..1"
+      },
+      "field_97": {
+        "id": "field_97",
+        "name": "Nome",
+        "path": "FatturaElettronicaHeader/CessionarioCommittente/RappresentanteFiscale/Nome",
+        "business_term": "1.4.4.3",
+        "type": "string",
+        "cardinality": "0 ..1"
+      },
+      "field_98": {
+        "id": "field_98",
+        "name": "Cognome",
+        "path": "FatturaElettronicaHeader/CessionarioCommittente/RappresentanteFiscale/Cognome",
+        "business_term": "1.4.4.4",
+        "type": "string",
+        "cardinality": "0 ..1"
+      },
+      "field_99": {
+        "id": "field_99",
+        "name": "TerzoIntermediarioOSoggettoEmittente",
+        "path": "FatturaElettronicaHeader/TerzoIntermediarioOSoggettoEmittente",
+        "business_term": "1.5",
+        "type": "string",
+        "cardinality": "0 ..1"
+      },
+      "field_100": {
+        "id": "field_100",
+        "name": "DatiAnagrafici",
+        "path": "FatturaElettronicaHeader/TerzoIntermediarioOSoggettoEmittente/DatiAnagrafici",
+        "business_term": "1.5.1",
+        "type": "string",
+        "cardinality": "1 ..1"
+      },
+      "field_101": {
+        "id": "field_101",
+        "name": "IdFiscaleIVA",
+        "path": "FatturaElettronicaHeader/TerzoIntermediarioOSoggettoEmittente/DatiAnagrafici/IdFiscaleIVA",
+        "business_term": "1.5.1.1",
+        "type": "string",
+        "cardinality": "0 ..1"
+      },
+      "field_102": {
+        "id": "field_102",
+        "name": "IdPaese",
+        "path": "FatturaElettronicaHeader/TerzoIntermediarioOSoggettoEmittente/DatiAnagrafici/IdFiscaleIVA/IdPaese",
+        "business_term": "1.5.1.1.1",
+        "type": "string",
+        "cardinality": "1 ..1"
+      },
+      "field_103": {
+        "id": "field_103",
+        "name": "IdCodice",
+        "path": "FatturaElettronicaHeader/TerzoIntermediarioOSoggettoEmittente/DatiAnagrafici/IdFiscaleIVA/IdCodice",
+        "business_term": "1.5.1.1.2",
+        "type": "string",
+        "cardinality": "1 ..1"
+      },
+      "field_104": {
+        "id": "field_104",
+        "name": "CodiceFiscale",
+        "path": "FatturaElettronicaHeader/TerzoIntermediarioOSoggettoEmittente/DatiAnagrafici/CodiceFiscale",
+        "business_term": "1.5.1.2",
+        "type": "string",
+        "cardinality": "0 ..1"
+      },
+      "field_105": {
+        "id": "field_105",
+        "name": "Anagrafica",
+        "path": "FatturaElettronicaHeader/TerzoIntermediarioOSoggettoEmittente/DatiAnagrafici/Anagrafica",
+        "business_term": "1.5.1.3",
+        "type": "string",
+        "cardinality": "1 ..1"
+      },
+      "field_106": {
+        "id": "field_106",
+        "name": "Denominazione",
+        "path": "FatturaElettronicaHeader/TerzoIntermediarioOSoggettoEmittente/DatiAnagrafici/Anagrafica/Denominazione",
+        "business_term": "1.5.1.3.1",
+        "type": "string",
+        "cardinality": "0 ..1"
+      },
+      "field_107": {
+        "id": "field_107",
+        "name": "Nome",
+        "path": "FatturaElettronicaHeader/TerzoIntermediarioOSoggettoEmittente/DatiAnagrafici/Anagrafica/Nome",
+        "business_term": "1.5.1.3.2",
+        "type": "string",
+        "cardinality": "0 ..1"
+      },
+      "field_108": {
+        "id": "field_108",
+        "name": "Cognome",
+        "path": "FatturaElettronicaHeader/TerzoIntermediarioOSoggettoEmittente/DatiAnagrafici/Anagrafica/Cognome",
+        "business_term": "1.5.1.3.3",
+        "type": "string",
+        "cardinality": "0 ..1"
+      },
+      "field_109": {
+        "id": "field_109",
+        "name": "Titolo",
+        "path": "FatturaElettronicaHeader/TerzoIntermediarioOSoggettoEmittente/DatiAnagrafici/Anagrafica/Titolo",
+        "business_term": "1.5.1.3.4",
+        "type": "string",
+        "cardinality": "0 ..1"
+      },
+      "field_110": {
+        "id": "field_110",
+        "name": "CodEORI",
+        "path": "FatturaElettronicaHeader/TerzoIntermediarioOSoggettoEmittente/DatiAnagrafici/Anagrafica/CodEORI",
+        "business_term": "1.5.1.3.5",
+        "type": "string",
+        "cardinality": "0 ..1"
+      },
+      "field_111": {
+        "id": "field_111",
+        "name": "SoggettoEmittente",
+        "path": "FatturaElettronicaHeader/SoggettoEmittente",
+        "business_term": "1.6",
+        "type": "string",
+        "cardinality": "0 ..1"
+      },
+      "field_112": {
+        "id": "field_112",
+        "name": "FatturaElettronicaBody",
+        "path": "FatturaElettronicaBody",
+        "business_term": "2",
+        "type": "string",
+        "cardinality": "1 ..n"
+      },
+      "field_113": {
+        "id": "field_113",
+        "name": "DatiGenerali",
+        "path": "FatturaElettronicaBody/DatiGenerali",
+        "business_term": "2.1",
+        "type": "string",
+        "cardinality": "1 ..1"
+      },
+      "field_114": {
+        "id": "field_114",
+        "name": "DatiGeneraliDocumento",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento",
+        "business_term": "2.1.1",
+        "type": "string",
+        "cardinality": "1 ..1"
+      },
+      "field_115": {
+        "id": "field_115",
+        "name": "TipoDocumento",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/TipoDocumento",
+        "business_term": "2.1.1.1",
+        "type": "string",
+        "cardinality": "1 ..1"
+      },
+      "field_116": {
+        "id": "field_116",
+        "name": "Divisa",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/Divisa",
+        "business_term": "2.1.1.2",
+        "type": "string",
+        "cardinality": "1 ..1"
+      },
+      "field_117": {
+        "id": "field_117",
+        "name": "Data",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/Data",
+        "business_term": "2.1.1.3",
+        "type": "string",
+        "cardinality": "1 ..1"
+      },
+      "field_118": {
+        "id": "field_118",
+        "name": "Numero",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/Numero",
+        "business_term": "2.1.1.4",
+        "type": "string",
+        "cardinality": "1 ..1"
+      },
+      "field_119": {
+        "id": "field_119",
+        "name": "DatiRitenuta",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/DatiRitenuta",
+        "business_term": "2.1.1.5",
+        "type": "string",
+        "cardinality": "0 ..n"
+      },
+      "field_120": {
+        "id": "field_120",
+        "name": "TipoRitenuta",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/DatiRitenuta/TipoRitenuta",
+        "business_term": "2.1.1.5.1",
+        "type": "string",
+        "cardinality": "1 ..1"
+      },
+      "field_121": {
+        "id": "field_121",
+        "name": "ImportoRitenuta",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/DatiRitenuta/ImportoRitenuta",
+        "business_term": "2.1.1.5.2",
+        "type": "string",
+        "cardinality": "1 ..1"
+      },
+      "field_122": {
+        "id": "field_122",
+        "name": "AliquotaRitenuta",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/DatiRitenuta/AliquotaRitenuta",
+        "business_term": "2.1.1.5.3",
+        "type": "string",
+        "cardinality": "1 ..1"
+      },
+      "field_123": {
+        "id": "field_123",
+        "name": "CausalePagamento",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/DatiRitenuta/CausalePagamento",
+        "business_term": "2.1.1.5.4",
+        "type": "string",
+        "cardinality": "1 ..1"
+      },
+      "field_124": {
+        "id": "field_124",
+        "name": "DatiBollo",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/DatiBollo",
+        "business_term": "2.1.1.6",
+        "type": "string",
+        "cardinality": "0 ..1"
+      },
+      "field_125": {
+        "id": "field_125",
+        "name": "BolloVirtuale",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/DatiBollo/BolloVirtuale",
+        "business_term": "2.1.1.6.1",
+        "type": "string",
+        "cardinality": "1 ..1"
+      },
+      "field_126": {
+        "id": "field_126",
+        "name": "ImportoBollo",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/DatiBollo/ImportoBollo",
+        "business_term": "2.1.1.6.2",
+        "type": "string",
+        "cardinality": "1 ..1"
+      },
+      "field_127": {
+        "id": "field_127",
+        "name": "DatiCassaPrevidenziale",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/DatiCassaPrevidenziale",
+        "business_term": "2.1.1.7",
+        "type": "string",
+        "cardinality": "0 ..n"
+      },
+      "field_128": {
+        "id": "field_128",
+        "name": "TipoCassa",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/DatiCassaPrevidenziale/TipoCassa",
+        "business_term": "2.1.1.7.1",
+        "type": "string",
+        "cardinality": "1 ..1"
+      },
+      "field_129": {
+        "id": "field_129",
+        "name": "AlCassa",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/DatiCassaPrevidenziale/AlCassa",
+        "business_term": "2.1.1.7.2",
+        "type": "string",
+        "cardinality": "1 ..1"
+      },
+      "field_130": {
+        "id": "field_130",
+        "name": "ImportoContributoCassa",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/DatiCassaPrevidenziale/ImportoContributoCassa",
+        "business_term": "2.1.1.7.3",
+        "type": "string",
+        "cardinality": "1 ..1"
+      },
+      "field_131": {
+        "id": "field_131",
+        "name": "ImponibileCassa",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/DatiCassaPrevidenziale/ImponibileCassa",
+        "business_term": "2.1.1.7.4",
+        "type": "string",
+        "cardinality": "0 ..1"
+      },
+      "field_132": {
+        "id": "field_132",
+        "name": "AliquotaIVA",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/DatiCassaPrevidenziale/AliquotaIVA",
+        "business_term": "2.1.1.7.5",
+        "type": "string",
+        "cardinality": "1 ..1"
+      },
+      "field_133": {
+        "id": "field_133",
+        "name": "Ritenuta",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/DatiCassaPrevidenziale/Ritenuta+C135:E1C135:G135",
+        "business_term": "2.1.1.7.6",
+        "type": "string",
+        "cardinality": "0 ..1"
+      },
+      "field_134": {
+        "id": "field_134",
+        "name": "Natura",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/DatiCassaPrevidenziale/Natura",
+        "business_term": "2.1.1.7.7",
+        "type": "string",
+        "cardinality": "0 ..1"
+      },
+      "field_135": {
+        "id": "field_135",
+        "name": "RiferimentoAmministrazione",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/DatiCassaPrevidenziale/RiferimentoAmministrazione",
+        "business_term": "2.1.1.7.8",
+        "type": "string",
+        "cardinality": "0 ..1"
+      },
+      "field_136": {
+        "id": "field_136",
+        "name": "ScontoMaggiorazione",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/ScontoMaggiorazione",
+        "business_term": "2.1.1.8",
+        "type": "string",
+        "cardinality": "0 ..n"
+      },
+      "field_137": {
+        "id": "field_137",
+        "name": "Tipo",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/ScontoMaggiorazione/Tipo",
+        "business_term": "2.1.1.8.1",
+        "type": "string",
+        "cardinality": "1 ..1"
+      },
+      "field_138": {
+        "id": "field_138",
+        "name": "Percentuale",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/ScontoMaggiorazione/Percentuale",
+        "business_term": "2.1.1.8.2",
+        "type": "string",
+        "cardinality": "0 ..1"
+      },
+      "field_139": {
+        "id": "field_139",
+        "name": "Importo",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/ScontoMaggiorazione/Importo",
+        "business_term": "2.1.1.8.3",
+        "type": "string",
+        "cardinality": "0 ..1"
+      },
+      "field_140": {
+        "id": "field_140",
+        "name": "ImportoTotaleDocumento",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/ImportoTotaleDocumento",
+        "business_term": "2.1.1.9",
+        "type": "string",
+        "cardinality": "0 ..1"
+      },
+      "field_141": {
+        "id": "field_141",
+        "name": "Arrotondamento",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/Arrotondamento",
+        "business_term": "2.1.1.10",
+        "type": "string",
+        "cardinality": "0 ..1"
+      },
+      "field_142": {
+        "id": "field_142",
+        "name": "Causale",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/Causale",
+        "business_term": "2.1.1.11",
+        "type": "string",
+        "cardinality": "0 ..n"
+      },
+      "field_143": {
+        "id": "field_143",
+        "name": "Art73",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/Art73",
+        "business_term": "2.1.1.12",
+        "type": "string",
+        "cardinality": "0 ..1"
+      },
+      "field_144": {
+        "id": "field_144",
+        "name": "DatiOrdineAcquisto",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiOrdineAcquisto\n",
+        "business_term": "2.1.2",
+        "type": "string",
+        "cardinality": "0 ..n"
+      },
+      "field_145": {
+        "id": "field_145",
+        "name": "RiferimentoNumeroLinea",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiOrdineAcquisto/RiferimentoNumeroLinea\n",
+        "business_term": "2.1.2.1",
+        "type": "string",
+        "cardinality": "0 ..n"
+      },
+      "field_146": {
+        "id": "field_146",
+        "name": "IdDocumento",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiOrdineAcquisto/IdDocumento\n",
+        "business_term": "2.1.2.2",
+        "type": "string",
+        "cardinality": "1 ..1"
+      },
+      "field_147": {
+        "id": "field_147",
+        "name": "Data",
+        "path": "FatturaElettronicaBody/DatiGenerali/DatiOrdineAcquisto/Data\n",
+        "business_term": "2.1.2.3",
+        "type": "string",
+        "cardinality": "0 ..1"
+      }
+    }
+  },
+  "outputSchema": {
+    "name": "UBL_PEPPOL",
+    "format": "xml",
+    "field_count": 146,
+    "fields": {
+      "field_0": {
+        "id": "field_0",
+        "name": "ext:UBLExtensions",
+        "path": "ext/UBLExtensions",
+        "type": "string"
+      },
+      "field_1": {
+        "id": "field_1",
+        "name": "ext:UBLExtension",
+        "path": "ext/UBLExtension",
+        "type": "string"
+      },
+      "field_2": {
+        "id": "field_2",
+        "name": "ext:ExtensionURI",
+        "path": "ext/ExtensionURI",
+        "type": "string"
+      },
+      "field_3": {
+        "id": "field_3",
+        "name": "ext:ExtensionContent",
+        "path": "ext/ExtensionContent",
+        "type": "string"
+      },
+      "field_4": {
+        "id": "field_4",
+        "name": "cbc:Description",
+        "path": "cbc/Description",
+        "type": "string"
+      },
+      "field_5": {
+        "id": "field_5",
+        "name": "ext:UBLExtension",
+        "path": "ext/UBLExtension",
+        "type": "string"
+      },
+      "field_6": {
+        "id": "field_6",
+        "name": "ext:ExtensionURI",
+        "path": "ext/ExtensionURI",
+        "type": "string"
+      },
+      "field_7": {
+        "id": "field_7",
+        "name": "ext:ExtensionContent",
+        "path": "ext/ExtensionContent",
+        "type": "string"
+      },
+      "field_8": {
+        "id": "field_8",
+        "name": "cbc:TypeCode",
+        "path": "cbc/TypeCode",
+        "type": "string"
+      },
+      "field_9": {
+        "id": "field_9",
+        "name": "ext:UBLExtension",
+        "path": "ext/UBLExtension",
+        "type": "string"
+      },
+      "field_10": {
+        "id": "field_10",
+        "name": "ext:ExtensionURI",
+        "path": "ext/ExtensionURI",
+        "type": "string"
+      },
+      "field_11": {
+        "id": "field_11",
+        "name": "ext:ExtensionContent",
+        "path": "ext/ExtensionContent",
+        "type": "string"
+      },
+      "field_12": {
+        "id": "field_12",
+        "name": "cbc:TypeCode",
+        "path": "cbc/TypeCode",
+        "type": "string"
+      },
+      "field_13": {
+        "id": "field_13",
+        "name": "ext:UBLExtension",
+        "path": "ext/UBLExtension",
+        "type": "string"
+      },
+      "field_14": {
+        "id": "field_14",
+        "name": "ext:ExtensionURI",
+        "path": "ext/ExtensionURI",
+        "type": "string"
+      },
+      "field_15": {
+        "id": "field_15",
+        "name": "ext:ExtensionContent",
+        "path": "ext/ExtensionContent",
+        "type": "string"
+      },
+      "field_16": {
+        "id": "field_16",
+        "name": "cbc:TypeCode",
+        "path": "cbc/TypeCode",
+        "type": "string"
+      },
+      "field_17": {
+        "id": "field_17",
+        "name": "ext:UBLExtension",
+        "path": "ext/UBLExtension",
+        "type": "string"
+      },
+      "field_18": {
+        "id": "field_18",
+        "name": "ext:ExtensionURI",
+        "path": "ext/ExtensionURI",
+        "type": "string"
+      },
+      "field_19": {
+        "id": "field_19",
+        "name": "ext:ExtensionContent",
+        "path": "ext/ExtensionContent",
+        "type": "string"
+      },
+      "field_20": {
+        "id": "field_20",
+        "name": "cbc:TypeCode",
+        "path": "cbc/TypeCode",
+        "type": "string"
+      },
+      "field_21": {
+        "id": "field_21",
+        "name": "ext:UBLExtension",
+        "path": "ext/UBLExtension",
+        "type": "string"
+      },
+      "field_22": {
+        "id": "field_22",
+        "name": "ext:ExtensionURI",
+        "path": "ext/ExtensionURI",
+        "type": "string"
+      },
+      "field_23": {
+        "id": "field_23",
+        "name": "ext:ExtensionContent",
+        "path": "ext/ExtensionContent",
+        "type": "string"
+      },
+      "field_24": {
+        "id": "field_24",
+        "name": "cbc:Amount",
+        "path": "cbc/Amount",
+        "type": "string"
+      },
+      "field_25": {
+        "id": "field_25",
+        "name": "@currencyID",
+        "path": "@currencyID",
+        "type": "string"
+      },
+      "field_26": {
+        "id": "field_26",
+        "name": "ext:UBLExtension",
+        "path": "ext/UBLExtension",
+        "type": "string"
+      },
+      "field_27": {
+        "id": "field_27",
+        "name": "ext:ExtensionURI",
+        "path": "ext/ExtensionURI",
+        "type": "string"
+      },
+      "field_28": {
+        "id": "field_28",
+        "name": "ext:ExtensionContent",
+        "path": "ext/ExtensionContent",
+        "type": "string"
+      },
+      "field_29": {
+        "id": "field_29",
+        "name": "cac:AllowanceCharge",
+        "path": "cac/AllowanceCharge",
+        "type": "string"
+      },
+      "field_30": {
+        "id": "field_30",
+        "name": "cbc:ChargeIndicator",
+        "path": "cbc/ChargeIndicator",
+        "type": "string"
+      },
+      "field_31": {
+        "id": "field_31",
+        "name": "cbc:MultiplierFactorNumeric",
+        "path": "cbc/MultiplierFactorNumeric",
+        "type": "string"
+      },
+      "field_32": {
+        "id": "field_32",
+        "name": "cbc:Amount",
+        "path": "cbc/Amount",
+        "type": "string"
+      },
+      "field_33": {
+        "id": "field_33",
+        "name": "@currencyID",
+        "path": "@currencyID",
+        "type": "string"
+      },
+      "field_34": {
+        "id": "field_34",
+        "name": "cbc:CustomizationID",
+        "path": "cbc/CustomizationID",
+        "type": "string"
+      },
+      "field_35": {
+        "id": "field_35",
+        "name": "cbc:ProfileID",
+        "path": "cbc/ProfileID",
+        "type": "string"
+      },
+      "field_36": {
+        "id": "field_36",
+        "name": "cbc:ID",
+        "path": "cbc/ID",
+        "type": "string"
+      },
+      "field_37": {
+        "id": "field_37",
+        "name": "cbc:IssueDate",
+        "path": "cbc/IssueDate",
+        "type": "string"
+      },
+      "field_38": {
+        "id": "field_38",
+        "name": "cbc:DueDate",
+        "path": "cbc/DueDate",
+        "type": "string"
+      },
+      "field_39": {
+        "id": "field_39",
+        "name": "cbc:InvoiceTypeCode",
+        "path": "cbc/InvoiceTypeCode",
+        "type": "string"
+      },
+      "field_40": {
+        "id": "field_40",
+        "name": "cbc:Note",
+        "path": "cbc/Note",
+        "type": "string"
+      },
+      "field_41": {
+        "id": "field_41",
+        "name": "cbc:TaxPointDate",
+        "path": "cbc/TaxPointDate",
+        "type": "string"
+      },
+      "field_42": {
+        "id": "field_42",
+        "name": "cbc:DocumentCurrencyCode",
+        "path": "cbc/DocumentCurrencyCode",
+        "type": "string"
+      },
+      "field_43": {
+        "id": "field_43",
+        "name": "cbc:TaxCurrencyCode",
+        "path": "cbc/TaxCurrencyCode",
+        "type": "string"
+      },
+      "field_44": {
+        "id": "field_44",
+        "name": "cbc:AccountingCost",
+        "path": "cbc/AccountingCost",
+        "type": "string"
+      },
+      "field_45": {
+        "id": "field_45",
+        "name": "cbc:BuyerReference",
+        "path": "cbc/BuyerReference",
+        "type": "string"
+      },
+      "field_46": {
+        "id": "field_46",
+        "name": "cac:InvoicePeriod",
+        "path": "cac/InvoicePeriod",
+        "type": "string"
+      },
+      "field_47": {
+        "id": "field_47",
+        "name": "cbc:StartDate",
+        "path": "cbc/StartDate",
+        "type": "string"
+      },
+      "field_48": {
+        "id": "field_48",
+        "name": "cbc:EndDate",
+        "path": "cbc/EndDate",
+        "type": "string"
+      },
+      "field_49": {
+        "id": "field_49",
+        "name": "cbc:DescriptionCode",
+        "path": "cbc/DescriptionCode",
+        "type": "string"
+      },
+      "field_50": {
+        "id": "field_50",
+        "name": "cac:OrderReference",
+        "path": "cac/OrderReference",
+        "type": "string"
+      },
+      "field_51": {
+        "id": "field_51",
+        "name": "cbc:ID",
+        "path": "cbc/ID",
+        "type": "string"
+      },
+      "field_52": {
+        "id": "field_52",
+        "name": "cbc:SalesOrderID",
+        "path": "cbc/SalesOrderID",
+        "type": "string"
+      },
+      "field_53": {
+        "id": "field_53",
+        "name": "cbc:IssueDate",
+        "path": "cbc/IssueDate",
+        "type": "string"
+      },
+      "field_54": {
+        "id": "field_54",
+        "name": "cac:BillingReference",
+        "path": "cac/BillingReference",
+        "type": "string"
+      },
+      "field_55": {
+        "id": "field_55",
+        "name": "cac:InvoiceDocumentReference",
+        "path": "cac/InvoiceDocumentReference",
+        "type": "string"
+      },
+      "field_56": {
+        "id": "field_56",
+        "name": "cbc:ID",
+        "path": "cbc/ID",
+        "type": "string"
+      },
+      "field_57": {
+        "id": "field_57",
+        "name": "cbc:IssueDate",
+        "path": "cbc/IssueDate",
+        "type": "string"
+      },
+      "field_58": {
+        "id": "field_58",
+        "name": "cac:AdditionalDocumentReference",
+        "path": "cac/AdditionalDocumentReference",
+        "type": "string"
+      },
+      "field_59": {
+        "id": "field_59",
+        "name": "cbc:ID",
+        "path": "cbc/ID",
+        "type": "string"
+      },
+      "field_60": {
+        "id": "field_60",
+        "name": "cbc:IssueDate",
+        "path": "cbc/IssueDate",
+        "type": "string"
+      },
+      "field_61": {
+        "id": "field_61",
+        "name": "cac:DespatchDocumentReference",
+        "path": "cac/DespatchDocumentReference",
+        "type": "string"
+      },
+      "field_62": {
+        "id": "field_62",
+        "name": "cbc:ID",
+        "path": "cbc/ID",
+        "type": "string"
+      },
+      "field_63": {
+        "id": "field_63",
+        "name": "cbc:IssueDate",
+        "path": "cbc/IssueDate",
+        "type": "string"
+      },
+      "field_64": {
+        "id": "field_64",
+        "name": "cac:ReceiptDocumentReference",
+        "path": "cac/ReceiptDocumentReference",
+        "type": "string"
+      },
+      "field_65": {
+        "id": "field_65",
+        "name": "cbc:ID",
+        "path": "cbc/ID",
+        "type": "string"
+      },
+      "field_66": {
+        "id": "field_66",
+        "name": "cac:OriginatorDocumentReference",
+        "path": "cac/OriginatorDocumentReference",
+        "type": "string"
+      },
+      "field_67": {
+        "id": "field_67",
+        "name": "cbc:ID",
+        "path": "cbc/ID",
+        "type": "string"
+      },
+      "field_68": {
+        "id": "field_68",
+        "name": "cac:ContractDocumentReference",
+        "path": "cac/ContractDocumentReference",
+        "type": "string"
+      },
+      "field_69": {
+        "id": "field_69",
+        "name": "cbc:ID",
+        "path": "cbc/ID",
+        "type": "string"
+      },
+      "field_70": {
+        "id": "field_70",
+        "name": "cac:AdditionalDocumentReference",
+        "path": "cac/AdditionalDocumentReference",
+        "type": "string"
+      },
+      "field_71": {
+        "id": "field_71",
+        "name": "cbc:ID",
+        "path": "cbc/ID",
+        "type": "string"
+      },
+      "field_72": {
+        "id": "field_72",
+        "name": "@schemeID",
+        "path": "@schemeID",
+        "type": "string"
+      },
+      "field_73": {
+        "id": "field_73",
+        "name": "cbc:DocumentTypeCode",
+        "path": "cbc/DocumentTypeCode",
+        "type": "string"
+      },
+      "field_74": {
+        "id": "field_74",
+        "name": "cbc:DocumentDescription",
+        "path": "cbc/DocumentDescription",
+        "type": "string"
+      },
+      "field_75": {
+        "id": "field_75",
+        "name": "cac:Attachment",
+        "path": "cac/Attachment",
+        "type": "string"
+      },
+      "field_76": {
+        "id": "field_76",
+        "name": "cbc:EmbeddedDocumentBinaryObject",
+        "path": "cbc/EmbeddedDocumentBinaryObject",
+        "type": "string"
+      },
+      "field_77": {
+        "id": "field_77",
+        "name": "@mimeCode",
+        "path": "@mimeCode",
+        "type": "string"
+      },
+      "field_78": {
+        "id": "field_78",
+        "name": "@filename",
+        "path": "@filename",
+        "type": "string"
+      },
+      "field_79": {
+        "id": "field_79",
+        "name": "cac:ExternalReference",
+        "path": "cac/ExternalReference",
+        "type": "string"
+      },
+      "field_80": {
+        "id": "field_80",
+        "name": "cbc:URI",
+        "path": "cbc/URI",
+        "type": "string"
+      },
+      "field_81": {
+        "id": "field_81",
+        "name": "cac:ProjectReference",
+        "path": "cac/ProjectReference",
+        "type": "string"
+      },
+      "field_82": {
+        "id": "field_82",
+        "name": "cbc:ID",
+        "path": "cbc/ID",
+        "type": "string"
+      },
+      "field_83": {
+        "id": "field_83",
+        "name": "cac:AccountingSupplierParty",
+        "path": "cac/AccountingSupplierParty",
+        "type": "string"
+      },
+      "field_84": {
+        "id": "field_84",
+        "name": "cac:Party",
+        "path": "cac/Party",
+        "type": "string"
+      },
+      "field_85": {
+        "id": "field_85",
+        "name": "cbc:EndpointID",
+        "path": "cbc/EndpointID",
+        "type": "string"
+      },
+      "field_86": {
+        "id": "field_86",
+        "name": "@schemeID",
+        "path": "@schemeID",
+        "type": "string"
+      },
+      "field_87": {
+        "id": "field_87",
+        "name": "cac:PartyIdentification",
+        "path": "cac/PartyIdentification",
+        "type": "string"
+      },
+      "field_88": {
+        "id": "field_88",
+        "name": "cbc:ID",
+        "path": "cbc/ID",
+        "type": "string"
+      },
+      "field_89": {
+        "id": "field_89",
+        "name": "@schemeID",
+        "path": "@schemeID",
+        "type": "string"
+      },
+      "field_90": {
+        "id": "field_90",
+        "name": "cac:PartyName",
+        "path": "cac/PartyName",
+        "type": "string"
+      },
+      "field_91": {
+        "id": "field_91",
+        "name": "cbc:Name",
+        "path": "cbc/Name",
+        "type": "string"
+      },
+      "field_92": {
+        "id": "field_92",
+        "name": "cac:PostalAddress",
+        "path": "cac/PostalAddress",
+        "type": "string"
+      },
+      "field_93": {
+        "id": "field_93",
+        "name": "cbc:StreetName",
+        "path": "cbc/StreetName",
+        "type": "string"
+      },
+      "field_94": {
+        "id": "field_94",
+        "name": "cbc:AdditionalStreetName",
+        "path": "cbc/AdditionalStreetName",
+        "type": "string"
+      },
+      "field_95": {
+        "id": "field_95",
+        "name": "cbc:CityName",
+        "path": "cbc/CityName",
+        "type": "string"
+      },
+      "field_96": {
+        "id": "field_96",
+        "name": "cbc:PostalZone",
+        "path": "cbc/PostalZone",
+        "type": "string"
+      },
+      "field_97": {
+        "id": "field_97",
+        "name": "cbc:CountrySubentity",
+        "path": "cbc/CountrySubentity",
+        "type": "string"
+      },
+      "field_98": {
+        "id": "field_98",
+        "name": "cac:AddressLine",
+        "path": "cac/AddressLine",
+        "type": "string"
+      },
+      "field_99": {
+        "id": "field_99",
+        "name": "cbc:Line",
+        "path": "cbc/Line",
+        "type": "string"
+      },
+      "field_100": {
+        "id": "field_100",
+        "name": "cac:Country",
+        "path": "cac/Country",
+        "type": "string"
+      },
+      "field_101": {
+        "id": "field_101",
+        "name": "cbc:IdentificationCode",
+        "path": "cbc/IdentificationCode",
+        "type": "string"
+      },
+      "field_102": {
+        "id": "field_102",
+        "name": "cac:PartyTaxScheme",
+        "path": "cac/PartyTaxScheme",
+        "type": "string"
+      },
+      "field_103": {
+        "id": "field_103",
+        "name": "cbc:CompanyID",
+        "path": "cbc/CompanyID",
+        "type": "string"
+      },
+      "field_104": {
+        "id": "field_104",
+        "name": "cbc:TaxLevelCode",
+        "path": "cbc/TaxLevelCode",
+        "type": "string"
+      },
+      "field_105": {
+        "id": "field_105",
+        "name": "cac:TaxScheme",
+        "path": "cac/TaxScheme",
+        "type": "string"
+      },
+      "field_106": {
+        "id": "field_106",
+        "name": "cbc:ID",
+        "path": "cbc/ID",
+        "type": "string"
+      },
+      "field_107": {
+        "id": "field_107",
+        "name": "cac:PartyLegalEntity",
+        "path": "cac/PartyLegalEntity",
+        "type": "string"
+      },
+      "field_108": {
+        "id": "field_108",
+        "name": "cbc:RegistrationName",
+        "path": "cbc/RegistrationName",
+        "type": "string"
+      },
+      "field_109": {
+        "id": "field_109",
+        "name": "cbc:CompanyID",
+        "path": "cbc/CompanyID",
+        "type": "string"
+      },
+      "field_110": {
+        "id": "field_110",
+        "name": "@schemeID",
+        "path": "@schemeID",
+        "type": "string"
+      },
+      "field_111": {
+        "id": "field_111",
+        "name": "cbc:CompanyLegalForm",
+        "path": "cbc/CompanyLegalForm",
+        "type": "string"
+      },
+      "field_112": {
+        "id": "field_112",
+        "name": "cac:Contact",
+        "path": "cac/Contact",
+        "type": "string"
+      },
+      "field_113": {
+        "id": "field_113",
+        "name": "cbc:Name",
+        "path": "cbc/Name",
+        "type": "string"
+      },
+      "field_114": {
+        "id": "field_114",
+        "name": "cbc:Telephone",
+        "path": "cbc/Telephone",
+        "type": "string"
+      },
+      "field_115": {
+        "id": "field_115",
+        "name": "cbc:ElectronicMail",
+        "path": "cbc/ElectronicMail",
+        "type": "string"
+      },
+      "field_116": {
+        "id": "field_116",
+        "name": "cac:AgentParty",
+        "path": "cac/AgentParty",
+        "type": "string"
+      },
+      "field_117": {
+        "id": "field_117",
+        "name": "cac:PostalAddress",
+        "path": "cac/PostalAddress",
+        "type": "string"
+      },
+      "field_118": {
+        "id": "field_118",
+        "name": "cbc:StreetName",
+        "path": "cbc/StreetName",
+        "type": "string"
+      },
+      "field_119": {
+        "id": "field_119",
+        "name": "cbc:CityName",
+        "path": "cbc/CityName",
+        "type": "string"
+      },
+      "field_120": {
+        "id": "field_120",
+        "name": "cbc:PostalZone",
+        "path": "cbc/PostalZone",
+        "type": "string"
+      },
+      "field_121": {
+        "id": "field_121",
+        "name": "cbc:CountrySubentity",
+        "path": "cbc/CountrySubentity",
+        "type": "string"
+      },
+      "field_122": {
+        "id": "field_122",
+        "name": "cac:Country",
+        "path": "cac/Country",
+        "type": "string"
+      },
+      "field_123": {
+        "id": "field_123",
+        "name": "cbc:IdentificationCode",
+        "path": "cbc/IdentificationCode",
+        "type": "string"
+      },
+      "field_124": {
+        "id": "field_124",
+        "name": "cac:ServiceProviderParty",
+        "path": "cac/ServiceProviderParty",
+        "type": "string"
+      },
+      "field_125": {
+        "id": "field_125",
+        "name": "cac:Party",
+        "path": "cac/Party",
+        "type": "string"
+      },
+      "field_126": {
+        "id": "field_126",
+        "name": "cac:PartyIdentification",
+        "path": "cac/PartyIdentification",
+        "type": "string"
+      },
+      "field_127": {
+        "id": "field_127",
+        "name": "cbc:ID",
+        "path": "cbc/ID",
+        "type": "string"
+      },
+      "field_128": {
+        "id": "field_128",
+        "name": "cac:PartyName",
+        "path": "cac/PartyName",
+        "type": "string"
+      },
+      "field_129": {
+        "id": "field_129",
+        "name": "cbc:Name",
+        "path": "cbc/Name",
+        "type": "string"
+      },
+      "field_130": {
+        "id": "field_130",
+        "name": "cac:PartyTaxScheme",
+        "path": "cac/PartyTaxScheme",
+        "type": "string"
+      },
+      "field_131": {
+        "id": "field_131",
+        "name": "cbc:CompanyID",
+        "path": "cbc/CompanyID",
+        "type": "string"
+      },
+      "field_132": {
+        "id": "field_132",
+        "name": "cac:TaxScheme",
+        "path": "cac/TaxScheme",
+        "type": "string"
+      },
+      "field_133": {
+        "id": "field_133",
+        "name": "cbc:ID",
+        "path": "cbc/ID",
+        "type": "string"
+      },
+      "field_134": {
+        "id": "field_134",
+        "name": "cac:Person",
+        "path": "cac/Person",
+        "type": "string"
+      },
+      "field_135": {
+        "id": "field_135",
+        "name": "cbc:FirstName",
+        "path": "cbc/FirstName",
+        "type": "string"
+      },
+      "field_136": {
+        "id": "field_136",
+        "name": "cbc:FamilyName",
+        "path": "cbc/FamilyName",
+        "type": "string"
+      },
+      "field_137": {
+        "id": "field_137",
+        "name": "cac:AccountingCustomerParty",
+        "path": "cac/AccountingCustomerParty",
+        "type": "string"
+      },
+      "field_138": {
+        "id": "field_138",
+        "name": "cac:Party",
+        "path": "cac/Party",
+        "type": "string"
+      },
+      "field_139": {
+        "id": "field_139",
+        "name": "cbc:EndpointID",
+        "path": "cbc/EndpointID",
+        "type": "string"
+      },
+      "field_140": {
+        "id": "field_140",
+        "name": "@schemeID",
+        "path": "@schemeID",
+        "type": "string"
+      },
+      "field_141": {
+        "id": "field_141",
+        "name": "cac:PartyIdentification",
+        "path": "cac/PartyIdentification",
+        "type": "string"
+      },
+      "field_142": {
+        "id": "field_142",
+        "name": "cbc:ID",
+        "path": "cbc/ID",
+        "type": "string"
+      },
+      "field_143": {
+        "id": "field_143",
+        "name": "@schemeID",
+        "path": "@schemeID",
+        "type": "string"
+      },
+      "field_144": {
+        "id": "field_144",
+        "name": "cac:PartyName",
+        "path": "cac/PartyName",
+        "type": "string"
+      },
+      "field_145": {
+        "id": "field_145",
+        "name": "cbc:Name",
+        "path": "cbc/Name",
+        "type": "string"
+      }
+    }
+  },
+  "connections": [
+    {
+      "source": "field_0",
+      "target": "field_0",
+      "transformation": ""
+    },
+    {
+      "source": "field_1",
+      "target": "field_1",
+      "transformation": ""
+    },
+    {
+      "source": "field_2",
+      "target": "field_2",
+      "transformation": ""
+    },
+    {
+      "source": "field_3",
+      "target": "field_3",
+      "transformation": ""
+    },
+    {
+      "source": "field_4",
+      "target": "field_4",
+      "transformation": ""
+    },
+    {
+      "source": "field_5",
+      "target": "field_5",
+      "transformation": ""
+    },
+    {
+      "source": "field_6",
+      "target": "field_6",
+      "transformation": ""
+    },
+    {
+      "source": "field_7",
+      "target": "field_7",
+      "transformation": ""
+    },
+    {
+      "source": "field_8",
+      "target": "field_8",
+      "transformation": ""
+    },
+    {
+      "source": "field_9",
+      "target": "field_9",
+      "transformation": ""
+    }
+  ],
+  "inputExample": "",
+  "outputExample": ""
+}
