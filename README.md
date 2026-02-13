@@ -1,55 +1,169 @@
+# Mapping System – IDoc / CSV → UBL / FatturaPA / PEPPOL
 
-### Main Components
+## Overview
 
-**Frontend**
+Mapping System is a local integration tool designed to create, manage, and execute structured data mappings between enterprise formats and international e-invoicing standards.
+
+It is intended for system integrators, e-invoicing specialists, and technical teams who need to transform data between formats such as IDoc, CSV, FatturaPA, UBL, PEPPOL, and EN16931.
+
+The application provides a visual environment to define field-to-field relationships, apply transformations, save reusable mappings, and execute conversions in a controlled and repeatable way.
+
+All operations run locally. No external services are required.
+
+---
+
+## Main Capabilities
+
+- Load and parse input schemas
+- Load and parse output schemas
+- Create field-to-field mappings
+- Apply transformation rules
+- Save mappings with versioning
+- Execute conversions on real data
+- Preview mapped data
+- Support forward and reverse mapping
+- AI-assisted mapping suggestions
+- Sequential automatic mapping discovery
+
+---
+
+## Supported Formats
+
+Input sources may include:
+- IDoc (positional structures)
+- CSV files
+- Structured XML sources
+- ERP export datasets
+
+Output targets may include:
+- UBL
+- FatturaPA
+- PEPPOL BIS
+- EN16931-aligned structures
+- Custom XML formats
+
+---
+
+## Architecture
+
+The system follows a simple local architecture:
+
+Frontend (HTML interface)  
+↓  
+Python API backend  
+↓  
+Mapping & transformation engine  
+↓  
+Local storage (JSON + SQLite)
+
+There is no cloud dependency.
+
+---
+
+## Components
+
+### Frontend
+
+File:
 - `frontend/index.html`
-- Visual editor for:
-  - Schema selection
-  - Mapping creation
-  - AI-assisted suggestions
-  - Sequential mapping execution
 
-**Backend**
-- `backend/api.py` → main API layer
-- `mapper_engine.py` → mapping logic
-- `transformation_engine.py` → data transformations
-- `reverse_mapper.py` → reverse mapping logic
-- `schema_parser.py` → schema interpretation
-- `idoc_parser.py` → positional IDoc handling
-- `csv_parser.py` → CSV handling
-- `storage_layer.py` → mapping/session persistence
-- `preview_extractor.py` → data preview generation
+Features:
+- Schema selection
+- Visual mapping creation
+- AI-assisted suggestions
+- Sequential mapping execution
+- Mapping preview
 
-**Storage**
-- `backend/data/database.sqlite`
-- `backend/mappings/*.json`
-- `backend/sessions/`
+### Backend
+
+Core modules:
+
+- `backend/api.py`  
+  Main API layer used by the frontend.
+
+- `mapper_engine.py`  
+  Core logic for field matching and mapping execution.
+
+- `transformation_engine.py`  
+  Applies data transformations between source and target fields.
+
+- `reverse_mapper.py`  
+  Generates reverse mappings from existing configurations.
+
+- `schema_parser.py`  
+  Parses input and output schema definitions.
+
+- `idoc_parser.py`  
+  Handles positional IDoc parsing using segment definitions.
+
+- `csv_parser.py`  
+  Handles CSV ingestion.
+
+- `preview_extractor.py`  
+  Extracts preview data for mapping validation.
+
+- `storage_layer.py`  
+  Persists mappings, sessions, and metadata.
 
 ---
 
-## Primary Use Cases
+## Storage Structure
 
-- IDoc → UBL (France, PEPPOL, etc.)
-- FatturaPA → UBL
-- CSV → EN16931
-- UBL → FatturaPA (reverse mapping)
-- Reusable mapping design for ERP integrations
+Local storage is used for persistence:
+
+- `backend/data/database.sqlite`  
+  Internal metadata database.
+
+- `backend/mappings/*.json`  
+  Versioned mapping files.
+
+- `backend/sessions/`  
+  Temporary session data.
+
+Mappings are stored as timestamped JSON files.
 
 ---
 
-## Key Features
+## Typical Use Cases
 
-- Sequential automatic mapping
-- AI-assisted field matching suggestions
-- Versioned mapping persistence
-- Support for positional IDoc structures
-- Support for multiple schema types:
-  - FatturaPA
-  - UBL
-  - PEPPOL
-  - EN16931
-- Reverse engineering of mappings
-- Data preview support
+- IDoc → UBL conversion
+- FatturaPA → UBL transformation
+- CSV → EN16931 mapping
+- UBL → FatturaPA reverse mapping
+- ERP integration prototyping
+- Mapping design for international e-invoicing flows
+- Data migration projects
+
+---
+
+## Sequential AI-Assisted Mapping
+
+The system can automatically attempt to discover mappings by:
+
+1. Starting from the first input field
+2. Searching for the most probable output field
+3. Continuing sequentially
+4. Stopping when confidence drops
+
+If the process is executed again:
+- Existing mappings are preserved
+- New potential matches are suggested
+
+This allows gradual enrichment of mapping quality over time.
+
+---
+
+## IDoc Support
+
+The system supports positional IDoc structures and can interpret:
+
+- Segment definitions
+- Technical field names
+- Qualifiers
+- Field lengths
+- Offsets (if available)
+
+This allows structured extraction even from rigid flat IDoc text files.
 
 ---
 
@@ -61,9 +175,9 @@ mapper_engine.py
 transformation_engine.py
 idoc_parser.py
 schema_parser.py
-storage_layer.py
 reverse_mapper.py
-...
+storage_layer.py
+preview_extractor.py
 
 frontend/
 index.html
@@ -73,150 +187,140 @@ input/
 output/
 
 examples/
-Sample IDoc, CSV, UBL test files
+Sample IDoc, CSV, and XML test files
 
 mappings/
 Saved mapping configurations
 
 run.bat
 .env
-
-
----
+--
 
 ## Requirements
 
-- Python 3.10+
-- Windows (primary tested environment)
+- Python 3.10 or newer
+- Windows environment (primary tested platform)
 - Modern web browser
 
 ---
 
 ## Installation
 
-1) Clone the repository
+Clone the repository:
 
-```bash
-git clone <repo>
+git clone <repository_url>
 cd mapping_system
-Create Python virtual environment
+
+
+Create a virtual environment:
 
 python -m venv venv
 venv\Scripts\activate
-Install dependencies (if not already available)
+
+
+Install dependencies:
 
 pip install flask pyyaml pandas
-Start the backend
+
+
+Start the backend:
 
 python backend/api.py
-or:
+
+
+or use:
 
 run.bat
-Open the frontend
 
-Open in your browser:
+
+Open the frontend:
 
 frontend/index.html
-Configuration
-Main configuration files:
 
-.env/.env → API keys and runtime settings
 
-backend/config.yml → system parameters
+---
 
-Operational Flow
-Load input schema
+## Configuration
 
-Load output schema
+Configuration files:
 
-Create mappings manually or with AI assistance
+- `.env/.env`  
+  Optional API keys and runtime parameters.
 
-Save mapping (versioned JSON)
+- `backend/config.yml`  
+  System-level configuration.
 
-Execute transformation
+---
 
-Validate output
+## Operational Flow
 
-Sequential AI-Assisted Mapping
-The system can:
+1. Load an input schema
+2. Load an output schema
+3. Create mappings manually or with AI assistance
+4. Save mapping (JSON versioned file)
+5. Execute transformation
+6. Validate the result
+7. Iterate and refine
 
-Start from the first input field
+---
 
-Automatically search for the most probable output match
+## Mapping Versioning
 
-Continue sequentially until confidence drops
-
-When re-running the process:
-
-Existing mappings are preserved
-
-New potential mappings are suggested
-
-IDoc Support
-Supports:
-
-Positional IDoc formats
-
-Parsing based on:
-
-Segment definitions
-
-Qualifiers
-
-Field lengths
-
-Offsets (if available)
-
-Example files:
-
-schemas/input/IDOC.txt
-Mapping Versioning
 Each saved mapping generates a timestamped file:
 
-name_YYYYMMDD_HHMMSS.json
-This enables:
+mapping_name_YYYYMMDD_HHMMSS.json
 
-History tracking
 
-Rollback capability
+This allows:
 
-Version comparison
+- History tracking
+- Rollback capability
+- Version comparison
+- Reuse across projects
 
-Security
-No external data transmission required
+---
 
-Fully local execution
+## Security Model
 
-Optional API keys via .env
+- Fully local execution
+- No automatic data transmission
+- API keys optional
+- Suitable for sensitive enterprise data
 
-Project Status
+---
+
+## Project Status
+
 Advanced prototype / integration laboratory.
 
-Suitable for:
+This project is suitable for:
 
-System integrators
+- System integrators
+- E-invoicing solution providers
+- ERP integration teams
+- Data transformation specialists
 
-E-invoicing teams
+---
 
-IDoc → UBL migration projects
+## Roadmap (Possible Extensions)
 
-ERP integration design
+- Advanced visual mapping editor
+- EN16931 validation module
+- Direct XML export engine
+- ERP connector plugins
+- Improved AI matching accuracy
+- Mapping quality scoring
 
-Possible Roadmap
-Advanced visual editor
+---
 
-EN16931 validation module
+## Author
 
-Direct XML export engine
-
-ERP connector plugins
-
-Improved AI mapping accuracy
-
-Author
-Paolo Forte
-e-Invoicing Program Manager
+Paolo Forte  
+e-Invoicing Program Manager  
 International Integration & Compliance Systems
 
-License
+---
+
+## License
+
 Internal use / experimental project.
