@@ -1,4 +1,4 @@
-# Mapping System – IDoc / CSV → UBL / FatturaPA / PEPPOL
+# Buddyliko Mapping System – IDoc / CSV → UBL / FatturaPA / PEPPOL
 
 ## Overview
 
