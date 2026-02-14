@@ -1,0 +1,91 @@
+# ===========================================================================
+# DATAMAPPER PRO - Configuration File
+# ===========================================================================
+
+# Application Settings
+app:
+  name: "DataMapper Pro"
+  version: "2.0"
+  debug: false
+  host: "127.0.0.1"
+  port: 8080
+  frontend_port: 8000
+
+# Authentication Settings
+auth:
+  enabled: true  # Set to true to enable authentication
+  require_login: true  # If true, all endpoints require auth
+  
+  # Session settings
+  secret_key: "datamapper-secret-key-change-in-production-2024"
+  token_expiry_hours: 24
+  
+  # OAuth Providers (optional)
+  oauth:
+    google:
+      enabled: true
+      client_id: "PUT HERE THE CLIENT ID.apps.googleusercontent.com"
+      client_secret: "PUT HERE THE SECRET KEY"
+      redirect_uri: "http://localhost:8080/auth/google/callback"
+    
+    facebook:
+      enabled: false
+      app_id: ""
+      app_secret: ""
+      redirect_uri: "http://localhost:8080/auth/facebook/callback"
+    
+    github:
+      enabled: false
+      client_id: ""
+      client_secret: ""
+      redirect_uri: "http://localhost:8080/auth/github/callback"
+
+# Database Settings
+database:
+  # Primary database (will auto-fallback if not available)
+  primary: "sqlite"  # Options: sqlite, tinydb, postgresql, memory
+  
+  # SQLite settings (recommended for production)
+  sqlite:
+    path: "data/database.sqlite"
+  
+  # TinyDB settings (JSON file - good for development)
+  tinydb:
+    path: "data/database.json"
+  
+  # PostgreSQL settings (for large scale)
+  postgresql:
+    enabled: false
+    connection_string: ""
+    # Or separate params:
+    host: "localhost"
+    port: 5432
+    database: "datamapper"
+    user: "postgres"
+    password: ""
+
+# Storage Settings
+storage:
+  upload_dir: "data/uploads"
+  max_file_size_mb: 100
+  allowed_extensions:
+    - csv
+    - xml
+    - json
+    - xlsx
+    - txt
+
+# API Settings
+api:
+  cors_origins:
+    - "http://localhost:8000"
+    - "http://127.0.0.1:8000"
+  
+  rate_limit:
+    enabled: false
+    requests_per_minute: 60
+
+# Logging
+logging:
+  level: "INFO"
+  file: "logs/app.log"
