@@ -35,8 +35,11 @@ from csv_parser import CSVSchemaParser, MappingCSVExporter
 # === INTEGRATED COMPONENTS (AUTO-ADDED) ===
 from storage_layer import StorageFactory
 from transformation_engine import TransformationEngine, XSDValidator
+from auth_system import AuthManager
 import yaml
 from pathlib import Path
+from fastapi import Depends, Header
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
 app = FastAPI(title="Visual Mapping System API", version="1.0.0")
 
@@ -67,6 +70,19 @@ try:
 except:
     storage = None
     print("⚠️ Using in-memory storage")
+
+# Authentication
+AUTH_ENABLED = APP_CONFIG.get('auth', {}).get('enabled', False)
+auth_manager = None
+security = HTTPBearer(auto_error=False)
+
+if AUTH_ENABLED and storage:
+    secret_key = APP_CONFIG.get('auth', {}).get('secret_key', 'default-secret-key')
+    token_expiry = APP_CONFIG.get('auth', {}).get('token_expiry_hours', 24)
+    auth_manager = AuthManager(storage, secret_key, token_expiry)
+    print(f"🔐 Authentication: ENABLED")
+else:
+    print(f"🔓 Authentication: DISABLED")
 
 # Schemas
 SCHEMAS_DIR = Path(__file__).parent.parent / 'schemas'
@@ -1420,6 +1436,362 @@ async def list_xsd():
     for xsd in SCHEMAS_DIR.rglob("*.xsd"):
         files.append({"name": xsd.name, "path": str(xsd.relative_to(SCHEMAS_DIR))})
     return {"files": files}
+
+
+# ============================================================================
+# AUTHENTICATION ENDPOINTS
+# ============================================================================
+
+class RegisterRequest(BaseModel):
+    email: str
+    password: str
+    name: Optional[str] = ""
+
+class LoginRequest(BaseModel):
+    email: str
+    password: str
+
+class OAuthCallbackRequest(BaseModel):
+    code: str
+    state: Optional[str] = None
+
+def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    """Dependency to get current user from JWT token"""
+    if not AUTH_ENABLED:
+        return {"id": "anonymous", "email": "anonymous@local", "name": "Anonymous"}
+    
+    if not credentials:
+        raise HTTPException(401, "Authentication required")
+    
+    token = credentials.credentials
+    try:
+        valid, payload = auth_manager.verify_token(token)
+        if not valid:
+            raise HTTPException(401, "Invalid or expired token")
+        return payload
+    except Exception as e:
+        raise HTTPException(401, f"Authentication error: {str(e)}")
+
+@app.get("/api/auth/status")
+async def auth_status():
+    """Check if authentication is enabled"""
+    return {
+        "enabled": AUTH_ENABLED,
+        "providers": {
+            "local": True,
+            "google": APP_CONFIG.get('auth', {}).get('oauth', {}).get('google', {}).get('enabled', False),
+            "facebook": APP_CONFIG.get('auth', {}).get('oauth', {}).get('facebook', {}).get('enabled', False),
+            "github": APP_CONFIG.get('auth', {}).get('oauth', {}).get('github', {}).get('enabled', False),
+        }
+    }
+
+@app.post("/api/auth/register")
+async def register(request: RegisterRequest):
+    """Register new user with email/password"""
+    if not AUTH_ENABLED:
+        raise HTTPException(400, "Authentication is disabled")
+    
+    success, message, user_data = auth_manager.register_user(
+        request.email, 
+        request.password, 
+        request.name
+    )
+    
+    if not success:
+        raise HTTPException(400, message)
+    
+    return {"success": True, "message": message, "user": user_data}
+
+@app.post("/api/auth/login")
+async def login(request: LoginRequest):
+    """Login with email/password"""
+    if not AUTH_ENABLED:
+        raise HTTPException(400, "Authentication is disabled")
+    
+    success, message, user_data = auth_manager.login(request.email, request.password)
+    
+    if not success:
+        raise HTTPException(401, message)
+    
+    return {"success": True, "message": message, "user": user_data, "token": user_data['token']}
+
+@app.get("/api/auth/google/login")
+async def google_login():
+    """Redirect to Google OAuth"""
+    if not AUTH_ENABLED:
+        raise HTTPException(400, "Authentication is disabled")
+    
+    google_config = APP_CONFIG.get('auth', {}).get('oauth', {}).get('google', {})
+    if not google_config.get('enabled'):
+        raise HTTPException(400, "Google OAuth is not enabled")
+    
+    client_id = google_config.get('client_id')
+    redirect_uri = google_config.get('redirect_uri')
+    
+    auth_url = (
+        f"https://accounts.google.com/o/oauth2/v2/auth?"
+        f"client_id={client_id}&"
+        f"redirect_uri={redirect_uri}&"
+        f"response_type=code&"
+        f"scope=openid email profile&"
+        f"access_type=offline"
+    )
+    
+    return {"auth_url": auth_url}
+
+@app.get("/api/auth/google/callback")
+async def google_callback(code: str, state: Optional[str] = None):
+    """Handle Google OAuth callback"""
+    if not AUTH_ENABLED:
+        raise HTTPException(400, "Authentication is disabled")
+    
+    google_config = APP_CONFIG.get('auth', {}).get('oauth', {}).get('google', {})
+    
+    # Exchange code for token
+    async with httpx.AsyncClient() as client:
+        token_response = await client.post(
+            "https://oauth2.googleapis.com/token",
+            data={
+                "code": code,
+                "client_id": google_config.get('client_id'),
+                "client_secret": google_config.get('client_secret'),
+                "redirect_uri": google_config.get('redirect_uri'),
+                "grant_type": "authorization_code"
+            }
+        )
+        
+        if token_response.status_code != 200:
+            raise HTTPException(400, "Failed to exchange code for token")
+        
+        tokens = token_response.json()
+        access_token = tokens.get('access_token')
+        
+        # Get user info
+        user_response = await client.get(
+            "https://www.googleapis.com/oauth2/v2/userinfo",
+            headers={"Authorization": f"Bearer {access_token}"}
+        )
+        
+        if user_response.status_code != 200:
+            raise HTTPException(400, "Failed to get user info")
+        
+        user_info = user_response.json()
+    
+    # Login or register user
+    oauth_data = {
+        'provider_id': user_info.get('id'),
+        'email': user_info.get('email'),
+        'name': user_info.get('name'),
+        'picture': user_info.get('picture')
+    }
+    
+    success, message, user_data = auth_manager.oauth_login('google', oauth_data)
+    
+    if not success:
+        raise HTTPException(400, message)
+    
+    # Redirect to frontend with token
+    token = user_data.get('token')
+    from fastapi.responses import RedirectResponse
+    return RedirectResponse(url=f"http://localhost:8000/?token={token}")
+
+# ALSO ADD WITHOUT /api/ PREFIX for Google OAuth compatibility
+@app.get("/auth/google/callback")
+async def google_callback_no_prefix(code: str, state: Optional[str] = None):
+    """Handle Google OAuth callback (alternative path without /api/)"""
+    return await google_callback(code, state)
+
+@app.get("/api/auth/facebook/login")
+async def facebook_login():
+    """Redirect to Facebook OAuth"""
+    if not AUTH_ENABLED:
+        raise HTTPException(400, "Authentication is disabled")
+    
+    fb_config = APP_CONFIG.get('auth', {}).get('oauth', {}).get('facebook', {})
+    if not fb_config.get('enabled'):
+        raise HTTPException(400, "Facebook OAuth is not enabled")
+    
+    app_id = fb_config.get('app_id')
+    redirect_uri = fb_config.get('redirect_uri')
+    
+    auth_url = (
+        f"https://www.facebook.com/v12.0/dialog/oauth?"
+        f"client_id={app_id}&"
+        f"redirect_uri={redirect_uri}&"
+        f"scope=email,public_profile"
+    )
+    
+    return {"auth_url": auth_url}
+
+@app.get("/api/auth/facebook/callback")
+async def facebook_callback(code: str):
+    """Handle Facebook OAuth callback"""
+    if not AUTH_ENABLED:
+        raise HTTPException(400, "Authentication is disabled")
+    
+    fb_config = APP_CONFIG.get('auth', {}).get('oauth', {}).get('facebook', {})
+    
+    # Exchange code for token
+    async with httpx.AsyncClient() as client:
+        token_response = await client.get(
+            "https://graph.facebook.com/v12.0/oauth/access_token",
+            params={
+                "client_id": fb_config.get('app_id'),
+                "client_secret": fb_config.get('app_secret'),
+                "redirect_uri": fb_config.get('redirect_uri'),
+                "code": code
+            }
+        )
+        
+        if token_response.status_code != 200:
+            raise HTTPException(400, "Failed to exchange code for token")
+        
+        tokens = token_response.json()
+        access_token = tokens.get('access_token')
+        
+        # Get user info
+        user_response = await client.get(
+            "https://graph.facebook.com/me",
+            params={
+                "fields": "id,name,email,picture",
+                "access_token": access_token
+            }
+        )
+        
+        if user_response.status_code != 200:
+            raise HTTPException(400, "Failed to get user info")
+        
+        user_info = user_response.json()
+    
+    # Login or register user
+    oauth_data = {
+        'provider_id': user_info.get('id'),
+        'email': user_info.get('email'),
+        'name': user_info.get('name'),
+        'picture': user_info.get('picture', {}).get('data', {}).get('url')
+    }
+    
+    success, message, user_data = auth_manager.oauth_login('facebook', oauth_data)
+    
+    if not success:
+        raise HTTPException(400, message)
+    
+    # Redirect to frontend with token
+    token = user_data.get('token')
+    from fastapi.responses import RedirectResponse
+    return RedirectResponse(url=f"http://localhost:8000/?token={token}")
+
+# ALSO ADD WITHOUT /api/ PREFIX for Facebook OAuth compatibility
+@app.get("/auth/facebook/callback")
+async def facebook_callback_no_prefix(code: str):
+    """Handle Facebook OAuth callback (alternative path without /api/)"""
+    return await facebook_callback(code)
+
+@app.get("/api/auth/github/login")
+async def github_login():
+    """Redirect to GitHub OAuth"""
+    if not AUTH_ENABLED:
+        raise HTTPException(400, "Authentication is disabled")
+    
+    gh_config = APP_CONFIG.get('auth', {}).get('oauth', {}).get('github', {})
+    if not gh_config.get('enabled'):
+        raise HTTPException(400, "GitHub OAuth is not enabled")
+    
+    client_id = gh_config.get('client_id')
+    redirect_uri = gh_config.get('redirect_uri')
+    
+    auth_url = (
+        f"https://github.com/login/oauth/authorize?"
+        f"client_id={client_id}&"
+        f"redirect_uri={redirect_uri}&"
+        f"scope=user:email"
+    )
+    
+    return {"auth_url": auth_url}
+
+@app.get("/api/auth/github/callback")
+async def github_callback(code: str):
+    """Handle GitHub OAuth callback"""
+    if not AUTH_ENABLED:
+        raise HTTPException(400, "Authentication is disabled")
+    
+    gh_config = APP_CONFIG.get('auth', {}).get('oauth', {}).get('github', {})
+    
+    # Exchange code for token
+    async with httpx.AsyncClient() as client:
+        token_response = await client.post(
+            "https://github.com/login/oauth/access_token",
+            data={
+                "client_id": gh_config.get('client_id'),
+                "client_secret": gh_config.get('client_secret'),
+                "code": code,
+                "redirect_uri": gh_config.get('redirect_uri')
+            },
+            headers={"Accept": "application/json"}
+        )
+        
+        if token_response.status_code != 200:
+            raise HTTPException(400, "Failed to exchange code for token")
+        
+        tokens = token_response.json()
+        access_token = tokens.get('access_token')
+        
+        # Get user info
+        user_response = await client.get(
+            "https://api.github.com/user",
+            headers={"Authorization": f"Bearer {access_token}"}
+        )
+        
+        if user_response.status_code != 200:
+            raise HTTPException(400, "Failed to get user info")
+        
+        user_info = user_response.json()
+        
+        # Get email (might be in separate endpoint)
+        email = user_info.get('email')
+        if not email:
+            email_response = await client.get(
+                "https://api.github.com/user/emails",
+                headers={"Authorization": f"Bearer {access_token}"}
+            )
+            emails = email_response.json()
+            primary_email = next((e for e in emails if e.get('primary')), None)
+            email = primary_email.get('email') if primary_email else None
+    
+    # Login or register user
+    oauth_data = {
+        'provider_id': str(user_info.get('id')),
+        'email': email,
+        'name': user_info.get('name') or user_info.get('login'),
+        'picture': user_info.get('avatar_url')
+    }
+    
+    success, message, user_data = auth_manager.oauth_login('github', oauth_data)
+    
+    if not success:
+        raise HTTPException(400, message)
+    
+    # Redirect to frontend with token
+    token = user_data.get('token')
+    from fastapi.responses import RedirectResponse
+    return RedirectResponse(url=f"http://localhost:8000/?token={token}")
+
+# ALSO ADD WITHOUT /api/ PREFIX for GitHub OAuth compatibility
+@app.get("/auth/github/callback")
+async def github_callback_no_prefix(code: str):
+    """Handle GitHub OAuth callback (alternative path without /api/)"""
+    return await github_callback(code)
+
+@app.get("/api/auth/me")
+async def get_me(user = Depends(get_current_user)):
+    """Get current user info"""
+    return {"user": user}
+
+@app.post("/api/auth/logout")
+async def logout():
+    """Logout (client should delete token)"""
+    return {"success": True, "message": "Logged out successfully"}
+
 
 if __name__ == "__main__":
     import uvicorn
