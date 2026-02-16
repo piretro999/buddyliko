@@ -3,14 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Buddyliko</title>
-    <link rel="icon" type="image/svg+xml" href="/assets/logo-icon.svg">
+    <title>Login - DataMapper Pro</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #00BCD4 0%, #3F51B5 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -25,18 +24,6 @@
             width: 100%;
             max-width: 440px;
             padding: 50px 40px;
-            animation: slideUp 0.5s ease-out;
-        }
-        
-        @keyframes slideUp {
-            from {
-                transform: translateY(30px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
         }
         
         .logo {
@@ -44,44 +31,15 @@
             margin-bottom: 40px;
         }
         
-        .logo svg {
-            width: 80px;
-            height: 80px;
-            margin-bottom: 20px;
-            animation: logoRotate 1s ease-out;
-        }
-        
-        @keyframes logoRotate {
-            from {
-                transform: rotate(-180deg) scale(0);
-                opacity: 0;
-            }
-            to {
-                transform: rotate(0deg) scale(1);
-                opacity: 1;
-            }
-        }
-        
         .logo h1 {
             font-size: 32px;
-            background: linear-gradient(135deg, #00BCD4 0%, #3F51B5 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: #667eea;
             margin-bottom: 8px;
         }
         
-        .logo .tagline {
+        .logo p {
             color: #666;
             font-size: 14px;
-            font-weight: 500;
-            margin-bottom: 4px;
-        }
-        
-        .logo .etymology {
-            color: #999;
-            font-size: 12px;
-            font-style: italic;
         }
         
         .tabs {
@@ -105,12 +63,12 @@
         }
         
         .tab.active {
-            color: #00BCD4;
-            border-bottom-color: #00BCD4;
+            color: #667eea;
+            border-bottom-color: #667eea;
         }
         
         .tab:hover {
-            color: #00BCD4;
+            color: #667eea;
         }
         
         .tab-content {
@@ -119,12 +77,6 @@
         
         .tab-content.active {
             display: block;
-            animation: fadeIn 0.3s ease-in;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
         }
         
         .form-group {
@@ -150,8 +102,8 @@
         
         input:focus {
             outline: none;
-            border-color: #00BCD4;
-            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
         
         .btn {
@@ -168,35 +120,13 @@
         }
         
         .btn-primary {
-            background: linear-gradient(135deg, #00BCD4 0%, #3F51B5 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .btn-primary::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #00ACC1 0%, #3949AB 100%);
-            transition: left 0.5s;
-        }
-        
-        .btn-primary:hover::before {
-            left: 0;
-        }
-        
-        .btn-primary span {
-            position: relative;
-            z-index: 1;
         }
         
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(33, 150, 243, 0.4);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
         }
         
         .btn-primary:active {
@@ -250,10 +180,15 @@
         }
         
         .btn-oauth:hover {
-            border-color: #00BCD4;
+            border-color: #667eea;
             background: #f8f9ff;
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .btn-oauth img {
+            width: 20px;
+            height: 20px;
         }
         
         .btn-google { color: #4285f4; }
@@ -281,7 +216,7 @@
         
         .loading {
             text-align: center;
-            color: #00BCD4;
+            color: #667eea;
             font-size: 14px;
             margin: 20px 0;
         }
@@ -294,23 +229,8 @@
 <body>
     <div class="login-container">
         <div class="logo">
-            <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-                <defs>
-                    <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" style="stop-color:#00BCD4;stop-opacity:1" />
-                        <stop offset="100%" style="stop-color:#3F51B5;stop-opacity:1" />
-                    </linearGradient>
-                </defs>
-                <circle cx="32" cy="32" r="30" fill="url(#logoGradient)"/>
-                <path d="M 20 32 A 12 12 0 1 1 44 32" stroke="white" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.9"/>
-                <path d="M 44 32 L 40 29 M 44 32 L 40 35" stroke="white" stroke-width="4" stroke-linecap="round" opacity="0.9"/>
-                <path d="M 44 32 A 12 12 0 1 1 20 32" stroke="white" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.9"/>
-                <path d="M 20 32 L 24 29 M 20 32 L 24 35" stroke="white" stroke-width="4" stroke-linecap="round" opacity="0.9"/>
-                <text x="32" y="42" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="white" text-anchor="middle">B</text>
-            </svg>
-            <h1>Buddyliko</h1>
-            <p class="tagline">Transform Your Data</p>
-            <p class="etymology">Badiliko (Swahili: Change)</p>
+            <h1>DataMapper Pro</h1>
+            <p>Visual Data Mapping System</p>
         </div>
         
         <div class="tabs">
@@ -333,7 +253,7 @@
                     <input type="password" id="login-password" required placeholder="••••••••">
                 </div>
                 
-                <button type="submit" class="btn btn-primary"><span>Login</span></button>
+                <button type="submit" class="btn btn-primary">Login</button>
             </form>
             
             <div class="divider" id="oauth-divider">
@@ -361,7 +281,7 @@
                     <input type="password" id="register-password" required placeholder="••••••••" minlength="6">
                 </div>
                 
-                <button type="submit" class="btn btn-primary"><span>Create Account</span></button>
+                <button type="submit" class="btn btn-primary">Create Account</button>
             </form>
             
             <div class="divider" id="oauth-divider-register">
@@ -381,6 +301,7 @@
         
         // Check auth status on load
         window.addEventListener('load', async () => {
+            // Check if already logged in
             const token = localStorage.getItem('datamapper_token');
             if (token) {
                 try {
@@ -388,13 +309,17 @@
                         headers: { 'Authorization': `Bearer ${token}` }
                     });
                     if (response.ok) {
+                        // Already logged in, redirect to app
                         window.location.href = '/app.html';
                         return;
                     }
                 } catch (e) {
+                    // Token invalid, remove it
                     localStorage.removeItem('datamapper_token');
                 }
             }
+            
+            // Load OAuth providers
             loadOAuthProviders();
         });
         
@@ -404,6 +329,7 @@
                 const data = await response.json();
                 
                 if (!data.enabled) {
+                    // Auth disabled, redirect directly to app
                     window.location.href = '/app.html';
                     return;
                 }
@@ -484,6 +410,7 @@
             document.getElementById('loading').classList.add('hidden');
         }
         
+        // Login form
         document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             hideAlert();
@@ -516,6 +443,7 @@
             }
         });
         
+        // Register form
         document.getElementById('register-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             hideAlert();
@@ -547,6 +475,7 @@
             }
         });
         
+        // OAuth functions
         async function loginWithGoogle() {
             try {
                 const response = await fetch(`${API_BASE}/api/auth/google/login`);

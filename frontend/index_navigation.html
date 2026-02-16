@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buddyliko - Home</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1E88E5 0%, #42A5F5 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 50px;
+        }
+        h1 { color: #1E88E5; font-size: 48px; margin-bottom: 10px; text-align: center; }
+        .subtitle { text-align: center; color: #666; font-size: 18px; margin-bottom: 40px; }
+        .section { margin: 40px 0; }
+        .section-title {
+            font-size: 24px; font-weight: 600; color: #333; margin-bottom: 20px;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+        .card {
+            background: white; border: 2px solid #e0e0e0; border-radius: 12px; padding: 25px;
+            text-decoration: none; transition: all 0.3s; display: block;
+        }
+        .card:hover {
+            border-color: #1E88E5; transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(30, 136, 229, 0.3);
+        }
+        .card-icon { font-size: 40px; margin-bottom: 15px; }
+        .card-title { font-size: 18px; font-weight: 600; color: #333; margin-bottom: 8px; }
+        .card-desc { font-size: 14px; color: #666; line-height: 1.5; }
+        .badge {
+            display: inline-block; padding: 4px 10px; border-radius: 12px;
+            font-size: 11px; font-weight: 600; margin-left: 8px;
+        }
+        .badge.public { background: #E8F5E9; color: #2E7D32; }
+        .badge.auth { background: #FFF3E0; color: #E65100; }
+        .badge.admin { background: #FFEBEE; color: #C62828; }
+        .info-box {
+            background: #E3F2FD; border-left: 4px solid #1E88E5; padding: 20px;
+            border-radius: 8px; margin: 30px 0;
+        }
+        .info-box h3 { color: #1565C0; margin-bottom: 10px; }
+        .info-box p { color: #1976D2; line-height: 1.6; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔷 Buddyliko</h1>
+        <p class="subtitle">Data Mapping & Transformation Platform v2.0</p>
+        
+        <div class="info-box">
+            <h3>🚀 Sistema Attivo</h3>
+            <p id="system-mode">Rilevamento modalità in corso...</p>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">📱 Pagine Disponibili</div>
+            <div class="cards">
+                <a href="app.html" class="card">
+                    <div class="card-icon">🗺️</div>
+                    <div class="card-title">Data Mapper <span class="badge public">Principale</span></div>
+                    <div class="card-desc">
+                        Crea e modifica mappature tra XML, JSON, CSV, IDOC. Interfaccia drag & drop con preview in tempo reale.
+                    </div>
+                </a>
+                
+                <a href="login.html" class="card">
+                    <div class="card-icon">🔐</div>
+                    <div class="card-title">Login <span class="badge auth">Auth Required</span></div>
+                    <div class="card-desc">
+                        Accedi con email/password oppure OAuth (Google, Facebook, GitHub).
+                    </div>
+                </a>
+                
+                <a href="admin.html" class="card">
+                    <div class="card-icon">👨‍💼</div>
+                    <div class="card-title">Admin Dashboard <span class="badge admin">Admin Only</span></div>
+                    <div class="card-desc">
+                        Approva utenti, gestisci ruoli, visualizza statistiche e audit log.
+                    </div>
+                </a>
+                
+                <a href="account-settings.html" class="card">
+                    <div class="card-icon">⚙️</div>
+                    <div class="card-title">Account Settings <span class="badge auth">User</span></div>
+                    <div class="card-desc">
+                        Collega/scollega provider OAuth, cambia password, gestisci account.
+                    </div>
+                </a>
+            </div>
+        </div>
+        
+        <div class="info-box" style="margin-top: 40px;">
+            <h3>📚 Link Utili</h3>
+            <p>
+                <strong>API Docs:</strong> <a href="http://localhost:8080/docs" target="_blank" style="color: #1E88E5;">Swagger UI</a><br>
+                <strong>Health Check:</strong> <a href="http://localhost:8080/api/health" target="_blank" style="color: #1E88E5;">/api/health</a><br>
+                <strong>Modalità:</strong> Simple (run.bat) | Full (run.bat --full)
+            </p>
+        </div>
+    </div>
+    
+    <script>
+        fetch('http://localhost:8080/api/health')
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('system-mode').innerHTML = `
+                    ✅ Backend Online - Version ${data.version || '2.0.0'} - Port 8080
+                `;
+            })
+            .catch(err => {
+                document.getElementById('system-mode').innerHTML = `
+                    ⚠️ Backend Offline - Avvia con: <code>run.bat</code>
+                `;
+            });
+    </script>
+</body>
+</html>

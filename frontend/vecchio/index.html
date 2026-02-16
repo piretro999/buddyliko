@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DataMapper Pro</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .loader {
+            text-align: center;
+            color: white;
+        }
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        h2 { font-size: 24px; margin-bottom: 10px; }
+        p { font-size: 14px; opacity: 0.9; }
+    </style>
+</head>
+<body>
+    <div class="loader">
+        <div class="spinner"></div>
+        <h2>DataMapper Pro</h2>
+        <p>Loading...</p>
+    </div>
+    
+    <script>
+        const API_BASE = 'http://localhost:8080';
+        
+        async function init() {
+            try {
+                // Check if auth is enabled
+                const statusResponse = await fetch(`${API_BASE}/api/auth/status`);
+                const status = await statusResponse.json();
+                
+                if (!status.enabled) {
+                    // Auth disabled, go directly to app
+                    window.location.href = '/app.html';
+                    return;
+                }
+                
+                // Auth enabled, check if user has token
+                const token = localStorage.getItem('datamapper_token');
+                
+                if (!token) {
+                    // No token, redirect to login
+                    window.location.href = '/login.html';
+                    return;
+                }
+                
+                // Verify token
+                const meResponse = await fetch(`${API_BASE}/api/auth/me`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (meResponse.ok) {
+                    // Token valid, go to app
+                    window.location.href = '/app.html';
+                } else {
+                    // Token invalid, remove and go to login
+                    localStorage.removeItem('datamapper_token');
+                    localStorage.removeItem('datamapper_user');
+                    window.location.href = '/login.html';
+                }
+                
+            } catch (e) {
+                // Connection error, try to go to app anyway
+                console.error('Init error:', e);
+                window.location.href = '/app.html';
+            }
+        }
+        
+        // Check for token in URL (from OAuth callback)
+        const urlParams = new URLSearchParams(window.location.search);
+        const tokenFromUrl = urlParams.get('token');
+        
+        if (tokenFromUrl) {
+            localStorage.setItem('datamapper_token', tokenFromUrl);
+            window.location.href = '/app.html';
+        } else {
+            init();
+        }
+    </script>
+</body>
+</html>

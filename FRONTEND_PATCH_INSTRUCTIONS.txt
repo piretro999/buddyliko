@@ -1,0 +1,214 @@
+============================================================
+FRONTEND PATCH - DOPPIO MENU A TENDINA PER DOCUMENT TYPE
+============================================================
+
+STEP 1: Aggiungere nuovi state variables
+-----------------------------------------
+Cerca in app.html la riga con:
+
+    const [outputSchemaId, setOutputSchemaId] = useState('');
+
+Aggiungi DOPO questa riga:
+
+    const [outputDocumentType, setOutputDocumentType] = useState('Invoice');
+    const [availableDocumentTypes, setAvailableDocumentTypes] = useState([]);
+
+============================================================
+
+STEP 2: Fetch document types quando cambia output schema
+---------------------------------------------------------
+Cerca la funzione handleSchemaLoad o dove si gestisce il cambio di output schema.
+
+Aggiungi questa nuova funzione:
+
+    const fetchDocumentTypes = async (schemaId) => {
+        if (!schemaId) {
+            setAvailableDocumentTypes([]);
+            return;
+        }
+        
+        try {
+            const res = await fetch(`${API_URL}/schemas/${schemaId}/document-types`);
+            const data = await res.json();
+            
+            if (data.success && data.document_types && data.document_types.length > 0) {
+                setAvailableDocumentTypes(data.document_types);
+                
+                // Set default to first type, prefer Invoice if available
+                const invoiceType = data.document_types.find(t => t.type === 'Invoice');
+                const defaultType = invoiceType ? invoiceType.type : data.document_types[0].type;
+                setOutputDocumentType(defaultType);
+                
+                console.log(`✅ Loaded ${data.document_types.length} document types for ${schemaId}`);
+            } else {
+                // No document types available (e.g., FatturaPA has only one type)
+                setAvailableDocumentTypes([]);
+                setOutputDocumentType('');
+            }
+        } catch (error) {
+            console.error('Failed to fetch document types:', error);
+            setAvailableDocumentTypes([]);
+        }
+    };
+
+Poi MODIFICA dove viene gestito il cambio di outputSchemaId:
+
+    // Quando si seleziona un output schema (nella funzione handleSchemaLoad o simile)
+    setOutputSchemaId(schemaId);
+    await fetchDocumentTypes(schemaId);  // ← AGGIUNGI QUESTA RIGA
+
+============================================================
+
+STEP 3: Aggiungere secondo menu a tendina nel UI
+-------------------------------------------------
+Cerca il menu a tendina per Output Schema. Dovrebbe essere simile a:
+
+    <select value={outputSchemaId} onChange={handleOutputSchemaChange}>
+        <option value="">Select Output Schema</option>
+        ...
+    </select>
+
+Aggiungi SUBITO DOPO questo select:
+
+    {/* Document Type selector - shown only if multiple types available */}
+    {availableDocumentTypes.length > 0 && (
+        <div style={{ marginTop: '10px' }}>
+            <label style={{ 
+                display: 'block', 
+                marginBottom: '5px', 
+                fontSize: '13px', 
+                fontWeight: '500',
+                color: '#666'
+            }}>
+                Document Type:
+            </label>
+            <select 
+                value={outputDocumentType}
+                onChange={(e) => setOutputDocumentType(e.target.value)}
+                style={{
+                    width: '100%',
+                    padding: '8px',
+                    border: '1px solid #ddd',
+                    borderRadius: '4px',
+                    fontSize: '13px'
+                }}
+            >
+                {availableDocumentTypes.map(docType => (
+                    <option key={docType.type} value={docType.type}>
+                        {docType.label}
+                    </option>
+                ))}
+            </select>
+        </div>
+    )}
+
+============================================================
+
+STEP 4: Salvare documentType nel project JSON
+----------------------------------------------
+Cerca la funzione saveProject(). Dovrebbe contenere qualcosa come:
+
+    const project = {
+        projectName: mappingName,
+        version: '2.0',
+        created: new Date().toISOString(),
+        inputSchema: inputSchema,
+        outputSchema: outputSchema,
+        ...
+    };
+
+MODIFICA per includere rootElement:
+
+    const project = {
+        projectName: mappingName,
+        version: '2.0',
+        created: new Date().toISOString(),
+        inputSchema: inputSchema,
+        outputSchema: {
+            ...outputSchema,
+            rootElement: outputDocumentType || outputSchema.rootElement  // ← AGGIUNGI
+        },
+        outputSchemaId: outputSchemaId,
+        inputSchemaId: inputSchemaId,
+        ...
+    };
+
+============================================================
+
+STEP 5: Caricare documentType quando si carica un progetto
+-----------------------------------------------------------
+Cerca la funzione loadProject(). Dentro dovrebbe esserci:
+
+    setOutputSchema(project.outputSchema);
+    setOutputSchemaId(project.outputSchemaId || '');
+
+AGGIUNGI dopo queste righe:
+
+    // Load document type if present
+    if (project.outputSchema && project.outputSchema.rootElement) {
+        setOutputDocumentType(project.outputSchema.rootElement);
+    }
+    
+    // Fetch available document types for this schema
+    if (project.outputSchemaId) {
+        await fetchDocumentTypes(project.outputSchemaId);
+    }
+
+============================================================
+
+STEP 6: Passare documentType al backend durante transform
+----------------------------------------------------------
+Cerca dove si prepara mappingRules per il transform. Dovrebbe essere:
+
+    const mappingRules = {
+        connections: connections.map(...),
+        inputSchema: inputSchema,
+        outputSchema: outputSchema
+    };
+
+MODIFICA per includere rootElement:
+
+    const mappingRules = {
+        connections: connections.map(...),
+        inputSchema: inputSchema,
+        outputSchema: {
+            ...outputSchema,
+            rootElement: outputDocumentType || outputSchema.rootElement || 'Invoice'
+        }
+    };
+
+============================================================
+
+STEP 7: Visual indicator nel UI
+--------------------------------
+OPZIONALE ma raccomandato - Aggiungi un badge che mostra il document type selezionato:
+
+Vicino al titolo "Output Schema" o nel header, aggiungi:
+
+    {outputDocumentType && (
+        <span style={{
+            marginLeft: '10px',
+            padding: '2px 8px',
+            background: 'linear-gradient(135deg, #00BCD4 0%, #3F51B5 100%)',
+            color: 'white',
+            borderRadius: '12px',
+            fontSize: '11px',
+            fontWeight: '600'
+        }}>
+            {outputDocumentType}
+        </span>
+    )}
+
+============================================================
+
+TESTING CHECKLIST:
+------------------
+✅ 1. Carica schema UBL-21 → Vedi menu "Document Type"
+✅ 2. Menu mostra: Invoice, CreditNote, DebitNote, etc.
+✅ 3. Seleziona "CreditNote" → Cambia
+✅ 4. Salva progetto → outputSchema.rootElement = "CreditNote"
+✅ 5. Ricarica progetto → Document Type torna a "CreditNote"
+✅ 6. Execute transform → Log backend mostra "🔍 Document type: CreditNote"
+✅ 7. Backend trova UBL-CreditNote-2.1.xsd (non FreightInvoice!)
+
+============================================================

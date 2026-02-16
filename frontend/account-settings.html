@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buddyliko - Account Settings</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #1E88E5 0%, #42A5F5 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 600px;
+            width: 100%;
+            padding: 40px;
+        }
+        
+        h1 {
+            color: #1E88E5;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .section {
+            margin-bottom: 30px;
+        }
+        
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .provider-card {
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 12px;
+            transition: all 0.3s;
+        }
+        
+        .provider-card.linked {
+            border-color: #4CAF50;
+            background: #f1f8f4;
+        }
+        
+        .provider-card:hover {
+            border-color: #1E88E5;
+            box-shadow: 0 4px 12px rgba(30, 136, 229, 0.2);
+        }
+        
+        .provider-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        
+        .provider-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .provider-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            background: #f5f5f5;
+        }
+        
+        .provider-icon.google { background: #fff; border: 2px solid #4285F4; }
+        .provider-icon.facebook { background: #1877F2; color: white; }
+        .provider-icon.github { background: #24292e; color: white; }
+        .provider-icon.email { background: #666; color: white; }
+        
+        .provider-details {
+            flex: 1;
+        }
+        
+        .provider-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 4px;
+        }
+        
+        .provider-email {
+            font-size: 13px;
+            color: #666;
+        }
+        
+        .provider-meta {
+            font-size: 12px;
+            color: #999;
+            margin-top: 8px;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .badge.primary {
+            background: #FFD700;
+            color: #000;
+        }
+        
+        .badge.linked {
+            background: #4CAF50;
+            color: white;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #1E88E5, #42A5F5);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(30, 136, 229, 0.4);
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: #666;
+            border: 2px solid #e0e0e0;
+        }
+        
+        .btn-secondary:hover {
+            border-color: #1E88E5;
+            color: #1E88E5;
+        }
+        
+        .btn-danger {
+            background: white;
+            color: #f44336;
+            border: 2px solid #f44336;
+        }
+        
+        .btn-danger:hover {
+            background: #f44336;
+            color: white;
+        }
+        
+        .btn-small {
+            padding: 6px 14px;
+            font-size: 12px;
+        }
+        
+        .alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+        }
+        
+        .alert.success {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border-left: 4px solid #4caf50;
+        }
+        
+        .alert.error {
+            background: #ffebee;
+            color: #c62828;
+            border-left: 4px solid #f44336;
+        }
+        
+        .alert.warning {
+            background: #fff3e0;
+            color: #e65100;
+            border-left: 4px solid #ff9800;
+        }
+        
+        .alert.info {
+            background: #e3f2fd;
+            color: #1565c0;
+            border-left: 4px solid #2196f3;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #1E88E5;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .user-info {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+        }
+        
+        .user-info h2 {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        
+        .user-info p {
+            color: #666;
+            font-size: 14px;
+            margin: 4px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 Account Settings</h1>
+        <p class="subtitle">Manage your authentication methods</p>
+        
+        <div id="alerts"></div>
+        
+        <div class="user-info" id="userInfo" style="display: none;">
+            <h2 id="userName"></h2>
+            <p><strong>Email:</strong> <span id="userEmail"></span></p>
+            <p><strong>Role:</strong> <span id="userRole"></span></p>
+            <p><strong>Status:</strong> <span id="userStatus"></span></p>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">
+                🔑 Linked Authentication Methods
+            </div>
+            
+            <div id="providersContainer">
+                <div class="alert info">
+                    <span class="loading"></span>
+                    Loading your account...
+                </div>
+            </div>
+        </div>
+        
+        <div class="section" id="availableProviders" style="display: none;">
+            <div class="section-title">
+                ➕ Available Providers
+            </div>
+            
+            <div id="availableContainer"></div>
+        </div>
+    </div>
+    
+    <script>
+        const API_URL = 'http://localhost:8080/api';
+        let currentUser = null;
+        let accessToken = localStorage.getItem('access_token');
+        
+        // Show alert
+        function showAlert(message, type = 'info') {
+            const alerts = document.getElementById('alerts');
+            const alert = document.createElement('div');
+            alert.className = `alert ${type}`;
+            alert.innerHTML = message;
+            alerts.appendChild(alert);
+            
+            setTimeout(() => {
+                alert.remove();
+            }, 5000);
+        }
+        
+        // Get current user
+        async function getCurrentUser() {
+            if (!accessToken) {
+                window.location.href = '/login.html';
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_URL}/auth/me`, {
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Not authenticated');
+                }
+                
+                currentUser = await response.json();
+                displayUser();
+                loadProviders();
+            } catch (error) {
+                showAlert('Not authenticated. Please login first.', 'error');
+                setTimeout(() => {
+                    window.location.href = '/login.html';
+                }, 2000);
+            }
+        }
+        
+        // Display user info
+        function displayUser() {
+            document.getElementById('userInfo').style.display = 'block';
+            document.getElementById('userName').textContent = currentUser.name;
+            document.getElementById('userEmail').textContent = currentUser.email;
+            document.getElementById('userRole').textContent = currentUser.role;
+            document.getElementById('userStatus').textContent = currentUser.status;
+        }
+        
+        // Load linked providers
+        async function loadProviders() {
+            try {
+                const response = await fetch(`${API_URL}/auth/providers`, {
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`
+                    }
+                });
+                
+                const providers = await response.json();
+                displayProviders(providers);
+            } catch (error) {
+                showAlert('Failed to load providers', 'error');
+            }
+        }
+        
+        // Display providers
+        function displayProviders(providers) {
+            const container = document.getElementById('providersContainer');
+            const availableContainer = document.getElementById('availableContainer');
+            
+            container.innerHTML = '';
+            availableContainer.innerHTML = '';
+            
+            const allProviders = ['EMAIL', 'GOOGLE', 'FACEBOOK', 'GITHUB'];
+            const linkedProviders = providers.map(p => p.provider);
+            
+            // Show linked providers
+            providers.forEach(provider => {
+                const card = createProviderCard(provider, true);
+                container.appendChild(card);
+            });
+            
+            // Show available providers
+            const available = allProviders.filter(p => !linkedProviders.includes(p));
+            if (available.length > 0) {
+                document.getElementById('availableProviders').style.display = 'block';
+                available.forEach(providerName => {
+                    const card = createProviderCard({provider: providerName}, false);
+                    availableContainer.appendChild(card);
+                });
+            }
+        }
+        
+        // Create provider card
+        function createProviderCard(provider, isLinked) {
+            const card = document.createElement('div');
+            card.className = `provider-card ${isLinked ? 'linked' : ''}`;
+            
+            const icons = {
+                EMAIL: '✉️',
+                GOOGLE: '🔵',
+                FACEBOOK: '🔷',
+                GITHUB: '⚫'
+            };
+            
+            const names = {
+                EMAIL: 'Email / Password',
+                GOOGLE: 'Google',
+                FACEBOOK: 'Facebook',
+                GITHUB: 'GitHub'
+            };
+            
+            let html = `
+                <div class="provider-header">
+                    <div class="provider-info">
+                        <div class="provider-icon ${provider.provider.toLowerCase()}">
+                            ${icons[provider.provider]}
+                        </div>
+                        <div class="provider-details">
+                            <div class="provider-name">${names[provider.provider]}</div>
+            `;
+            
+            if (isLinked) {
+                if (provider.provider_email) {
+                    html += `<div class="provider-email">${provider.provider_email}</div>`;
+                }
+                if (provider.is_primary) {
+                    html += `<div class="provider-meta"><span class="badge primary">⭐ Primary</span></div>`;
+                } else {
+                    html += `<div class="provider-meta"><span class="badge linked">✓ Linked</span></div>`;
+                }
+                if (provider.last_used_at) {
+                    const date = new Date(provider.last_used_at).toLocaleDateString();
+                    html += `<div class="provider-meta">Last used: ${date}</div>`;
+                }
+            }
+            
+            html += `
+                        </div>
+                    </div>
+                    <div>
+            `;
+            
+            if (isLinked) {
+                if (!provider.is_primary) {
+                    html += `
+                        <button class="btn btn-secondary btn-small" onclick="setPrimary('${provider.provider}')">
+                            ⭐ Set Primary
+                        </button>
+                    `;
+                }
+                if (provider.provider !== 'EMAIL') {
+                    html += `
+                        <button class="btn btn-danger btn-small" onclick="unlinkProvider('${provider.provider}')">
+                            ❌ Unlink
+                        </button>
+                    `;
+                }
+            } else {
+                html += `
+                    <button class="btn btn-primary btn-small" onclick="linkProvider('${provider.provider}')">
+                        🔗 Link ${names[provider.provider]}
+                    </button>
+                `;
+            }
+            
+            html += `
+                    </div>
+                </div>
+            `;
+            
+            card.innerHTML = html;
+            return card;
+        }
+        
+        // Link provider
+        async function linkProvider(provider) {
+            const providerLower = provider.toLowerCase();
+            
+            try {
+                // Get auth URL
+                const response = await fetch(`${API_URL}/auth/${providerLower}/login`, {
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`
+                    }
+                });
+                
+                const data = await response.json();
+                
+                // Redirect to OAuth
+                window.location.href = data.url;
+            } catch (error) {
+                showAlert(`Failed to start ${provider} linking`, 'error');
+            }
+        }
+        
+        // Unlink provider
+        async function unlinkProvider(provider) {
+            if (!confirm(`Are you sure you want to unlink ${provider}?`)) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_URL}/auth/providers/${provider.toLowerCase()}/unlink`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`
+                    }
+                });
+                
+                if (response.ok) {
+                    showAlert(`${provider} unlinked successfully`, 'success');
+                    loadProviders();
+                } else {
+                    const error = await response.json();
+                    showAlert(error.detail || 'Failed to unlink provider', 'error');
+                }
+            } catch (error) {
+                showAlert('Failed to unlink provider', 'error');
+            }
+        }
+        
+        // Set primary provider
+        async function setPrimary(provider) {
+            try {
+                const response = await fetch(`${API_URL}/auth/providers/${provider.toLowerCase()}/set-primary`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`
+                    }
+                });
+                
+                if (response.ok) {
+                    showAlert(`${provider} set as primary`, 'success');
+                    loadProviders();
+                } else {
+                    showAlert('Failed to set primary provider', 'error');
+                }
+            } catch (error) {
+                showAlert('Failed to set primary provider', 'error');
+            }
+        }
+        
+        // Handle OAuth callback
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('code') && urlParams.has('state')) {
+            const code = urlParams.get('code');
+            const state = urlParams.get('state');
+            
+            // Determine provider from referrer or URL path
+            // This is a simplified version - in production use proper state management
+            showAlert('Processing OAuth callback...', 'info');
+            
+            // Clean URL
+            window.history.replaceState({}, document.title, window.location.pathname);
+            
+            // Reload providers
+            setTimeout(() => {
+                getCurrentUser();
+            }, 1000);
+        }
+        
+        // Initialize
+        getCurrentUser();
+    </script>
+</body>
+</html>

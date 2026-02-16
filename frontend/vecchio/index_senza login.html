@@ -3,9 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Buddyliko - Transform Your Data</title>
-    
-    <link rel="icon" type="image/svg+xml" href="/assets/logo-icon.svg">
+    <title>Visual Mapping System - Complete</title>
     
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -47,7 +45,7 @@
             bottom: 10px;
             width: 28px;
             height: 28px;
-            background: linear-gradient(135deg, #00BCD4 0%, #3F51B5 100%);
+            background: #667eea;
             color: white;
             border: none;
             border-radius: 5px;
@@ -63,80 +61,19 @@
         }
         
         .sidebar-toggle:hover {
-            background: linear-gradient(135deg, #00ACC1 0%, #3949AB 100%);
+            background: #5568d3;
             transform: scale(1.1);
         }
         
         .sidebar-header {
             padding: 20px;
-            background: linear-gradient(135deg, #00BCD4 0%, #3F51B5 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
         }
         .sidebar-content {
             flex: 1;
             overflow-y: auto;
             padding: 15px;
-        }
-        
-        .sidebar-footer {
-            padding: 15px 20px;
-            border-top: 1px solid #e0e0e0;
-            background: #fafafa;
-        }
-        
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
-        
-        .user-avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #00BCD4 0%, #3F51B5 100%);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 14px;
-        }
-        
-        .user-details {
-            flex: 1;
-            font-size: 13px;
-        }
-        
-        .user-name {
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 2px;
-        }
-        
-        .user-email {
-            color: #666;
-            font-size: 11px;
-        }
-        
-        .btn-logout {
-            width: 100%;
-            padding: 10px;
-            background: white;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: 600;
-            color: #666;
-            transition: all 0.3s;
-        }
-        
-        .btn-logout:hover {
-            border-color: #00BCD4;
-            color: #00BCD4;
-            background: #f8f9ff;
         }
         .main-canvas {
             flex: 1;
@@ -208,7 +145,7 @@
         }
         
         .btn-primary { 
-            background: #00BCD4; 
+            background: #667eea; 
             color: white; 
         }
         .btn-primary:hover:not(:disabled) { 
@@ -258,7 +195,7 @@
         
         input[type="text"]:focus, select:focus, textarea:focus {
             outline: none;
-            border-color: #00BCD4;
+            border-color: #667eea;
             box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
         }
         
@@ -287,7 +224,7 @@
         
         /* Removed resize handle from cells */
         .field-box:hover {
-            border-color: #00BCD4;
+            border-color: #667eea;
             transform: translateX(3px);
             box-shadow: 0 2px 8px rgba(102,126,234,0.2);
         }
@@ -374,7 +311,7 @@
             top: calc(50% - 50px);     /* Slightly UP */
             width: 16px;               /* Wider */
             height: 60px;              /* Taller */
-            background: #00BCD4;       /* Blue by default */
+            background: #667eea;       /* Blue by default */
             border: 2px solid white;
             border-radius: 4px;
             cursor: ew-resize;
@@ -402,7 +339,7 @@
             top: calc(50% + 50px);     /* Slightly DOWN */
             width: 16px;               /* Wider */
             height: 60px;              /* Taller */
-            background: #00BCD4;       /* Blue by default */
+            background: #667eea;       /* Blue by default */
             border: 2px solid white;
             border-radius: 4px;
             cursor: ew-resize;
@@ -469,7 +406,7 @@
         }
         .connection-line {
             fill: none;
-            stroke: #00BCD4;
+            stroke: #667eea;
             stroke-width: 3;
             transition: none; /* Remove transition to avoid lag during scroll */
         }
@@ -487,7 +424,7 @@
             to { stroke-dashoffset: -10; }
         }
         .connection-arrow {
-            fill: #00BCD4;
+            fill: #667eea;
         }
         
         /* Hover Popup */
@@ -582,7 +519,7 @@
         }
         .formula-textarea:focus {
             outline: none;
-            border-color: #00BCD4;
+            border-color: #667eea;
             box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
         }
         .operator-buttons {
@@ -610,9 +547,9 @@
             transition: all 0.2s;
         }
         .operator-btn:hover {
-            background: #00BCD4;
+            background: #667eea;
             color: white;
-            border-color: #00BCD4;
+            border-color: #667eea;
         }
         .formula-editor-footer {
             padding: 20px;
@@ -657,7 +594,7 @@
             cursor: pointer;
         }
         .upload-area:hover {
-            border-color: #00BCD4;
+            border-color: #667eea;
             background: #f5f5ff;
         }
         .form-group {
@@ -688,8 +625,8 @@
             font-weight: 600;
         }
         .tab.active {
-            border-bottom-color: #00BCD4;
-            color: #00BCD4;
+            border-bottom-color: #667eea;
+            color: #667eea;
         }
         .empty-state {
             text-align: center;
@@ -708,7 +645,7 @@
             background: #f0f0f0;
         }
         .connection-list-item.selected {
-            border-color: #00BCD4;
+            border-color: #667eea;
             background: #e3f2fd;
         }
         
@@ -854,124 +791,6 @@
     </style>
 </head>
 <body>
-    <!-- Authentication Check - BLOCKING VERSION -->
-    <div id="auth-check" style="
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(135deg, #00BCD4 0%, #3F51B5 100%);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 999999;
-        color: white;
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    ">
-        <div style="text-align: center;">
-            <div style="
-                width: 50px;
-                height: 50px;
-                border: 4px solid rgba(255,255,255,0.3);
-                border-top-color: white;
-                border-radius: 50%;
-                animation: spin 1s linear infinite;
-                margin: 0 auto 20px;
-            "></div>
-            <style>
-                @keyframes spin {
-                    to { transform: rotate(360deg); }
-                }
-            </style>
-            <h2 style="font-size: 24px; margin-bottom: 10px;">Verifying Authentication...</h2>
-            <p style="font-size: 14px; opacity: 0.9;">Please wait</p>
-        </div>
-    </div>
-    
-    <script>
-        // BLOCKING authentication check
-        (async function() {
-            const API_BASE = 'http://localhost:8080';
-            const authCheckDiv = document.getElementById('auth-check');
-            
-            try {
-                console.log('🔐 Checking authentication...');
-                
-                // Check if auth is enabled
-                const statusResponse = await fetch(`${API_BASE}/api/auth/status`);
-                
-                if (!statusResponse.ok) {
-                    console.error('❌ Failed to check auth status');
-                    authCheckDiv.remove();
-                    return;
-                }
-                
-                const status = await statusResponse.json();
-                console.log('Auth status:', status);
-                
-                if (status.enabled) {
-                    console.log('🔐 Auth is ENABLED');
-                    
-                    // Auth is enabled, verify token
-                    const token = localStorage.getItem('datamapper_token');
-                    
-                    if (!token) {
-                        console.log('❌ No token found, redirecting to login...');
-                        window.location.href = '/login.html';
-                        return;
-                    }
-                    
-                    console.log('🔑 Token found, verifying...');
-                    
-                    // Verify token is valid
-                    const meResponse = await fetch(`${API_BASE}/api/auth/me`, {
-                        headers: { 'Authorization': `Bearer ${token}` }
-                    });
-                    
-                    if (!meResponse.ok) {
-                        console.log('❌ Token invalid, redirecting to login...');
-                        localStorage.removeItem('datamapper_token');
-                        localStorage.removeItem('datamapper_user');
-                        window.location.href = '/login.html';
-                        return;
-                    }
-                    
-                    const userData = await meResponse.json();
-                    console.log('✅ Authenticated as:', userData);
-                    
-                    // Token valid, remove blocking overlay and continue
-                    authCheckDiv.remove();
-                } else {
-                    console.log('🔓 Auth is DISABLED, continuing...');
-                    // Auth disabled, remove blocking overlay and continue
-                    authCheckDiv.remove();
-                }
-                
-            } catch (e) {
-                console.error('⚠️ Auth check failed:', e);
-                // On error, remove overlay and continue anyway
-                authCheckDiv.remove();
-            }
-        })();
-        
-        // Add logout functionality
-        function logout() {
-            localStorage.removeItem('datamapper_token');
-            localStorage.removeItem('datamapper_user');
-            window.location.href = '/login.html';
-        }
-        
-        // Get auth token for API calls
-        function getAuthHeaders() {
-            const token = localStorage.getItem('datamapper_token');
-            if (token) {
-                return { 'Authorization': `Bearer ${token}` };
-            }
-            return {};
-        }
-    </script>
-    
     <div id="root"></div>
     
     <script>
@@ -1015,109 +834,6 @@
                         }, highlighted),
                         React.createElement('span', { style: { color: 'black' } }, after)
                     );
-                } else if (isHighlighted) {
-                    // LINE-LEVEL HIGHLIGHTING for XML with advanced coloring
-                    // Check if line contains XML tags
-                    const isXMLLine = line.trim().includes('<') && line.trim().includes('>');
-                    
-                    if (isXMLLine) {
-                        // Parse XML line with colorization:
-                        // 1. Opening/Closing tags: dark gray background, white text
-                        // 2. Final values: black background, green text
-                        // 3. Subtags: black background, yellow text
-                        
-                        const parts = [];
-                        let remaining = line;
-                        let key = 0;
-                        
-                        // Regex to match XML tags and content
-                        const xmlRegex = /(<[^>]+>)|([^<>]+)/g;
-                        let match;
-                        
-                        while ((match = xmlRegex.exec(line)) !== null) {
-                            if (match[1]) {
-                                // It's a tag: <tag> or </tag>
-                                const tagContent = match[1];
-                                
-                                parts.push(
-                                    React.createElement('span', {
-                                        key: key++,
-                                        style: {
-                                            background: '#555',  // DARK GRAY for tags
-                                            color: 'white',      // WHITE text
-                                            padding: '0 2px',
-                                            fontWeight: 'normal'
-                                        }
-                                    }, tagContent)
-                                );
-                            } else if (match[2]) {
-                                // It's content between tags
-                                const content = match[2];
-                                
-                                // Check if content contains nested tags (subtag) or is final value
-                                const hasNestedTags = content.includes('<');
-                                const trimmedContent = content.trim();
-                                
-                                if (trimmedContent.length > 0) {
-                                    if (hasNestedTags) {
-                                        // Content with subtags - YELLOW
-                                        parts.push(
-                                            React.createElement('span', {
-                                                key: key++,
-                                                style: {
-                                                    background: 'black',
-                                                    color: 'yellow',
-                                                    fontWeight: 'bold'
-                                                }
-                                            }, content)
-                                        );
-                                    } else {
-                                        // Final value - GREEN
-                                        parts.push(
-                                            React.createElement('span', {
-                                                key: key++,
-                                                style: {
-                                                    background: 'black',
-                                                    color: '#0f0',  // BRIGHT GREEN for value
-                                                    fontWeight: 'bold',
-                                                    padding: '0 2px'
-                                                }
-                                            }, content)
-                                        );
-                                    }
-                                } else {
-                                    // Whitespace
-                                    parts.push(content);
-                                }
-                            }
-                        }
-                        
-                        return React.createElement('div', {
-                            key: idx,
-                            style: {
-                                background: 'black',
-                                padding: '2px 4px',
-                                fontFamily: 'monospace',
-                                whiteSpace: 'pre',
-                                fontSize: '11px'
-                            }
-                        }, ...parts);
-                        
-                    } else {
-                        // Non-XML line - simple white on black
-                        return React.createElement('div', { 
-                            key: idx,
-                            style: { 
-                                background: 'black',
-                                color: 'white',
-                                padding: '2px 4px',
-                                fontFamily: 'monospace',
-                                whiteSpace: 'pre',
-                                fontSize: '11px',
-                                fontWeight: 'bold'
-                            }
-                        }, line);
-                    }
                 } else {
                     // Normal line (light gray background)
                     return React.createElement('div', { 
@@ -1158,7 +874,7 @@
                     }
                 },
                     popup.type === 'input' 
-                        ? (popup.lines || popup.contextLines || []).map((line, idx) => renderInputLine(line, idx))
+                        ? popup.lines.map((line, idx) => renderInputLine(line, idx))
                         : React.createElement('pre', { 
                             style: { 
                                 margin: 0,
@@ -1287,7 +1003,7 @@ OPENAI_API_KEY=sk-...`
                                 React.createElement('a', { 
                                     href: 'https://console.anthropic.com/settings/keys', 
                                     target: '_blank',
-                                    style: { color: '#00BCD4' }
+                                    style: { color: '#667eea' }
                                 }, 'https://console.anthropic.com/settings/keys')
                             ),
                             React.createElement('div', null,
@@ -1296,7 +1012,7 @@ OPENAI_API_KEY=sk-...`
                                 React.createElement('a', { 
                                     href: 'https://platform.openai.com/api-keys', 
                                     target: '_blank',
-                                    style: { color: '#00BCD4' }
+                                    style: { color: '#667eea' }
                                 }, 'https://platform.openai.com/api-keys')
                             )
                         )
@@ -1653,7 +1369,7 @@ OPENAI_API_KEY=sk-...`
                         // Load panel
                         showLoadPanel && React.createElement('div', {
                             style: {
-                                border: '2px solid #00BCD4',
+                                border: '2px solid #667eea',
                                 borderRadius: '8px',
                                 padding: '15px',
                                 background: '#f8f9ff',
@@ -2082,7 +1798,7 @@ OPENAI_API_KEY=sk-...`
                     background: 'white',
                     borderRadius: '12px',
                     boxShadow: '0 10px 40px rgba(0,0,0,0.2)',
-                    border: '2px solid #00BCD4',
+                    border: '2px solid #667eea',
                     zIndex: 1000,
                     display: 'flex',
                     flexDirection: 'column'
@@ -2095,7 +1811,7 @@ OPENAI_API_KEY=sk-...`
                         display: 'flex',
                         justifyContent: 'space-between',
                         alignItems: 'center',
-                        background: 'linear-gradient(135deg, #00BCD4 0%, #3F51B5 100%)',
+                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                         color: 'white',
                         borderRadius: '10px 10px 0 0'
                     }
@@ -2173,7 +1889,7 @@ OPENAI_API_KEY=sk-...`
                                 background: isSelected(suggestion) ? '#e8f4ff' : '#f9f9f9',
                                 borderRadius: '8px',
                                 marginBottom: '10px',
-                                border: isSelected(suggestion) ? '2px solid #00BCD4' : '1px solid #ddd'
+                                border: isSelected(suggestion) ? '2px solid #667eea' : '1px solid #ddd'
                             }
                         },
                             React.createElement('div', {
@@ -2220,7 +1936,7 @@ OPENAI_API_KEY=sk-...`
                                         }
                                     }, 
                                         `📥 ${suggestion.source_field}`,
-                                        React.createElement('div', { style: { color: '#00BCD4', margin: '5px 0' } }, '↓'),
+                                        React.createElement('div', { style: { color: '#667eea', margin: '5px 0' } }, '↓'),
                                         `📤 ${suggestion.target_field}`
                                     ),
                                     suggestion.suggested_formula && React.createElement('div', {
@@ -2311,18 +2027,6 @@ OPENAI_API_KEY=sk-...`
             // Hide/show connected fields
             const [hideConnected, setHideConnected] = useState(false);
             
-            // Available schemas from backend
-            const [availableInputSchemas, setAvailableInputSchemas] = useState([]);
-            const [availableOutputSchemas, setAvailableOutputSchemas] = useState([]);
-            
-            // Selected schema IDs (for persistence and reverse mapping)
-            const [inputSchemaId, setInputSchemaId] = useState('');
-            const [outputSchemaId, setOutputSchemaId] = useState('');
-            
-            // Document type selection (for schemas like UBL that have multiple types)
-            const [outputDocumentType, setOutputDocumentType] = useState('Invoice');
-            const [availableDocumentTypes, setAvailableDocumentTypes] = useState([]);
-            
             const canvasRef = useRef(null);
             const hoverTimeoutRef = useRef(null);
             
@@ -2334,70 +2038,7 @@ OPENAI_API_KEY=sk-...`
             // Load session on mount
             useEffect(() => {
                 loadSession();
-                loadAvailableSchemas();
             }, []);
-            
-            // Load available schemas from /api/schemas/list
-            const loadAvailableSchemas = async () => {
-                try {
-                    const res = await fetch(`${API_URL}/schemas/list`);
-                    if (!res.ok) {
-                        console.error('Failed to load schemas');
-                        return;
-                    }
-                    const data = await res.json();
-                    
-                    // Update state instead of manipulating DOM
-                    setAvailableInputSchemas(data.input || []);
-                    setAvailableOutputSchemas(data.output || []);
-                    
-                    console.log('✅ Loaded schemas:', data);
-                } catch (err) {
-                    console.error('Failed to load available schemas:', err);
-                }
-            };
-            
-            // Fetch available document types for a schema
-            const fetchDocumentTypes = async (schemaId) => {
-                console.log('🔍 fetchDocumentTypes called with schemaId:', schemaId);
-                
-                if (!schemaId) {
-                    console.log('⚠️ No schemaId provided, clearing document types');
-                    setAvailableDocumentTypes([]);
-                    return;
-                }
-                
-                try {
-                    const url = `${API_URL}/schemas/${schemaId}/document-types`;
-                    console.log('📡 Fetching document types from:', url);
-                    
-                    const res = await fetch(url);
-                    console.log('📥 Response status:', res.status);
-                    
-                    const data = await res.json();
-                    console.log('📦 Response data:', data);
-                    
-                    if (data.success && data.document_types && data.document_types.length > 0) {
-                        console.log(`✅ Found ${data.document_types.length} document types:`, data.document_types.map(d => d.type));
-                        setAvailableDocumentTypes(data.document_types);
-                        
-                        // Set default to first type, prefer Invoice if available
-                        const invoiceType = data.document_types.find(t => t.type === 'Invoice');
-                        const defaultType = invoiceType ? invoiceType.type : data.document_types[0].type;
-                        setOutputDocumentType(defaultType);
-                        
-                        console.log(`✅ Loaded ${data.document_types.length} document types for ${schemaId}. Default: ${defaultType}`);
-                    } else {
-                        // No document types available (e.g., FatturaPA has only one type)
-                        console.log('ℹ️ No document types available for', schemaId);
-                        setAvailableDocumentTypes([]);
-                        setOutputDocumentType('');
-                    }
-                } catch (error) {
-                    console.error('❌ Failed to fetch document types:', error);
-                    setAvailableDocumentTypes([]);
-                }
-            };
             
             // Auto-save to localStorage every 30 seconds
             useEffect(() => {
@@ -2425,8 +2066,6 @@ OPENAI_API_KEY=sk-...`
                     const session = {
                         inputSchema,
                         outputSchema,
-                        inputSchemaId,
-                        outputSchemaId,
                         connections,
                         mappingName,
                         timestamp: new Date().toISOString()
@@ -2445,8 +2084,6 @@ OPENAI_API_KEY=sk-...`
                         const session = JSON.parse(localSession);
                         if (session.inputSchema) setInputSchema(session.inputSchema);
                         if (session.outputSchema) setOutputSchema(session.outputSchema);
-                        if (session.inputSchemaId) setInputSchemaId(session.inputSchemaId);
-                        if (session.outputSchemaId) setOutputSchemaId(session.outputSchemaId);
                         if (session.connections) setConnections(session.connections);
                         if (session.mappingName) setMappingName(session.mappingName);
                         
@@ -2848,12 +2485,7 @@ OPENAI_API_KEY=sk-...`
                     version: '2.0', // Updated to 2.0 with schema definitions
                     created: new Date().toISOString(),
                     inputSchema: inputSchema,
-                    outputSchema: {
-                        ...outputSchema,
-                        rootElement: outputDocumentType || (outputSchema && outputSchema.rootElement) || 'Invoice'
-                    },
-                    inputSchemaId: inputSchemaId, // Schema ID for backend reference
-                    outputSchemaId: outputSchemaId, // Schema ID for backend reference
+                    outputSchema: outputSchema,
                     inputSchemaDefinition: inputSchemaDefinition, // Schema Editor definition
                     outputSchemaDefinition: outputSchemaDefinition, // Schema Editor definition
                     inputExample: inputExample,
@@ -2883,10 +2515,7 @@ OPENAI_API_KEY=sk-...`
                     
                     try {
                         const text = await file.text();
-                        console.log('📄 File size:', text.length, 'bytes');
                         const project = JSON.parse(text);
-                        console.log('🔍 Parsed project with', project.connections?.length || 0, 'connections');
-                        console.log('🔍 Last 3 connections:', project.connections?.slice(-3).map(c => c.targetPath));
                         
                         // Validate project structure
                         if (!project.projectName || !project.inputSchema || !project.outputSchema) {
@@ -2898,24 +2527,11 @@ OPENAI_API_KEY=sk-...`
                         setMappingName(project.projectName);
                         setInputSchema(project.inputSchema);
                         setOutputSchema(project.outputSchema);
-                        setInputSchemaId(project.inputSchemaId || ''); // Load schema IDs
-                        setOutputSchemaId(project.outputSchemaId || ''); // Load schema IDs
                         setInputSchemaDefinition(project.inputSchemaDefinition || null);
                         setOutputSchemaDefinition(project.outputSchemaDefinition || null);
                         setInputExample(project.inputExample || '');
                         setOutputExample(project.outputExample || '');
                         setConnections(project.connections || []);
-                        console.log('🔍 DEBUG: Loaded', project.connections?.length || 0, 'connections from project file');
-                        
-                        // Load document type if present
-                        if (project.outputSchema && project.outputSchema.rootElement) {
-                            setOutputDocumentType(project.outputSchema.rootElement);
-                        }
-                        
-                        // Fetch available document types for this schema
-                        if (project.outputSchemaId) {
-                            await fetchDocumentTypes(project.outputSchemaId);
-                        }
                         
                         // Update field positions after schemas load
                         setTimeout(() => {
@@ -2988,9 +2604,6 @@ OPENAI_API_KEY=sk-...`
                     // Apply reversed mapping
                     setInputSchema(reversed.inputSchema);
                     setOutputSchema(reversed.outputSchema);
-                    // SWAP schema IDs when reversing!
-                    setInputSchemaId(outputSchemaId);  // Input becomes Output's ID
-                    setOutputSchemaId(inputSchemaId);  // Output becomes Input's ID
                     setInputExample(reversed.inputExample || '');
                     setOutputExample(reversed.outputExample || '');
                     setConnections(reversed.connections || []);
@@ -3293,19 +2906,7 @@ OPENAI_API_KEY=sk-...`
                     setSelectedConnection,
                     uploadExampleFile,
                     inputExample,
-                    outputExample,
-                    loadAvailableSchemas,
-                    showStatus,
-                    availableInputSchemas,
-                    availableOutputSchemas,
-                    inputSchemaId,
-                    setInputSchemaId,
-                    outputSchemaId,
-                    setOutputSchemaId,
-                    outputDocumentType,
-                    setOutputDocumentType,
-                    availableDocumentTypes,
-                    fetchDocumentTypes
+                    outputExample
                 })
                 ),  // Close sidebar-wrapper
                 
@@ -3351,8 +2952,7 @@ OPENAI_API_KEY=sk-...`
                     popupPinned,
                     setShowSchemaEditor,
                     hideConnected,
-                    setHideConnected,
-                    outputDocumentType
+                    setHideConnected
                 }),
                 
                 selectedConnection && React.createElement(PropertiesPanel, {
@@ -3423,21 +3023,11 @@ OPENAI_API_KEY=sk-...`
             );
         }
         
-        function Sidebar({ inputSchema, outputSchema, connections, activeTab, setActiveTab, setShowUploadModal, setUploadDirection, downloadSampleCSV, statusMessage, setDraggedField, selectedConnection, setSelectedConnection, uploadExampleFile, inputExample, outputExample, loadAvailableSchemas, showStatus, availableInputSchemas, availableOutputSchemas, inputSchemaId, setInputSchemaId, outputSchemaId, setOutputSchemaId, outputDocumentType, setOutputDocumentType, availableDocumentTypes, fetchDocumentTypes }) {
+        function Sidebar({ inputSchema, outputSchema, connections, activeTab, setActiveTab, setShowUploadModal, setUploadDirection, downloadSampleCSV, statusMessage, setDraggedField, selectedConnection, setSelectedConnection, uploadExampleFile, inputExample, outputExample }) {
             return React.createElement('div', { className: 'sidebar' },
                 React.createElement('div', { className: 'sidebar-header' },
-                    React.createElement('div', { style: { display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' } },
-                        React.createElement('svg', { width: '32', height: '32', viewBox: '0 0 64 64', style: { flexShrink: 0 } },
-                            React.createElement('circle', { cx: '32', cy: '32', r: '30', fill: 'rgba(255,255,255,0.2)' }),
-                            React.createElement('path', { d: 'M 20 32 A 12 12 0 1 1 44 32', stroke: 'white', strokeWidth: '4', fill: 'none', strokeLinecap: 'round' }),
-                            React.createElement('path', { d: 'M 44 32 L 40 29 M 44 32 L 40 35', stroke: 'white', strokeWidth: '4', strokeLinecap: 'round' }),
-                            React.createElement('path', { d: 'M 44 32 A 12 12 0 1 1 20 32', stroke: 'white', strokeWidth: '4', fill: 'none', strokeLinecap: 'round' }),
-                            React.createElement('path', { d: 'M 20 32 L 24 29 M 20 32 L 24 35', stroke: 'white', strokeWidth: '4', strokeLinecap: 'round' }),
-                            React.createElement('text', { x: '32', y: '42', fontFamily: 'Arial, sans-serif', fontSize: '24', fontWeight: 'bold', fill: 'white', textAnchor: 'middle' }, 'B')
-                        ),
-                        React.createElement('h2', { style: { margin: 0 } }, 'Buddyliko')
-                    ),
-                    React.createElement('p', { style: { fontSize: '12px', margin: 0, opacity: 0.9 } }, 'Transform Your Data')
+                    React.createElement('h2', null, '🎨 Visual Mapper'),
+                    React.createElement('p', { style: { fontSize: '12px' } }, 'Drag & Drop CSV Mapping')
                 ),
                 React.createElement('div', { className: 'sidebar-content' },
                     statusMessage && React.createElement('div', { 
@@ -3451,48 +3041,13 @@ OPENAI_API_KEY=sk-...`
                         React.createElement('div', { 
                             className: `tab ${activeTab === 'output' ? 'active' : ''}`,
                             onClick: () => setActiveTab('output')
-                        }, 
-                            '📤 Output',
-                            (outputDocumentType && outputDocumentType !== '') && React.createElement('span', {
-                                style: {
-                                    marginLeft: '6px',
-                                    padding: '2px 6px',
-                                    background: 'linear-gradient(135deg, #00BCD4 0%, #3F51B5 100%)',
-                                    color: 'white',
-                                    borderRadius: '10px',
-                                    fontSize: '10px',
-                                    fontWeight: '600'
-                                }
-                            }, outputDocumentType)
-                        ),
+                        }, '📤 Output'),
                         React.createElement('div', { 
                             className: `tab ${activeTab === 'connections' ? 'active' : ''}`,
                             onClick: () => setActiveTab('connections')
-                        }, `🔗 ${connections.length}`),
-                        React.createElement('div', { 
-                            className: `tab ${activeTab === 'schemas' ? 'active' : ''}`,
-                            onClick: () => setActiveTab('schemas')
-                        }, '📋 Schemas')
+                        }, `🔗 ${connections.length}`)
                     ),
                     activeTab === 'input' && React.createElement('div', null,
-                        React.createElement('div', { style: { marginBottom: '10px' } },
-                            React.createElement('label', { style: { display: 'block', marginBottom: '5px', fontWeight: 'bold', fontSize: '13px' } }, '📋 Select Schema Type:'),
-                            React.createElement('select', {
-                                id: 'inputSchemaTypeSelect',
-                                className: 'schema-type-select',
-                                style: { width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ddd', fontSize: '13px' },
-                                value: inputSchemaId,
-                                onChange: (e) => setInputSchemaId(e.target.value)
-                            },
-                                React.createElement('option', { value: '' }, '-- Select schema type --'),
-                                availableInputSchemas.map(schema => 
-                                    React.createElement('option', { 
-                                        key: schema.name, 
-                                        value: schema.name 
-                                    }, `${schema.name}${schema.hasXsd ? ' ✅' : ''}${schema.hasSchematron ? ' 📋' : ''}`)
-                                )
-                            )
-                        ),
                         React.createElement('button', {
                             className: 'btn btn-primary btn-full',
                             onClick: () => {
@@ -3524,71 +3079,6 @@ OPENAI_API_KEY=sk-...`
                         )
                     ),
                     activeTab === 'output' && React.createElement('div', null,
-                        React.createElement('div', { style: { marginBottom: '10px' } },
-                            React.createElement('label', { style: { display: 'block', marginBottom: '5px', fontWeight: 'bold', fontSize: '13px' } }, '📋 Select Schema Type:'),
-                            React.createElement('select', {
-                                id: 'outputSchemaTypeSelect',
-                                className: 'schema-type-select',
-                                style: { width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ddd', fontSize: '13px' },
-                                value: outputSchemaId,
-                                onChange: async (e) => {
-                                    setOutputSchemaId(e.target.value);
-                                    await fetchDocumentTypes(e.target.value);
-                                }
-                            },
-                                React.createElement('option', { value: '' }, '-- Select schema type --'),
-                                availableOutputSchemas.map(schema => 
-                                    React.createElement('option', { 
-                                        key: schema.name, 
-                                        value: schema.name 
-                                    }, `${schema.name}${schema.hasXsd ? ' ✅' : ''}${schema.hasSchematron ? ' 📋' : ''}`)
-                                )
-                            )
-                        ),
-                        
-                        // Document Type selector - shown only if multiple types available
-                        availableDocumentTypes.length > 0 && React.createElement('div', { 
-                            style: { 
-                                marginTop: '10px',
-                                padding: '10px',
-                                background: '#f0f8ff',
-                                border: '2px solid #00BCD4',
-                                borderRadius: '6px'
-                            } 
-                        },
-                            React.createElement('label', { 
-                                style: { 
-                                    display: 'block', 
-                                    marginBottom: '5px', 
-                                    fontSize: '13px', 
-                                    fontWeight: '600',
-                                    color: '#333'
-                                } 
-                            }, '📄 Document Type:'),
-                            React.createElement('select', {
-                                value: outputDocumentType,
-                                onChange: (e) => {
-                                    console.log('📄 Document type changed to:', e.target.value);
-                                    setOutputDocumentType(e.target.value);
-                                },
-                                style: {
-                                    width: '100%',
-                                    padding: '8px',
-                                    border: '1px solid #ddd',
-                                    borderRadius: '4px',
-                                    fontSize: '13px',
-                                    fontWeight: '500'
-                                }
-                            },
-                                availableDocumentTypes.map(docType => 
-                                    React.createElement('option', { 
-                                        key: docType.type, 
-                                        value: docType.type 
-                                    }, docType.label)
-                                )
-                            )
-                        ),
-                        
                         React.createElement('button', {
                             className: 'btn btn-primary btn-full',
                             onClick: () => {
@@ -3623,102 +3113,12 @@ OPENAI_API_KEY=sk-...`
                         connections,
                         selectedConnection,
                         setSelectedConnection
-                    }),
-                    activeTab === 'schemas' && React.createElement('div', { style: { padding: '10px' } },
-                        React.createElement('h3', { style: { marginBottom: '15px', fontSize: '16px' } }, '📋 Schema Management'),
-                        React.createElement('p', { style: { fontSize: '13px', color: '#666', marginBottom: '15px' } }, 
-                            'Upload a ZIP file containing schema.xsd and rules.sch. The schema will be added to both input/ and output/ directories.'
-                        ),
-                        React.createElement('label', {
-                            className: 'btn btn-primary btn-full',
-                            style: { cursor: 'pointer', marginBottom: '10px' }
-                        }, 
-                            '📦 Upload Schema ZIP',
-                            React.createElement('input', {
-                                type: 'file',
-                                accept: '.zip',
-                                style: { display: 'none' },
-                                onChange: async (e) => {
-                                    const file = e.target.files[0];
-                                    if (!file) return;
-                                    
-                                    showStatus('⏳ Uploading schema...', 'info');
-                                    
-                                    const formData = new FormData();
-                                    formData.append('file', file);
-                                    
-                                    try {
-                                        const res = await fetch(`${API_URL}/schemas/upload`, {
-                                            method: 'POST',
-                                            body: formData
-                                        });
-                                        
-                                        if (!res.ok) {
-                                            const error = await res.json();
-                                            throw new Error(error.detail || 'Upload failed');
-                                        }
-                                        
-                                        const data = await res.json();
-                                        showStatus(`✅ Schema "${data.schemaName}" uploaded successfully!`, 'success');
-                                        
-                                        // Reload schemas list
-                                        loadAvailableSchemas();
-                                        
-                                        // Reset file input
-                                        e.target.value = '';
-                                    } catch (err) {
-                                        console.error('Upload error:', err);
-                                        showStatus(`❌ Upload failed: ${err.message}`, 'error');
-                                    }
-                                }
-                            })
-                        ),
-                        React.createElement('div', { style: { marginTop: '20px', padding: '10px', background: '#f0f0f0', borderRadius: '6px', fontSize: '12px' } },
-                            React.createElement('strong', null, 'ZIP Structure:'),
-                            React.createElement('pre', { style: { margin: '5px 0', fontFamily: 'monospace', fontSize: '11px' } },
-                                `schema_name/\n  ├── schema.xsd (required)\n  └── rules.sch (optional)`
-                            )
-                        ),
-                        React.createElement('button', {
-                            className: 'btn btn-secondary btn-full',
-                            style: { marginTop: '10px' },
-                            onClick: loadAvailableSchemas
-                        }, '🔄 Refresh Schema List')
-                    )
-                ),
-                React.createElement('div', { className: 'sidebar-footer' },
-                    React.createElement('div', { className: 'user-info' },
-                        React.createElement('div', { className: 'user-avatar' },
-                            (localStorage.getItem('datamapper_user') ? 
-                                JSON.parse(localStorage.getItem('datamapper_user')).name?.charAt(0).toUpperCase() : 
-                                'U')
-                        ),
-                        React.createElement('div', { className: 'user-details' },
-                            React.createElement('div', { className: 'user-name' },
-                                (localStorage.getItem('datamapper_user') ? 
-                                    JSON.parse(localStorage.getItem('datamapper_user')).name || 'User' : 
-                                    'Anonymous')
-                            ),
-                            React.createElement('div', { className: 'user-email' },
-                                (localStorage.getItem('datamapper_user') ? 
-                                    JSON.parse(localStorage.getItem('datamapper_user')).email || '' : 
-                                    'Not logged in')
-                            )
-                        )
-                    ),
-                    localStorage.getItem('datamapper_token') && React.createElement('button', {
-                        className: 'btn-logout',
-                        onClick: () => {
-                            if (confirm('Are you sure you want to logout?')) {
-                                logout();
-                            }
-                        }
-                    }, '🚪 Logout')
+                    })
                 )
             );
         }
         
-        function MainCanvas({ inputSchema, outputSchema, connections, draggedField, setDraggedField, addConnection, mappingName, setMappingName, saveMapping, canvasRef, fieldPositions, updateFieldPositions, selectedConnection, setSelectedConnection, saveSessionToBackend, clearSession, sessionLoaded, inputExample, outputExample, hoverPopup, setHoverPopup, hoverTimeoutRef, setShowFormulaEditor, setEditingConnection, runAIAutoMap, runBusinessRulesAutomap, aiProcessing, setShowSettings, searchQuery, setSearchQuery, performSearch, nextSearchResult, searchResults, currentSearchIndex, saveProject, loadProject, reverseMapping, setPopupPinned, popupPinned, setShowSchemaEditor, hideConnected, setHideConnected, outputDocumentType }) {
+        function MainCanvas({ inputSchema, outputSchema, connections, draggedField, setDraggedField, addConnection, mappingName, setMappingName, saveMapping, canvasRef, fieldPositions, updateFieldPositions, selectedConnection, setSelectedConnection, saveSessionToBackend, clearSession, sessionLoaded, inputExample, outputExample, hoverPopup, setHoverPopup, hoverTimeoutRef, setShowFormulaEditor, setEditingConnection, runAIAutoMap, runBusinessRulesAutomap, aiProcessing, setShowSettings, searchQuery, setSearchQuery, performSearch, nextSearchResult, searchResults, currentSearchIndex, saveProject, loadProject, reverseMapping, setPopupPinned, popupPinned, setShowSchemaEditor, hideConnected, setHideConnected }) {
             const [dropTarget, setDropTarget] = useState(null);
             
             const handleDrop = (targetField, targetType) => {
@@ -3827,33 +3227,10 @@ OPENAI_API_KEY=sk-...`
                                 if (!file) return;
                                 
                                 try {
-                                    // Prepare mapping rules
-                                    const mappingRules = {
-                                        connections: connections.map(conn => ({
-                                            source: conn.source,
-                                            target: conn.target,
-                                            sourceName: conn.sourceName,
-                                            targetName: conn.targetName,
-                                            sourcePath: conn.sourcePath,
-                                            targetPath: conn.targetPath,
-                                            transformation: conn.transformation
-                                        })),
-                                        inputSchema: inputSchema,
-                                        outputSchema: {
-                                            ...outputSchema,
-                                            rootElement: outputDocumentType || (outputSchema && outputSchema.rootElement) || 'Invoice'
-                                        }
-                                    };
-                                    
-                                    console.log('📤 Sending transform with', connections.length, 'connections');
-                                    console.log('📄 Document type:', outputDocumentType || 'Invoice');
-                                    console.log('Mapping rules:', mappingRules);
-                                    
                                     const formData = new FormData();
                                     formData.append('file', file);
                                     formData.append('output_format', 'xml');
                                     formData.append('validate', 'false');
-                                    formData.append('mapping_rules', JSON.stringify(mappingRules));
                                     
                                     const res = await fetch(`${API_URL}/transform/execute`, {
                                         method: 'POST',
@@ -3868,15 +3245,13 @@ OPENAI_API_KEY=sk-...`
                                         a.download = 'transformed_output.xml';
                                         a.click();
                                         window.URL.revokeObjectURL(url);
-                                        console.log('✅ Transformation complete! File downloaded.');
+                                        showStatus('✅ Transformation complete! File downloaded.', 'success');
                                     } else {
                                         const error = await res.json();
-                                        console.error('❌ Transformation failed:', error);
-                                        alert(`Transformation failed: ${error.errors ? error.errors.join(', ') : 'Unknown error'}`);
+                                        showStatus(`❌ Transformation failed: ${error.errors ? error.errors.join(', ') : 'Unknown error'}`, 'error');
                                     }
                                 } catch (err) {
-                                    console.error('Transform error:', err);
-                                    alert(`Error: ${err.message}`);
+                                    showStatus(`❌ Error: ${err.message}`, 'error');
                                 }
                             };
                             input.click();
@@ -4103,16 +3478,9 @@ OPENAI_API_KEY=sk-...`
         
         function FieldBox({ field, type, setDraggedField, draggedField, dropTarget, setDropTarget, handleDrop, updateFieldPositions, connections, inputExample, outputExample, inputSchema, outputSchema, setHoverPopup, hoverTimeoutRef, popupPinned, setPopupPinned, selectedConnection }) {
             const isConnected = connections.some(c => 
-                (type === 'input' && (c.source === field.path || c.source === field.id || c.source === field.name)) ||
-                (type === 'output' && (c.target === field.path || c.target === field.id || c.target === field.name))
+                (type === 'input' && c.source === field.path) ||
+                (type === 'output' && c.target === field.path)
             );
-            
-            // DEBUG: Log connection status
-            if (type === 'output') {
-                console.log('🔍 Field:', field.name, 'path:', field.path, 'id:', field.id);
-                console.log('🔗 isConnected:', isConnected);
-                console.log('📊 Total connections:', connections.length);
-            }
             
             const isDropTarget = dropTarget === field.id;
             const isDragging = draggedField?.field.id === field.id;
@@ -4298,41 +3666,11 @@ OPENAI_API_KEY=sk-...`
                         });
                         
                     } else if (type === 'output' && isConnected) {
-                        console.log('OUTPUT HOVER START (CONNECTED)', field.name, 'isConnected:', isConnected);
-                        
-                        // Helper function to apply transformations
-                        const applyTransformation = (value, transType) => {
-                            if (!value || typeof value !== 'string') return value;
-                            
-                            const type = typeof transType === 'string' ? transType.toUpperCase() : '';
-                            
-                            switch (type) {
-                                case 'UPPERCASE':
-                                    return value.toUpperCase();
-                                case 'LOWERCASE':
-                                    return value.toLowerCase();
-                                case 'TRIM':
-                                    return value.trim();
-                                case 'CAPITALIZE':
-                                    return value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
-                                case 'DIRECT':
-                                    return value;
-                                default:
-                                    // Unknown transformation type
-                                    console.warn('Unknown transformation type:', transType);
-                                    return value;
-                            }
-                        };
+                        console.log('OUTPUT HOVER START', field.name, 'isConnected:', isConnected);
                         
                         // OUTPUT: Generate XML code with ACTUAL VALUES from input
-                        // FIX: Check both field.path and field.id for matching connections
-                        const relatedConns = connections.filter(c => 
-                            c.target === field.path || 
-                            c.target === field.id ||
-                            c.target === field.name
-                        );
+                        const relatedConns = connections.filter(c => c.target === field.path);
                         console.log('Related connections:', relatedConns);
-                        console.log('Field:', field.path, field.id, field.name);
                         
                         let code = '';
                         
@@ -4341,363 +3679,90 @@ OPENAI_API_KEY=sk-...`
                         const nodeName = xmlPath.split('/').pop();
                         
                         // Function to extract value from input example
-                        const extractValueFromInput = async (sourceField) => {
-                            console.log('═══════════════════════════════════════');
-                            console.log('🔍 EXTRACTING VALUE');
-                            console.log('📝 sourceField:', sourceField);
-                            console.log('📋 inputSchema.fields:', Object.keys(inputSchema?.fields || {}));
-                            
+                        const extractValueFromInput = (sourceField) => {
+                            console.log('Extracting value for:', sourceField);
                             if (!inputExample || !inputSchema) {
-                                console.log('❌ No inputExample or inputSchema');
+                                console.log('No inputExample or inputSchema');
                                 return null;
                             }
                             
                             const lines = inputExample.split('\n');
+                            const sourceFieldData = inputSchema.fields[sourceField.replace('.', '_')];
+                            console.log('Source field data:', sourceFieldData);
                             
-                            // Find source field data - try multiple keys
-                            let sourceFieldData = null;
-                            const possibleKeys = [
-                                sourceField,
-                                sourceField.replace('.', '_'),
-                                sourceField.replace(':', '_'),
-                                sourceField.replace(/[.:]/g, '_')
-                            ];
-                            
-                            console.log('🔎 Trying keys:', possibleKeys);
-                            
-                            for (const key of possibleKeys) {
-                                if (inputSchema.fields[key]) {
-                                    sourceFieldData = inputSchema.fields[key];
-                                    console.log('✅ FOUND with key:', key);
-                                    console.log('📄 Field data:', sourceFieldData);
-                                    break;
-                                }
-                            }
-                            
-                            // If not found by key, try to find by field.id or field.name
-                            if (!sourceFieldData) {
-                                console.log('🔎 Searching in all fields by id/name/path...');
-                                for (const [fieldKey, fieldData] of Object.entries(inputSchema.fields)) {
-                                    if (fieldData.id === sourceField || 
-                                        fieldData.name === sourceField || 
-                                        fieldData.path === sourceField ||
-                                        fieldKey === sourceField) {
-                                        sourceFieldData = fieldData;
-                                        console.log('✅ FOUND field:', fieldKey, '→', fieldData);
-                                        break;
-                                    }
-                                }
-                            }
-                            
-                            if (!sourceFieldData) {
-                                console.error('❌❌❌ FIELD NOT FOUND:', sourceField);
-                                console.log('Available fields:', Object.keys(inputSchema.fields));
+                            if (!sourceFieldData || !sourceFieldData.offset || !sourceFieldData.length) {
+                                console.log('Missing offset/length');
                                 return null;
                             }
                             
-                            console.log('✅✅✅ sourceFieldData:', sourceFieldData);
+                            const segmentName = sourceField.split('.')[0];
+                            const offset = parseInt(sourceFieldData.offset);
+                            const length = parseInt(sourceFieldData.length);
                             
-                            // Detect format
-                            const isXML = inputExample.trim().startsWith('<');
-                            const isJSON = inputExample.trim().startsWith('{') || inputExample.trim().startsWith('[');
-                            
-                            if (isXML || isJSON) {
-                                // XML/JSON: Use API extraction
-                                console.log('📡 Using API for XML/JSON extraction');
-                                
-                                const fieldPath = sourceFieldData?.xml_path || sourceFieldData?.json_path || sourceFieldData?.path;
-                                if (!fieldPath) {
-                                    console.log('No path for field');
-                                    return null;
+                            // Find line with segment
+                            for (let line of lines) {
+                                const altSegment = segmentName.replace(/^E1/, 'E2');
+                                if (line.startsWith(segmentName) || line.startsWith(altSegment)) {
+                                    // Extract value at offset
+                                    const value = line.substring(offset, offset + length).trim();
+                                    console.log('Extracted value:', value, 'from offset', offset, 'length', length);
+                                    return value || null;
                                 }
-                                
-                                try {
-                                    const response = await fetch('http://localhost:8080/api/preview/extract', {
-                                        method: 'POST',
-                                        headers: { 'Content-Type': 'application/json' },
-                                        body: JSON.stringify({
-                                            example_content: inputExample,
-                                            field_path: fieldPath,
-                                            field_name: sourceFieldData.name || sourceField,
-                                            format_type: isXML ? 'xml' : 'json'
-                                        })
-                                    });
-                                    
-                                    const data = await response.json();
-                                    
-                                    if (data.error) {
-                                        console.error('API Error:', data.error);
-                                        return null;
-                                    }
-                                    
-                                    console.log('✅ Extracted value from XML/JSON:', data.value);
-                                    return data.value;
-                                    
-                                } catch (err) {
-                                    console.error('API call failed:', err);
-                                    return null;
-                                }
-                                
-                            } else {
-                                // FLAT FILE (IDOC): Use offset/length
-                                if (!sourceFieldData || !sourceFieldData.offset || !sourceFieldData.length) {
-                                    console.log('Missing offset/length');
-                                    return null;
-                                }
-                                
-                                const segmentName = sourceField.split('.')[0];
-                                const offset = parseInt(sourceFieldData.offset);
-                                const length = parseInt(sourceFieldData.length);
-                                
-                                // Find line with segment
-                                for (let line of lines) {
-                                    const altSegment = segmentName.replace(/^E1/, 'E2');
-                                    if (line.startsWith(segmentName) || line.startsWith(altSegment)) {
-                                        // Extract value at offset
-                                        const value = line.substring(offset, offset + length).trim();
-                                        console.log('Extracted value:', value, 'from offset', offset, 'length', length);
-                                        return value || null;
-                                    }
-                                }
-                                return null;
                             }
+                            return null;
                         };
                         
                         if (relatedConns.length === 1) {
                             const conn = relatedConns[0];
+                            let value = null;
                             
-                            // Show loading state immediately
-                            setHoverPopup({
-                                type: 'output',
-                                code: '⏳ Loading transformation...',
-                                field: field,
-                                x: rect.left - 410,
-                                y: rect.top
-                            });
+                            // Try to get actual value from input example
+                            value = extractValueFromInput(conn.source);
                             
-                            // Extract value asynchronously
-                            extractValueFromInput(conn.source).then(value => {
-                                console.log('📥 Extracted value:', value);
-                                console.log('🔗 Connection:', conn);
-                                console.log('🔄 Transformation object:', conn.transformation);
-                                
-                                if (!value) {
-                                    // NO FALLBACK to field name! Use placeholder instead
-                                    console.warn('⚠️ Could not extract value from input example for:', conn.source);
-                                    value = 'VALUE_NOT_FOUND';
-                                }
-                                
-                                // Apply transformation to the extracted value
-                                let transformedValue = value;
-                                
-                                if (conn.transformation) {
-                                    // Check what type of transformation object we have
-                                    if (typeof conn.transformation === 'string') {
-                                        // Simple string transformation type
-                                        transformedValue = applyTransformation(value, conn.transformation);
-                                    } else if (conn.transformation.formula) {
-                                        // Has custom formula - show formula (can't evaluate dynamically)
-                                        transformedValue = `\${${conn.transformation.formula}}`;
-                                    } else if (conn.transformation.type && typeof conn.transformation.type === 'string' && conn.transformation.type !== 'direct') {
-                                        // Built-in transformation with type property
-                                        transformedValue = applyTransformation(value, conn.transformation.type);
-                                    } else if (conn.transformation.operation) {
-                                        // Complex transformation object with operation, inputs, etc.
-                                        // For now, show a placeholder (can't evaluate complex transformations)
-                                        transformedValue = `\${${conn.transformation.operation}(...)}`;
-                                    } else {
-                                        // Unknown transformation format, use value as-is
-                                        console.warn('Unknown transformation format:', conn.transformation);
-                                        transformedValue = value;
-                                    }
-                                }
-                                
-                                console.log('Final transformed value:', transformedValue);
-                                
-                                let code = '';
-                                const xmlPath = field.xml_path || field.path;
-                                const nodeName = xmlPath.split('/').pop();
-                                
-                                // Generate XML with transformed value
-                                code = `<${nodeName}>${transformedValue}</${nodeName}>`;
-                                
-                                // Add parent context if available
-                                const pathParts = xmlPath.split('/').filter(p => p);
-                                if (pathParts.length > 1) {
-                                    const parentNode = pathParts[pathParts.length - 2];
-                                    code = `<${parentNode}>\n  ${code}\n</${parentNode}>`;
-                                }
-                                
-                                console.log('Generated code:', code);
-                                
-                                // Update popup with actual code
-                                setHoverPopup({
-                                    type: 'output',
-                                    code: code,
-                                    field: field,
-                                    connections: relatedConns,
-                                    x: rect.left - 410,
-                                    y: rect.top
-                                });
-                            }).catch(err => {
-                                console.error('Extraction failed:', err);
-                                // Show error popup
-                                setHoverPopup({
-                                    type: 'output',
-                                    code: `❌ Error: ${err.message}`,
-                                    field: field,
-                                    x: rect.left - 410,
-                                    y: rect.top
-                                });
-                            });
+                            if (!value) {
+                                // Fallback to field name
+                                value = conn.sourceName || conn.source;
+                            }
                             
-                            // Exit early - popup will be updated by promise
+                            console.log('Final value:', value);
+                            
+                            if (conn.transformation && conn.transformation.formula) {
+                                code = `<${nodeName}>\${${conn.transformation.formula}}</${nodeName}>`;
+                            } else if (conn.transformation && conn.transformation.type !== 'direct') {
+                                code = `<${nodeName}>\${${conn.transformation.type.toUpperCase()}(${value})}</${nodeName}>`;
+                            } else {
+                                code = `<${nodeName}>${value}</${nodeName}>`;
+                            }
                             
                         } else if (relatedConns.length > 1) {
-                            // Multiple inputs - show loading
-                            setHoverPopup({
-                                type: 'output',
-                                code: '⏳ Loading transformation...',
-                                field: field,
-                                x: rect.left - 410,
-                                y: rect.top
-                            });
-                            
-                            // Extract all values asynchronously
-                            Promise.all(relatedConns.map(c => extractValueFromInput(c.source)))
-                                .then(extractedValues => {
-                                    const values = extractedValues.map((val, i) => 
-                                        val || relatedConns[i].sourceName || relatedConns[i].source
-                                    ).join(' ');
-                                    
-                                    const xmlPath = field.xml_path || field.path;
-                                    const nodeName = xmlPath.split('/').pop();
-                                    let code = `<${nodeName}>${values}</${nodeName}>`;
-                                    
-                                    // Add parent context
-                                    const pathParts = xmlPath.split('/').filter(p => p);
-                                    if (pathParts.length > 1) {
-                                        const parentNode = pathParts[pathParts.length - 2];
-                                        code = `<${parentNode}>\n  ${code}\n</${parentNode}>`;
-                                    }
-                                    
-                                    console.log('Generated code (multiple):', code);
-                                    
-                                    setHoverPopup({
-                                        type: 'output',
-                                        code: code,
-                                        field: field,
-                                        connections: relatedConns,
-                                        x: rect.left - 410,
-                                        y: rect.top
-                                    });
-                                })
-                                .catch(err => {
-                                    console.error('Extraction failed:', err);
-                                    setHoverPopup({
-                                        type: 'output',
-                                        code: `❌ Error: ${err.message}`,
-                                        field: field,
-                                        x: rect.left - 410,
-                                        y: rect.top
-                                    });
-                                });
-                            
-                            // Exit early - popup updated by promise
-                            
+                            // Multiple inputs: extract all values
+                            const values = relatedConns.map(c => {
+                                const val = extractValueFromInput(c.source);
+                                return val || c.sourceName || c.source;
+                            }).join(' ');
+                            code = `<${nodeName}>${values}</${nodeName}>`;
                         } else {
                             // No connection yet
-                            const xmlPath = field.xml_path || field.path;
-                            const nodeName = xmlPath.split('/').pop();
-                            let code = `<${nodeName}>TO_BE_MAPPED</${nodeName}>`;
-                            
-                            // Add parent context if available
-                            const pathParts = xmlPath.split('/').filter(p => p);
-                            if (pathParts.length > 1) {
-                                const parentNode = pathParts[pathParts.length - 2];
-                                code = `<${parentNode}>\n  ${code}\n</${parentNode}>`;
-                            }
-                            
-                            setHoverPopup({
-                                type: 'output',
-                                code: code,
-                                field: field,
-                                connections: relatedConns,
-                                x: rect.left - 410,
-                                y: rect.top
-                            });
+                            code = `<${nodeName}>TO_BE_MAPPED</${nodeName}>`;
                         }
-                    } else if (type === 'output' && !isConnected && outputExample) {
-                        // OUTPUT NOT CONNECTED: Show structure from example
-                        console.log('OUTPUT HOVER (NO CONNECTION) - Showing structure from example');
                         
-                        const xmlPath = field.xml_path || field.path;
-                        const nodeName = xmlPath.split('/').pop();
-                        
-                        // Try to extract structure from output example
-                        const isXML = outputExample.trim().startsWith('<');
-                        
-                        if (isXML) {
-                            // Extract this node from output example
-                            try {
-                                const regex = new RegExp(`<${nodeName}[^>]*>([\\s\\S]*?)<\\/${nodeName}>`, 'i');
-                                const match = outputExample.match(regex);
-                                
-                                if (match) {
-                                    let code = match[0];
-                                    
-                                    setHoverPopup({
-                                        type: 'output',
-                                        code: code,
-                                        field: field,
-                                        connections: [],
-                                        x: rect.left - 410,
-                                        y: rect.top
-                                    });
-                                } else {
-                                    // No match in example, show placeholder
-                                    let code = `<${nodeName}>TO_BE_MAPPED</${nodeName}>`;
-                                    
-                                    const pathParts = xmlPath.split('/').filter(p => p);
-                                    if (pathParts.length > 1) {
-                                        const parentNode = pathParts[pathParts.length - 2];
-                                        code = `<${parentNode}>\n  ${code}\n</${parentNode}>`;
-                                    }
-                                    
-                                    setHoverPopup({
-                                        type: 'output',
-                                        code: code,
-                                        field: field,
-                                        connections: [],
-                                        x: rect.left - 410,
-                                        y: rect.top
-                                    });
-                                }
-                            } catch (err) {
-                                console.error('Error extracting structure:', err);
-                                // Fallback to simple placeholder
-                                setHoverPopup({
-                                    type: 'output',
-                                    code: `<${nodeName}>STRUCTURE</${nodeName}>`,
-                                    field: field,
-                                    connections: [],
-                                    x: rect.left - 410,
-                                    y: rect.top
-                                });
-                            }
-                        } else {
-                            // Non-XML output, show simple placeholder
-                            let code = `<${nodeName}>TO_BE_MAPPED</${nodeName}>`;
-                            
-                            setHoverPopup({
-                                type: 'output',
-                                code: code,
-                                field: field,
-                                connections: [],
-                                x: rect.left - 410,
-                                y: rect.top
-                            });
+                        // Add parent context if available
+                        const pathParts = xmlPath.split('/').filter(p => p);
+                        if (pathParts.length > 1) {
+                            const parentNode = pathParts[pathParts.length - 2];
+                            code = `<${parentNode}>\n  ${code}\n</${parentNode}>`;
                         }
+                        
+                        console.log('Generated code:', code);
+                        
+                        setHoverPopup({
+                            type: 'output',
+                            code: code,
+                            field: field,
+                            connections: relatedConns,
+                            x: rect.left - 410,
+                            y: rect.top
+                        });
                     }
                 };
                 
@@ -4825,7 +3890,7 @@ OPENAI_API_KEY=sk-...`
                         React.createElement('polygon', {
                             className: 'connection-arrow',
                             points: `${targetPos.x},${targetPos.y} ${targetPos.x-10},${targetPos.y-5} ${targetPos.x-10},${targetPos.y+5}`,
-                            style: { fill: isSelected ? '#f44336' : '#00BCD4', cursor: 'pointer' },
+                            style: { fill: isSelected ? '#f44336' : '#667eea', cursor: 'pointer' },
                             onDoubleClick: (e) => {
                                 e.stopPropagation();
                                 if (confirm(`Eliminare collegamento ${conn.sourceName} → ${conn.targetName}?`)) {
@@ -4998,7 +4063,7 @@ OPENAI_API_KEY=sk-...`
                         onDragLeave: handleDragLeave,
                         onDrop: handleDrop,
                         style: {
-                            border: isDragging ? '3px dashed #00BCD4' : '2px dashed #ddd',
+                            border: isDragging ? '3px dashed #667eea' : '2px dashed #ddd',
                             background: isDragging ? '#f0f4ff' : 'transparent'
                         }
                     },

@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Buddyliko</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: system-ui; background: #f5f7fa; }
+        .header { background: linear-gradient(135deg, #1E88E5, #42A5F5); color: white; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 30px; }
+        .stat-card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .stat-value { font-size: 32px; font-weight: bold; color: #1E88E5; }
+        .stat-label { color: #666; font-size: 14px; margin-top: 5px; }
+        .section { background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .section-title { font-size: 18px; font-weight: 600; margin-bottom: 15px; color: #333; }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #f5f5f5; padding: 12px; text-align: left; font-weight: 600; font-size: 13px; color: #666; }
+        td { padding: 12px; border-bottom: 1px solid #eee; font-size: 14px; }
+        .badge { padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+        .badge.pending { background: #FFF3E0; color: #E65100; }
+        .badge.approved { background: #E8F5E9; color: #2E7D32; }
+        .badge.suspended { background: #FFEBEE; color: #C62828; }
+        .btn { padding: 6px 12px; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; }
+        .btn-primary { background: #1E88E5; color: white; }
+        .btn-success { background: #4CAF50; color: white; }
+        .btn-danger { background: #f44336; color: white; }
+        .btn:hover { opacity: 0.9; transform: translateY(-1px); }
+        .alert { padding: 12px; border-radius: 8px; margin-bottom: 15px; }
+        .alert.success { background: #E8F5E9; color: #2E7D32; }
+        .alert.error { background: #FFEBEE; color: #C62828; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+            <h1>🔐 Admin Dashboard</h1>
+            <p id="adminName"></p>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div id="alerts"></div>
+        
+        <div class="stats" id="stats"></div>
+        
+        <div class="section">
+            <div class="section-title">⏳ Pending Users (<span id="pendingCount">0</span>)</div>
+            <table id="pendingTable">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Registered</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="pendingBody"></tbody>
+            </table>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">👥 All Users</div>
+            <table id="usersTable">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                        <th>Plan</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="usersBody"></tbody>
+            </table>
+        </div>
+    </div>
+    
+    <script>
+        const API = 'http://localhost:8080/api';
+        const token = localStorage.getItem('access_token');
+        
+        function showAlert(msg, type = 'success') {
+            const div = document.createElement('div');
+            div.className = `alert ${type}`;
+            div.textContent = msg;
+            document.getElementById('alerts').appendChild(div);
+            setTimeout(() => div.remove(), 3000);
+        }
+        
+        async function loadStats() {
+            const res = await fetch(`${API}/admin/stats`, { headers: { Authorization: `Bearer ${token}` }});
+            const stats = await res.json();
+            
+            document.getElementById('stats').innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-value">${stats.total_users}</div>
+                    <div class="stat-label">Total Users</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${stats.pending_users}</div>
+                    <div class="stat-label">Pending</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${stats.approved_users}</div>
+                    <div class="stat-label">Approved</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${stats.active_users_30d}</div>
+                    <div class="stat-label">Active (30d)</div>
+                </div>
+            `;
+        }
+        
+        async function loadPending() {
+            const res = await fetch(`${API}/admin/users/pending`, { headers: { Authorization: `Bearer ${token}` }});
+            const users = await res.json();
+            
+            document.getElementById('pendingCount').textContent = users.length;
+            document.getElementById('pendingBody').innerHTML = users.map(u => `
+                <tr>
+                    <td>${u.name}</td>
+                    <td>${u.email}</td>
+                    <td>${new Date(u.created_at).toLocaleDateString()}</td>
+                    <td>
+                        <button class="btn btn-success" onclick="approve(${u.id})">✓ Approve</button>
+                        <button class="btn btn-danger" onclick="reject(${u.id})">✗ Reject</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        async function loadAllUsers() {
+            const res = await fetch(`${API}/admin/users`, { headers: { Authorization: `Bearer ${token}` }});
+            const users = await res.json();
+            
+            document.getElementById('usersBody').innerHTML = users.map(u => `
+                <tr>
+                    <td>${u.name}</td>
+                    <td>${u.email}</td>
+                    <td>${u.role}</td>
+                    <td><span class="badge ${u.status.toLowerCase()}">${u.status}</span></td>
+                    <td>${u.plan}</td>
+                    <td>
+                        ${u.status === 'APPROVED' ? `<button class="btn btn-danger" onclick="suspend(${u.id})">Suspend</button>` : ''}
+                        ${u.status === 'SUSPENDED' ? `<button class="btn btn-success" onclick="unsuspend(${u.id})">Unsuspend</button>` : ''}
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        async function approve(id) {
+            try {
+                await fetch(`${API}/admin/users/${id}/approve`, {
+                    method: 'POST',
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                showAlert('User approved!');
+                loadStats();
+                loadPending();
+                loadAllUsers();
+            } catch (e) {
+                showAlert('Failed to approve', 'error');
+            }
+        }
+        
+        async function reject(id) {
+            const reason = prompt('Rejection reason:');
+            if (!reason) return;
+            
+            try {
+                await fetch(`${API}/admin/users/${id}/reject`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: id, reason })
+                });
+                showAlert('User rejected');
+                loadStats();
+                loadPending();
+            } catch (e) {
+                showAlert('Failed to reject', 'error');
+            }
+        }
+        
+        async function suspend(id) {
+            const reason = prompt('Suspension reason:');
+            if (!reason) return;
+            
+            try {
+                await fetch(`${API}/admin/users/${id}/suspend`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: id, reason })
+                });
+                showAlert('User suspended');
+                loadAllUsers();
+            } catch (e) {
+                showAlert('Failed', 'error');
+            }
+        }
+        
+        async function unsuspend(id) {
+            try {
+                await fetch(`${API}/admin/users/${id}/unsuspend`, {
+                    method: 'POST',
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                showAlert('User unsuspended');
+                loadAllUsers();
+            } catch (e) {
+                showAlert('Failed', 'error');
+            }
+        }
+        
+        async function init() {
+            const res = await fetch(`${API}/auth/me`, { headers: { Authorization: `Bearer ${token}` }});
+            const user = await res.json();
+            document.getElementById('adminName').textContent = `Welcome, ${user.name} (${user.role})`;
+            
+            loadStats();
+            loadPending();
+            loadAllUsers();
+        }
+        
+        init();
+    </script>
+</body>
+</html>

@@ -1,0 +1,63 @@
+.mapping-canvas {
+  max-width: 100%;
+  height: calc(100vh - 134px);
+  display: flex;
+  flex-direction: column;
+}
+
+.canvas-header {
+  margin-bottom: 24px;
+}
+
+.canvas-header h1 {
+  margin: 0 0 8px 0;
+  color: #333;
+  font-size: 32px;
+}
+
+.canvas-header p {
+  margin: 0;
+  color: #666;
+  font-size: 16px;
+}
+
+.canvas-placeholder {
+  flex: 1;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed #ccc;
+}
+
+.placeholder-content {
+  text-align: center;
+  padding: 60px 40px;
+}
+
+.placeholder-icon {
+  font-size: 80px;
+  display: block;
+  margin-bottom: 20px;
+}
+
+.placeholder-content h2 {
+  margin: 0 0 12px 0;
+  color: #333;
+  font-size: 28px;
+}
+
+.placeholder-content p {
+  margin: 8px 0;
+  color: #666;
+  font-size: 16px;
+}
+
+.placeholder-content .hint {
+  margin-top: 20px;
+  font-size: 14px;
+  color: #999;
+  font-style: italic;
+}

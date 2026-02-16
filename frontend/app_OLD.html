@@ -2319,10 +2319,6 @@ OPENAI_API_KEY=sk-...`
             const [inputSchemaId, setInputSchemaId] = useState('');
             const [outputSchemaId, setOutputSchemaId] = useState('');
             
-            // Document type selection (for schemas like UBL that have multiple types)
-            const [outputDocumentType, setOutputDocumentType] = useState('Invoice');
-            const [availableDocumentTypes, setAvailableDocumentTypes] = useState([]);
-            
             const canvasRef = useRef(null);
             const hoverTimeoutRef = useRef(null);
             
@@ -2354,48 +2350,6 @@ OPENAI_API_KEY=sk-...`
                     console.log('✅ Loaded schemas:', data);
                 } catch (err) {
                     console.error('Failed to load available schemas:', err);
-                }
-            };
-            
-            // Fetch available document types for a schema
-            const fetchDocumentTypes = async (schemaId) => {
-                console.log('🔍 fetchDocumentTypes called with schemaId:', schemaId);
-                
-                if (!schemaId) {
-                    console.log('⚠️ No schemaId provided, clearing document types');
-                    setAvailableDocumentTypes([]);
-                    return;
-                }
-                
-                try {
-                    const url = `${API_URL}/schemas/${schemaId}/document-types`;
-                    console.log('📡 Fetching document types from:', url);
-                    
-                    const res = await fetch(url);
-                    console.log('📥 Response status:', res.status);
-                    
-                    const data = await res.json();
-                    console.log('📦 Response data:', data);
-                    
-                    if (data.success && data.document_types && data.document_types.length > 0) {
-                        console.log(`✅ Found ${data.document_types.length} document types:`, data.document_types.map(d => d.type));
-                        setAvailableDocumentTypes(data.document_types);
-                        
-                        // Set default to first type, prefer Invoice if available
-                        const invoiceType = data.document_types.find(t => t.type === 'Invoice');
-                        const defaultType = invoiceType ? invoiceType.type : data.document_types[0].type;
-                        setOutputDocumentType(defaultType);
-                        
-                        console.log(`✅ Loaded ${data.document_types.length} document types for ${schemaId}. Default: ${defaultType}`);
-                    } else {
-                        // No document types available (e.g., FatturaPA has only one type)
-                        console.log('ℹ️ No document types available for', schemaId);
-                        setAvailableDocumentTypes([]);
-                        setOutputDocumentType('');
-                    }
-                } catch (error) {
-                    console.error('❌ Failed to fetch document types:', error);
-                    setAvailableDocumentTypes([]);
                 }
             };
             
@@ -2848,10 +2802,7 @@ OPENAI_API_KEY=sk-...`
                     version: '2.0', // Updated to 2.0 with schema definitions
                     created: new Date().toISOString(),
                     inputSchema: inputSchema,
-                    outputSchema: {
-                        ...outputSchema,
-                        rootElement: outputDocumentType || (outputSchema && outputSchema.rootElement) || 'Invoice'
-                    },
+                    outputSchema: outputSchema,
                     inputSchemaId: inputSchemaId, // Schema ID for backend reference
                     outputSchemaId: outputSchemaId, // Schema ID for backend reference
                     inputSchemaDefinition: inputSchemaDefinition, // Schema Editor definition
@@ -2883,10 +2834,7 @@ OPENAI_API_KEY=sk-...`
                     
                     try {
                         const text = await file.text();
-                        console.log('📄 File size:', text.length, 'bytes');
                         const project = JSON.parse(text);
-                        console.log('🔍 Parsed project with', project.connections?.length || 0, 'connections');
-                        console.log('🔍 Last 3 connections:', project.connections?.slice(-3).map(c => c.targetPath));
                         
                         // Validate project structure
                         if (!project.projectName || !project.inputSchema || !project.outputSchema) {
@@ -2905,17 +2853,6 @@ OPENAI_API_KEY=sk-...`
                         setInputExample(project.inputExample || '');
                         setOutputExample(project.outputExample || '');
                         setConnections(project.connections || []);
-                        console.log('🔍 DEBUG: Loaded', project.connections?.length || 0, 'connections from project file');
-                        
-                        // Load document type if present
-                        if (project.outputSchema && project.outputSchema.rootElement) {
-                            setOutputDocumentType(project.outputSchema.rootElement);
-                        }
-                        
-                        // Fetch available document types for this schema
-                        if (project.outputSchemaId) {
-                            await fetchDocumentTypes(project.outputSchemaId);
-                        }
                         
                         // Update field positions after schemas load
                         setTimeout(() => {
@@ -3301,11 +3238,7 @@ OPENAI_API_KEY=sk-...`
                     inputSchemaId,
                     setInputSchemaId,
                     outputSchemaId,
-                    setOutputSchemaId,
-                    outputDocumentType,
-                    setOutputDocumentType,
-                    availableDocumentTypes,
-                    fetchDocumentTypes
+                    setOutputSchemaId
                 })
                 ),  // Close sidebar-wrapper
                 
@@ -3351,8 +3284,7 @@ OPENAI_API_KEY=sk-...`
                     popupPinned,
                     setShowSchemaEditor,
                     hideConnected,
-                    setHideConnected,
-                    outputDocumentType
+                    setHideConnected
                 }),
                 
                 selectedConnection && React.createElement(PropertiesPanel, {
@@ -3423,7 +3355,7 @@ OPENAI_API_KEY=sk-...`
             );
         }
         
-        function Sidebar({ inputSchema, outputSchema, connections, activeTab, setActiveTab, setShowUploadModal, setUploadDirection, downloadSampleCSV, statusMessage, setDraggedField, selectedConnection, setSelectedConnection, uploadExampleFile, inputExample, outputExample, loadAvailableSchemas, showStatus, availableInputSchemas, availableOutputSchemas, inputSchemaId, setInputSchemaId, outputSchemaId, setOutputSchemaId, outputDocumentType, setOutputDocumentType, availableDocumentTypes, fetchDocumentTypes }) {
+        function Sidebar({ inputSchema, outputSchema, connections, activeTab, setActiveTab, setShowUploadModal, setUploadDirection, downloadSampleCSV, statusMessage, setDraggedField, selectedConnection, setSelectedConnection, uploadExampleFile, inputExample, outputExample, loadAvailableSchemas, showStatus, availableInputSchemas, availableOutputSchemas, inputSchemaId, setInputSchemaId, outputSchemaId, setOutputSchemaId }) {
             return React.createElement('div', { className: 'sidebar' },
                 React.createElement('div', { className: 'sidebar-header' },
                     React.createElement('div', { style: { display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' } },
@@ -3451,20 +3383,7 @@ OPENAI_API_KEY=sk-...`
                         React.createElement('div', { 
                             className: `tab ${activeTab === 'output' ? 'active' : ''}`,
                             onClick: () => setActiveTab('output')
-                        }, 
-                            '📤 Output',
-                            (outputDocumentType && outputDocumentType !== '') && React.createElement('span', {
-                                style: {
-                                    marginLeft: '6px',
-                                    padding: '2px 6px',
-                                    background: 'linear-gradient(135deg, #00BCD4 0%, #3F51B5 100%)',
-                                    color: 'white',
-                                    borderRadius: '10px',
-                                    fontSize: '10px',
-                                    fontWeight: '600'
-                                }
-                            }, outputDocumentType)
-                        ),
+                        }, '📤 Output'),
                         React.createElement('div', { 
                             className: `tab ${activeTab === 'connections' ? 'active' : ''}`,
                             onClick: () => setActiveTab('connections')
@@ -3531,10 +3450,7 @@ OPENAI_API_KEY=sk-...`
                                 className: 'schema-type-select',
                                 style: { width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ddd', fontSize: '13px' },
                                 value: outputSchemaId,
-                                onChange: async (e) => {
-                                    setOutputSchemaId(e.target.value);
-                                    await fetchDocumentTypes(e.target.value);
-                                }
+                                onChange: (e) => setOutputSchemaId(e.target.value)
                             },
                                 React.createElement('option', { value: '' }, '-- Select schema type --'),
                                 availableOutputSchemas.map(schema => 
@@ -3545,50 +3461,6 @@ OPENAI_API_KEY=sk-...`
                                 )
                             )
                         ),
-                        
-                        // Document Type selector - shown only if multiple types available
-                        availableDocumentTypes.length > 0 && React.createElement('div', { 
-                            style: { 
-                                marginTop: '10px',
-                                padding: '10px',
-                                background: '#f0f8ff',
-                                border: '2px solid #00BCD4',
-                                borderRadius: '6px'
-                            } 
-                        },
-                            React.createElement('label', { 
-                                style: { 
-                                    display: 'block', 
-                                    marginBottom: '5px', 
-                                    fontSize: '13px', 
-                                    fontWeight: '600',
-                                    color: '#333'
-                                } 
-                            }, '📄 Document Type:'),
-                            React.createElement('select', {
-                                value: outputDocumentType,
-                                onChange: (e) => {
-                                    console.log('📄 Document type changed to:', e.target.value);
-                                    setOutputDocumentType(e.target.value);
-                                },
-                                style: {
-                                    width: '100%',
-                                    padding: '8px',
-                                    border: '1px solid #ddd',
-                                    borderRadius: '4px',
-                                    fontSize: '13px',
-                                    fontWeight: '500'
-                                }
-                            },
-                                availableDocumentTypes.map(docType => 
-                                    React.createElement('option', { 
-                                        key: docType.type, 
-                                        value: docType.type 
-                                    }, docType.label)
-                                )
-                            )
-                        ),
-                        
                         React.createElement('button', {
                             className: 'btn btn-primary btn-full',
                             onClick: () => {
@@ -3718,7 +3590,7 @@ OPENAI_API_KEY=sk-...`
             );
         }
         
-        function MainCanvas({ inputSchema, outputSchema, connections, draggedField, setDraggedField, addConnection, mappingName, setMappingName, saveMapping, canvasRef, fieldPositions, updateFieldPositions, selectedConnection, setSelectedConnection, saveSessionToBackend, clearSession, sessionLoaded, inputExample, outputExample, hoverPopup, setHoverPopup, hoverTimeoutRef, setShowFormulaEditor, setEditingConnection, runAIAutoMap, runBusinessRulesAutomap, aiProcessing, setShowSettings, searchQuery, setSearchQuery, performSearch, nextSearchResult, searchResults, currentSearchIndex, saveProject, loadProject, reverseMapping, setPopupPinned, popupPinned, setShowSchemaEditor, hideConnected, setHideConnected, outputDocumentType }) {
+        function MainCanvas({ inputSchema, outputSchema, connections, draggedField, setDraggedField, addConnection, mappingName, setMappingName, saveMapping, canvasRef, fieldPositions, updateFieldPositions, selectedConnection, setSelectedConnection, saveSessionToBackend, clearSession, sessionLoaded, inputExample, outputExample, hoverPopup, setHoverPopup, hoverTimeoutRef, setShowFormulaEditor, setEditingConnection, runAIAutoMap, runBusinessRulesAutomap, aiProcessing, setShowSettings, searchQuery, setSearchQuery, performSearch, nextSearchResult, searchResults, currentSearchIndex, saveProject, loadProject, reverseMapping, setPopupPinned, popupPinned, setShowSchemaEditor, hideConnected, setHideConnected }) {
             const [dropTarget, setDropTarget] = useState(null);
             
             const handleDrop = (targetField, targetType) => {
@@ -3834,19 +3706,13 @@ OPENAI_API_KEY=sk-...`
                                             target: conn.target,
                                             sourceName: conn.sourceName,
                                             targetName: conn.targetName,
-                                            sourcePath: conn.sourcePath,
-                                            targetPath: conn.targetPath,
                                             transformation: conn.transformation
                                         })),
                                         inputSchema: inputSchema,
-                                        outputSchema: {
-                                            ...outputSchema,
-                                            rootElement: outputDocumentType || (outputSchema && outputSchema.rootElement) || 'Invoice'
-                                        }
+                                        outputSchema: outputSchema
                                     };
                                     
                                     console.log('📤 Sending transform with', connections.length, 'connections');
-                                    console.log('📄 Document type:', outputDocumentType || 'Invoice');
                                     console.log('Mapping rules:', mappingRules);
                                     
                                     const formData = new FormData();

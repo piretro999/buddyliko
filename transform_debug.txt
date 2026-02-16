@@ -1,0 +1,2 @@
+ERRORE: File MappaFPAUBL2_1_project_complete.json non trovato!
+Posizione corrente: E:\AI\buddyliko\backend
