@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  UBL Invoice 2.1 - Minimal Schema
+  For use with PEPPOL BIS Schematron validation
+  
+  This is a simplified version. For full validation, download complete UBL 2.1 package from:
+  http://docs.oasis-open.org/ubl/os-UBL-2.1/UBL-2.1.zip
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2"
+           xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2"
+           targetNamespace="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified"
+           version="2.1">
+  
+  <!-- Import Common Components -->
+  <xs:import namespace="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2"
+             schemaLocation="UBL-CommonBasicComponents-2.1.xsd"/>
+  <xs:import namespace="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2"
+             schemaLocation="UBL-CommonAggregateComponents-2.1.xsd"/>
+  
+  <!-- Root Element -->
+  <xs:element name="Invoice" type="InvoiceType"/>
+  
+  <!-- Invoice Type -->
+  <xs:complexType name="InvoiceType">
+    <xs:sequence>
+      <!-- Header -->
+      <xs:element ref="cbc:CustomizationID" minOccurs="0"/>
+      <xs:element ref="cbc:ProfileID" minOccurs="0"/>
+      <xs:element ref="cbc:ID"/>
+      <xs:element ref="cbc:IssueDate"/>
+      <xs:element ref="cbc:DueDate" minOccurs="0"/>
+      <xs:element ref="cbc:InvoiceTypeCode"/>
+      <xs:element ref="cbc:Note" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element ref="cbc:TaxPointDate" minOccurs="0"/>
+      <xs:element ref="cbc:DocumentCurrencyCode"/>
+      <xs:element ref="cbc:TaxCurrencyCode" minOccurs="0"/>
+      <xs:element ref="cbc:AccountingCost" minOccurs="0"/>
+      <xs:element ref="cbc:BuyerReference" minOccurs="0"/>
+      
+      <!-- Period -->
+      <xs:element ref="cac:InvoicePeriod" minOccurs="0" maxOccurs="unbounded"/>
+      
+      <!-- Order Reference -->
+      <xs:element ref="cac:OrderReference" minOccurs="0"/>
+      
+      <!-- Billing Reference -->
+      <xs:element ref="cac:BillingReference" minOccurs="0" maxOccurs="unbounded"/>
+      
+      <!-- Contract Reference -->
+      <xs:element ref="cac:ContractDocumentReference" minOccurs="0" maxOccurs="unbounded"/>
+      
+      <!-- Additional Documents -->
+      <xs:element ref="cac:AdditionalDocumentReference" minOccurs="0" maxOccurs="unbounded"/>
+      
+      <!-- Project Reference -->
+      <xs:element ref="cac:ProjectReference" minOccurs="0" maxOccurs="unbounded"/>
+      
+      <!-- Parties -->
+      <xs:element ref="cac:AccountingSupplierParty"/>
+      <xs:element ref="cac:AccountingCustomerParty"/>
+      <xs:element ref="cac:PayeeParty" minOccurs="0"/>
+      <xs:element ref="cac:TaxRepresentativeParty" minOccurs="0"/>
+      
+      <!-- Delivery -->
+      <xs:element ref="cac:Delivery" minOccurs="0" maxOccurs="unbounded"/>
+      
+      <!-- Payment -->
+      <xs:element ref="cac:PaymentMeans" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element ref="cac:PaymentTerms" minOccurs="0" maxOccurs="unbounded"/>
+      
+      <!-- Allowances and Charges -->
+      <xs:element ref="cac:AllowanceCharge" minOccurs="0" maxOccurs="unbounded"/>
+      
+      <!-- Tax Total -->
+      <xs:element ref="cac:TaxTotal" minOccurs="0" maxOccurs="unbounded"/>
+      
+      <!-- Legal Monetary Total -->
+      <xs:element ref="cac:LegalMonetaryTotal"/>
+      
+      <!-- Invoice Lines -->
+      <xs:element ref="cac:InvoiceLine" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  
+</xs:schema>
