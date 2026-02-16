@@ -1,0 +1,12 @@
+campo,business_term,spiegazione,obbligatorio,numerosità,condizionalità
+EDI_DC40.DOCNUM,Document Number,Numero documento IDOC,SI,1..1,
+E1EDK01.BELNR,Invoice Number,Numero fattura,SI,1..1,
+E1EDK01.DATUM,Invoice Date,Data emissione fattura,SI,1..1,
+E1EDK01.WKURS,Exchange Rate,Tasso di cambio,NO,0..1,IF foreign currency
+E1EDP01.POSEX,Line Item Number,Numero riga,SI,1..N,
+E1EDP01.MENGE,Quantity,Quantità articolo,SI,1..N,
+E1EDP01.MENEE,Unit of Measure,Unità di misura,SI,1..N,
+E1EDP01.PREIS,Unit Price,Prezzo unitario,SI,1..N,
+E1EDP19.MWSKZ,Tax Code,Codice IVA,SI,1..N,
+E1EDP19.MSATZ,Tax Rate,Aliquota IVA percentuale,SI,1..N,
+E1EDP26.BEZTX,Item Description,Descrizione articolo,NO,0..N,

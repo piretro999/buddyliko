@@ -1,0 +1,16 @@
+campo,business_term,spiegazione,obbligatorio,numerosità,condizionalità,calcolo
+Invoice.ID,Invoice Number,Numero identificativo fattura,SI,1..1,,
+Invoice.IssueDate,Issue Date,Data emissione,SI,1..1,,
+Invoice.DocumentCurrencyCode,Currency Code,Codice valuta,SI,1..1,,
+InvoiceLine.ID,Line ID,Identificativo riga,SI,1..N,,
+InvoiceLine.InvoicedQuantity,Invoiced Quantity,Quantità fatturata,SI,1..N,,
+InvoiceLine.LineExtensionAmount,Line Total,Totale riga senza IVA,SI,1..N,,InvoicedQuantity * Price
+InvoiceLine.Item.Description,Item Description,Descrizione articolo,NO,0..N,,
+InvoiceLine.Price.PriceAmount,Price,Prezzo unitario,SI,1..N,,
+InvoiceLine.TaxTotal.TaxAmount,Tax Amount,Importo IVA riga,SI,1..N,,LineExtensionAmount * (TaxPercent / 100)
+InvoiceLine.TaxTotal.TaxSubtotal.TaxCategory.ID,Tax Category,Categoria IVA,SI,1..N,,
+InvoiceLine.TaxTotal.TaxSubtotal.TaxCategory.Percent,Tax Percent,Percentuale IVA,SI,1..N,,
+TaxTotal.TaxAmount,Total Tax Amount,Importo IVA totale documento,SI,1..1,,SUM(InvoiceLine.TaxTotal.TaxAmount)
+LegalMonetaryTotal.TaxExclusiveAmount,Total Excluding Tax,Totale imponibile,SI,1..1,,SUM(InvoiceLine.LineExtensionAmount)
+LegalMonetaryTotal.TaxInclusiveAmount,Total Including Tax,Totale con IVA,SI,1..1,,TaxExclusiveAmount + TaxTotal.TaxAmount
+LegalMonetaryTotal.PayableAmount,Payable Amount,Importo da pagare,SI,1..1,,TaxInclusiveAmount
