@@ -1,42 +1,39 @@
-# Buddyliko Mapping System – IDoc / CSV → UBL / FatturaPA / PEPPOL
+# Buddyliko — Mapping System
+### IDoc / CSV / XML → UBL / FatturaPA / PEPPOL / EN16931
 
-## Overview
+A local integration tool for creating, managing, and executing structured data mappings between enterprise formats and international e-invoicing standards.
 
-Mapping System is a local integration tool designed to create, manage, and execute structured data mappings between enterprise formats and international e-invoicing standards.
-
-It is intended for system integrators, e-invoicing specialists, and technical teams who need to transform data between formats such as IDoc, CSV, FatturaPA, UBL, PEPPOL, and EN16931.
-
-The application provides a visual environment to define field-to-field relationships, apply transformations, save reusable mappings, and execute conversions in a controlled and repeatable way.
-
-All operations run locally. No external services are required.
+Designed for system integrators, e-invoicing specialists, and technical teams who need to transform data between formats in a controlled, repeatable, and fully offline environment.
 
 ---
 
 ## Main Capabilities
 
-- Load and parse input schemas
-- Load and parse output schemas
-- Create field-to-field mappings
-- Apply transformation rules
-- Save mappings with versioning
-- Execute conversions on real data
-- Preview mapped data
-- Support forward and reverse mapping
+- Load and parse input/output schemas (XML, IDoc, CSV, JSON)
+- Visual field-to-field mapping editor
+- Apply transformation rules (direct, formula-based, concatenation, etc.)
+- Save and version mappings as JSON files
+- Execute conversions on real data files
+- Live hover preview — shows actual extracted values from example files on both input and output fields
+- Export mapping as CSV, JSON, or SVG diagram
+- Forward and reverse mapping support
 - AI-assisted mapping suggestions
 - Sequential automatic mapping discovery
+- XSD-aware output ordering (UBL 2.1 compliant element sequence)
+- Authentication layer (optional, configurable)
 
 ---
 
 ## Supported Formats
 
-Input sources may include:
-- IDoc (positional structures)
-- CSV files
-- Structured XML sources
+**Input**
+- IDoc (positional flat structures)
+- CSV
+- XML (FatturaPA and custom structures)
 - ERP export datasets
 
-Output targets may include:
-- UBL
+**Output**
+- UBL 2.1
 - FatturaPA
 - PEPPOL BIS
 - EN16931-aligned structures
@@ -46,87 +43,99 @@ Output targets may include:
 
 ## Architecture
 
-The system follows a simple local architecture:
-
-Frontend (HTML interface)  
-↓  
-Python API backend  
-↓  
-Mapping & transformation engine  
-↓  
+```
+Frontend (app.html)
+       ↓
+Python API backend (api.py)
+       ↓
+Mapping & transformation engine
+       ↓
 Local storage (JSON + SQLite)
+```
 
-There is no cloud dependency.
+No cloud dependency. All operations run locally.
 
 ---
 
 ## Components
 
 ### Frontend
+**File:** `frontend/app.html`
 
-File:
-- `frontend/index.html`
-
-Features:
-- Schema selection
-- Visual mapping creation
-- AI-assisted suggestions
-- Sequential mapping execution
-- Mapping preview
+- Schema selection (input and output, with ID-based resolution)
+- Visual canvas for drag-and-drop mapping creation
+- Hover popup preview: shows extracted values from loaded example files for both input and output fields (with transformation applied)
+- AI-assisted and sequential mapping suggestions
+- Formula editor with built-in transformation types
+- Export: CSV table, JSON project file, SVG diagram
+- Session persistence (save/load project)
+- Reverse mapping
+- Hide/show connected fields toggle
+- Schema editor (visual field structure builder)
+- Search across fields
 
 ### Backend
 
-Core modules:
-
-- `backend/api.py`  
-  Main API layer used by the frontend.
-
-- `mapper_engine.py`  
-  Core logic for field matching and mapping execution.
-
-- `transformation_engine.py`  
-  Applies data transformations between source and target fields.
-
-- `reverse_mapper.py`  
-  Generates reverse mappings from existing configurations.
-
-- `schema_parser.py`  
-  Parses input and output schema definitions.
-
-- `idoc_parser.py`  
-  Handles positional IDoc parsing using segment definitions.
-
-- `csv_parser.py`  
-  Handles CSV ingestion.
-
-- `preview_extractor.py`  
-  Extracts preview data for mapping validation.
-
-- `storage_layer.py`  
-  Persists mappings, sessions, and metadata.
+| Module | Description |
+|---|---|
+| `api.py` | Main FastAPI layer, all endpoints |
+| `transformation_engine.py` | Executes field mappings, applies transformations, orders output elements per XSD |
+| `mapper_engine.py` | Core field matching and mapping logic |
+| `schema_parser.py` | Parses input/output schema definitions |
+| `idoc_parser.py` | Positional IDoc parsing using segment definitions |
+| `csv_parser.py` | CSV ingestion |
+| `preview_extractor.py` | Extracts field values from XML/JSON example files (XPath-based, path-precise) |
+| `diagram_generator.py` | Generates SVG mapping diagrams (pure Python, no external dependencies) |
+| `reverse_mapper.py` | Generates reverse mappings from existing configurations |
+| `storage_layer.py` | Persists mappings, sessions, and metadata |
+| `formulas.py` | Formula library for transformation rules |
 
 ---
 
 ## Storage Structure
 
-Local storage is used for persistence:
+```
+backend/data/database.sqlite     # Internal metadata
+backend/mappings/*.json          # Versioned mapping files
+backend/sessions/                # Temporary session data
+schemas/input/                   # Input schema definitions
+schemas/output/                  # Output schema definitions + XSD files
+```
 
-- `backend/data/database.sqlite`  
-  Internal metadata database.
+Mappings are stored as timestamped JSON files:
+```
+mapping_name_YYYYMMDD_HHMMSS.json
+```
 
-- `backend/mappings/*.json`  
-  Versioned mapping files.
+---
 
-- `backend/sessions/`  
-  Temporary session data.
+## Mapping File Format
 
-Mappings are stored as timestamped JSON files.
+Each mapping connection includes:
+
+```json
+{
+  "id": "conn_2",
+  "source": "TipoDocumento",
+  "target": "cbc_InvoiceTypeCode",
+  "sourcePath": "FatturaElettronicaBody/DatiGenerali/DatiGeneraliDocumento/TipoDocumento",
+  "targetPath": "cbc:InvoiceTypeCode",
+  "businessTerm": "BT-3",
+  "transformation": {
+    "type": "DIRECT",
+    "formula": null,
+    "description": "Direct 1:1 mapping"
+  }
+}
+```
+
+The `sourcePath` and `targetPath` fields are required for correct value extraction and XSD-ordered output generation.
 
 ---
 
 ## Typical Use Cases
 
-- IDoc → UBL conversion
+- IDoc → UBL 2.1 conversion
 - FatturaPA → UBL transformation
 - CSV → EN16931 mapping
 - UBL → FatturaPA reverse mapping
@@ -136,147 +145,88 @@ Mappings are stored as timestamped JSON files.
 
 ---
 
-## Sequential AI-Assisted Mapping
+## Preview System
 
-The system can automatically attempt to discover mappings by:
+Each field in the canvas shows a hover popup with the actual value extracted from a loaded example file.
 
-1. Starting from the first input field
-2. Searching for the most probable output field
+- **Input fields**: value extracted from the input example via XPath or positional offset (IDoc)
+- **Output fields (connected)**: value extracted from the input example, routed through the connection's `sourcePath` and transformation applied
+- **Output fields (not connected)**: structure placeholder from output example
+
+The preview extractor uses strict path navigation — it never returns concatenated values from multiple XML nodes with the same tag name.
+
+---
+
+## SVG Diagram Export
+
+The mapping can be exported as a clean SVG diagram showing:
+
+- Source fields and paths (left column)
+- Target fields and paths (right column)
+- Transformation type badges
+- Business term (BT-xx) labels
+- Logical grouping by source section
+
+Generated by `diagram_generator.py` — no external libraries required.
+
+---
+
+## XSD Output Ordering
+
+When an output schema ID is configured (e.g. `UBL-21`), the transformation engine automatically reorders output XML elements to comply with the XSD sequence. The schema is resolved by fuzzy-matching the `outputSchemaId` field in the mapping rules against the available XSD directories.
+
+---
+
+## AI-Assisted Mapping
+
+The system can automatically discover mappings by:
+
+1. Starting from the first unmapped input field
+2. Searching for the most probable output field match
 3. Continuing sequentially
-4. Stopping when confidence drops
+4. Stopping when confidence drops below threshold
 
-If the process is executed again:
-- Existing mappings are preserved
-- New potential matches are suggested
-
-This allows gradual enrichment of mapping quality over time.
+Running the process again preserves existing mappings and suggests new candidates.
 
 ---
 
 ## IDoc Support
 
-The system supports positional IDoc structures and can interpret:
+Supports positional IDoc structures:
 
 - Segment definitions
-- Technical field names
-- Qualifiers
-- Field lengths
-- Offsets (if available)
-
-This allows structured extraction even from rigid flat IDoc text files.
-
----
-
-## Repository Structure
-
-backend/
-api.py
-mapper_engine.py
-transformation_engine.py
-idoc_parser.py
-schema_parser.py
-reverse_mapper.py
-storage_layer.py
-preview_extractor.py
-
-frontend/
-index.html
-
-schemas/
-input/
-output/
-
-examples/
-Sample IDoc, CSV, and XML test files
-
-mappings/
-Saved mapping configurations
-
-run.bat
-.env
---
-
-## Requirements
-
-- Python 3.10 or newer
-- Windows environment (primary tested platform)
-- Modern web browser
+- Technical field names and qualifiers
+- Field lengths and offsets
+- Handles both E1 and E2 segment prefixes
 
 ---
 
 ## Installation
 
-Clone the repository:
-
+```bash
 git clone <repository_url>
-cd mapping_system
-
-
-Create a virtual environment:
+cd buddyliko
 
 python -m venv venv
 venv\Scripts\activate
 
-
-Install dependencies:
-
-pip install flask pyyaml pandas
-
-
-Start the backend:
+pip install -r requirements.txt
 
 python backend/api.py
+```
 
+Or use `run.bat` on Windows.
 
-or use:
-
-run.bat
-
-
-Open the frontend:
-
-frontend/index.html
-
+Open `frontend/app.html` in a browser.
 
 ---
 
 ## Configuration
 
-Configuration files:
-
-- `.env/.env`  
-  Optional API keys and runtime parameters.
-
-- `backend/config.yml`  
-  System-level configuration.
-
----
-
-## Operational Flow
-
-1. Load an input schema
-2. Load an output schema
-3. Create mappings manually or with AI assistance
-4. Save mapping (JSON versioned file)
-5. Execute transformation
-6. Validate the result
-7. Iterate and refine
-
----
-
-## Mapping Versioning
-
-Each saved mapping generates a timestamped file:
-
-mapping_name_YYYYMMDD_HHMMSS.json
-
-
-This allows:
-
-- History tracking
-- Rollback capability
-- Version comparison
-- Reuse across projects
+| File | Purpose |
+|---|---|
+| `.env` | API keys, runtime parameters, auth settings |
+| `backend/config.yml` | System-level configuration |
 
 ---
 
@@ -284,8 +234,41 @@ This allows:
 
 - Fully local execution
 - No automatic data transmission
-- API keys optional
+- Optional authentication layer (token-based)
 - Suitable for sensitive enterprise data
+
+---
+
+## Repository Structure
+
+```
+backend/
+  api.py
+  transformation_engine.py
+  mapper_engine.py
+  schema_parser.py
+  idoc_parser.py
+  csv_parser.py
+  preview_extractor.py
+  diagram_generator.py
+  reverse_mapper.py
+  storage_layer.py
+  formulas.py
+
+frontend/
+  app.html
+
+schemas/
+  input/
+  output/
+    UBL-21/
+      xsd/
+
+mappings/
+examples/
+run.bat
+.env
+```
 
 ---
 
@@ -293,8 +276,7 @@ This allows:
 
 Advanced prototype / integration laboratory.
 
-This project is suitable for:
-
+Suitable for:
 - System integrators
 - E-invoicing solution providers
 - ERP integration teams
@@ -302,20 +284,9 @@ This project is suitable for:
 
 ---
 
-## Roadmap (Possible Extensions)
-
-- Advanced visual mapping editor
-- EN16931 validation module
-- Direct XML export engine
-- ERP connector plugins
-- Improved AI matching accuracy
-- Mapping quality scoring
-
----
-
 ## Author
 
-Paolo Forte  
+**Paolo Forte**  
 e-Invoicing Program Manager  
 International Integration & Compliance Systems
 
