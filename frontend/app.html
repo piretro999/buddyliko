@@ -347,6 +347,15 @@
             animation: pulse-highlight 1s ease-in-out;
         }
         
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(1.3); }
+        }
+        @keyframes shimmer {
+            0% { opacity: 0.7; }
+            50% { opacity: 1; }
+            100% { opacity: 0.7; }
+        }
         @keyframes pulse-highlight {
             0%, 100% { box-shadow: 0 0 10px rgba(255, 215, 0, 0.3); }
             50% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.6); }
@@ -2205,6 +2214,152 @@ OPENAI_API_KEY=sk-...`
             );
         }
         
+        // AI Work Panel — live log modal shown while AI automap runs
+        function AIWorkPanel({ log, onClose, processing }) {
+            const bottomRef = React.useRef(null);
+            React.useEffect(() => {
+                if (bottomRef.current) bottomRef.current.scrollIntoView({ behavior: 'smooth' });
+            }, [log]);
+
+            const renderLine = (evt, i) => {
+                if (!evt) return null;
+                const type = evt.type;
+                const msg  = evt.msg || '';
+
+                // Color + prefix logic matching backend log format
+                let color = '#cdd6f4';
+                let prefix = '';
+                if (type === 'error')      { color = '#f38ba8'; prefix = '❌ '; }
+                else if (type === 'done')  { color = '#a6e3a1'; prefix = '🎯 '; }
+                else if (type === 'chunk_done') { color = '#94e2d5'; prefix = '  '; }
+                else if (msg.startsWith('🚀')) { color = '#89dceb'; }
+                else if (msg.startsWith('🔑')) { color = '#89b4fa'; }
+                else if (msg.startsWith('📦')) { color = '#cba6f7'; }
+                else if (msg.startsWith('🤖')) { color = '#f9e2af'; }
+                else if (msg.startsWith('📝')) { color = '#a6adc8'; }
+                else if (msg.startsWith('✅') && msg.includes('HTTP')) { color = '#a6e3a1'; }
+                else if (msg.startsWith('📄')) { color = '#a6adc8'; }
+                else if (msg.startsWith('🔢')) { color = '#89dceb'; }
+                else if (msg.startsWith('❌')) { color = '#f38ba8'; }
+                else if (msg.startsWith('🔄')) { color = '#cba6f7'; }
+                else if (msg.startsWith('⏭️')) { color = '#a6adc8'; }
+
+                const lines = [prefix + msg];
+
+                // For chunk_done, render accepted/skipped detail lines
+                if (type === 'chunk_done' && evt.accepted && evt.accepted.length > 0) {
+                    evt.accepted.forEach(a => {
+                        const conf = a.conf || 0;
+                        const confColor = conf >= 0.9 ? '#a6e3a1' : conf >= 0.75 ? '#89dceb' : conf >= 0.6 ? '#f9e2af' : '#f38ba8';
+                        lines.push(
+                            React.createElement('span', { key: `acc-${i}-${a.tgt}`, style: { display: 'block', paddingLeft: '16px', color: confColor } },
+                                `    '${a.src}' → '${a.tgt}' | conf=${conf.toFixed(2)} | ${a.reason || ''}`
+                            )
+                        );
+                    });
+                }
+
+                return React.createElement('div', {
+                    key: i,
+                    style: { color, fontFamily: 'monospace', fontSize: '12px', lineHeight: '1.6', whiteSpace: 'pre-wrap', wordBreak: 'break-all', marginBottom: '1px' }
+                }, ...lines.map((l, j) => typeof l === 'string'
+                    ? React.createElement('span', { key: j, style: { display: 'block' } }, l)
+                    : l
+                ));
+            };
+
+            const doneEvt = log.find(e => e.type === 'done');
+            const totalMatches = doneEvt ? (doneEvt.suggestions || []).length : null;
+            const green  = doneEvt ? doneEvt.green  : null;
+            const yellow = doneEvt ? doneEvt.yellow : null;
+
+            return React.createElement('div', {
+                style: {
+                    position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+                    background: 'rgba(0,0,0,0.75)', zIndex: 9999,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center'
+                },
+                onClick: (e) => { if (e.target === e.currentTarget) onClose(); }
+            },
+                React.createElement('div', {
+                    style: {
+                        background: '#1e1e2e', borderRadius: '12px', width: '820px', maxWidth: '95vw',
+                        height: '80vh', display: 'flex', flexDirection: 'column',
+                        boxShadow: '0 25px 60px rgba(0,0,0,0.7)', border: '1px solid #313244', overflow: 'hidden'
+                    }
+                },
+                    // Header
+                    React.createElement('div', {
+                        style: {
+                            background: 'linear-gradient(135deg, #313244, #45475a)',
+                            padding: '14px 20px', display: 'flex', alignItems: 'center',
+                            justifyContent: 'space-between', borderBottom: '1px solid #45475a', flexShrink: 0
+                        }
+                    },
+                        React.createElement('div', { style: { display: 'flex', alignItems: 'center', gap: '10px' } },
+                            React.createElement('span', { style: { fontSize: '20px' } }, '🤖'),
+                            React.createElement('div', null,
+                                React.createElement('div', { style: { color: '#cdd6f4', fontWeight: 'bold', fontSize: '15px' } }, 'AI at Work'),
+                                React.createElement('div', { style: { color: '#a6adc8', fontSize: '11px' } },
+                                    processing
+                                        ? `Processing… ${log.filter(e => e.type === 'chunk_done').length} calls done`
+                                        : totalMatches !== null
+                                            ? `✅ Completed — ${totalMatches} suggestions (${green} 🟢 confident, ${yellow} 🟡 uncertain)`
+                                            : 'Ready'
+                                )
+                            )
+                        ),
+                        React.createElement('div', { style: { display: 'flex', gap: '8px', alignItems: 'center' } },
+                            processing && React.createElement('div', {
+                                style: { width: '10px', height: '10px', borderRadius: '50%', background: '#a6e3a1',
+                                    animation: 'pulse 1s infinite', flexShrink: 0 }
+                            }),
+                            React.createElement('button', {
+                                onClick: onClose,
+                                style: { background: processing ? '#45475a' : '#f38ba8', border: 'none', borderRadius: '6px', 
+                                    color: processing ? '#cdd6f4' : '#1e1e2e',
+                                    padding: '4px 12px', cursor: 'pointer', fontWeight: 'bold', fontSize: '12px' },
+                                title: processing ? 'Close (AI still running in background)' : 'Close'
+                            }, '✕ Close')
+                        )
+                    ),
+                    // Progress bar
+                    processing && React.createElement('div', { style: { height: '3px', background: '#313244', flexShrink: 0 } },
+                        React.createElement('div', {
+                            style: {
+                                height: '100%', background: 'linear-gradient(90deg, #89b4fa, #cba6f7)',
+                                width: log.length > 0 ? '60%' : '10%',
+                                transition: 'width 0.5s ease', animation: 'shimmer 2s infinite'
+                            }
+                        })
+                    ),
+                    // Log body
+                    React.createElement('div', {
+                        style: { flex: 1, overflowY: 'auto', padding: '16px 20px', scrollbarColor: '#45475a #1e1e2e' }
+                    },
+                        log.length === 0
+                            ? React.createElement('div', { style: { color: '#6c7086', fontFamily: 'monospace', fontSize: '12px' } }, 'Waiting for AI to start…')
+                            : log.map((evt, i) => renderLine(evt, i)),
+                        React.createElement('div', { ref: bottomRef })
+                    ),
+                    // Footer stats
+                    !processing && doneEvt && React.createElement('div', {
+                        style: { background: '#181825', borderTop: '1px solid #313244', padding: '12px 20px',
+                            display: 'flex', gap: '24px', flexShrink: 0 }
+                    },
+                        React.createElement('span', { style: { color: '#a6e3a1', fontSize: '13px', fontWeight: 'bold' } },
+                            `🟢 ${green} confident (≥0.75)`),
+                        React.createElement('span', { style: { color: '#f9e2af', fontSize: '13px', fontWeight: 'bold' } },
+                            `🟡 ${yellow} uncertain (0.5–0.74)`),
+                        React.createElement('span', { style: { color: '#89b4fa', fontSize: '13px', fontWeight: 'bold' } },
+                            `📋 ${totalMatches} total suggestions`),
+                        React.createElement('span', { style: { color: '#a6adc8', fontSize: '12px', marginLeft: 'auto' } },
+                            `${log.filter(e => e.type === 'chunk_done').length} API calls made`)
+                    )
+                )
+            );
+        }
+
         // AI Suggestions Panel Component
         function AISuggestionsPanel({ suggestions, onApprove, onReject, onClose, processing }) {
             const [selectedIds, setSelectedIds] = useState(new Set());
@@ -2498,6 +2653,8 @@ OPENAI_API_KEY=sk-...`
             const [aiSuggestions, setAiSuggestions] = useState([]);
             const [showAiPanel, setShowAiPanel] = useState(false);
             const [aiProcessing, setAiProcessing] = useState(false);
+            const [showAiWork, setShowAiWork] = useState(false);
+            const [aiWorkLog, setAiWorkLog] = useState([]);
             const [showSettings, setShowSettings] = useState(false);
             const [selectedOutputField, setSelectedOutputField] = useState(null);
             
@@ -2944,8 +3101,10 @@ OPENAI_API_KEY=sk-...`
                 
                 const conn = {
                     id: `conn_${Date.now()}`,
-                    source: sourceField.path,
-                    target: targetField.path,
+                    source: sourceField.id || sourceField.path,
+                    target: targetField.id || targetField.path,
+                    sourcePath: sourceField.xml_path || sourceField.path,
+                    targetPath: targetField.xml_path || targetField.path,
                     sourceName: sourceField.name,
                     targetName: targetField.name,
                     transformation: { type: 'direct' }
@@ -3164,13 +3323,10 @@ OPENAI_API_KEY=sk-...`
             
             // Project Management: Save Project
             const saveProject = () => {
-                if (!mappingName) {
-                    showStatus('⚠️ Enter project name first', 'error');
-                    return;
-                }
+                const name = mappingName || 'Buddyliko_Project';
                 
                 const project = {
-                    projectName: mappingName,
+                    projectName: name,
                     version: '2.0', // Updated to 2.0 with schema definitions
                     created: new Date().toISOString(),
                     inputSchema: inputSchema,
@@ -3188,7 +3344,7 @@ OPENAI_API_KEY=sk-...`
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = `${mappingName}_project.json`;
+                a.download = `${name}_project.json`;
                 a.click();
                 URL.revokeObjectURL(url);
                 showStatus('📦 Project saved with schema definitions!', 'success');
@@ -3485,56 +3641,89 @@ OPENAI_API_KEY=sk-...`
                 showStatus('🤖 AI analyzing schemas...', 'success');
                 
                 try {
-                    // Prepare schema data
+                    // Prepare schema data — include all fields that help matching
                     const inputFields = Object.values(inputSchema.fields || {}).map(f => ({
                         name: f.name,
-                        path: f.path,
-                        type: f.type,
-                        business_term: f.business_term,
-                        description: f.description,
-                        cardinality: f.cardinality
-                    }));
-                    
-                    const outputFields = Object.values(outputSchema.fields || {}).map(f => ({
-                        name: f.name,
-                        path: f.path,
+                        path: f.path || f.id,
+                        id: f.id,
                         type: f.type,
                         business_term: f.business_term,
                         description: f.description,
                         cardinality: f.cardinality,
-                        calculation: f.calculation
+                        offset: f.offset,
+                        xml_path: f.xml_path
                     }));
                     
-                    // Prepare example data (first 10 lines)
-                    const inputSample = inputExample ? inputExample.split('\n').slice(0, 10).join('\n') : '';
-                    const outputSample = outputExample ? outputExample.split('\n').slice(0, 10).join('\n') : '';
+                    const outputFields = Object.values(outputSchema.fields || {}).map(f => ({
+                        name: f.name,
+                        path: f.path || f.id,
+                        id: f.id,
+                        type: f.type,
+                        business_term: f.business_term,
+                        description: f.description,
+                        cardinality: f.cardinality,
+                        calculation: f.calculation,
+                        offset: f.offset,
+                        xml_path: f.xml_path
+                    }));
                     
-                    // Try Claude first, fallback to OpenAI
-                    let suggestions = [];
+                    const inputSample = inputExample ? inputExample.split('\n').slice(0, 15).join('\n') : '';
                     
-                    // Call backend instead of direct API
-                    const response = await fetch(`${API_URL}/ai/auto-map`, {
+                    // Estimate chunks info for status message
+                    const nInp = inputFields.length;
+                    const nOut = outputFields.length;
+                    showStatus(`🤖 AI analyzing ${nInp} input × ${nOut} output fields in chunks...`, 'success');
+                    
+                    // Use streaming endpoint — accumulate log in background, don't auto-open panel
+                    setAiWorkLog([]);
+                    // setShowAiWork(true); — user must click "AI at Work" button to open
+
+                    const response = await fetch(`${API_URL}/ai/auto-map-stream`, {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
+                        headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
                         body: JSON.stringify({
                             input_fields: inputFields,
                             output_fields: outputFields,
                             input_sample: inputSample,
-                            output_sample: outputSample
+                            output_sample: ''
                         })
                     });
-                    
+
                     if (!response.ok) {
                         const error = await response.json();
                         throw new Error(error.detail || 'Backend AI error');
                     }
-                    
-                    suggestions = await response.json();
-                    
+
+                    // Parse SSE stream
+                    const reader = response.body.getReader();
+                    const decoder = new TextDecoder();
+                    let buffer = '';
+                    let suggestions = [];
+
+                    while (true) {
+                        const { done, value } = await reader.read();
+                        if (done) break;
+                        buffer += decoder.decode(value, { stream: true });
+                        const lines = buffer.split('\n');
+                        buffer = lines.pop(); // keep incomplete line
+                        for (const line of lines) {
+                            if (!line.startsWith('data: ')) continue;
+                            try {
+                                const evt = JSON.parse(line.slice(6));
+                                setAiWorkLog(prev => [...prev, evt]);
+                                if (evt.type === 'done') {
+                                    suggestions = evt.suggestions || [];
+                                } else if (evt.type === 'error') {
+                                    throw new Error(evt.msg);
+                                }
+                            } catch(e) { /* skip malformed */ }
+                        }
+                    }
+
+                    const green = suggestions.filter(s => s.confidence >= 0.75).length;
+                    const yellow = suggestions.filter(s => s.confidence >= 0.5 && s.confidence < 0.75).length;
                     setAiSuggestions(suggestions);
-                    showStatus(`✅ AI found ${suggestions.length} suggestions`, 'success');
+                    showStatus(`✅ AI: ${suggestions.length} suggestions (${green} 🟢 confident, ${yellow} 🟡 uncertain)`, 'success');
                     
                 } catch (error) {
                     console.error('AI Error:', error);
@@ -3609,20 +3798,79 @@ OPENAI_API_KEY=sk-...`
             // Approve AI suggestion
             const approveAISuggestion = (suggestion) => {
                 console.log('🔵 APPROVE CALLED:', suggestion.source_field, '→', suggestion.target_field);
+                console.log('  inputSchema:', !!inputSchema, 'fields count:', Object.keys(inputSchema?.fields || {}).length);
+                console.log('  outputSchema:', !!outputSchema, 'fields count:', Object.keys(outputSchema?.fields || {}).length);
                 
-                const sourceField = Object.values(inputSchema.fields).find(f => f.path === suggestion.source_field);
-                const targetField = Object.values(outputSchema.fields).find(f => f.path === suggestion.target_field);
+                if (!inputSchema?.fields || !outputSchema?.fields) {
+                    console.error('❌ Schema not loaded!');
+                    showStatus('❌ Schema not loaded, cannot apply suggestion', 'error');
+                    return;
+                }
+
+                // Multi-criteria lookup: match by path, id, name, or partial match
+                const findField = (fields, val) => {
+                    if (!val) return null;
+                    const entries = Object.values(fields);
+                    // 1. Exact match on path, id, name
+                    let found = entries.find(f =>
+                        f.path === val || f.id === val || f.name === val
+                    );
+                    if (found) return found;
+                    // 2. Case-insensitive
+                    const valLow = val.toLowerCase();
+                    found = entries.find(f =>
+                        (f.path || '').toLowerCase() === valLow ||
+                        (f.id || '').toLowerCase() === valLow ||
+                        (f.name || '').toLowerCase() === valLow
+                    );
+                    if (found) return found;
+                    // 3. Suffix match (Claude may return last segment)
+                    found = entries.find(f =>
+                        (f.path || '').endsWith(val) || val.endsWith(f.path || '') ||
+                        (f.name || '').endsWith(val) || val.endsWith(f.name || '')
+                    );
+                    if (found) return found;
+                    // 4. Contains
+                    found = entries.find(f =>
+                        valLow.includes((f.name || '').toLowerCase()) ||
+                        (f.name || '').toLowerCase().includes(valLow)
+                    );
+                    return found || null;
+                };
+
+                const sourceField = findField(inputSchema.fields, suggestion.source_field);
+                const targetField = findField(outputSchema.fields, suggestion.target_field);
+                console.log('  sourceField found:', !!sourceField, sourceField?.path);
+                console.log('  targetField found:', !!targetField, targetField?.path);
                 
                 if (sourceField && targetField) {
+                    // Find the actual key used in schema.fields for each field
+                    const findKey = (fields, field) => {
+                        return Object.keys(fields).find(k =>
+                            fields[k] === field ||
+                            fields[k].id === field.id ||
+                            fields[k].path === field.path
+                        ) || field.id || field.path;
+                    };
+                    const sourceKey = findKey(inputSchema.fields, sourceField);
+                    const targetKey = findKey(outputSchema.fields, targetField);
+
+                    // sourcePath: for XML/JSON use xml_path; for IDoc flat use the segment.field path (NOT the numeric offset)
+                    const srcPath = sourceField.xml_path || sourceField.path;
+                    const tgtPath = targetField.xml_path || targetField.path;
+
                     const conn = {
                         id: `conn_${Date.now()}`,
-                        source: sourceField.path,
-                        target: targetField.path,
+                        source: sourceKey,
+                        target: targetKey,
+                        sourcePath: srcPath,
+                        targetPath: tgtPath,
                         sourceName: sourceField.name,
                         targetName: targetField.name,
+                        businessTerm: targetField.business_term || '',
                         transformation: suggestion.suggested_formula 
-                            ? { type: 'formula', formula: suggestion.suggested_formula }
-                            : { type: 'direct' }
+                            ? { type: 'FORMULA', formula: suggestion.suggested_formula, description: suggestion.reasoning }
+                            : { type: 'DIRECT', formula: null, description: suggestion.reasoning }
                     };
                     
                     console.log('  ✅ Connection created:', conn.id);
@@ -3751,7 +3999,9 @@ OPENAI_API_KEY=sk-...`
                     onFieldContextMenu: handleFieldContextMenu,
                     onEditNode: (f, t) => setEditingNode({ field: f, colType: t }),
                     onDeleteNode: deleteNode,
-                    exportDiagram
+                    exportDiagram,
+                    aiWorkLog,
+                    setShowAiWork
                 }),
                 
                 selectedConnection && React.createElement(PropertiesPanel, {
@@ -3855,6 +4105,12 @@ OPENAI_API_KEY=sk-...`
                     onApprove: approveAISuggestion,
                     onReject: rejectAISuggestion,
                     onClose: () => setShowAiPanel(false),
+                    processing: aiProcessing
+                }),
+
+                showAiWork && React.createElement(AIWorkPanel, {
+                    log: aiWorkLog,
+                    onClose: () => setShowAiWork(false),
                     processing: aiProcessing
                 })
             );
@@ -4117,7 +4373,7 @@ OPENAI_API_KEY=sk-...`
             );
         }
         
-        function MainCanvas({ inputSchema, outputSchema, connections, draggedField, setDraggedField, addConnection, mappingName, setMappingName, saveMapping, canvasRef, fieldPositions, updateFieldPositions, selectedConnection, setSelectedConnection, saveSessionToBackend, clearSession, sessionLoaded, inputExample, outputExample, hoverPopup, setHoverPopup, hoverTimeoutRef, setShowFormulaEditor, setEditingConnection, runAIAutoMap, runBusinessRulesAutomap, aiProcessing, setShowSettings, searchQuery, setSearchQuery, performSearch, nextSearchResult, searchResults, currentSearchIndex, saveProject, loadProject, reverseMapping, setPopupPinned, popupPinned, setShowSchemaEditor, hideConnected, setHideConnected, onOpenNodeImport, onFieldContextMenu, onEditNode, onDeleteNode, exportDiagram }) {
+        function MainCanvas({ inputSchema, outputSchema, connections, draggedField, setDraggedField, addConnection, mappingName, setMappingName, saveMapping, canvasRef, fieldPositions, updateFieldPositions, selectedConnection, setSelectedConnection, saveSessionToBackend, clearSession, sessionLoaded, inputExample, outputExample, hoverPopup, setHoverPopup, hoverTimeoutRef, setShowFormulaEditor, setEditingConnection, runAIAutoMap, runBusinessRulesAutomap, aiProcessing, setShowSettings, searchQuery, setSearchQuery, performSearch, nextSearchResult, searchResults, currentSearchIndex, saveProject, loadProject, reverseMapping, setPopupPinned, popupPinned, setShowSchemaEditor, hideConnected, setHideConnected, onOpenNodeImport, onFieldContextMenu, onEditNode, onDeleteNode, exportDiagram, aiWorkLog, setShowAiWork }) {
             const [dropTarget, setDropTarget] = useState(null);
             
             const handleDrop = (targetField, targetType) => {
@@ -4202,8 +4458,8 @@ OPENAI_API_KEY=sk-...`
                     React.createElement('button', {
                         className: 'btn btn-success',
                         onClick: saveProject,
-                        disabled: !mappingName || !inputSchema || !outputSchema,
-                        title: 'Save complete project (schemas + examples + mappings)'
+                        disabled: !inputSchema || !outputSchema,
+                        title: 'Save complete project (schemas + examples + mappings) — name not required'
                     }, '📦 Save Project'),
                     React.createElement('button', {
                         className: 'btn btn-primary',
@@ -4233,15 +4489,21 @@ OPENAI_API_KEY=sk-...`
                                 if (!file) return;
                                 
                                 try {
-                                    // Prepare mapping rules
+                                    // Prepare mapping rules — enrich each connection with full field paths
                                     const mappingRules = {
-                                        connections: connections.map(conn => ({
-                                            source: conn.source,
-                                            target: conn.target,
-                                            sourceName: conn.sourceName,
-                                            targetName: conn.targetName,
-                                            transformation: conn.transformation
-                                        })),
+                                        connections: connections.map(conn => {
+                                            const srcField = inputSchema?.fields?.[conn.source] || {};
+                                            const tgtField = outputSchema?.fields?.[conn.target] || {};
+                                            return {
+                                                source: conn.source,
+                                                target: conn.target,
+                                                sourceName: conn.sourceName || srcField.name,
+                                                targetName: conn.targetName || tgtField.name,
+                                                sourcePath: conn.sourcePath || srcField.xml_path || srcField.path || conn.source,
+                                                targetPath: conn.targetPath || tgtField.xml_path || tgtField.path || conn.target,
+                                                transformation: conn.transformation || { type: 'DIRECT', formula: null }
+                                            };
+                                        }),
                                         inputSchema: inputSchema,
                                         outputSchema: outputSchema
                                     };
@@ -4290,6 +4552,19 @@ OPENAI_API_KEY=sk-...`
                         disabled: !inputSchema || !outputSchema || aiProcessing,
                         title: 'AI analyzes schemas and suggests mappings'
                     }, aiProcessing ? '⏳ AI Working...' : '🤖 AI Auto-Map'),
+                    React.createElement('button', {
+                        className: 'btn btn-secondary',
+                        title: aiProcessing ? 'AI running — click to open live log' : aiWorkLog.length > 0 ? 'Open AI activity log from last run' : 'Run AI Auto-Map first',
+                        disabled: aiWorkLog.length === 0 && !aiProcessing,
+                        onClick: () => setShowAiWork(true),
+                        style: { position: 'relative' }
+                    }, 
+                        aiProcessing ? '⚡ AI at Work…' : '🔬 AI at Work',
+                        aiProcessing && React.createElement('span', {
+                            style: { display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%',
+                                background: '#a6e3a1', marginLeft: '6px', animation: 'pulse 1s infinite' }
+                        })
+                    ),
                     React.createElement('button', {
                         className: 'btn btn-success',
                         onClick: runBusinessRulesAutomap,
@@ -4527,7 +4802,9 @@ OPENAI_API_KEY=sk-...`
         function FieldBox({ field, type, setDraggedField, draggedField, dropTarget, setDropTarget, handleDrop, updateFieldPositions, connections, inputExample, outputExample, inputSchema, outputSchema, setHoverPopup, hoverTimeoutRef, popupPinned, setPopupPinned, selectedConnection, onFieldContextMenu, onEditNode, onDeleteNode }) {
             const isConnected = connections.some(c => 
                 (type === 'input' && (c.source === field.path || c.source === field.id || c.source === field.name)) ||
-                (type === 'output' && (c.target === field.path || c.target === field.id || c.target === field.name))
+                (type === 'output' && (c.target === field.path || c.target === field.id || c.target === field.name ||
+                    c.target === (field.path || '').replace(/\./g, '_') ||
+                    (field.path && c.target && c.target.replace(/[._]/g,'') === field.path.replace(/[._]/g,''))))
             );
             
             // DEBUG: Log connection status
@@ -4535,6 +4812,10 @@ OPENAI_API_KEY=sk-...`
                 console.log('🔍 Field:', field.name, 'path:', field.path, 'id:', field.id);
                 console.log('🔗 isConnected:', isConnected);
                 console.log('📊 Total connections:', connections.length);
+                if (isConnected) {
+                    const matchingConns = connections.filter(c => c.target === field.path || c.target === field.id || c.target === field.name || c.target === (field.path||'').replace(/\./g,'_') || (field.path && c.target && c.target.replace(/[._]/g,'') === field.path.replace(/[._]/g,'')));
+                    console.log('🎯 Matching conns for popup:', matchingConns.length, matchingConns.map(c => ({target: c.target, source: c.source, sourcePath: c.sourcePath})));
+                }
             }
             
             const isDropTarget = dropTarget === field.id;
@@ -4553,6 +4834,8 @@ OPENAI_API_KEY=sk-...`
                 // Capture rect BEFORE setTimeout
                 const rect = e.currentTarget.getBoundingClientRect();
                 
+                // Use a ref snapshot so setTimeout closure always sees latest connections
+                const connectionsSnapshot = connections.slice();
                 const showPopupFn = () => {
                     console.log('SHOWING POPUP for', field.name);
                     
