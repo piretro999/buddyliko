@@ -2,8 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Buddyliko - Transform Your Data</title>
+    <title>Buddyliko - Your Buddy in transformations</title>
     
     <link rel="icon" type="image/svg+xml" href="/assets/logo-icon.svg">
     
@@ -68,8 +71,8 @@
         }
         
         .sidebar-header {
-            padding: 20px;
-            background: linear-gradient(135deg, #00BCD4 0%, #3F51B5 100%);
+            padding: 8px 12px 8px;
+            background: linear-gradient(135deg, #29D6EC 0%, #6573C3 100%);
             color: white;
         }
         .sidebar-content {
@@ -284,6 +287,35 @@
             min-height: auto;
             height: auto;
         }
+
+        /* Node action buttons — hidden by default, visible on hover */
+        .field-box-actions {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            display: none;
+            gap: 3px;
+            z-index: 10;
+        }
+        .field-box:hover .field-box-actions {
+            display: flex;
+        }
+        .field-action-btn {
+            width: 22px;
+            height: 22px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0.85;
+            transition: all 0.15s;
+        }
+        .field-action-btn:hover { opacity: 1; transform: scale(1.15); }
+        .field-action-btn.edit  { background: #e3f2fd; color: #1565c0; }
+        .field-action-btn.delete { background: #ffebee; color: #c62828; }
         
         /* Removed resize handle from cells */
         .field-box:hover {
@@ -851,6 +883,158 @@
                 max-height: 60vh;
             }
         }
+
+        /* ===== NODE IMPORT / EDIT / DELETE FEATURES ===== */
+        
+        /* "+" button in column headers */
+        .col-import-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            background: #ff9800;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 20px;
+            font-weight: bold;
+            line-height: 1;
+            transition: all 0.2s;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+            flex-shrink: 0;
+        }
+        .col-import-btn:hover {
+            background: #f57c00;
+            transform: scale(1.12);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        /* Node import modal */
+        .node-import-modal {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            width: 480px;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .node-import-modal h3 {
+            margin: 0;
+            font-size: 16px;
+        }
+
+        /* Draggable node-bundle */
+        .node-bundle {
+            position: fixed;
+            z-index: 9000;
+            background: white;
+            border: 2px dashed #00BCD4;
+            border-radius: 8px;
+            padding: 10px 14px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+            cursor: grab;
+            user-select: none;
+            max-width: 280px;
+            min-width: 180px;
+        }
+        .node-bundle:active { cursor: grabbing; }
+        .node-bundle-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: #00BCD4;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .node-bundle-count {
+            background: #00BCD4;
+            color: white;
+            border-radius: 10px;
+            padding: 1px 7px;
+            font-size: 11px;
+        }
+        .node-bundle-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            font-size: 11px;
+            max-height: 120px;
+            overflow-y: auto;
+        }
+        .node-bundle-list li {
+            padding: 2px 0;
+            border-bottom: 1px solid #f0f0f0;
+            color: #333;
+        }
+        .node-bundle-drop-hint {
+            margin-top: 8px;
+            font-size: 10px;
+            color: #888;
+            text-align: center;
+            font-style: italic;
+        }
+
+        /* Drop zone highlight on field-box */
+        .field-box.bundle-drop-target {
+            border-color: #00BCD4 !important;
+            border-style: dashed !important;
+            background: #e0f7fa !important;
+            box-shadow: 0 0 12px rgba(0,188,212,0.4);
+        }
+        
+        /* Field context menu */
+        .field-context-menu {
+            position: fixed;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+            z-index: 8000;
+            min-width: 160px;
+            overflow: hidden;
+        }
+        .field-context-menu-item {
+            padding: 10px 16px;
+            cursor: pointer;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.15s;
+        }
+        .field-context-menu-item:hover {
+            background: #f5f5f5;
+        }
+        .field-context-menu-item.danger {
+            color: #f44336;
+        }
+        .field-context-menu-item.danger:hover {
+            background: #ffebee;
+        }
+        .field-context-menu-separator {
+            height: 1px;
+            background: #eee;
+            margin: 2px 0;
+        }
+
+        /* Node edit modal */
+        .node-edit-modal {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            width: 420px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .node-edit-modal h3 {
+            margin: 0;
+            font-size: 16px;
+        }
     </style>
 </head>
 <body>
@@ -1174,72 +1358,95 @@
         
         // Formula Editor Component
         function FormulaEditor({ connection, onSave, onClose }) {
-            const [formula, setFormula] = useState(connection.transformation?.formula || '');
+            const [expression, setExpression] = useState(
+                connection.transformation?.expression || ''
+            );
             const textareaRef = useRef(null);
-            
-            const operators = ['+', '-', '*', '/', '&&', 'UPPERCASE', 'LOWERCASE', 'SUBSTRING', 'DATE_FORMAT', 'TRIM', 'CONCAT'];
-            
-            const insertOperator = (op) => {
-                const textarea = textareaRef.current;
-                if (textarea) {
-                    const start = textarea.selectionStart;
-                    const end = textarea.selectionEnd;
-                    const text = formula;
-                    const before = text.substring(0, start);
-                    const after = text.substring(end);
-                    const newFormula = before + op + ' ' + after;
-                    setFormula(newFormula);
-                    setTimeout(() => {
-                        textarea.focus();
-                        textarea.selectionStart = textarea.selectionEnd = start + op.length + 1;
-                    }, 0);
-                }
+
+            const snippets = [
+                { label: 'Upper',        code: 'value.upper()' },
+                { label: 'Lower',        code: 'value.lower()' },
+                { label: 'Trim',         code: 'value.strip()' },
+                { label: 'Replace',      code: 'value.replace("old", "new")' },
+                { label: 'Split [0]',    code: 'value.split("/")[0]' },
+                { label: '× 100',        code: 'float(value) * 100' },
+                { label: '÷ 100',        code: 'float(value) / 100' },
+                { label: 'Round 2',      code: 'round(float(value), 2)' },
+                { label: 'Substring',    code: 'value[0:8]' },
+                { label: 'Pad 0 ×10',   code: 'value.zfill(10)' },
+                { label: 'Date ISO',     code: 'value[0:10]' },
+                { label: 'Default EUR',  code: 'value if value else "EUR"' },
+                { label: 'Strip alpha',  code: 'import re; re.sub(r"[^0-9.]", "", value)' },
+                { label: 'Negate',       code: 'str(-float(value))' },
+            ];
+
+            const insertSnippet = (code) => {
+                const ta = textareaRef.current;
+                if (!ta) return;
+                const s = ta.selectionStart, e = ta.selectionEnd;
+                const next = expression.slice(0,s) + code + expression.slice(e);
+                setExpression(next);
+                setTimeout(() => { ta.focus(); ta.selectionStart = ta.selectionEnd = s + code.length; }, 0);
             };
-            
-            return React.createElement('div', {
-                className: 'formula-editor-modal',
-                onClick: onClose
-            },
-                React.createElement('div', {
-                    className: 'formula-editor',
-                    onClick: (e) => e.stopPropagation()
-                },
-                    React.createElement('div', { className: 'formula-editor-header' },
-                        React.createElement('h3', null, '✏️ Edit Formula')
-                    ),
-                    React.createElement('div', { className: 'formula-editor-body' },
-                        React.createElement('div', { style: { marginBottom: '10px', fontSize: '12px', color: '#666' } },
-                            `Mapping: ${connection.source} → ${connection.target}`
+
+            const panelStyle = { background: '#1e1e2e', color: '#cdd6f4', borderRadius: '8px', width: '680px', maxHeight: '85vh', display: 'flex', flexDirection: 'column', boxShadow: '0 10px 40px rgba(0,0,0,0.6)' };
+            const headerStyle = { padding: '16px 20px', borderBottom: '1px solid #313244', display: 'flex', alignItems: 'center', justifyContent: 'space-between' };
+            const bodyStyle = { padding: '16px 20px', flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '12px' };
+            const labelStyle = { fontSize: '11px', fontWeight: '700', color: '#a6adc8', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' };
+            const taStyle = { width: '100%', minHeight: '120px', padding: '12px', fontFamily: '"Fira Code", "Courier New", monospace', fontSize: '13px', background: '#181825', color: '#cdd6f4', border: '1px solid #45475a', borderRadius: '6px', resize: 'vertical', outline: 'none' };
+            const snippetBtn = { padding: '4px 10px', background: '#313244', color: '#cdd6f4', border: '1px solid #45475a', borderRadius: '4px', cursor: 'pointer', fontSize: '11px', fontFamily: 'monospace', transition: 'all 0.15s' };
+            const hintBox = { background: '#181825', border: '1px solid #45475a', borderRadius: '6px', padding: '10px 14px', fontSize: '11px', color: '#a6adc8', lineHeight: '1.7' };
+
+            return React.createElement('div', { className: 'formula-editor-modal', onClick: onClose },
+                React.createElement('div', { style: panelStyle, onClick: e => e.stopPropagation() },
+                    React.createElement('div', { style: headerStyle },
+                        React.createElement('div', null,
+                            React.createElement('div', { style: { fontWeight: '700', fontSize: '15px', color: '#cdd6f4' } }, '✏️ Custom Formula'),
+                            React.createElement('div', { style: { fontSize: '11px', color: '#6c7086', marginTop: '2px' } },
+                                connection.sourceName + '  →  ' + connection.targetName)
                         ),
-                        React.createElement('textarea', {
-                            ref: textareaRef,
-                            className: 'formula-textarea',
-                            value: formula,
-                            onChange: (e) => setFormula(e.target.value),
-                            placeholder: 'Enter formula, e.g.: UPPERCASE(field1) && field2'
-                        }),
-                        React.createElement('div', { className: 'operator-buttons' },
-                            React.createElement('div', { className: 'operator-buttons-label' }, 'Quick Insert:'),
-                            React.createElement('div', { className: 'operator-buttons-grid' },
-                                operators.map(op =>
-                                    React.createElement('button', {
-                                        key: op,
-                                        className: 'operator-btn',
-                                        onClick: () => insertOperator(op)
-                                    }, op)
-                                )
+                        React.createElement('button', { onClick: onClose, style: { background: 'none', border: 'none', color: '#6c7086', fontSize: '20px', cursor: 'pointer' } }, '✕')
+                    ),
+                    React.createElement('div', { style: bodyStyle },
+                        React.createElement('div', null,
+                            React.createElement('div', { style: labelStyle }, 'Expression Python — usa "value" come variabile sorgente'),
+                            React.createElement('textarea', {
+                                ref: textareaRef,
+                                style: taStyle,
+                                value: expression,
+                                onChange: e => setExpression(e.target.value),
+                                placeholder: 'es: value.upper()  oppure  float(value) * 100  oppure  value.split("/")[0]',
+                                spellCheck: false
+                            })
+                        ),
+                        React.createElement('div', null,
+                            React.createElement('div', { style: labelStyle }, 'Snippet rapidi'),
+                            React.createElement('div', { style: { display: 'flex', flexWrap: 'wrap', gap: '6px' } },
+                                snippets.map(s => React.createElement('button', {
+                                    key: s.label,
+                                    style: snippetBtn,
+                                    onClick: () => insertSnippet(s.code),
+                                    onMouseEnter: e => { e.target.style.background = '#45475a'; e.target.style.color = '#cba6f7'; },
+                                    onMouseLeave: e => { e.target.style.background = '#313244'; e.target.style.color = '#cdd6f4'; }
+                                }, s.label))
                             )
+                        ),
+                        React.createElement('div', { style: hintBox },
+                            React.createElement('strong', { style: { color: '#cba6f7' } }, 'Suggerimenti: '),
+                            React.createElement('span', null, '"value" contiene sempre il valore del campo sorgente come stringa. '),
+                            React.createElement('span', null, 'Puoi usare qualsiasi espressione Python su una riga. '),
+                            React.createElement('br', null),
+                            React.createElement('strong', { style: { color: '#89dceb' } }, 'Esempi: '),
+                            React.createElement('code', { style: { color: '#a6e3a1' } }, 'value.strip().upper()'),
+                            React.createElement('span', null, ' · '),
+                            React.createElement('code', { style: { color: '#a6e3a1' } }, 'value[0:4] + "-" + value[4:6]'),
+                            React.createElement('span', null, ' · '),
+                            React.createElement('code', { style: { color: '#a6e3a1' } }, '"IT" + value if not value.startswith("IT") else value')
                         )
                     ),
-                    React.createElement('div', { className: 'formula-editor-footer' },
-                        React.createElement('button', {
-                            className: 'btn btn-secondary',
-                            onClick: onClose
-                        }, 'Cancel'),
-                        React.createElement('button', {
-                            className: 'btn btn-success',
-                            onClick: () => onSave(formula)
-                        }, '✅ Save Formula')
+                    React.createElement('div', { style: { padding: '12px 20px', borderTop: '1px solid #313244', display: 'flex', gap: '10px', justifyContent: 'flex-end' } },
+                        React.createElement('button', { className: 'btn btn-secondary', onClick: onClose }, 'Annulla'),
+                        React.createElement('button', { className: 'btn btn-success', onClick: () => onSave({ type: 'CUSTOM', expression }) }, '✅ Salva Formula')
                     )
                 )
             );
@@ -2284,6 +2491,7 @@ OPENAI_API_KEY=sk-...`
             const [outputExample, setOutputExample] = useState('');
             const [hoverPopup, setHoverPopup] = useState(null);
             const [showFormulaEditor, setShowFormulaEditor] = useState(false);
+            const [availableFormulas, setAvailableFormulas] = useState([]);
             const [editingConnection, setEditingConnection] = useState(null);
             
             // AI Integration
@@ -2319,10 +2527,13 @@ OPENAI_API_KEY=sk-...`
             const [inputSchemaId, setInputSchemaId] = useState('');
             const [outputSchemaId, setOutputSchemaId] = useState('');
             
-            // Document type selection (for schemas like UBL that have multiple types)
-            const [outputDocumentType, setOutputDocumentType] = useState('Invoice');
-            const [availableDocumentTypes, setAvailableDocumentTypes] = useState([]);
-            
+            // Node import / bundle / edit features
+            const [showNodeImportModal, setShowNodeImportModal] = useState(false);
+            const [nodeImportDirection, setNodeImportDirection] = useState('input');
+            const [nodeBundles, setNodeBundles] = useState([]);
+            const [contextMenu, setContextMenu] = useState(null); // { x, y, field, colType }
+            const [editingNode, setEditingNode] = useState(null);  // { field, colType }
+
             const canvasRef = useRef(null);
             const hoverTimeoutRef = useRef(null);
             
@@ -2354,48 +2565,6 @@ OPENAI_API_KEY=sk-...`
                     console.log('✅ Loaded schemas:', data);
                 } catch (err) {
                     console.error('Failed to load available schemas:', err);
-                }
-            };
-            
-            // Fetch available document types for a schema
-            const fetchDocumentTypes = async (schemaId) => {
-                console.log('🔍 fetchDocumentTypes called with schemaId:', schemaId);
-                
-                if (!schemaId) {
-                    console.log('⚠️ No schemaId provided, clearing document types');
-                    setAvailableDocumentTypes([]);
-                    return;
-                }
-                
-                try {
-                    const url = `${API_URL}/schemas/${schemaId}/document-types`;
-                    console.log('📡 Fetching document types from:', url);
-                    
-                    const res = await fetch(url);
-                    console.log('📥 Response status:', res.status);
-                    
-                    const data = await res.json();
-                    console.log('📦 Response data:', data);
-                    
-                    if (data.success && data.document_types && data.document_types.length > 0) {
-                        console.log(`✅ Found ${data.document_types.length} document types:`, data.document_types.map(d => d.type));
-                        setAvailableDocumentTypes(data.document_types);
-                        
-                        // Set default to first type, prefer Invoice if available
-                        const invoiceType = data.document_types.find(t => t.type === 'Invoice');
-                        const defaultType = invoiceType ? invoiceType.type : data.document_types[0].type;
-                        setOutputDocumentType(defaultType);
-                        
-                        console.log(`✅ Loaded ${data.document_types.length} document types for ${schemaId}. Default: ${defaultType}`);
-                    } else {
-                        // No document types available (e.g., FatturaPA has only one type)
-                        console.log('ℹ️ No document types available for', schemaId);
-                        setAvailableDocumentTypes([]);
-                        setOutputDocumentType('');
-                    }
-                } catch (error) {
-                    console.error('❌ Failed to fetch document types:', error);
-                    setAvailableDocumentTypes([]);
                 }
             };
             
@@ -2640,15 +2809,46 @@ OPENAI_API_KEY=sk-...`
             }, [connections]);
             
             // Update positions when formula editor opens/closes (layout shifts)
+            // Re-draw arrows whenever formula editor opens/closes
             useEffect(() => {
-                setTimeout(updateFieldPositions, 100);
+                setTimeout(updateFieldPositions, 50);
+                setTimeout(updateFieldPositions, 200);
+                setTimeout(updateFieldPositions, 400);
             }, [showFormulaEditor]);
+
+            // Re-draw arrows when properties panel opens/closes (changes canvas width)
+            useEffect(() => {
+                setTimeout(updateFieldPositions, 50);
+                setTimeout(updateFieldPositions, 200);
+                setTimeout(updateFieldPositions, 400);
+            }, [selectedConnection]);
+
+            // ResizeObserver: re-draw arrows on ANY canvas size change (most robust)
+            useEffect(() => {
+                const canvas = canvasRef.current;
+                if (!canvas) return;
+                const ro = new ResizeObserver(() => { updateFieldPositions(); });
+                ro.observe(canvas);
+                return () => ro.disconnect();
+            }, []);
             
             // Update positions when sidebar is toggled (layout shifts)
             useEffect(() => {
                 // Wait for the CSS transition to complete (0.3s)
                 setTimeout(updateFieldPositions, 350);
             }, [showSidebar]);
+
+            // Load available formulas from backend on mount
+            useEffect(() => {
+                fetch('/api/formulas')
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.formulas && data.formulas.length > 0) {
+                            setAvailableFormulas(data.formulas);
+                        }
+                    })
+                    .catch(() => {}); // silently ignore if backend not available
+            }, []);
             
             // Search function with RegExp
             const performSearch = () => {
@@ -2760,6 +2960,132 @@ OPENAI_API_KEY=sk-...`
                 setSelectedConnection(null);
                 showStatus('🗑️ Connection deleted', 'success');
             };
+
+            // ===== NODE FEATURES =====
+
+            // Import a set of rows as a draggable bundle
+            const handleNodeBundleImport = (rows, direction) => {
+                // Normalize rows: ensure they have at least 'name' field
+                const nodes = rows.map(r => ({
+                    name: r.name || r.field_name || r.Field_Name || r.Name || Object.values(r)[0] || 'Unknown',
+                    type: r.type || r.Type || 'string',
+                    cardinality: r.cardinality || r.Cardinality || '0..1',
+                    business_term: r.business_term || r.Business_Term || '',
+                    description: r.description || r.Description || '',
+                    required: false,
+                    _raw: r
+                }));
+                const bundle = {
+                    id: 'bundle_' + Date.now(),
+                    direction,
+                    nodes
+                };
+                setNodeBundles(prev => [...prev, bundle]);
+                showStatus(`📦 Pacchetto creato con ${nodes.length} nodi — trascinalo sullo schema`, 'success');
+            };
+
+            // Drop bundle after a specific field
+            const handleBundleDrop = (bundle, fieldId, colType) => {
+                const schema = colType === 'input' ? inputSchema : outputSchema;
+                const setSchema = colType === 'input' ? setInputSchema : setOutputSchema;
+                if (!schema) return;
+
+                const fieldKey = fieldId.replace(`${colType}-`, '').replace(/_/g, '.');
+                const fieldEntries = Object.entries(schema.fields);
+                const dropIdx = fieldEntries.findIndex(([k]) => k === fieldKey || k.replace(/\./g,'_') === fieldKey.replace(/\./g,'_'));
+
+                // Build new field objects
+                const newFields = {};
+                bundle.nodes.forEach((n, i) => {
+                    const id = `imported_${Date.now()}_${i}`;
+                    const path = `imported.${n.name.replace(/\s+/g,'_')}`;
+                    newFields[path] = {
+                        id, name: n.name, path, type: n.type,
+                        cardinality: n.cardinality, business_term: n.business_term,
+                        description: n.description, required: n.required,
+                        xml_path: `/${schema.name || 'root'}/${n.name}`
+                    };
+                });
+
+                // Insert after dropIdx
+                const before = fieldEntries.slice(0, dropIdx + 1);
+                const after = fieldEntries.slice(dropIdx + 1);
+                const allFields = Object.fromEntries([...before, ...Object.entries(newFields), ...after]);
+
+                setSchema({ ...schema, fields: allFields });
+                setNodeBundles(prev => prev.filter(b => b.id !== bundle.id));
+                showStatus(`✅ ${bundle.nodes.length} nodi inseriti dopo il campo selezionato`, 'success');
+                setTimeout(updateFieldPositions, 100);
+            };
+
+            // Dismiss a bundle without dropping
+            const dismissBundle = (bundleId) => {
+                setNodeBundles(prev => prev.filter(b => b.id !== bundleId));
+            };
+
+            // Delete a node (field) from schema + remove all connections
+            const deleteNode = (field, colType) => {
+                if (!window.confirm(`Eliminare il nodo "${field.name}"?\nVerranno rimossi anche tutti i collegamenti associati.`)) return;
+
+                const schema = colType === 'input' ? inputSchema : outputSchema;
+                const setSchema = colType === 'input' ? setInputSchema : setOutputSchema;
+                if (!schema) return;
+
+                // Build new fields object excluding any key that matches this field
+                const newFields = {};
+                Object.entries(schema.fields).forEach(([k, f]) => {
+                    const isThisField = 
+                        f.id === field.id ||
+                        f.path === field.path ||
+                        k === field.path ||
+                        k === field.id;
+                    if (!isThisField) {
+                        newFields[k] = f;
+                    }
+                });
+
+                setSchema({ ...schema, fields: newFields });
+
+                // Remove connections involving this field
+                setConnections(prev => prev.filter(c => {
+                    if (colType === 'input') {
+                        return c.source !== field.path && c.source !== field.id && c.source !== field.name;
+                    } else {
+                        return c.target !== field.path && c.target !== field.id && c.target !== field.name;
+                    }
+                }));
+
+                showStatus(`🗑️ Nodo "${field.name}" eliminato con i suoi collegamenti`, 'success');
+                setTimeout(updateFieldPositions, 100);
+            };
+
+            // Edit / update a node
+            const saveNodeEdit = (updatedField, colType) => {
+                const schema = colType === 'input' ? inputSchema : outputSchema;
+                const setSchema = colType === 'input' ? setInputSchema : setOutputSchema;
+                if (!schema) return;
+
+                const newFields = {};
+                Object.entries(schema.fields).forEach(([k, f]) => {
+                    const isThisField =
+                        f.id === updatedField.id ||
+                        f.path === updatedField.path ||
+                        k === updatedField.path ||
+                        k === updatedField.id;
+                    newFields[k] = isThisField ? { ...f, ...updatedField } : f;
+                });
+
+                setSchema({ ...schema, fields: newFields });
+                showStatus(`✅ Nodo "${updatedField.name}" aggiornato`, 'success');
+                setTimeout(updateFieldPositions, 100);
+            };
+
+            // Open context menu on right-click of a field
+            const handleFieldContextMenu = (e, field, colType) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setContextMenu({ x: e.clientX, y: e.clientY, field, colType });
+            };
             
             // Expose delete callback for double-click on connections
             useEffect(() => {
@@ -2848,10 +3174,7 @@ OPENAI_API_KEY=sk-...`
                     version: '2.0', // Updated to 2.0 with schema definitions
                     created: new Date().toISOString(),
                     inputSchema: inputSchema,
-                    outputSchema: {
-                        ...outputSchema,
-                        rootElement: outputDocumentType || (outputSchema && outputSchema.rootElement) || 'Invoice'
-                    },
+                    outputSchema: outputSchema,
                     inputSchemaId: inputSchemaId, // Schema ID for backend reference
                     outputSchemaId: outputSchemaId, // Schema ID for backend reference
                     inputSchemaDefinition: inputSchemaDefinition, // Schema Editor definition
@@ -2883,10 +3206,7 @@ OPENAI_API_KEY=sk-...`
                     
                     try {
                         const text = await file.text();
-                        console.log('📄 File size:', text.length, 'bytes');
                         const project = JSON.parse(text);
-                        console.log('🔍 Parsed project with', project.connections?.length || 0, 'connections');
-                        console.log('🔍 Last 3 connections:', project.connections?.slice(-3).map(c => c.targetPath));
                         
                         // Validate project structure
                         if (!project.projectName || !project.inputSchema || !project.outputSchema) {
@@ -2905,17 +3225,6 @@ OPENAI_API_KEY=sk-...`
                         setInputExample(project.inputExample || '');
                         setOutputExample(project.outputExample || '');
                         setConnections(project.connections || []);
-                        console.log('🔍 DEBUG: Loaded', project.connections?.length || 0, 'connections from project file');
-                        
-                        // Load document type if present
-                        if (project.outputSchema && project.outputSchema.rootElement) {
-                            setOutputDocumentType(project.outputSchema.rootElement);
-                        }
-                        
-                        // Fetch available document types for this schema
-                        if (project.outputSchemaId) {
-                            await fetchDocumentTypes(project.outputSchemaId);
-                        }
                         
                         // Update field positions after schemas load
                         setTimeout(() => {
@@ -3061,6 +3370,94 @@ OPENAI_API_KEY=sk-...`
                 }
             };
             
+
+            // Export current fields as CSV (always from live state, not backend)
+            const exportFieldsCSV = (direction) => {
+                const schema = direction === 'input' ? inputSchema : outputSchema;
+                if (!schema || !schema.fields) {
+                    showStatus('⚠️ Nessuno schema caricato', 'error');
+                    return;
+                }
+                const fields = Object.values(schema.fields);
+                if (fields.length === 0) {
+                    showStatus('⚠️ Nessun campo da esportare', 'error');
+                    return;
+                }
+
+                // Detect columns dynamically from all fields
+                const allKeys = new Set(['campo', 'business_term', 'spiegazione', 'obbligatorio', 'numerosità', 'condizionalità']);
+                fields.forEach(f => {
+                    if (f.type)          allKeys.add('type');
+                    if (f.xml_path)      allKeys.add('xml_path');
+                    if (f.json_path)     allKeys.add('json_path');
+                    if (f.offset)        allKeys.add('offset');
+                    if (f.length)        allKeys.add('length');
+                    if (f.calculation)   allKeys.add('calculation');
+                    if (f.condition)     allKeys.add('condizionalità');
+                });
+                const headers = Array.from(allKeys);
+
+                const rows = fields.map(f => headers.map(h => {
+                    switch(h) {
+                        case 'campo':          return f.path || f.name || '';
+                        case 'business_term':  return f.business_term || '';
+                        case 'spiegazione':    return f.description || '';
+                        case 'obbligatorio':   return f.required ? 'SI' : 'NO';
+                        case 'numerosità':     return f.cardinality || '0..1';
+                        case 'condizionalità': return f.condition || '';
+                        case 'type':           return f.type || '';
+                        case 'xml_path':       return f.xml_path || '';
+                        case 'json_path':      return f.json_path || '';
+                        case 'offset':         return f.offset || '';
+                        case 'length':         return f.length || '';
+                        case 'calculation':    return f.calculation || '';
+                        default:               return f[h] || '';
+                    }
+                }));
+
+                const escape = v => '"' + String(v).replace(/"/g, '""') + '"';
+                const csv = [headers.map(escape), ...rows.map(r => r.map(escape))].join('\n');
+                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = (schema.name || direction + '_schema') + '_fields.csv';
+                a.click();
+                URL.revokeObjectURL(url);
+                showStatus('✅ Export completato: ' + fields.length + ' campi', 'success');
+            };
+
+            const exportDiagram = async () => {
+                if (!connections || connections.length === 0) {
+                    showStatus('⚠️ Nessuna connessione da esportare', 'error');
+                    return;
+                }
+                try {
+                    showStatus('🎨 Generazione diagramma...', 'info');
+                    const res = await fetch(`${API_URL}/mapping/diagram`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+                        body: JSON.stringify({
+                            connections: connections,
+                            projectName: mappingName || 'Mappatura',
+                            inputSchemaName: inputSchemaId || 'Input',
+                            outputSchemaName: outputSchemaId || 'Output'
+                        })
+                    });
+                    if (!res.ok) throw new Error(await res.text());
+                    const blob = await res.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'mapping_diagram.svg';
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    showStatus('✅ Diagramma esportato!', 'success');
+                } catch(e) {
+                    showStatus('❌ Errore: ' + e.message, 'error');
+                }
+            };
+
             const downloadSampleCSV = async (type) => {
                 try {
                     const response = await fetch(`${API_URL}/csv/sample/${type}`);
@@ -3287,6 +3684,7 @@ OPENAI_API_KEY=sk-...`
                     setShowUploadModal,
                     setUploadDirection,
                     downloadSampleCSV,
+                    exportFieldsCSV,
                     statusMessage,
                     setDraggedField,
                     selectedConnection,
@@ -3302,10 +3700,7 @@ OPENAI_API_KEY=sk-...`
                     setInputSchemaId,
                     outputSchemaId,
                     setOutputSchemaId,
-                    outputDocumentType,
-                    setOutputDocumentType,
-                    availableDocumentTypes,
-                    fetchDocumentTypes
+                    exportDiagram
                 })
                 ),  // Close sidebar-wrapper
                 
@@ -3352,11 +3747,16 @@ OPENAI_API_KEY=sk-...`
                     setShowSchemaEditor,
                     hideConnected,
                     setHideConnected,
-                    outputDocumentType
+                    onOpenNodeImport: (dir) => { setNodeImportDirection(dir); setShowNodeImportModal(true); },
+                    onFieldContextMenu: handleFieldContextMenu,
+                    onEditNode: (f, t) => setEditingNode({ field: f, colType: t }),
+                    onDeleteNode: deleteNode,
+                    exportDiagram
                 }),
                 
                 selectedConnection && React.createElement(PropertiesPanel, {
                     connection: selectedConnection,
+                    availableFormulas: availableFormulas,
                     updateConnectionTransformation,
                     deleteConnection,
                     setSelectedConnection,
@@ -3369,6 +3769,45 @@ OPENAI_API_KEY=sk-...`
                     onClose: () => setShowUploadModal(false),
                     onUpload: uploadSchema
                 }),
+
+                // Node import modal
+                showNodeImportModal && React.createElement(NodeImportModal, {
+                    direction: nodeImportDirection,
+                    schemaType: nodeImportDirection === 'input'
+                        ? (inputSchema?.type || (inputSchema?.name?.includes('xml') ? 'xml' : 'csv'))
+                        : (outputSchema?.type || (outputSchema?.name?.includes('xml') ? 'xml' : 'csv')),
+                    onClose: () => setShowNodeImportModal(false),
+                    onImport: handleNodeBundleImport
+                }),
+
+                // Draggable node bundles
+                nodeBundles.map(bundle =>
+                    React.createElement(NodeBundle, {
+                        key: bundle.id,
+                        bundle,
+                        onDrop: handleBundleDrop,
+                        onDismiss: dismissBundle
+                    })
+                ),
+
+                // Field context menu
+                contextMenu && React.createElement(FieldContextMenu, {
+                    x: contextMenu.x,
+                    y: contextMenu.y,
+                    field: contextMenu.field,
+                    colType: contextMenu.colType,
+                    onEdit: (field, colType) => setEditingNode({ field, colType }),
+                    onDelete: deleteNode,
+                    onClose: () => setContextMenu(null)
+                }),
+
+                // Node edit modal
+                editingNode && React.createElement(NodeEditModal, {
+                    field: editingNode.field,
+                    colType: editingNode.colType,
+                    onSave: saveNodeEdit,
+                    onClose: () => setEditingNode(null)
+                }),
                 
                 hoverPopup && React.createElement(HoverPopup, { 
                     popup: hoverPopup,
@@ -3378,11 +3817,9 @@ OPENAI_API_KEY=sk-...`
                 
                 showFormulaEditor && editingConnection && React.createElement(FormulaEditor, {
                     connection: editingConnection,
-                    onSave: (formula) => {
-                        updateConnectionTransformation(editingConnection.id, { 
-                            type: 'formula',
-                            formula: formula 
-                        });
+                    onSave: (result) => {
+                        // result is { type: 'CUSTOM', expression: '...' }
+                        updateConnectionTransformation(editingConnection.id, result);
                         setShowFormulaEditor(false);
                         setEditingConnection(null);
                     },
@@ -3423,21 +3860,35 @@ OPENAI_API_KEY=sk-...`
             );
         }
         
-        function Sidebar({ inputSchema, outputSchema, connections, activeTab, setActiveTab, setShowUploadModal, setUploadDirection, downloadSampleCSV, statusMessage, setDraggedField, selectedConnection, setSelectedConnection, uploadExampleFile, inputExample, outputExample, loadAvailableSchemas, showStatus, availableInputSchemas, availableOutputSchemas, inputSchemaId, setInputSchemaId, outputSchemaId, setOutputSchemaId, outputDocumentType, setOutputDocumentType, availableDocumentTypes, fetchDocumentTypes }) {
+        function Sidebar({ inputSchema, outputSchema, connections, activeTab, setActiveTab, setShowUploadModal, setUploadDirection, downloadSampleCSV, exportFieldsCSV, statusMessage, setDraggedField, selectedConnection, setSelectedConnection, uploadExampleFile, inputExample, outputExample, loadAvailableSchemas, showStatus, availableInputSchemas, availableOutputSchemas, inputSchemaId, setInputSchemaId, outputSchemaId, setOutputSchemaId, exportDiagram }) {
             return React.createElement('div', { className: 'sidebar' },
                 React.createElement('div', { className: 'sidebar-header' },
-                    React.createElement('div', { style: { display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' } },
-                        React.createElement('svg', { width: '32', height: '32', viewBox: '0 0 64 64', style: { flexShrink: 0 } },
-                            React.createElement('circle', { cx: '32', cy: '32', r: '30', fill: 'rgba(255,255,255,0.2)' }),
-                            React.createElement('path', { d: 'M 20 32 A 12 12 0 1 1 44 32', stroke: 'white', strokeWidth: '4', fill: 'none', strokeLinecap: 'round' }),
-                            React.createElement('path', { d: 'M 44 32 L 40 29 M 44 32 L 40 35', stroke: 'white', strokeWidth: '4', strokeLinecap: 'round' }),
-                            React.createElement('path', { d: 'M 44 32 A 12 12 0 1 1 20 32', stroke: 'white', strokeWidth: '4', fill: 'none', strokeLinecap: 'round' }),
-                            React.createElement('path', { d: 'M 20 32 L 24 29 M 20 32 L 24 35', stroke: 'white', strokeWidth: '4', strokeLinecap: 'round' }),
-                            React.createElement('text', { x: '32', y: '42', fontFamily: 'Arial, sans-serif', fontSize: '24', fontWeight: 'bold', fill: 'white', textAnchor: 'middle' }, 'B')
-                        ),
-                        React.createElement('h2', { style: { margin: 0 } }, 'Buddyliko')
-                    ),
-                    React.createElement('p', { style: { fontSize: '12px', margin: 0, opacity: 0.9 } }, 'Transform Your Data')
+                    React.createElement('div', { style: { textAlign: 'center', paddingBottom: '0', marginTop: '-18px' } },
+                        React.createElement('img', {
+                            src: 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBzdGFuZGFsb25lPSJubyI/Pgo8IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDIwMDEwOTA0Ly9FTiIKICJodHRwOi8vd3d3LnczLm9yZy9UUi8yMDAxL1JFQy1TVkctMjAwMTA5MDQvRFREL3N2ZzEwLmR0ZCI+CjxzdmcgdmVyc2lvbj0iMS4wIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiB3aWR0aD0iMTUzNi4wMDAwMDBwdCIgaGVpZ2h0PSIxMDI0LjAwMDAwMHB0IiB2aWV3Qm94PSIwIDAgMTUzNi4wMDAwMDAgMTAyNC4wMDAwMDAiCiBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCBtZWV0Ij4KCjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAuMDAwMDAwLDEwMjQuMDAwMDAwKSBzY2FsZSgwLjEwMDAwMCwtMC4xMDAwMDApIgpmaWxsPSIjMDAwMDAwIiBzdHJva2U9Im5vbmUiPgo8cGF0aCBkPSJNMzc2MyA3MjUzIGMxNSAtMiAzOSAtMiA1NSAwIDE1IDIgMiA0IC0yOCA0IC0zMCAwIC00MyAtMiAtMjcgLTR6Ii8+CjxwYXRoIGQ9Ik0zOTk4IDcyNTMgYzE4IC0yIDQ1IC0yIDYwIDAgMTUgMiAwIDQgLTMzIDQgLTMzIDAgLTQ1IC0yIC0yNyAtNHoiLz4KPHBhdGggZD0iTTM1NDUgNzIzMCBjLTIzOCAtNDcgLTQ0MCAtMTQzIC02NjAgLTMxMSAtOTQgLTcxIC0yNDAgLTI1MCAtMjk2Ci0zNjEgLTY1IC0xMjggLTExNSAtMzI4IC0xMjAgLTQ4MCAtMiAtMzQgLTcgLTU5IC0xNCAtNjIgLTcgLTIgLTkyIC04IC0xOTAKLTEyIC0xMDEgLTQgLTE3MSAtMTAgLTE2MyAtMTUgMjMgLTE1IDI3OCAtOTcgNDE2IC0xMzMgMjQwIC02NSA2NjQgLTE1NiA3MjIKLTE1NiAxMiAwIDE3IDExIDE5IDQ3IDEgMjYgNCA1MCA2IDUzIDMgNCAtNTEgMjIgLTExOCA0MSBsLTEyMiAzNCA5NiAzIDk2IDMKMTcgNzcgYzEwIDQyIDIxIDg1IDI3IDk0IDE1IDI5IDEyIDM2IC02NCAxMTcgLTgxIDg2IC0xNTkgMjA5IC0yMDIgMzE2IC0zNwo5NCAtOTYgMjY4IC05MSAyNzIgMiAyIDE4IC0zOCAzNiAtODkgODAgLTIyMyAxNjEgLTM0MSAzMzkgLTQ5MiBsODggLTc1IDcKLTE0MiBjNiAtMTI1IDkgLTE0NSAyNyAtMTYyIGwyMCAtMTkgLTEgMTU0IGMtMSA4NCAtMSAxNTggMCAxNjMgMCA2IDE2NyAtMTU5CjM3MSAtMzY1IGwzNzEgLTM3NSAtMTE5IC0xMTQgYy0xNjUgLTE1OCAtNjA1IC01NzQgLTY4MSAtNjQzIC01NiAtNTIgLTk0IC03NQotNzcgLTQ4IDMgNSAyNCA5OCA0NSAyMDUgMzAgMTQ3IDM3IDIwMSAzMCAyMTYgLTYgMTAgLTE0IDE5IC0xOSAxOSAtMTggMAotMjc1IC03NCAtNDM5IC0xMjYgLTI3OSAtOTAgLTY4OCAtMjYxIC02NjkgLTI4MCAyIC0zIDc4IDExIDE2OCAzMCA5MCAxOSAxNjUKMzMgMTY3IDMxIDIgLTIgMTkgLTY2IDM4IC0xNDIgNzQgLTI5NiA5OSAtMzUwIDIzMCAtNDk4IGw2MiAtNzAgNyAtMTM4IGM4Ci0xNDggMTIgLTE1OCA4MCAtMjIwIDk4IC04OSA1MTMgLTMxMyA2NzYgLTM2NSAyNTUgLTgyIDQyNyAtNzQgNjg1IDI4IDEyMSA0OQo0MjggMjExIDU0MiAyODcgMTI1IDgzIDEyOSA5MyAxMzQgMjkzIGw0IDE2NSA1MiA2NSBjMjkgMzUgNjEgODMgNzIgMTA2IDIxCjQzIDYwIDIwMSA4MyAzMzkgbDEzIDgwIDUwIDUgYzk3IDExIDEzNyA1MCAyMDkgMjAzIDczIDE1NiAxMTUgMzczIDExNSA1OTUgMAoxNjAgLTE4IDI0NyAtNTkgMjg3IC0xNiAxNCAtNTggMzcgLTk2IDQ5IC0zNyAxMyAtNzEgMjggLTc1IDMzIC0yMiAyMyAtNDIKMTM2IC00NSAyNTIgLTMgMTEyIC0zMyAzMTMgLTUwIDMyOSAtOCA4IC02IC01IDEwIC05OCA4IC00NyAxOCAtMTQyIDIyIC0yMTMKNSAtMTA2IDQgLTEzMCAtOSAtMTQ1IC05IC05IC0zNCAtNTEgLTU4IC05MiAtMjMgLTQxIC0zOSAtNjYgLTM1IC01NSA0IDExIDkKMzggMTIgNjAgNyA2MSAtMTQgMzQ0IC0zMCAzOTcgLTE1IDQ2IC0xNCA0OCAyMiAxMjAgMjAgNDAgMzkgNzQgNDMgNzYgNCAyIDQKMTAgMSAxOCAtMyA4IC0xOCAtMTIgLTM5IC01NCAtNDEgLTgyIC0xMDQgLTE5MCAtMTA0IC0xNzkgMCA0IDkgMjUgMjAgNDcgMTEKMjIgMjAgNDcgMjAgNTcgMCA0MCAtOTkgMjE4IC0xNTIgMjc0IC0yOSAzMCAtNzAgNzQgLTkwIDk3IGwtMzcgNDEgLTQ0IC0xMzcKYy02OCAtMjA3IC03NCAtMjM4IC01NSAtMjU5IDU1IC02MiAxMTMgLTI5NyA5MCAtMzYyIC0xMCAtMjcgLTggLTMwIDMxIC00NwoyMyAtMTEgNjIgLTM3IDg3IC01OCA0MyAtMzcgNDUgLTM4IDQ4IC0xNyAyIDEyIDkgMjAgMTUgMTggMTggLTYgMTI4IC0yMjMKMTIyIC0yMzkgLTEzIC0zMyAtNTYgLTcgLTExMCA2NiAtNTMgNzIgLTkwIDEwOSAtMTM1IDEzOSAtNDggMzMgLTIzNSAxNyAtNDcyCi0zOSAtMTIzIC0yOSAtMTYxIC01MSAtMjAzIC0xMTYgLTE2IC0yNiAtMzMgLTQ3IC0zNyAtNDcgLTUgLTEgLTM1IDI2IC02OCA1OQotMzMgMzMgLTYwIDU1IC02MCA0OCAwIC02IC0zIC04IC02IC01IC05IDggMjMgOTQgNDggMTI5IDMxIDQ0IDIwMiAxNTEgMzQyCjIxNCAxMzIgNTkgMTg2IDk2IDIxMCAxNDMgOCAxNCA2NCAxODEgMTI2IDM3MSBsMTEyIDM0NSAtNDUgNDAgYy00MyAzNyAtMTA3CjgxIC0xMDcgNzIgMCAtMyAyNSAtMjEgOTggLTczIDIgLTEgLTQgLTE3IC0xMiAtMzUgLTggLTE5IC0xNSAtMjkgLTE1IC0yMiAtMQo3IC0zMCAzMiAtNjUgNTggLTM1IDI1IC02OSA1MSAtNzYgNTkgLTIxIDI2IC0yOTMgMTUzIC0zOTQgMTg1IC05MyAyOSAtMTYwCjQxIC0zMzMgNTkgLTcyIDggLTcyIDggLTc3IC0xNyAtMyAtMTQgLTI4IC0xNzIgLTU2IC0zNTEgLTI4IC0xNzkgLTYyIC0zOTAKLTc1IC00NzAgLTE0IC04MCAtMjUgLTE3NyAtMjUgLTIxNiAwIC02NSA0IC04MCA0OSAtMTcwIDU0IC0xMDkgNzEgLTE2MSA3MQotMjE1IDAgLTM0IC0yIC0zNiAtMjYgLTMxIC0xNSAzIC0zMyAxNyAtNDIgMzEgLTggMTQgLTUxIDU4IC05NSA5NiAtNDMgMzkKLTEzNSAxMjUgLTIwMyAxOTEgLTY4IDY3IC0xMjQgMTE4IC0xMjYgMTEzIC01IC0xMyAtMTcyIDE0NSAtMjEzIDIwMSAtMzMgNDUKLTg0IDE0MCAtMTA2IDE5OCAtMTYgNDMgMCAyMSAzNiAtNDcgNDEgLTc3IDEzOCAtMjAxIDE1OSAtMjAxIDcgMCAxOSAxNCAyNgozMCAyNSA2MCAxMzQgMTUyIDMwOCAyNTggNTUgMzMgMTM0IDU1IDE0MyA0MCA5IC0xNCAxMCAtMTAgNDQgMTcyIDM5IDIxNSA2NwozOTIgNjEgMzk4IC0zIDMgLTYzIC0zIC0xMzMgLTEzIC0xODcgLTI2IC00MjcgLTEwOSAtNTUwIC0xOTEgLTY2IC00NCAtMTYzCi0xMjEgLTE4MCAtMTQzIC0xNCAtMjAgLTIxIC0xMyAtMjggMjUgLTUgMjcgLTEgMzIgNzAgNzcgMTkxIDEyMiA0MDIgMjA0IDYwNQoyMzcgODUgMTMgMTAyIDE4IDY1IDE4IC0yNyAwIC05MCAtOCAtMTQwIC0xOHogbS02OTYgLTQyNCBjMzggLTYwIDMwIC03OSAtNzEKLTE4MiAtOTAgLTkyIC0xMTkgLTEwOSAtMTQ1IC04MyAtMTcgMTcgMjkgMTExIDk1IDE5NyA0NiA2MCA4NiAxMDIgOTggMTAyIDEKMCAxMiAtMTUgMjMgLTM0eiBtMTUxMSAtOTggYzEwMSAtMzEgMTk1IC0xMDQgMzA3IC0yNDIgbDMyIC00MCAxMiAzMCBjNiAxNgoyOSA3NiA1MCAxMzQgMjEgNTggMzggMTAxIDM4IDk3IDIgLTE3IC0xMzEgLTQ3MiAtMTQ1IC00OTggLTIxIC00MSAtNjQgLTcwCi0yMDQgLTEzNiAtMTM3IC02NSAtMjkyIC0xNTggLTMyOCAtMTk2IC0xMiAtMTMgLTM2IC01NSAtNTIgLTkzIC0yNiAtNTkgLTI5Ci02MyAtMjQgLTI5IDQgMjIgMTMgNTcgMjAgNzkgMTggNTEgMTggNjMgLTUgODggLTExIDExIC0yOCA0MyAtMzkgNzIgLTExIDI4Ci0zNyA5NCAtNTcgMTQ2IC00OSAxMjYgLTU3IDIyMSAtMjYgMzMzIDM4IDE0MSA4MSAyMDYgMTU1IDIzOCA4NyAzNyAxODEgNDMKMjY2IDE3eiBtLTE3ODggLTI1MyBjLTIgLTE0IC04IC0yNSAtMTMgLTI1IC0xMiAwIC0xMSA3IDEgMzEgMTQgMjYgMTggMjQgMTIKLTZ6IG0tMzYgLTIwNSBjLTkgLTU4IC0yMSAtMTM4IC0yOCAtMTc3IC02IC00MyAtMTYgLTczIC0yMyAtNzMgLTcgMCAtMTAgMTEKLTkgMjggMiAxNSA4IDcyIDE0IDEyNyAxMyAxMTkgNTMgMjc3IDU4IDIzMCAyIC0xNiAtMyAtNzcgLTEyIC0xMzV6IG0yODEyCi00MjUgYzE0IC01NCAxNSAtODggMyAtMTAwIC0yMyAtMjQgLTg0IC0yMzMgLTEwNCAtMzU1IC0yIC0xNCAtNSAtNSAtNiAyMCAwCjI1IDE1IDEwNCAzNSAxNzUgMTkgNzIgMzcgMTQyIDQwIDE1NiA3IDMzIC0xMyA0NyAtMzEgMjMgLTggLTExIC0xNSAtMTQgLTE1Ci03IDAgMTcgNTEgMTMzIDU5IDEzMyA0IDAgMTIgLTIwIDE5IC00NXogbS00MzkgLTE1MiBjMjEgLTUgMjAgLTcgLTE1IC0yMAotNDggLTE4IC0zMTQgLTMwIC0yNzQgLTEyIDY2IDI5IDIzMyA0NyAyODkgMzJ6IG02MTkgLTEzOCBjLTExIC0zMyAtMzMgLTExOAotNDggLTE5MCAtMjQgLTExMiAtMjggLTEyMyAtMjkgLTgwIC0xIDU1IDAgNTQgLTc0IDU3IGwtMjggMSA2IDY4IGM2IDYyIDQyCjIxMiA0NCAxODIgMSAtNyAxMCAtMTMgMjEgLTEzIDEyIDAgMzQgLTcgNTAgLTE1IDI4IC0xNCAyOSAtMTQgNTAgMjEgMTEgMjAKMjMgMzUgMjUgMzMgMiAtMiAtNiAtMzEgLTE3IC02NHogbS03ODIgNDQgYzUzIC0xNCA2NCAtNDMgMTIgLTMxIC01MiAxMSAtMTc5CjcgLTIyMyAtOCAtMjIgLTggLTQ0IC0xMyAtNDggLTEyIC01IDEgLTYgLTIgLTIgLTcgMyAtNiAtMyAtMTUgLTE0IC0yMSAtMTEKLTUgLTIyIC02IC0yNSAtMSAtOSAxMyAyNCAzNyA4OSA2NSA2NiAyOCAxMzggMzMgMjExIDE1eiBtNTk5IC05MSBjLTEwIC02OQotMjIgLTEwMSAtMzYgLTkyIC0yMSAxMyAxMiAxNDQgMzcgMTQ0IDMgMCAzIC0yNCAtMSAtNTJ6IG0tNjM1IC0xOCBjMTAgLTUgMjUKLTI4IDM0IC01MSAxNSAtMzcgMTUgLTQ0IDEgLTY1IC0yNiAtNDAgLTEzNSAtNDUgLTE3NiAtOCAtMjYgMjMgLTI3IDEwOSAtMgoxMjIgMjIgMTMgMTIxIDE0IDE0MyAyeiBtLTMxMSAtMjkgYy04IC0xMCAtMjcgLTM1IC00MyAtNTYgLTUxIC02MyAtNDEgLTY3CjE4OSAtNzEgMTQyIC0zIDIxOSAwIDI2NCAxMCBsNjQgMTMgLTI0IC0xOSBjLTEzIC0xMSAtMTkgLTE3IC0xMyAtMTQgMTUgOCAzOAotMjAgMjkgLTM0IC04IC0xMyAzMyA3IDc5IDM5IGwzMCAyMCAyNyAtMjQgYzE2IC0xMyAzNCAtMjUgNDEgLTI4IDE2IC02IC0xOAotMzcgLTExNCAtMTA0IC00MCAtMjcgLTY4IC01NCAtNjggLTY0IDAgLTE0IDU2IC0xODIgMTA1IC0zMTQgNiAtMTcgNCAtMTYKLTEzIDQgbC0xOSAyNCAtNDQgLTI2IGMtMjggLTE2IC03MiAtMzAgLTExOSAtMzcgLTE0MiAtMjAgLTE5MyAtMzEgLTIxNiAtNDgKLTMxIC0yMyAtMzAgLTI2IDEyIC01MSAzNSAtMjEgMzYgLTIzIDI5IC02NyAtMyAtMjQgLTEzIC02MCAtMjAgLTc4IC04IC0xOAotMTIgLTM2IC05IC0zOCA5IC05IC05NyAtMjAgLTMwMSAtMzAgLTI2MCAtMTMgLTMwOSAtMTMgLTQzNSAwIC01OCA2IC0xMTMgMTEKLTEyMiAxMiAtMTYgMCAtMTYgMyAtMyA0MSA4IDIzIDE1IDUwIDE1IDYwIDAgMjYgNyAyNCA2OCAtMTcgNjEgLTQxIDE1MCAtNzQKMTk4IC03NCAxOCAwIDU3IDkgODUgMjAgNzIgMjkgMjM1IDEzNiAyNjAgMTcyIDQ2IDY0IDI5IDE2NSAtMzcgMjE3IC00MiAzMwotNDggMjQgLTEwIC0xNCA0MCAtNDAgNTYgLTk2IDM1IC0xMjEgLTEyIC0xNCAtMjkgLTE2IC0xMDggLTExIC04MyA1IC05NyAzCi0xMjEgLTE0IC0xNSAtMTIgLTUwIC0yMyAtODEgLTI2IC02NiAtNyAtMTExIDEyIC0xMzQgNTcgLTE0IDI3IC0xMyAzOSA2IDE0MgoxMSA2MiAyOSAxMzEgNDAgMTU0IDEwIDIyIDUxIDcxIDkwIDEwOSBsNzEgNjkgMTQgLTI1IGM3IC0xMyAxMyAtNTMgMTQgLTg5CmwwIC02NCA1OCAtNTMgYzMxIC0yOSA2MiAtNTMgNjcgLTUzIDYgMCA5IDM1IDcgOTIgLTMgNzEgMSAxMDggMTYgMTU1IDEyIDM3CjE2IDY2IDExIDc1IC0xNyAyNiAtOSA1NyAyMiA4NSAxNyAxNSA1MCA0NyA3MiA3MSA0MyA0NCA1OSA1NSAzNiAyM3ogbTgyNAotMTM2IGMzMSAtODggNTEgLTIwNCA0MiAtMjQ3IC0xMiAtNTkgLTUzIC0xMTQgLTE0NyAtMjAyIC01MSAtNDcgLTk0IC04NiAtOTcKLTg2IC0xMiAxIC0xNDggMzM4IC0xMzkgMzQ1IDIgMSA0MSAyNyA4OCA1NyA5NiA2MiAxNDYgMTEyIDE3OSAxODIgMjkgNTggMzgKNTIgNzQgLTQ5eiBtMjUgLTQ5MiBjLTIwIC0xNTUgLTUyIC0zNTAgLTcyIC00MzMgLTEyIC01MyAtMTMgLTUxIC0xMCA3MCAxIDY5CjcgMTU0IDEzIDE5MCA1IDM2IDE1IDEwMyAyMiAxNTAgOCA1OCAxOSA5NiAzNyAxMjIgMTMgMjEgMjUgMzggMjYgMzggMSAwIC02Ci02MiAtMTYgLTEzN3ogbS0zMDUgLTI2NiBjLTE1IC03NSAtMjkgLTEzNSAtMzEgLTEzMiAtNiA1IDI3IDIxMCA0MCAyNDYgMjEKNjEgMTggMTggLTkgLTExNHogbS0yMjExIC00MSBjNCAzIDMwIC02NyA1NyAtMTU0IGw1MSAtMTU5IDkxIC0xMTMgOTEgLTExMwotMTYgLTMzIGMtOCAtMTkgLTE5IC0zNCAtMjQgLTM0IC0yMCAwIC0yMjggMjM0IC0yNTYgMjg5IC04IDE0IC0yOCA3OCAtNDYKMTQxIC0xNyA2MyAtMzYgMTI4IC00MSAxNDQgLTEzIDQzIC0xMyA0MyAzOSAzNiAyNiAtNSA1MCAtNiA1NCAtNHogbTU4MCAtNzAKYy0zIC01NyAyIC03OCA1NCAtMjEyIDk5IC0yNTggMTgzIC00NTMgMjgyIC02NTYgOTAgLTE4NCA5NSAtMTk3IDcyIC0xOTEgLTY0CjE0IC03NCAyNiAtMTM5IDE1OCAtNzUgMTUxIC0xMjYgMjcwIC0yMjIgNTIwIC0zOCA5OSAtNzggMTk5IC04OSAyMjMgLTEzIDI3Ci0yMCA2NCAtMjAgMTAzIDAgNTQgMyA2NCAyOSA5MCAxNiAxNiAzMSAyOSAzMyAyOSAyIDAgMiAtMjkgMCAtNjR6IG0xNDA3IC03OApjMTggLTI4IDI3IC0zNSAzNyAtMjcgMjIgMTggLTExIC0xMDEgLTU0IC0xOTMgLTIxIC00NSAtNDkgLTkxIC02MyAtMTAwIC0xMwotMTAgLTU5IC00MCAtMTAyIC02OSAtNDIgLTI4IC04MyAtNjMgLTkxIC03NyAtMjMgLTQ4IC02OSAtMjA2IC02NyAtMjMyIDIKLTE3IC0xNyA0IC02MSA3MCAtODUgMTI4IC04OSAxMzAgLTMwNSAxMzMgLTIxOSAzIC0yMjMgMCAtMzExIC0xNTggLTI0IC00MwotMzIgLTUyIC0yNyAtMzAgOSA0MyA4NiAxNzUgMTA5IDE4NyAxMSA2IDEwOSAxNCAyMjAgMTkgMjc0IDEzIDMwNyAyMyAzODEKMTE3IDQ2IDU4IDU3IDkyIDMwIDkyIC0xMyAwIC0xOSAxMSAtMTcgMzEgMSA0IC0zMCAtOCAtNjcgLTI3IC05MSAtNDUgLTE3NgotNjQgLTI4NyAtNjQgLTE5OCAwIC0zMTkgNTAgLTMwMCAxMjUgNyAyOCAzOCAzNiA5NiAyNSA2MSAtMTIgMTg4IC0xMiAyOTAgMAoxNjggMjEgMjk2IDY5IDQxMCAxNTMgMzAgMjIgNDcgMzEgMzcgMTkgLTExIC0xMSAtMTYgLTI2IC0xMiAtMzEgMyAtNiAxIC0xMQotNSAtMTEgLTYgMCAtOCAtNSAtNCAtMTEgMyAtNiAtMTMgLTMxIC0zNyAtNTUgLTI0IC0yNCAtMzggLTQ0IC0zMyAtNDQgMTIgMAo4MCA3OSAxMDkgMTI1IDUzIDg1IDg1IDkzIDEyNCAzM3ogbTE2NyAtNzkgYy0xNSAtNTYgLTMxIC0xMDkgLTM3IC0xMTggLTkKLTEzIC05IC0xMyAtNCA0IDMgMTEgMTggNjkgMzIgMTMwIDE0IDYwIDI4IDEwNCAzMCA5NyAzIC02IC03IC01OCAtMjEgLTExM3oKbS00MjIgODcgYzggLTMyIC0yMCAtNjQgLTc3IC05MCAtMTMyIC02MCAtMjUxIC04MCAtNDMzIC03NCAtMTI0IDUgLTE0OCA5Ci0yMjMgMzYgLTk3IDM2IC0xMTEgNDYgLTExMSA3NyAwIDUzIDE5IDY4IDUyIDM5IDE2IC0xNiAxOCAtMTYgMjQgMCAxMSAyOQoxMjQgMTggMTI0IC0xMiAwIC0xMyAyIC0xMyAxMyAzIDEyIDE2IDIzIDE3IDgzIDExIDM4IC00IDczIC0xMSA3OCAtMTYgNiAtNgoxNCAtNiAyMSAwIDEzIDExIDE0MyAzMiAxNTUgMjUgNCAtMyAzMSAwIDU5IDcgMzkgOSA1NyA5IDc2IDAgMjEgLTEwIDI5IC05CjQwIDIgOSA4IDM0IDEzIDY0IDEzIDQxIC0xIDUxIC00IDU1IC0yMXogbTQ4NiAtOTcgYy0xMSAtNTIgLTM2IC0xMjcgLTU1Ci0xNjcgLTE5IC00MSAtMzIgLTc5IC0yOSAtODUgNSAtOCAyIC04IC02IDAgLTExIDEwIC03IDI2IDIzIDkwIDIwIDQzIDQ2IDEyMAo1OCAxNzEgMTEgNTEgMjMgOTEgMjUgODkgMyAtMiAtNCAtNDcgLTE2IC05OHogbS0xOTYxIC0yMiBjMTcgLTU0IDU0IC0xNDMgODkKLTIwOSAyIC01IDAgLTggLTUgLTggLTE4IDAgLTczIDEyMCAtOTcgMjE0IC0xNSA1NCAtMjYgMTAzIC0yNSAxMTAgMSAxMiA0IDMKMzggLTEwN3ogbTE2MSAtMzA5IGMyNSAtMzQgOTQgLTEyNyAxNTMgLTIwNyA1OSAtNzkgMTA2IC0xNDYgMTAzIC0xNDggLTIgLTIKLTMwIDMwIC02MiA3MyAtMzMgNDIgLTgxIDEwNCAtMTA4IDEzOCAtMjYgMzMgLTY2IDg3IC04OCAxMTkgLTIxIDMxIC00MiA1NwotNDYgNTcgLTQgMCAtMTUgLTEyIC0yNSAtMjUgLTIzIC0zMiAtMjMgLTMxIDEyMCAtMTg0IDExMCAtMTE3IDE5OSAtMTk1IDIxMgotMTg2IDUgMiAyMiAtMTMgNDAgLTM1IDE4IC0yMiAyOSAtNDAgMjYgLTQwIC0xMSAwIC0xNzUgMTE1IC0yNDYgMTcyIC0zNyAyOQotMTAzIDg3IC0xNDggMTI3IGwtODEgNzUgMTcgMjUgYzEyIDIwIDgzIDEwMSA4OCAxMDEgMCAwIDIxIC0yOCA0NSAtNjJ6Cm0xNzIxIDQgbDM3IC01MiAtMTAyIC0xMDMgYy01NSAtNTYgLTEyMSAtMTE4IC0xNDYgLTEzNyAtNTAgLTM4IC00MyAtMjcgMjgKNDcgMTQ3IDE1MyAxNzUgMTk3IDE1NiAyNDcgLTEwIDI2IC0yMSAxOSAtNTggLTM2IC0xOSAtMjkgLTEwMCAtMTI5IC0xODAKLTIyMyAtMTI5IC0xNTIgLTE2NiAtMjAyIC0xMjEgLTE2NSA4IDcgMTUgMTAgMTUgNyAwIC0yIC0yMSAtMjIgLTQ3IC00MyBsLTQ3Ci0zOCAyMCAzMyBjMTAgMTggNjIgODUgMTE0IDE0OSAxNDEgMTczIDIyNCAyODIgMjUxIDMyOSAxMyAyNCAyOSA0MSAzNCA0MCA2Ci0yIDI2IC0yNyA0NiAtNTV6IG0xMDkgMzUgYzAgLTIgLTEwIC0xMiAtMjIgLTIzIGwtMjMgLTE5IDE5IDIzIGMxOCAyMSAyNiAyNwoyNiAxOXogbS03NDYgLTE4MSBjMTggLTE4IDQ5IC02NSA3MCAtMTA1IGwzNyAtNzEgLTI1IC0xMCBjLTkwIC0zNCAtMTU2IC00NAotMjkxIC00NCAtMTA0IDAgLTE1NyA1IC0yMDUgMTggLTM2IDEwIC03NyAyMSAtOTIgMjMgLTE2IDMgLTI4IDcgLTI4IDkgMCAzCjEyIDI4IDI2IDU3IDM5IDc3IDgzIDEzNyAxMDcgMTQ3IDEyIDUgMTAwIDkgMTk2IDkgbDE3NCAxIDMxIC0zNHoiLz4KPHBhdGggZD0iTTQ2MzAgNTQ1MyBjMCAtOCAtOSAtMTcgLTIwIC0yMCAtMjUgLTcgLTI1IC0xNSAtMSAtMzcgNDIgLTM4IDExNCAyCjc3IDQyIC0yMyAyNiAtNTYgMzUgLTU2IDE1eiIvPgo8cGF0aCBkPSJNNTA4OSA1MjIzIGMtMTggLTIwIC0yOCAtMzMgLTIxIC0yOSAzNyAyMSAtMjEgLTE3NyAtNjcgLTIyOSAtMTcKLTIwIC0zMSAtMzkgLTMwIC00MyAxIC0yMiA0NiAtMTI2IDU0IC0xMjkgNiAtMiA0NiAzMyA5MCA3NyBsNzkgNzkgNCA2MSBjNgo4MiAtMzkgMjUwIC02NiAyNTAgLTUgMCAtMjQgLTE2IC00MyAtMzd6Ii8+CjxwYXRoIGQ9Ik0zODM4IDM3ODQgYy0zMSAtMTYgLTY4IC04MCAtNjggLTExNyAwIC0zNSAyMyAtNjEgNDcgLTUzIDE2IDUgMjIKMTggMjcgNjIgMyAzMSAxMyA3MSAyMSA5MCAxNiAzOCAxMiA0MCAtMjcgMTh6Ii8+CjxwYXRoIGQ9Ik00MTIzIDcyNDMgYzkgLTIgMjMgLTIgMzAgMCA2IDMgLTEgNSAtMTggNSAtMTYgMCAtMjIgLTIgLTEyIC01eiIvPgo8cGF0aCBkPSJNNDE3OCA3MjMzIGM2IC0yIDE4IC0yIDI1IDAgNiAzIDEgNSAtMTMgNSAtMTQgMCAtMTkgLTIgLTEyIC01eiIvPgo8cGF0aCBkPSJNNDY4MCA3MDU2IGMwIC0zIDkgLTEwIDIwIC0xNiAxMSAtNiAyMCAtOCAyMCAtNiAwIDMgLTkgMTAgLTIwIDE2Ci0xMSA2IC0yMCA4IC0yMCA2eiIvPgo8cGF0aCBkPSJNNTAwMCA2ODI2IGMwIC00IDIzIC0zMyA1MSAtNjQgNjEgLTY3IDEyMiAtMTU1IDE2NyAtMjQyIDE4IC0zNiAzMAotNTQgMjYgLTQwIC0xMCA0MCAtNjEgMTMwIC0xMDcgMTkxIC01NyA3NiAtMTM2IDE2NiAtMTM3IDE1NXoiLz4KPHBhdGggZD0iTTUyODEgNjM1NCBjMCAtMTEgMyAtMTQgNiAtNiAzIDcgMiAxNiAtMSAxOSAtMyA0IC02IC0yIC01IC0xM3oiLz4KPHBhdGggZD0iTTIxNjIgNTgwNCBjMTMgLTExMiAxMTMgLTM1OCAxNjggLTQxMiAxNiAtMTYgNDkgLTM0IDc3IC00MiAyNiAtNgo1NiAtMTQgNjYgLTE3IDI1IC02IDIxIC0yMyAtNiAtMjMgLTEzIDAgLTQ2IC03IC03MyAtMTUgLTQ4IC0xNCAtNTEgLTE3IC02NwotNjkgLTEwIC0yOSAtMTQgLTYyIC0xMCAtNzEgNCAtMTEgMiAtMTYgLTQgLTEyIC01IDMgLTkgLTcgLTkgLTI2IDAgLTE4IC0xMAotNzggLTIyIC0xMzQgLTEyIC01NyAtMjQgLTEyOSAtMjUgLTE2MSAtMiAtMzIgLTcgLTYzIC0xMCAtNzAgLTQgLTYgMjcgNSA3MAoyNSAxMjMgNTcgMzM5IDEzNiA1ODggMjE3IDM4MSAxMjIgNDUxIDE0NiA0MjIgMTQwIC0xNiAtMiAtMjYgLTEgLTIzIDQgMyA1Ci00IDE4IC0xNSAyOCAtMTIgMTAgLTI4IDMyIC0zNyA0OSAtMjMgNDQgLTgyIDIzNCAtODIgMjY0IDAgNDcgLTEyIDY5IC00MSA4MQotMzUgMTUgLTM4IDMwIC02IDMxIDMyIDEgLTIyIDE3IC00MDMgMTE5IC0xODQgNTAgLTM4NSAxMDYgLTQ0NiAxMjUgLTYyIDE5Ci0xMTQgMzUgLTExNiAzNSAtMiAwIC0xIC0zMCA0IC02NnoiLz4KPHBhdGggZD0iTTYyMzAgNTc1MyBsLTk2IC00IC0yMyAtMTgyIGMtMTIgLTEwMCAtNDQgLTM1MSAtNzAgLTU1NyBsLTQ4IC0zNzUKOTEgLTggYzUwIC01IDE4OCAtNiAzMDYgLTQgMzIxIDcgNDMwIDM1IDUyMCAxMzQgNTkgNjQgODAgMTI1IDgwIDIyNyAwIDExNAotNjAgMjAyIC0xNTMgMjIyIC01MiAxMSAtNTEgMTUgMTIgNDQgODEgMzkgMTM2IDk1IDE1NSAxNjEgMjQgODEgMjEgMTQ2IC0xMQoyMTAgLTI1IDQ3IC0zNiA1OCAtOTMgODYgLTk4IDQ5IC0yNTIgNjAgLTY3MCA0NnogbTUyNSAtMjMgYzc0IC0xMSAxNTIgLTQzCjE5OSAtODMgMjUgLTIwIDMwIC0zMiAzNCAtODUgbDQgLTYwIC0xMDMgNSAtMTAyIDYgLTQxIDQyIGMtMzIgMzMgLTUzIDQ1IC05NAo1NCAtNTkgMTIgLTE1NSAxNCAtMjI1IDUgLTQyIC02IC00NyAtMTAgLTUyIC0zOCAtNiAtMzAgLTggLTMxIC00OCAtMjkgLTIzIDIKLTcyIDggLTEwOSAxNCBsLTY4IDExIDAgNDggYzAgMjYgMyA2MSA2IDc4IDYgMjkgMTAgMzEgNTMgMzUgMTA1IDggNDgxIDYgNTQ2Ci0zeiBtLTgyIC0xNTQgYzU1IC0yMyA3MiAtNTEgNzIgLTExNiAwIC02NyAtMjAgLTEwMiAtNzYgLTEzNSAtMjggLTE2IC01NwotMjAgLTE2NiAtMjMgLTczIC0zIC0xMzMgMCAtMTMzIDQgMCA1IDcgNjUgMTUgMTM0IDggNjkgMTUgMTMxIDE1IDEzOCAwIDE4CjIyOSAxNyAyNzMgLTJ6IG0tMjUgLTQ3MCBjNjUgLTM0IDc3IC0xMjcgMzAgLTIxOSAtMzEgLTYyIC04NSAtODEgLTI0MSAtODUKbC0xMjggLTQgNSAyMyBjMyAxMyAxMCA2OSAxNiAxMjQgMTcgMTU3IDIwIDE3MyAzOCAxNzkgOSAyIDY5IDQgMTMyIDIgODggLTEKMTIzIC02IDE0OCAtMjB6Ii8+CjxwYXRoIGQ9Ik04NTg2IDU3MDggYy0zIC0yNCAtMTMgLTk5IC0yMiAtMTY4IGwtMTYgLTEyNSAtMTMyIDAgYy0yMDUgMCAtMzE5Ci00MyAtMzg3IC0xNDUgLTU0IC04MSAtODQgLTIyNSAtNzcgLTM4MCAzIC04MiA3IC0xMDIgMzEgLTE0MiA2OCAtMTE2IDE4MwotMTQyIDUzNiAtMTE4IDEwMiA2IDE4OSAxNSAxOTMgMTggNCA0IDIxIDEyNiAzOCAyNzIgMTcgMTQ2IDQ0IDM3MSA1OSA1MDAgMTYKMTI5IDMxIDI1NiAzNCAyODMgbDUgNDcgLTEyOCAwIC0xMjggMCAtNiAtNDJ6IG0yNDQgMTkgYzAgLTcgLTExIC04MSAtMjUKLTE2NSAtMTQgLTg0IC0yNSAtMTU0IC0yNSAtMTU1IDAgLTcgLTkwIC04IC0xNDMgLTIgbC01OSA3IDYgOTIgYzMgNTAgOCAxMjQKMTIgMTY0IGw2IDcyIDExNCAwIGM4NiAwIDExNCAtMyAxMTQgLTEzeiBtLTMzMiAtNDgzIGMyNyAtOCAyNyAtNiAtMTIgLTI4OQpsLTIxIC0xNjAgLTkzIC0zIGMtOTEgLTMgLTkzIC0yIC0xMjIgMjcgLTI4IDI4IC0zMCAzNCAtMzAgMTEzIDAgOTUgMjEgMjA0CjQ3IDI0OSAxMCAxOCAzNiA0MCA1OCA1MCA0MCAxOSAxMjcgMjUgMTczIDEzeiIvPgo8cGF0aCBkPSJNOTUyMSA1NjU4IGMtNiAtNTEgLTE2IC0xMjcgLTIyIC0xNjkgbC0xMSAtNzYgLTEyNiAxIGMtMjU1IDIgLTM2NwotNjIgLTQzMiAtMjQ2IC0xNyAtNDkgLTIzIC05MyAtMjcgLTIwMyAtNSAtMTMwIC00IC0xNDUgMTcgLTE5MyAyOCAtNjQgNzIKLTEwNCAxNDIgLTEyOCA0MyAtMTUgODMgLTE5IDIwOCAtMTkgODUgMCAyMDggNCAyNzMgOCAxMDkgOCAxMTcgMTEgMTIxIDMwIDMKMTIgMTIgODcgMjEgMTY3IDkgODAgMjUgMjE1IDM2IDMwMCAyNCAxOTcgNjkgNTkxIDY5IDYwNyAwIDEwIC0zMSAxMyAtMTI5IDEzCmwtMTI4IDAgLTEyIC05MnogbTI1OSA3MCBjMCAtMTQgLTE0IC05NiAtNDIgLTIzOCBsLTIwIC0xMDUgLTk2IDMgYy01MyAyIC05OAo1IC0xMDAgNyAtNSA0IDE2IDI4OSAyNCAzMjMgNCAyMSA4IDIyIDExOSAyMiA4MiAwIDExNSAtMyAxMTUgLTEyeiBtLTMxNwotNDg4IGM1IC00IC00MSAtNDA3IC00OSAtNDM3IC0yIC05IC0zMCAtMTMgLTkzIC0xMyAtODEgMCAtOTIgMiAtMTIwIDI1IC0zOAozMyAtNDYgODEgLTMyIDE5NSAxOSAxNDkgNDkgMjA5IDExNyAyMzAgMjkgOSAxNjggOSAxNzcgMHoiLz4KPHBhdGggZD0iTTExMzE3IDU3MjkgYy0yMyAtMjEgLTI3IC0zNCAtMzMgLTExMCBsLTYgLTg2IDEwOSAtNiBjMTU1IC05IDE0OAotMTMgMTYzIDk5IDkgNjUgOSA5OSAyIDEwNiAtNSA1IC01NCAxMiAtMTA5IDE1IC05NCA1IC0xMDAgNCAtMTI2IC0xOHogbTIyNwotMjkgYy00IC02NiAtMTggLTEzMyAtMzEgLTE0NiAtMTEgLTEwIC00MSAtMTQgLTExNCAtMTQgbC0xMDAgMCA3IDczIGMxMiAxMjMKNiAxMTggMTMxIDExNSBsMTA4IC0zIC0xIC0yNXoiLz4KPHBhdGggZD0iTTEwODY2IDU3MDggYy0zIC0xMyAtMTYgLTExMyAtMzEgLTIyMyAtMTQgLTExMCAtMzYgLTI3NCAtNDkgLTM2NQotMzQgLTIzMiAtNjYgLTQ2MyAtNjYgLTQ3NyAwIC0xMCAzNCAtMTMgMTM0IC0xMyA3NCAwIDEzNyA0IDE0MCA4IDMgNSAyMyAxNTQKNDUgMzMzIDIzIDE3OCA1MiA0MTEgNjYgNTE4IDE0IDEwNiAyNSAyMDQgMjUgMjE3IGwwIDI0IC0xMzAgMCBjLTEyNiAwIC0xMzAKLTEgLTEzNCAtMjJ6IG0yNTQgLTEzIGMwIC0xNCAtNiAtNTQgLTE0IC04OCAtOCAtMzQgLTIyIC0xMDIgLTMxIC0xNTIgLTkgLTQ5Ci0xOSAtOTIgLTIxIC05NSAtMyAtMyAtNDIgLTggLTg3IC0xMSAtNDUgLTMgLTkwIC05IC05OSAtMTMgLTE2IC03IC0xOCAtMgotMTggNTEgMCAzMyA0IDk1IDEwIDEzOSA1IDQzIDEyIDEwNSAxNSAxMzcgbDYgNTcgMTIwIDAgMTE5IDAgMCAtMjV6Ii8+CjxwYXRoIGQ9Ik0xMTc0NSA1NzA4IGMtMiAtMTMgLTExIC03NSAtMjAgLTEzOCAtOCAtNjMgLTIwIC0xNDYgLTI1IC0xODUgLTIwCi0xNDEgLTkwIC03MDggLTkwIC03MzEgMCAtMjQgMCAtMjQgMTI5IC0yNCA3MyAwIDEzMiA0IDEzNiAxMCAzIDUgMTMgODQgMjIKMTc1IDEwIDkxIDIwIDE2NSAyMyAxNjUgMyAwIDEyIC0xMiAyMSAtMjggNzUgLTEyOCAxNjcgLTI3MiAxODcgLTI5NCAyNiAtMjgKMjYgLTI4IDE2NSAtMjggNzYgMCAxMzcgNCAxMzUgOCAtNyAxNyAtMTUwIDI0MiAtMjExIDMzMiBsLTY0IDk1IDE0NiAxNDkgYzgwCjgyIDEzMCAxMzggMTExIDEyMyAtMTkgLTE1IC00OSAtMzUgLTY2IC00MyAtMjkgLTE1IC0zMyAtMTUgLTgzIDExIC0zOCAxOQotNTEgMzEgLTQ3IDQxIDMgOSA2IDE4IDYgMjAgMCAyIDI4IDQgNjMgNSAzNCAxIDg5IDUgMTIyIDkgNTEgNiA0MSA3IC02NiA5CmwtMTI2IDEgLTEzNCAtMTI5IGMtNzMgLTcyIC0xMzUgLTEyOCAtMTM3IC0xMjcgLTEgMiA5IDEwOCAyMyAyMzYgMTUgMTI3IDI1CjIzMyAyMyAyMzYgLTIgMiAtMTUgLTU1IC0yOCAtMTI3IC0xMyAtNzIgLTI4IC0xMzMgLTMzIC0xMzYgLTUgLTMgLTUyIC03Ci0xMDQgLTkgbC05NiAtMyA3IDEzNyBjMTAgMTc1IDE5IDI0MiAzNyAyNTMgMTEgNyAxMSA5IC0zIDkgLTEwIDAgLTIwIC0xMAotMjMgLTIyeiIvPgo8cGF0aCBkPSJNMTE4MjAgNTcyNCBjODMgLTggMTkwIC04IDE5MCAtMSAwIDQgLTUxIDYgLTExMiA1IC02MiAtMSAtOTcgLTMKLTc4IC00eiIvPgo8cGF0aCBkPSJNMzI3OCA1NjkzIGM3IC0zIDE2IC0yIDE5IDEgNCAzIC0yIDYgLTEzIDUgLTExIDAgLTE0IC0zIC02IC02eiIvPgo8cGF0aCBkPSJNMTI4MDUgNTQwMCBjLTgzIC0xMSAtMTcyIC00NCAtMjE1IC03OCAtODAgLTY1IC0xMjIgLTE5OSAtMTI0IC0zOTcKLTEgLTEwNyAyIC0xMjUgMjIgLTE2NyAyOSAtNTggNTYgLTgxIDEyOSAtMTA4IDg3IC0zMiAxOTcgLTQ0IDMxNiAtMzIgMjI4IDIzCjMxNSA5NiAzNjIgMzAyIDU5IDI2NSA5IDQxOCAtMTUyIDQ2MyAtNzEgMjAgLTI1MyAyOSAtMzM4IDE3eiBtMjgzIC0yOSBjMjMKLTcgNDIgLTE2IDQyIC0yMiAwIC02IC00IC04IC05IC00IC01IDMgLTEyIDEgLTE1IC0zIC0zIC01IC0yNiAtMTAgLTUzIC0xMQotMjYgLTEgLTU4IC04IC03MCAtMTcgLTI5IC0xOCAtMTIzIC0zMSAtMTIzIC0xNiAwIDggLTc1IDE3IC0xODIgMjIgLTI5IDIKLTIxIDE2IDIwIDM0IDczIDMzIDI5NSA0MyAzOTAgMTd6IG0tNzEgLTE1NSBjMjcgLTIzIDI4IC0yOCAyNyAtMTA4IDAgLTk4Ci0yMCAtMjA5IC00NSAtMjU5IC0zMCAtNjEgLTEzNSAtODggLTIxMyAtNTUgLTQzIDE4IC01MCA0MCAtNDggMTQ2IDYgMjMzIDQ3CjMwMCAxODQgMzAwIDU2IDAgNzEgLTQgOTUgLTI0eiIvPgo8cGF0aCBkPSJNNzE0NiA1MzY2IGMtMTcgLTkwIC00NyAtMzEyIC01NyAtNDIwIC0xMCAtMTA3IC05IC0xMzAgNSAtMTc4IDgKLTMwIDI4IC02OCA0MyAtODMgNjkgLTcwIDE5NSAtOTEgMzMyIC01NiA2MiAxNSA4OCAxOCA5NyAxMCA5IC03IDU1IC0xMCAxMzEKLTcgbDExOCA0IDggNzQgYzUgNDEgMjIgMTc2IDM4IDMwMCAxNiAxMjQgMzIgMjU5IDM1IDMwMSBsNyA3NiAtMTI0IDUgYy02OCAzCi0xMjYgNCAtMTI4IDIgLTIgLTIgLTE4IC0xMjAgLTM2IC0yNjQgLTIyIC0xNzQgLTM5IC0yNjkgLTQ5IC0yODYgLTI3IC00MAotNjQgLTU4IC0xMjEgLTU4IC01OSAtMSAtOTAgMTggLTk4IDYxIC0yIDE0IDYgMTE2IDE5IDIyNyAxNCAxMTAgMjcgMjI4IDMwCjI2MSBsNiA2MCAtMTI1IDEgLTEyNSAxIC02IC0zMXoiLz4KPHBhdGggZD0iTTk4NTEgNTMzMyBjMTEgLTMyIDQ5IC0xNTkgODUgLTI4MyA4MSAtMjgyIDEyMCAtMzkxIDE0NCAtNDEwIDIwCi0xNSAyMCAtMTYgLTEgLTU3IC0zMiAtNjQgLTg3IC04OCAtMTkwIC03OSAtNDMgNCAtNzkgNSAtNzkgNCAwIC0yIC03IC00MQotMTQgLTg4IC04IC00NyAtMTEgLTg5IC02IC05NCA0IC00IDY4IC02IDE0MiAtNSAxMjcgNCAxMzcgNiAyMDAgMzcgMTEzIDU1CjE0MSA5OCAzMjggNDkwIDY1IDEzNiAxNDkgMzEzIDE4OCAzOTUgbDcxIDE0NyAtMTI0IDAgLTEyNSAwIC00MyAtOTIgYy0yMwotNTEgLTc0IC0xNjYgLTExMiAtMjU1IC0zOSAtOTAgLTcyIC0xNjMgLTc2IC0xNjMgLTMgMCAtMjkgMTAwIC01OSAyMjMgLTI5CjEyMiAtNTcgMjM3IC02MiAyNTUgbC05IDMyIC0xMzkgMCAtMTM5IDAgMjAgLTU3eiBtMjM5IDE3IGMwIC0yNyAtNDYgLTQ1IC04MQotMzMgLTI4IDExIC03NSAxMCAtMTAwIC0xIC0xMyAtNSAtMTkgMCAtMjcgMjMgbC0xMSAzMSAxMTAgMCBjMTAzIDAgMTA5IC0xCjEwOSAtMjB6IG01OTAgMTMgYy0xIC0yNiAtMjMgLTM0IC05OSAtMzggLTQ1IC0zIC04NiAtNyAtOTIgLTEwIC01IC00IC05IDgKLTkgMjQgbDAgMzEgMTAwIDAgYzU1IDAgMTAwIC0zIDEwMCAtN3oiLz4KPHBhdGggZD0iTTExMjYwIDUzODggYzAgLTIgLTExIC04NCAtMjUgLTE4MyAtMTQgLTk5IC0zNCAtMjUyIC00NSAtMzQwIC0xMQotODggLTIyIC0xNzcgLTI1IC0xOTcgbC01IC0zOCAxMzQgMCAxMzUgMCA2IDQzIGMyOCAyMDIgNzcgNTg2IDgyIDY0NSBsNiA3MgotMTMyIDAgYy03MiAwIC0xMzEgLTEgLTEzMSAtMnoiLz4KPC9nPgo8L3N2Zz4K',
+                            alt: 'Buddyliko',
+                            style: {
+                                width: '100%',
+                                maxWidth: '100%',
+                                height: 'auto',
+                                display: 'block',
+                                margin: '0 auto 0 auto',
+                                borderRadius: '8px'
+                            }
+                        }),
+                        React.createElement('p', {
+                            style: {
+                                fontSize: '36px',
+                                margin: '-8px 0 0 0',
+                                opacity: 1,
+                                fontStyle: 'italic',
+                                fontWeight: '700',
+                                letterSpacing: '0.4px',
+                                textAlign: 'center',
+                                textShadow: '0 1px 3px rgba(0,0,0,0.3)'
+                            }
+                        }, 'Your Buddy in transformations')
+                    )
                 ),
                 React.createElement('div', { className: 'sidebar-content' },
                     statusMessage && React.createElement('div', { 
@@ -3451,20 +3902,7 @@ OPENAI_API_KEY=sk-...`
                         React.createElement('div', { 
                             className: `tab ${activeTab === 'output' ? 'active' : ''}`,
                             onClick: () => setActiveTab('output')
-                        }, 
-                            '📤 Output',
-                            (outputDocumentType && outputDocumentType !== '') && React.createElement('span', {
-                                style: {
-                                    marginLeft: '6px',
-                                    padding: '2px 6px',
-                                    background: 'linear-gradient(135deg, #00BCD4 0%, #3F51B5 100%)',
-                                    color: 'white',
-                                    borderRadius: '10px',
-                                    fontSize: '10px',
-                                    fontWeight: '600'
-                                }
-                            }, outputDocumentType)
-                        ),
+                        }, '📤 Output'),
                         React.createElement('div', { 
                             className: `tab ${activeTab === 'connections' ? 'active' : ''}`,
                             onClick: () => setActiveTab('connections')
@@ -3514,8 +3952,8 @@ OPENAI_API_KEY=sk-...`
                         ),
                         React.createElement('button', {
                             className: 'btn btn-secondary btn-full',
-                            onClick: () => downloadSampleCSV('input')
-                        }, '📥 Download Sample CSV'),
+                            onClick: () => inputSchema ? exportFieldsCSV('input') : downloadSampleCSV('input')
+                        }, inputSchema ? '📥 Export Fields CSV' : '📥 Download Sample CSV'),
                         inputSchema ? React.createElement('div', { style: { fontSize: '12px', color: '#666', marginBottom: '10px' } },
                             `${inputSchema.field_count} fields - Drag to canvas`
                         ) : React.createElement('div', { className: 'empty-state' },
@@ -3531,10 +3969,7 @@ OPENAI_API_KEY=sk-...`
                                 className: 'schema-type-select',
                                 style: { width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ddd', fontSize: '13px' },
                                 value: outputSchemaId,
-                                onChange: async (e) => {
-                                    setOutputSchemaId(e.target.value);
-                                    await fetchDocumentTypes(e.target.value);
-                                }
+                                onChange: (e) => setOutputSchemaId(e.target.value)
                             },
                                 React.createElement('option', { value: '' }, '-- Select schema type --'),
                                 availableOutputSchemas.map(schema => 
@@ -3545,50 +3980,6 @@ OPENAI_API_KEY=sk-...`
                                 )
                             )
                         ),
-                        
-                        // Document Type selector - shown only if multiple types available
-                        availableDocumentTypes.length > 0 && React.createElement('div', { 
-                            style: { 
-                                marginTop: '10px',
-                                padding: '10px',
-                                background: '#f0f8ff',
-                                border: '2px solid #00BCD4',
-                                borderRadius: '6px'
-                            } 
-                        },
-                            React.createElement('label', { 
-                                style: { 
-                                    display: 'block', 
-                                    marginBottom: '5px', 
-                                    fontSize: '13px', 
-                                    fontWeight: '600',
-                                    color: '#333'
-                                } 
-                            }, '📄 Document Type:'),
-                            React.createElement('select', {
-                                value: outputDocumentType,
-                                onChange: (e) => {
-                                    console.log('📄 Document type changed to:', e.target.value);
-                                    setOutputDocumentType(e.target.value);
-                                },
-                                style: {
-                                    width: '100%',
-                                    padding: '8px',
-                                    border: '1px solid #ddd',
-                                    borderRadius: '4px',
-                                    fontSize: '13px',
-                                    fontWeight: '500'
-                                }
-                            },
-                                availableDocumentTypes.map(docType => 
-                                    React.createElement('option', { 
-                                        key: docType.type, 
-                                        value: docType.type 
-                                    }, docType.label)
-                                )
-                            )
-                        ),
-                        
                         React.createElement('button', {
                             className: 'btn btn-primary btn-full',
                             onClick: () => {
@@ -3610,8 +4001,8 @@ OPENAI_API_KEY=sk-...`
                         ),
                         React.createElement('button', {
                             className: 'btn btn-secondary btn-full',
-                            onClick: () => downloadSampleCSV('output')
-                        }, '📥 Download Sample CSV'),
+                            onClick: () => outputSchema ? exportFieldsCSV('output') : downloadSampleCSV('output')
+                        }, outputSchema ? '📤 Export Fields CSV' : '📥 Download Sample CSV'),
                         outputSchema ? React.createElement('div', { style: { fontSize: '12px', color: '#666', marginBottom: '10px' } },
                             `${outputSchema.field_count} fields - Drag to canvas`
                         ) : React.createElement('div', { className: 'empty-state' },
@@ -3619,11 +4010,19 @@ OPENAI_API_KEY=sk-...`
                             React.createElement('p', null, 'Upload CSV schema')
                         )
                     ),
-                    activeTab === 'connections' && React.createElement(ConnectionsList, {
-                        connections,
-                        selectedConnection,
-                        setSelectedConnection
-                    }),
+                    activeTab === 'connections' && React.createElement('div', {
+                        style: {
+                            overflowY: 'auto',
+                            maxHeight: 'calc(100vh - 280px)',
+                            paddingRight: '4px'
+                        }
+                    },
+                        React.createElement(ConnectionsList, {
+                            connections,
+                            selectedConnection,
+                            setSelectedConnection
+                        })
+                    ),
                     activeTab === 'schemas' && React.createElement('div', { style: { padding: '10px' } },
                         React.createElement('h3', { style: { marginBottom: '15px', fontSize: '16px' } }, '📋 Schema Management'),
                         React.createElement('p', { style: { fontSize: '13px', color: '#666', marginBottom: '15px' } }, 
@@ -3718,7 +4117,7 @@ OPENAI_API_KEY=sk-...`
             );
         }
         
-        function MainCanvas({ inputSchema, outputSchema, connections, draggedField, setDraggedField, addConnection, mappingName, setMappingName, saveMapping, canvasRef, fieldPositions, updateFieldPositions, selectedConnection, setSelectedConnection, saveSessionToBackend, clearSession, sessionLoaded, inputExample, outputExample, hoverPopup, setHoverPopup, hoverTimeoutRef, setShowFormulaEditor, setEditingConnection, runAIAutoMap, runBusinessRulesAutomap, aiProcessing, setShowSettings, searchQuery, setSearchQuery, performSearch, nextSearchResult, searchResults, currentSearchIndex, saveProject, loadProject, reverseMapping, setPopupPinned, popupPinned, setShowSchemaEditor, hideConnected, setHideConnected, outputDocumentType }) {
+        function MainCanvas({ inputSchema, outputSchema, connections, draggedField, setDraggedField, addConnection, mappingName, setMappingName, saveMapping, canvasRef, fieldPositions, updateFieldPositions, selectedConnection, setSelectedConnection, saveSessionToBackend, clearSession, sessionLoaded, inputExample, outputExample, hoverPopup, setHoverPopup, hoverTimeoutRef, setShowFormulaEditor, setEditingConnection, runAIAutoMap, runBusinessRulesAutomap, aiProcessing, setShowSettings, searchQuery, setSearchQuery, performSearch, nextSearchResult, searchResults, currentSearchIndex, saveProject, loadProject, reverseMapping, setPopupPinned, popupPinned, setShowSchemaEditor, hideConnected, setHideConnected, onOpenNodeImport, onFieldContextMenu, onEditNode, onDeleteNode, exportDiagram }) {
             const [dropTarget, setDropTarget] = useState(null);
             
             const handleDrop = (targetField, targetType) => {
@@ -3785,6 +4184,13 @@ OPENAI_API_KEY=sk-...`
                         disabled: connections.length === 0,
                         title: 'Export mapping as JSON'
                     }, '📄 Export JSON'),
+                    React.createElement('button', {
+                        className: 'btn btn-secondary',
+                        onClick: exportDiagram,
+                        disabled: connections.length === 0,
+                        title: 'Esporta diagramma SVG della mappatura',
+                        style: { background: connections.length > 0 ? 'linear-gradient(135deg, #667eea, #764ba2)' : undefined, color: connections.length > 0 ? '#fff' : undefined, border: 'none' }
+                    }, '🗺️ Diagramma'),
                     React.createElement('div', {
                         style: { 
                             width: '2px', 
@@ -3834,19 +4240,13 @@ OPENAI_API_KEY=sk-...`
                                             target: conn.target,
                                             sourceName: conn.sourceName,
                                             targetName: conn.targetName,
-                                            sourcePath: conn.sourcePath,
-                                            targetPath: conn.targetPath,
                                             transformation: conn.transformation
                                         })),
                                         inputSchema: inputSchema,
-                                        outputSchema: {
-                                            ...outputSchema,
-                                            rootElement: outputDocumentType || (outputSchema && outputSchema.rootElement) || 'Invoice'
-                                        }
+                                        outputSchema: outputSchema
                                     };
                                     
                                     console.log('📤 Sending transform with', connections.length, 'connections');
-                                    console.log('📄 Document type:', outputDocumentType || 'Invoice');
                                     console.log('Mapping rules:', mappingRules);
                                     
                                     const formData = new FormData();
@@ -3956,8 +4356,10 @@ OPENAI_API_KEY=sk-...`
                             style: { width: '450px' }
                         },
                             React.createElement('h3', {
-                                style: { cursor: 'ew-resize' },  // Always show resize cursor
+                                style: { cursor: 'ew-resize', display: 'flex', alignItems: 'center', justifyContent: 'space-between' },  // Always show resize cursor
                                 onMouseDown: (e) => {
+                                    // Don't trigger resize if clicking the + button
+                                    if (e.target.classList.contains('col-import-btn')) return;
                                     e.preventDefault();
                                     console.log('INPUT HEADER DRAG START');
                                     const column = document.getElementById('input-column');
@@ -3987,7 +4389,14 @@ OPENAI_API_KEY=sk-...`
                                     document.addEventListener('mousemove', onMouseMove);
                                     document.addEventListener('mouseup', onMouseUp);
                                 }
-                            }, '📥 INPUT SCHEMA'),
+                            },
+                                React.createElement('span', null, '📥 INPUT SCHEMA'),
+                                inputSchema && React.createElement('button', {
+                                    className: 'col-import-btn',
+                                    title: 'Importa nodi aggiuntivi (CSV/JSON)',
+                                    onClick: (e) => { e.stopPropagation(); onOpenNodeImport && onOpenNodeImport('input'); }
+                                }, '＋')
+                            ),
                             inputSchema && Object.values(inputSchema.fields)
                                 .filter(field => {
                                     if (!hideConnected) return true;
@@ -4017,7 +4426,10 @@ OPENAI_API_KEY=sk-...`
                                     hoverTimeoutRef,
                                     popupPinned,
                                     setPopupPinned,
-                                    selectedConnection
+                                    selectedConnection,
+                                    onFieldContextMenu,
+                                    onEditNode,
+                                    onDeleteNode
                                 })
                             )
                         ),
@@ -4029,8 +4441,9 @@ OPENAI_API_KEY=sk-...`
                             style: { width: '450px' }
                         },
                             React.createElement('h3', {
-                                style: { cursor: 'ew-resize' },  // Always show resize cursor
+                                style: { cursor: 'ew-resize', display: 'flex', alignItems: 'center', justifyContent: 'space-between' },  // Always show resize cursor
                                 onMouseDown: (e) => {
+                                    if (e.target.classList.contains('col-import-btn')) return;
                                     e.preventDefault();
                                     console.log('OUTPUT HEADER DRAG START');
                                     const column = document.getElementById('output-column');
@@ -4060,7 +4473,14 @@ OPENAI_API_KEY=sk-...`
                                     document.addEventListener('mousemove', onMouseMove);
                                     document.addEventListener('mouseup', onMouseUp);
                                 }
-                            }, '📤 OUTPUT SCHEMA'),
+                            },
+                                React.createElement('span', null, '📤 OUTPUT SCHEMA'),
+                                outputSchema && React.createElement('button', {
+                                    className: 'col-import-btn',
+                                    title: 'Importa nodi aggiuntivi (CSV/JSON)',
+                                    onClick: (e) => { e.stopPropagation(); onOpenNodeImport && onOpenNodeImport('output'); }
+                                }, '＋')
+                            ),
                             outputSchema && Object.values(outputSchema.fields)
                                 .filter(field => {
                                     if (!hideConnected) return true;
@@ -4087,7 +4507,10 @@ OPENAI_API_KEY=sk-...`
                                     hoverTimeoutRef,
                                     popupPinned,
                                     setPopupPinned,
-                                    selectedConnection
+                                    selectedConnection,
+                                    onFieldContextMenu,
+                                    onEditNode,
+                                    onDeleteNode
                                 })
                             )
                         )
@@ -4101,7 +4524,7 @@ OPENAI_API_KEY=sk-...`
             );
         }
         
-        function FieldBox({ field, type, setDraggedField, draggedField, dropTarget, setDropTarget, handleDrop, updateFieldPositions, connections, inputExample, outputExample, inputSchema, outputSchema, setHoverPopup, hoverTimeoutRef, popupPinned, setPopupPinned, selectedConnection }) {
+        function FieldBox({ field, type, setDraggedField, draggedField, dropTarget, setDropTarget, handleDrop, updateFieldPositions, connections, inputExample, outputExample, inputSchema, outputSchema, setHoverPopup, hoverTimeoutRef, popupPinned, setPopupPinned, selectedConnection, onFieldContextMenu, onEditNode, onDeleteNode }) {
             const isConnected = connections.some(c => 
                 (type === 'input' && (c.source === field.path || c.source === field.id || c.source === field.name)) ||
                 (type === 'output' && (c.target === field.path || c.target === field.id || c.target === field.name))
@@ -4198,7 +4621,7 @@ OPENAI_API_KEY=sk-...`
                             const formatType = isXML ? 'xml' : 'json';
                             
                             // Call API asynchronously
-                            fetch('http://localhost:8080/api/preview/extract', {
+                            fetch(`${API_URL}/preview/extract`, {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
                                 body: JSON.stringify({
@@ -4341,7 +4764,7 @@ OPENAI_API_KEY=sk-...`
                         const nodeName = xmlPath.split('/').pop();
                         
                         // Function to extract value from input example
-                        const extractValueFromInput = async (sourceField) => {
+                        const extractValueFromInput = async (sourceField, directPath) => {
                             console.log('═══════════════════════════════════════');
                             console.log('🔍 EXTRACTING VALUE');
                             console.log('📝 sourceField:', sourceField);
@@ -4354,6 +4777,28 @@ OPENAI_API_KEY=sk-...`
                             
                             const lines = inputExample.split('\n');
                             
+                            // SHORTCUT: if we already have the path from conn.sourcePath, use it directly
+                            if (directPath && (inputExample.trim().startsWith('<') || inputExample.trim().startsWith('{'))) {
+                                const isXML2 = inputExample.trim().startsWith('<');
+                                try {
+                                    const resp = await fetch(`${API_URL}/preview/extract`, {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+                                        body: JSON.stringify({
+                                            example_content: inputExample,
+                                            field_path: directPath,
+                                            field_name: sourceField,
+                                            format_type: isXML2 ? 'xml' : 'json'
+                                        })
+                                    });
+                                    const d = await resp.json();
+                                    if (d.value !== null && d.value !== undefined && !d.error) {
+                                        return d.value;
+                                    }
+                                } catch(e) {}
+                                // If direct path failed, fall through to schema lookup
+                            }
+
                             // Find source field data - try multiple keys
                             let sourceFieldData = null;
                             const possibleKeys = [
@@ -4390,8 +4835,28 @@ OPENAI_API_KEY=sk-...`
                             }
                             
                             if (!sourceFieldData) {
+                                // Last resort: try using sourceField as a path directly
+                                const isXML3 = inputExample.trim().startsWith('<');
+                                const isJSON3 = inputExample.trim().startsWith('{') || inputExample.trim().startsWith('[');
+                                if (isXML3 || isJSON3) {
+                                    try {
+                                        const resp = await fetch(`${API_URL}/preview/extract`, {
+                                            method: 'POST',
+                                            headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+                                            body: JSON.stringify({
+                                                example_content: inputExample,
+                                                field_path: sourceField,
+                                                field_name: sourceField,
+                                                format_type: isXML3 ? 'xml' : 'json'
+                                            })
+                                        });
+                                        const d = await resp.json();
+                                        if (d.value !== null && d.value !== undefined && !d.error) {
+                                            return d.value;
+                                        }
+                                    } catch(e) {}
+                                }
                                 console.error('❌❌❌ FIELD NOT FOUND:', sourceField);
-                                console.log('Available fields:', Object.keys(inputSchema.fields));
                                 return null;
                             }
                             
@@ -4412,7 +4877,7 @@ OPENAI_API_KEY=sk-...`
                                 }
                                 
                                 try {
-                                    const response = await fetch('http://localhost:8080/api/preview/extract', {
+                                    const response = await fetch(`${API_URL}/preview/extract`, {
                                         method: 'POST',
                                         headers: { 'Content-Type': 'application/json' },
                                         body: JSON.stringify({
@@ -4475,8 +4940,8 @@ OPENAI_API_KEY=sk-...`
                                 y: rect.top
                             });
                             
-                            // Extract value asynchronously
-                            extractValueFromInput(conn.source).then(value => {
+                            // Extract value asynchronously — prefer sourcePath if available
+                            extractValueFromInput(conn.source, conn.sourcePath).then(value => {
                                 console.log('📥 Extracted value:', value);
                                 console.log('🔗 Connection:', conn);
                                 console.log('🔄 Transformation object:', conn.transformation);
@@ -4767,6 +5232,25 @@ OPENAI_API_KEY=sk-...`
                 onMouseEnter: (e) => handleMouseEnter(e, false),
                 onMouseLeave: handleMouseLeave
             },
+                // Edit / Delete buttons (visible on hover)
+                (onEditNode || onDeleteNode) && React.createElement('div', {
+                    className: 'field-box-actions',
+                    onClick: e => e.stopPropagation(),
+                    onMouseDown: e => e.stopPropagation(),
+                    draggable: false,
+                    onDragStart: e => e.preventDefault()
+                },
+                    onEditNode && React.createElement('button', {
+                        className: 'field-action-btn edit',
+                        title: 'Modifica nodo',
+                        onClick: (e) => { e.stopPropagation(); e.preventDefault(); onEditNode(field, type); }
+                    }, '✏️'),
+                    onDeleteNode && React.createElement('button', {
+                        className: 'field-action-btn delete',
+                        title: 'Elimina nodo',
+                        onClick: (e) => { e.stopPropagation(); e.preventDefault(); onDeleteNode(field, type); }
+                    }, '🗑️')
+                ),
                 React.createElement('div', { className: 'field-name' },
                     isConnected && (type === 'input' ? '→ ' : '← '),
                     field.name
@@ -4839,6 +5323,428 @@ OPENAI_API_KEY=sk-...`
             );
         }
         
+        // ===================================================
+        // NODE IMPORT MODAL
+        // ===================================================
+        function NodeImportModal({ direction, schemaType, onClose, onImport }) {
+            const [file, setFile] = useState(null);
+            const [fileType, setFileType] = useState('csv');
+            const [isDragging, setIsDragging] = useState(false);
+            const [preview, setPreview] = useState(null);
+            const [error, setError] = useState('');
+            const fileInputRef = useRef(null);
+
+            const isXML = schemaType === 'xml' || schemaType === 'xsd';
+
+            const parseCSV = (text) => {
+                const lines = text.trim().split('\n').filter(l => l.trim());
+                if (lines.length < 2) throw new Error('CSV must have header + at least one row');
+                const headers = lines[0].split(',').map(h => h.replace(/"/g,'').trim());
+                return lines.slice(1).map(line => {
+                    const vals = line.split(',').map(v => v.replace(/"/g,'').trim());
+                    const obj = {};
+                    headers.forEach((h, i) => obj[h] = vals[i] || '');
+                    return obj;
+                });
+            };
+
+            const parseJSON = (text) => {
+                const data = JSON.parse(text);
+                if (Array.isArray(data)) return data;
+                if (data.fields) return Array.isArray(data.fields) ? data.fields : Object.values(data.fields);
+                return [data];
+            };
+
+            const handleFileSelect = async (selectedFile) => {
+                setFile(selectedFile);
+                setError('');
+                setPreview(null);
+                try {
+                    const text = await selectedFile.text();
+                    let rows;
+                    const ext = selectedFile.name.split('.').pop().toLowerCase();
+                    if (ext === 'json') {
+                        rows = parseJSON(text);
+                        setFileType('json');
+                    } else {
+                        rows = parseCSV(text);
+                        setFileType('csv');
+                    }
+                    setPreview(rows.slice(0, 5));
+                } catch(e) {
+                    setError('Parse error: ' + e.message);
+                }
+            };
+
+            const handleImport = async () => {
+                if (!file) return;
+                try {
+                    const text = await file.text();
+                    let rows;
+                    const ext = file.name.split('.').pop().toLowerCase();
+                    if (ext === 'json') {
+                        rows = parseJSON(text);
+                    } else {
+                        rows = parseCSV(text);
+                    }
+                    onImport(rows, direction);
+                    onClose();
+                } catch(e) {
+                    setError('Import error: ' + e.message);
+                }
+            };
+
+            return React.createElement('div', { className: 'modal-overlay', onClick: onClose },
+                React.createElement('div', {
+                    className: 'node-import-modal',
+                    onClick: e => e.stopPropagation()
+                },
+                    // Header
+                    React.createElement('div', {
+                        style: {
+                            padding: '18px 20px',
+                            background: 'linear-gradient(135deg, #00BCD4 0%, #3F51B5 100%)',
+                            color: 'white',
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center'
+                        }
+                    },
+                        React.createElement('h3', null,
+                            `📥 Importa Nodi Aggiuntivi — ${direction.toUpperCase()}`
+                        ),
+                        React.createElement('button', {
+                            onClick: onClose,
+                            style: { background: 'none', border: 'none', color: 'white', fontSize: '20px', cursor: 'pointer' }
+                        }, '×')
+                    ),
+
+
+
+                    // Body
+                    React.createElement('div', { style: { padding: '20px', overflowY: 'auto', flex: 1 } },
+                        React.createElement('p', { style: { fontSize: '13px', color: '#555', marginBottom: '16px' } },
+                            'Carica un file CSV o JSON con la stessa struttura dello schema corrente. I nodi importati appariranno come un pacchetto trascinabile da posizionare nello schema XML.'
+                        ),
+
+                        // Drop area
+                        React.createElement('div', {
+                            style: {
+                                border: isDragging ? '3px dashed #00BCD4' : '2px dashed #ccc',
+                                borderRadius: '8px',
+                                padding: '24px',
+                                textAlign: 'center',
+                                background: isDragging ? '#e0f7fa' : '#fafafa',
+                                cursor: 'pointer',
+                                marginBottom: '16px',
+                                transition: 'all 0.2s'
+                            },
+                            onClick: () => fileInputRef.current?.click(),
+                            onDragOver: e => { e.preventDefault(); setIsDragging(true); },
+                            onDragLeave: () => setIsDragging(false),
+                            onDrop: e => {
+                                e.preventDefault();
+                                setIsDragging(false);
+                                const f = e.dataTransfer.files[0];
+                                if (f) handleFileSelect(f);
+                            }
+                        },
+                            file
+                                ? React.createElement('div', null,
+                                    React.createElement('div', { style: { fontSize: '36px' } }, '✅'),
+                                    React.createElement('div', { style: { fontWeight: 'bold', marginTop: '6px' } }, file.name)
+                                )
+                                : React.createElement('div', null,
+                                    React.createElement('div', { style: { fontSize: '36px' } }, isDragging ? '📂' : '📁'),
+                                    React.createElement('div', { style: { marginTop: '8px', color: '#666' } }, 'Clicca o trascina qui un file CSV o JSON')
+                                ),
+                            React.createElement('input', {
+                                ref: fileInputRef,
+                                type: 'file',
+                                style: { display: 'none' },
+                                accept: '.csv,.json',
+                                onChange: e => e.target.files[0] && handleFileSelect(e.target.files[0])
+                            })
+                        ),
+
+                        // Error
+                        error && React.createElement('div', {
+                            style: { color: '#f44336', fontSize: '13px', marginBottom: '12px', padding: '8px', background: '#ffebee', borderRadius: '4px' }
+                        }, error),
+
+                        // Preview
+                        preview && preview.length > 0 && React.createElement('div', { style: { marginBottom: '16px' } },
+                            React.createElement('div', {
+                                style: { fontWeight: '600', fontSize: '13px', marginBottom: '8px', color: '#333' }
+                            }, `Anteprima (${preview.length} su ${preview.length} righe):`)  ,
+                            React.createElement('div', {
+                                style: { overflowX: 'auto', border: '1px solid #ddd', borderRadius: '6px', fontSize: '11px' }
+                            },
+                                React.createElement('table', { style: { width: '100%', borderCollapse: 'collapse' } },
+                                    React.createElement('thead', null,
+                                        React.createElement('tr', { style: { background: '#f5f5f5' } },
+                                            Object.keys(preview[0]).slice(0,6).map(k =>
+                                                React.createElement('th', {
+                                                    key: k,
+                                                    style: { padding: '6px 8px', borderBottom: '1px solid #ddd', textAlign: 'left', whiteSpace: 'nowrap' }
+                                                }, k)
+                                            )
+                                        )
+                                    ),
+                                    React.createElement('tbody', null,
+                                        preview.map((row, i) =>
+                                            React.createElement('tr', { key: i, style: { borderBottom: '1px solid #f0f0f0' } },
+                                                Object.values(row).slice(0,6).map((v, j) =>
+                                                    React.createElement('td', {
+                                                        key: j,
+                                                        style: { padding: '5px 8px', maxWidth: '100px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }
+                                                    }, String(v))
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    ),
+
+                    // Footer
+                    React.createElement('div', {
+                        style: { padding: '14px 20px', borderTop: '1px solid #eee', display: 'flex', gap: '10px', justifyContent: 'flex-end' }
+                    },
+                        React.createElement('button', { className: 'btn btn-secondary', onClick: onClose }, 'Annulla'),
+                        React.createElement('button', {
+                            className: 'btn btn-primary',
+                            onClick: handleImport,
+                            disabled: !file || !!error
+                        }, '📦 Importa come Pacchetto')
+                    )
+                )
+            );
+        }
+
+        // ===================================================
+        // NODE BUNDLE (draggable package of nodes)
+        // ===================================================
+        function NodeBundle({ bundle, onDrop, onDismiss }) {
+            const [pos, setPos] = useState({ x: 80, y: 200 });
+            const [dragging, setDragging] = useState(false);
+            const [dropZoneActive, setDropZoneActive] = useState(false);
+            const dragOffset = useRef({ x: 0, y: 0 });
+            const bundleRef = useRef(null);
+
+            const handleMouseDown = (e) => {
+                e.preventDefault();
+                setDragging(true);
+                dragOffset.current = {
+                    x: e.clientX - pos.x,
+                    y: e.clientY - pos.y
+                };
+
+                const onMove = (me) => {
+                    setPos({ x: me.clientX - dragOffset.current.x, y: me.clientY - dragOffset.current.y });
+
+                    // Check if hovering over a field-box
+                    const els = document.elementsFromPoint(me.clientX, me.clientY);
+                    const onField = els.some(el => el.classList.contains('field-box'));
+                    setDropZoneActive(onField);
+                };
+
+                const onUp = (ue) => {
+                    setDragging(false);
+                    document.removeEventListener('mousemove', onMove);
+                    document.removeEventListener('mouseup', onUp);
+
+                    // Check drop target
+                    const els = document.elementsFromPoint(ue.clientX, ue.clientY);
+                    const fieldEl = els.find(el => el.classList.contains('field-box') && el.dataset.fieldId);
+                    if (fieldEl) {
+                        const fieldId = fieldEl.dataset.fieldId;
+                        const colType = fieldId.startsWith('input-') ? 'input' : 'output';
+                        onDrop(bundle, fieldId, colType);
+                    }
+                };
+
+                document.addEventListener('mousemove', onMove);
+                document.addEventListener('mouseup', onUp);
+            };
+
+            return React.createElement('div', {
+                ref: bundleRef,
+                className: 'node-bundle',
+                style: {
+                    left: pos.x + 'px',
+                    top: pos.y + 'px',
+                    outline: dropZoneActive ? '2px solid #4caf50' : 'none',
+                    background: dropZoneActive ? '#e8f5e9' : 'white'
+                },
+                onMouseDown: handleMouseDown
+            },
+                React.createElement('div', { className: 'node-bundle-title' },
+                    '📦 Pacchetto',
+                    React.createElement('span', { className: 'node-bundle-count' }, bundle.nodes.length + ' nodi'),
+                    React.createElement('span', {
+                        style: { marginLeft: 'auto', cursor: 'pointer', color: '#999', fontSize: '16px', fontWeight: 'normal' },
+                        onClick: (e) => { e.stopPropagation(); onDismiss(bundle.id); }
+                    }, '×')
+                ),
+                React.createElement('ul', { className: 'node-bundle-list' },
+                    bundle.nodes.slice(0, 6).map((n, i) =>
+                        React.createElement('li', { key: i }, n.name || n.field_name || n.Field_Name || Object.values(n)[0])
+                    ),
+                    bundle.nodes.length > 6 && React.createElement('li', { key: 'more', style: { color: '#999', fontStyle: 'italic' } },
+                        `... e altri ${bundle.nodes.length - 6}`
+                    )
+                ),
+                React.createElement('div', { className: 'node-bundle-drop-hint' },
+                    dropZoneActive ? '✅ Rilascia qui per inserire dopo questo nodo' : '☝️ Trascina su un nodo per inserirlo dopo'
+                )
+            );
+        }
+
+        // ===================================================
+        // FIELD CONTEXT MENU
+        // ===================================================
+        function FieldContextMenu({ x, y, field, colType, onEdit, onDelete, onClose }) {
+            useEffect(() => {
+                // Use mousedown on capture so we catch clicks outside AFTER the menu has rendered
+                const handler = (e) => {
+                    // If click is not inside context menu, close
+                    const menu = document.querySelector('.field-context-menu');
+                    if (menu && !menu.contains(e.target)) {
+                        onClose();
+                    }
+                };
+                // Delay adding listener so the right-click event that opened the menu doesn't immediately close it
+                const t = setTimeout(() => {
+                    document.addEventListener('mousedown', handler);
+                }, 100);
+                return () => {
+                    clearTimeout(t);
+                    document.removeEventListener('mousedown', handler);
+                };
+            }, []);
+
+            // Adjust position so menu doesn't go off screen
+            const menuStyle = {
+                left: Math.min(x, window.innerWidth - 180) + 'px',
+                top: Math.min(y, window.innerHeight - 100) + 'px'
+            };
+
+            return React.createElement('div', {
+                className: 'field-context-menu',
+                style: menuStyle,
+                onMouseDown: e => e.stopPropagation()
+            },
+                React.createElement('div', {
+                    className: 'field-context-menu-item',
+                    onMouseDown: (e) => {
+                        e.stopPropagation();
+                        onClose();
+                        setTimeout(() => onEdit(field, colType), 0);
+                    }
+                }, React.createElement('span', null, '✏️'), ' Modifica nodo'),
+                React.createElement('div', { className: 'field-context-menu-separator' }),
+                React.createElement('div', {
+                    className: 'field-context-menu-item danger',
+                    onMouseDown: (e) => {
+                        e.stopPropagation();
+                        onClose();
+                        setTimeout(() => onDelete(field, colType), 0);
+                    }
+                }, React.createElement('span', null, '🗑️'), ' Elimina nodo')
+            );
+        }
+
+        // ===================================================
+        // NODE EDIT MODAL
+        // ===================================================
+        function NodeEditModal({ field, colType, onSave, onClose }) {
+            const [form, setForm] = useState({
+                name: field.name || '',
+                type: field.type || 'string',
+                cardinality: field.cardinality || '0..1',
+                business_term: field.business_term || '',
+                description: field.description || '',
+                required: field.required || false
+            });
+
+            const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
+
+            return React.createElement('div', { className: 'modal-overlay', onClick: onClose },
+                React.createElement('div', {
+                    className: 'node-edit-modal',
+                    onClick: e => e.stopPropagation(),
+                    style: { padding: '0' }
+                },
+                    // Header
+                    React.createElement('div', {
+                        style: {
+                            padding: '16px 20px',
+                            background: 'linear-gradient(135deg, #00BCD4 0%, #3F51B5 100%)',
+                            color: 'white',
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            borderRadius: '12px 12px 0 0'
+                        }
+                    },
+                        React.createElement('h3', null, `✏️ Modifica Nodo — ${field.name}`),
+                        React.createElement('button', {
+                            onClick: onClose,
+                            style: { background: 'none', border: 'none', color: 'white', fontSize: '20px', cursor: 'pointer' }
+                        }, '×')
+                    ),
+                    // Body
+                    React.createElement('div', { style: { padding: '20px' } },
+                        [
+                            ['Nome campo', 'name', 'text'],
+                            ['Tipo dati', 'type', 'select', ['string', 'integer', 'decimal', 'boolean', 'date', 'datetime', 'element']],
+                            ['Cardinalità', 'cardinality', 'select', ['0..1', '1..1', '0..n', '1..n']],
+                            ['Business Term', 'business_term', 'text'],
+                            ['Descrizione', 'description', 'text']
+                        ].map(([label, key, inputType, opts]) =>
+                            React.createElement('div', { key: key, className: 'form-group', style: { marginBottom: '14px' } },
+                                React.createElement('label', { style: { display: 'block', fontWeight: '600', fontSize: '13px', marginBottom: '5px' } }, label),
+                                inputType === 'select'
+                                    ? React.createElement('select', {
+                                        value: form[key],
+                                        onChange: e => set(key, e.target.value),
+                                        style: { width: '100%' }
+                                    },
+                                        opts.map(o => React.createElement('option', { key: o, value: o }, o))
+                                    )
+                                    : React.createElement('input', {
+                                        type: 'text',
+                                        value: form[key],
+                                        onChange: e => set(key, e.target.value),
+                                        style: { width: '100%' }
+                                    })
+                            )
+                        ),
+                        React.createElement('label', { style: { display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' } },
+                            React.createElement('input', {
+                                type: 'checkbox',
+                                checked: form.required,
+                                onChange: e => set('required', e.target.checked)
+                            }),
+                            React.createElement('span', { style: { fontWeight: '600', fontSize: '13px' } }, 'Campo obbligatorio')
+                        )
+                    ),
+                    // Footer
+                    React.createElement('div', {
+                        style: { padding: '14px 20px', borderTop: '1px solid #eee', display: 'flex', gap: '10px', justifyContent: 'flex-end' }
+                    },
+                        React.createElement('button', { className: 'btn btn-secondary', onClick: onClose }, 'Annulla'),
+                        React.createElement('button', {
+                            className: 'btn btn-success',
+                            onClick: () => { onSave({ ...field, ...form }, colType); onClose(); }
+                        }, '✅ Salva')
+                    )
+                )
+            );
+        }
+
         function ConnectionsList({ connections, selectedConnection, setSelectedConnection }) {
             if (connections.length === 0) {
                 return React.createElement('div', { className: 'empty-state' },
@@ -4868,82 +5774,238 @@ OPENAI_API_KEY=sk-...`
             );
         }
         
-        function PropertiesPanel({ connection, updateConnectionTransformation, deleteConnection, setSelectedConnection, setShowFormulaEditor, setEditingConnection }) {
-            const [transType, setTransType] = useState(connection.transformation.type);
-            
+        function FormulaParamsPanel({ transType, params, onChange }) {
+            // Helper: generic text input row
+            const row = (label, key, placeholder, type='text') =>
+                React.createElement('div', { className: 'form-group', key: key },
+                    React.createElement('label', null, label),
+                    React.createElement('input', {
+                        type,
+                        value: params[key] || '',
+                        placeholder,
+                        onChange: e => onChange({ ...params, [key]: e.target.value })
+                    })
+                );
+
+            const select = (label, key, options) =>
+                React.createElement('div', { className: 'form-group', key: key },
+                    React.createElement('label', null, label),
+                    React.createElement('select', {
+                        value: params[key] || options[0].value,
+                        onChange: e => onChange({ ...params, [key]: e.target.value })
+                    }, options.map(o => React.createElement('option', { key: o.value, value: o.value }, o.label)))
+                );
+
+            const hint = (text) =>
+                React.createElement('div', { style: { fontSize: '11px', color: '#888', background: '#f9f9f9', padding: '8px 10px', borderRadius: '4px', marginBottom: '8px' } }, text);
+
+            const t = (transType || '').toUpperCase();
+
+            if (t === 'DIRECT') return React.createElement('div', { style: { fontSize: '12px', color: '#888', padding: '8px 0' } }, '→ Nessun parametro: il valore viene copiato così com\'è.');
+
+            if (t === 'CONCAT') return React.createElement('div', null,
+                hint('Unisce più valori. Trascina più campi sorgente sulla stessa destinazione per abilitare il multi-source.'),
+                row('Separatore', 'separator', 'es: " " oppure "-" oppure ""')
+            );
+
+            if (t === 'SPLIT') return React.createElement('div', null,
+                hint('Estrae una parte da una stringa usando un delimitatore o regex.'),
+                row('Delimitatore', 'delimiter', 'es: "/" oppure "-" oppure " "'),
+                row('Indice parte (0=prima)', 'index', '0', 'number'),
+                row('Oppure: Regex (avanzato)', 'regex', 'es: (\\d{4})-(\\d{2})'),
+                row('Gruppo regex', 'group', '1', 'number')
+            );
+
+            if (t === 'DATE_FORMAT') return React.createElement('div', null,
+                hint('Converte il formato data. Usa strftime: %Y=anno, %m=mese, %d=giorno, %H=ora, %M=minuti.'),
+                row('Formato input', 'from_format', 'es: %Y%m%d oppure %d/%m/%Y'),
+                row('Formato output', 'to_format', 'es: %Y-%m-%d oppure %d.%m.%Y')
+            );
+
+            if (t === 'MATH') return React.createElement('div', null,
+                hint('Operazione aritmetica sul valore numerico del campo sorgente.'),
+                select('Operazione', 'operation', [
+                    { value: 'add',       label: '+ Addizione' },
+                    { value: 'subtract',  label: '- Sottrazione' },
+                    { value: 'multiply',  label: '× Moltiplicazione' },
+                    { value: 'divide',    label: '÷ Divisione' },
+                    { value: 'round',     label: '≈ Arrotonda' },
+                    { value: 'abs',       label: '| | Valore assoluto' },
+                    { value: 'negate',    label: '− Negazione' },
+                ]),
+                row('Operando (es: 100)', 'operand', '100', 'number'),
+                row('Decimali (solo per round)', 'decimals', '2', 'number')
+            );
+
+            if (t === 'LOOKUP') return React.createElement('div', null,
+                hint('Traduce codici tramite una tabella. Inserisci il JSON della tabella sotto.'),
+                React.createElement('div', { className: 'form-group' },
+                    React.createElement('label', null, 'Tabella (JSON)'),
+                    React.createElement('textarea', {
+                        style: { width: '100%', minHeight: '90px', fontFamily: 'monospace', fontSize: '12px', padding: '8px', border: '1px solid #ddd', borderRadius: '4px', resize: 'vertical' },
+                        value: params.table_raw || (params.table ? JSON.stringify(params.table, null, 2) : ''),
+                        placeholder: '{"IT": "380", "DE": "380", "FR": "380"}',
+                        onChange: e => {
+                            try { onChange({ ...params, table: JSON.parse(e.target.value), table_raw: e.target.value }); }
+                            catch(_) { onChange({ ...params, table_raw: e.target.value }); }
+                        }
+                    })
+                ),
+                row('Valore default se non trovato', 'default', 'es: 380')
+            );
+
+            if (t === 'CONDITIONAL') return React.createElement('div', null,
+                hint('Condizioni if/then. Inserisci le regole come JSON array.'),
+                React.createElement('div', { className: 'form-group' },
+                    React.createElement('label', null, 'Condizioni (JSON)'),
+                    React.createElement('textarea', {
+                        style: { width: '100%', minHeight: '110px', fontFamily: 'monospace', fontSize: '12px', padding: '8px', border: '1px solid #ddd', borderRadius: '4px', resize: 'vertical' },
+                        value: params.conditions_raw || (params.conditions ? JSON.stringify(params.conditions, null, 2) : ''),
+                        placeholder: '[{"if": {"equals": "RE"}, "then": "381"}]',
+                        onChange: e => {
+                            try { onChange({ ...params, conditions: JSON.parse(e.target.value), conditions_raw: e.target.value }); }
+                            catch(_) { onChange({ ...params, conditions_raw: e.target.value }); }
+                        }
+                    })
+                ),
+                row('Valore default (nessuna condizione)', 'default', 'es: 380')
+            );
+
+            if (t === 'STRING_OP') {
+                const op = params.operation || 'upper';
+                const extraFields = [];
+                if (op === 'replace')       { extraFields.push(row('Trova', 'find', 'es: .')); extraFields.push(row('Sostituisci con', 'replace_with', 'es: ,')); }
+                if (op === 'substring')     { extraFields.push(row('Inizio (0-based)', 'start', '0', 'number')); extraFields.push(row('Fine (escluso)', 'end', '8', 'number')); }
+                if (op === 'pad_left' || op === 'pad_right') { extraFields.push(row('Larghezza totale', 'width', '10', 'number')); extraFields.push(row('Carattere riempimento', 'char', '0')); }
+                if (op === 'remove_prefix') extraFields.push(row('Prefisso da rimuovere', 'prefix', 'es: IT'));
+                if (op === 'remove_suffix') extraFields.push(row('Suffisso da rimuovere', 'suffix', 'es: .xml'));
+                if (op === 'regex_replace') { extraFields.push(row('Pattern regex', 'pattern', 'es: [^0-9]')); extraFields.push(row('Sostituisci con', 'repl', '')); }
+                return React.createElement('div', null,
+                    hint('Operazione sulla stringa.'),
+                    select('Operazione', 'operation', [
+                        { value: 'upper',          label: 'MAIUSCOLO' },
+                        { value: 'lower',          label: 'minuscolo' },
+                        { value: 'trim',           label: 'Rimuovi spazi' },
+                        { value: 'replace',        label: 'Sostituisci' },
+                        { value: 'substring',      label: 'Sottostringa' },
+                        { value: 'pad_left',       label: 'Riempi a sinistra' },
+                        { value: 'pad_right',      label: 'Riempi a destra' },
+                        { value: 'remove_prefix',  label: 'Rimuovi prefisso' },
+                        { value: 'remove_suffix',  label: 'Rimuovi suffisso' },
+                        { value: 'regex_replace',  label: 'Regex replace' },
+                    ]),
+                    ...extraFields
+                );
+            }
+
+            if (t === 'DEFAULT') return React.createElement('div', null,
+                hint('Usa questo valore se il campo sorgente è vuoto o null.'),
+                row('Valore di default', 'value', 'es: EUR oppure 380')
+            );
+
+            if (t === 'HARDCODE') return React.createElement('div', null,
+                hint('Ignora il valore sorgente e inserisce sempre questo valore fisso.'),
+                row('Valore fisso', 'value', 'es: EUR oppure 380 oppure IT')
+            );
+
+            if (t === 'COALESCE') return React.createElement('div', null,
+                hint('Prende il primo valore non vuoto tra i campi elencati (separati da virgola).'),
+                row('Campi alternativi (separati da ,)', 'fields_raw', 'es: VAT_ID, TAX_ID, FISCAL_CODE')
+            );
+
+            if (t === 'SUM_MULTI') return React.createElement('div', null,
+                hint('Somma numericamente più campi sorgente. Usa multi-source per selezionare i campi.'),
+                row('Decimali', 'decimals', '2', 'number')
+            );
+
+            if (t === 'CUSTOM') return React.createElement('div', { style: { fontSize: '12px', color: '#888', padding: '8px 0' } },
+                '✏️ Clicca "Apri Editor Avanzato" per scrivere l\'espressione Python.'
+            );
+
+            return React.createElement('div', { style: { fontSize: '12px', color: '#888', padding: '8px 0' } },
+                'Seleziona una formula per vedere i parametri.'
+            );
+        }
+
+        function PropertiesPanel({ connection, updateConnectionTransformation, deleteConnection, setSelectedConnection, setShowFormulaEditor, setEditingConnection, availableFormulas }) {
+            const [transType, setTransType] = useState(connection.transformation?.type || 'direct');
+            const [params, setParams] = useState(connection.transformation?.params || {});
+
+            const saveParams = (newParams) => {
+                setParams(newParams);
+                updateConnectionTransformation(connection.id, { type: transType, params: newParams });
+            };
+
+            const handleTypeChange = (newType) => {
+                setTransType(newType);
+                setParams({});
+                updateConnectionTransformation(connection.id, { type: newType, params: {} });
+            };
+
+            const sectionStyle = { background: '#f5f9ff', border: '1px solid #e3eaf5', borderRadius: '6px', padding: '12px 14px', marginTop: '12px' };
+            const sectionLabel = { fontSize: '11px', fontWeight: '700', color: '#29D6EC', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '10px' };
+
+            // Build formula options
+            const STATIC_FORMULAS = [
+                { id: 'direct',      label: '→ Direct (1:1)' },
+                { id: 'custom',      label: '✏️ Custom Formula' },
+                { id: 'concat',      label: '🔗 Concatenate' },
+                { id: 'split',       label: '✂️ Split' },
+                { id: 'date_format', label: '📅 Date Format' },
+                { id: 'math',        label: '🔢 Math' },
+                { id: 'lookup',      label: '📊 Lookup Table' },
+                { id: 'conditional', label: '🔀 Conditional' },
+                { id: 'string_op',   label: '🔤 String Operation' },
+                { id: 'default',     label: '🔁 Default Value' },
+                { id: 'hardcode',    label: '📌 Hardcode' },
+                { id: 'coalesce',    label: '🔍 Coalesce' },
+                { id: 'sum_multi',   label: '➕ Sum Multi' },
+            ];
+            const formulaOptions = (availableFormulas && availableFormulas.length > 0)
+                ? [{ id: 'direct', label: '→ Direct (1:1)' }, { id: 'custom', label: '✏️ Custom Formula' },
+                   ...availableFormulas.filter(f => !['DIRECT','NOOP'].includes(f.id)).map(f => ({ id: f.id.toLowerCase(), label: f.label }))]
+                : STATIC_FORMULAS;
+
             return React.createElement('div', { className: 'properties-panel' },
-                React.createElement('h3', { style: { marginBottom: '20px' } }, '⚙️ Connection Properties'),
+                React.createElement('h3', { style: { marginBottom: '16px' } }, '⚙️ Connection Properties'),
+
+                // Source / Target
                 React.createElement('div', { className: 'form-group' },
                     React.createElement('label', null, 'Source:'),
-                    React.createElement('input', { 
-                        type: 'text', 
-                        value: connection.source, 
-                        readOnly: true,
-                        style: { background: '#f5f5f5', color: '#4caf50', fontWeight: 'bold' }
-                    })
+                    React.createElement('input', { type: 'text', value: connection.sourceName || connection.source, readOnly: true, style: { background: '#f5f5f5', color: '#4caf50', fontWeight: 'bold' } })
                 ),
                 React.createElement('div', { className: 'form-group' },
                     React.createElement('label', null, 'Target:'),
-                    React.createElement('input', { 
-                        type: 'text', 
-                        value: connection.target, 
-                        readOnly: true,
-                        style: { background: '#f5f5f5', color: '#2196f3', fontWeight: 'bold' }
-                    })
+                    React.createElement('input', { type: 'text', value: connection.targetName || connection.target, readOnly: true, style: { background: '#f5f5f5', color: '#2196f3', fontWeight: 'bold' } })
                 ),
+
+                // Formula selector
                 React.createElement('div', { className: 'form-group' },
                     React.createElement('label', null, 'Transformation Rule:'),
                     React.createElement('select', {
                         value: transType,
-                        onChange: (e) => {
-                            setTransType(e.target.value);
-                            updateConnectionTransformation(connection.id, { type: e.target.value, params: {} });
-                        }
-                    },
-                        React.createElement('option', { value: 'direct' }, '→ Direct (1:1)'),
-                        React.createElement('option', { value: 'concat' }, '🔗 Concatenate'),
-                        React.createElement('option', { value: 'substring' }, '✂️ Substring'),
-                        React.createElement('option', { value: 'format_date' }, '📅 Format Date'),
-                        React.createElement('option', { value: 'lookup' }, '📊 Lookup Table'),
-                        React.createElement('option', { value: 'upper' }, '⬆️ Uppercase'),
-                        React.createElement('option', { value: 'lower' }, '⬇️ Lowercase'),
-                        React.createElement('option', { value: 'trim' }, '✂️ Trim Spaces'),
-                        React.createElement('option', { value: 'math' }, '🔢 Math Operation'),
-                        React.createElement('option', { value: 'formula' }, '✏️ Custom Formula')
-                    )
+                        onChange: e => handleTypeChange(e.target.value),
+                        style: { fontWeight: '600' }
+                    }, formulaOptions.map(f => React.createElement('option', { key: f.id, value: f.id }, f.label)))
                 ),
-                connection.transformation?.formula && React.createElement('div', { className: 'form-group' },
-                    React.createElement('label', null, 'Formula:'),
-                    React.createElement('div', { 
-                        style: { 
-                            padding: '10px', 
-                            background: '#f9f9f9', 
-                            borderRadius: '4px',
-                            fontFamily: 'monospace',
-                            fontSize: '12px',
-                            wordBreak: 'break-all'
-                        } 
-                    }, connection.transformation.formula)
+
+                // Params panel
+                transType !== 'direct' && React.createElement('div', { style: sectionStyle },
+                    React.createElement('div', { style: sectionLabel }, '⚙️ Parametri'),
+                    React.createElement(FormulaParamsPanel, { transType, params, onChange: saveParams })
                 ),
-                React.createElement('button', {
+
+                // Custom formula button
+                (transType === 'custom' || transType === 'CUSTOM') && React.createElement('button', {
                     className: 'btn btn-primary',
-                    style: { width: '100%', marginTop: '15px' },
-                    onClick: () => {
-                        setEditingConnection(connection);
-                        setShowFormulaEditor(true);
-                    }
-                }, '✏️ Edit Formula'),
-                React.createElement('div', { style: { display: 'flex', gap: '10px', marginTop: '30px' } },
-                    React.createElement('button', {
-                        className: 'btn btn-danger',
-                        style: { flex: 1 },
-                        onClick: () => deleteConnection(connection.id)
-                    }, '🗑️ Delete'),
-                    React.createElement('button', {
-                        className: 'btn btn-secondary',
-                        style: { flex: 1 },
-                        onClick: () => setSelectedConnection(null)
-                    }, '✕ Close')
+                    style: { width: '100%', marginTop: '12px' },
+                    onClick: () => { setEditingConnection(connection); setShowFormulaEditor(true); }
+                }, '✏️ Apri Editor Avanzato'),
+
+                // Delete / Close
+                React.createElement('div', { style: { display: 'flex', gap: '10px', marginTop: '24px' } },
+                    React.createElement('button', { className: 'btn btn-danger', style: { flex: 1 }, onClick: () => deleteConnection(connection.id) }, '🗑️ Delete'),
+                    React.createElement('button', { className: 'btn btn-secondary', style: { flex: 1 }, onClick: () => setSelectedConnection(null) }, '✕ Close')
                 )
             );
         }
