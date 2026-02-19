@@ -4865,14 +4865,22 @@ OPENAI_API_KEY=sk-...`
                             // Detect format
                             const isXML = inputExample.trim().startsWith('<');
                             const isJSON = inputExample.trim().startsWith('{') || inputExample.trim().startsWith('[');
+                            // IDoc: flat file with numeric offset+length on the field
+                            const hasNumericOffset = sourceFieldData?.offset && 
+                                !isNaN(parseInt(sourceFieldData.offset)) && 
+                                parseInt(sourceFieldData.offset) > 0;
+                            const hasLength = sourceFieldData?.length && 
+                                !isNaN(parseInt(sourceFieldData.length));
+                            const isIDoc = !isXML && !isJSON && hasNumericOffset && hasLength;
                             
-                            if (isXML || isJSON) {
+                            if ((isXML || isJSON) && !isIDoc) {
                                 // XML/JSON: Use API extraction
                                 console.log('📡 Using API for XML/JSON extraction');
                                 
+                                // For XML: prefer xml_path, then json_path, then path (FatturaPA uses path directly)
                                 const fieldPath = sourceFieldData?.xml_path || sourceFieldData?.json_path || sourceFieldData?.path;
                                 if (!fieldPath) {
-                                    console.log('No path for field');
+                                    console.log('No path for field, skipping API');
                                     return null;
                                 }
                                 
