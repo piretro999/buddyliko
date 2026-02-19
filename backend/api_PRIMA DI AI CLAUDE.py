@@ -22,7 +22,7 @@ Endpoints:
 - /api/ai - AI-powered auto-mapping
 """
 
-from fastapi import FastAPI, File, UploadFile, HTTPException, Form
+from fastapi import FastAPI, File, UploadFile, HTTPException, Form, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, FileResponse, Response
 from pydantic import BaseModel
@@ -61,6 +61,11 @@ from csv_parser import CSVSchemaParser, MappingCSVExporter
 from storage_layer import StorageFactory
 from transformation_engine import TransformationEngine, XSDValidator
 from formulas import list_formulas as _list_formulas
+try:
+    from diagram_generator import generate_svg as _generate_svg
+    _diagram_available = True
+except ImportError:
+    _diagram_available = False
 from auth_system import AuthManager
 import yaml
 from pathlib import Path
@@ -1153,322 +1158,54 @@ async def get_csv_sample(type: str):
 # AI AUTO-MAPPING ENDPOINT
 # ============================================================================
 
-def _ai_path(f: Dict) -> str:
-    """Canonical path identifier for a field."""
-    return (f.get("path") or f.get("id") or f.get("name") or "").strip()
-
-def _ai_compact(f: Dict) -> Dict:
-    """Minimal field representation sent to AI — saves tokens."""
-    return {
-        "path": _ai_path(f),
-        "name": f.get("name", ""),
-        "bt":   (f.get("business_term") or f.get("bt") or "").strip(),
-        "desc": (f.get("description") or f.get("spiegazione") or "")[:100],
-        "type": f.get("type", ""),
-    }
-
-def _ai_chunk_size(fields: List[Dict], budget: int = 1400) -> int:
-    """How many fields fit in ~budget tokens."""
-    avg = max(1, sum(len(json.dumps(_ai_compact(f))) for f in fields[:20]) // max(1, min(20, len(fields)))) // 4
-    return max(5, budget // avg)
-
-def _ai_chunks(fields: List[Dict], budget: int = 1400) -> List[List[Dict]]:
-    size = _ai_chunk_size(fields, budget)
-    return [fields[i:i+size] for i in range(0, len(fields), size)]
-
-def _fuzzy_resolve(value: str, lookup: Dict[str, str]) -> Optional[str]:
-    """
-    Resolve a value Claude returned to an actual field path.
-    lookup: {path -> path, name -> path, ...}
-    Returns the canonical path or None.
-    """
-    if not value:
-        return None
-    v = value.strip()
-    # 1. Exact
-    if v in lookup:
-        return lookup[v]
-    # 2. Case-insensitive
-    vl = v.lower()
-    for k, canon in lookup.items():
-        if k.lower() == vl:
-            return canon
-    # 3. Suffix match (Claude may return last part of path)
-    for k, canon in lookup.items():
-        if k.endswith(v) or v.endswith(k):
-            return canon
-    # 4. Contains
-    for k, canon in lookup.items():
-        if vl in k.lower() or k.lower() in vl:
-            return canon
-    return None
-
-async def _ai_call_chunk(inp_chunk: List[Dict], out_chunk: List[Dict], sample: str) -> List[Dict]:
-    """Call AI for one chunk pair. Returns raw suggestion dicts."""
-    inp_c = [_ai_compact(f) for f in inp_chunk]
-    out_c = [_ai_compact(f) for f in out_chunk]
-    sample_snip = sample[:300] if sample else ""
-
-    prompt = f"""You are a data mapping expert. Match input fields to output fields.
-
-INPUT FIELDS:
-{json.dumps(inp_c, indent=2)}
-
-OUTPUT FIELDS:
-{json.dumps(out_c, indent=2)}
-
-{"DATA SAMPLE:\n" + sample_snip if sample_snip else ""}
-
-Return ONLY a JSON array. For source_field use the "path" or "name" value from INPUT FIELDS. For target_field use the "path" or "name" value from OUTPUT FIELDS. Only include matches with confidence >= 0.5. Skip fields with no good match.
-
-[
-  {{
-    "source_field": "path or name from input",
-    "target_field": "path or name from output",
-    "confidence": 0.9,
-    "reasoning": "brief reason",
-    "suggested_formula": null
-  }}
-]
-
-Return ONLY valid JSON array, no markdown, no explanation."""
-
-    import re as _re
-
-    def _extract(text: str) -> List[Dict]:
-        m = _re.search(r'\[[\s\S]*\]', text)
-        if m:
-            try:
-                return json.loads(m.group(0))
-            except Exception:
-                pass
-        return []
-
-    print(f"🤖 _ai_call_chunk: {len(inp_chunk)} inp x {len(out_chunk)} out | ANTHROPIC_KEY={'YES' if ANTHROPIC_API_KEY else 'NO'} OPENAI_KEY={'YES' if OPENAI_API_KEY else 'NO'}")
-    print(f"📝 Prompt length: {len(prompt)} chars (~{len(prompt)//4} tokens)")
-
-    if ANTHROPIC_API_KEY:
-        try:
-            async with httpx.AsyncClient() as client:
-                r = await client.post(
-                    'https://api.anthropic.com/v1/messages',
-                    headers={
-                        'Content-Type': 'application/json',
-                        'x-api-key': ANTHROPIC_API_KEY,
-                        'anthropic-version': '2023-06-01'
-                    },
-                    json={
-                        'model': 'claude-haiku-4-5-20251001',
-                        'max_tokens': 2000,
-                        'messages': [{'role': 'user', 'content': prompt}]
-                    },
-                    timeout=90.0
-                )
-                print(f"✅ Anthropic response: HTTP {r.status_code}")
-                if r.status_code == 200:
-                    text = r.json()['content'][0]['text']
-                    print(f"📄 Raw response (first 500): {text[:500]}")
-                    result = _extract(text)
-                    print(f"🔢 Extracted suggestions: {len(result)}")
-                    if result:
-                        return result
-                else:
-                    print(f"❌ Anthropic error body: {r.text[:300]}")
-        except Exception as e:
-            print(f"❌ Anthropic exception: {e}")
-
-    if OPENAI_API_KEY:
-        try:
-            async with httpx.AsyncClient() as client:
-                r = await client.post(
-                    'https://api.openai.com/v1/chat/completions',
-                    headers={
-                        'Content-Type': 'application/json',
-                        'Authorization': f'Bearer {OPENAI_API_KEY}'
-                    },
-                    json={
-                        'model': 'gpt-4-turbo-preview',
-                        'messages': [
-                            {'role': 'system', 'content': 'You are a data mapping expert. Respond with valid JSON only.'},
-                            {'role': 'user', 'content': prompt}
-                        ],
-                        'temperature': 0.2,
-                        'max_tokens': 2000
-                    },
-                    timeout=90.0
-                )
-                print(f"✅ OpenAI response: HTTP {r.status_code}")
-                if r.status_code == 200:
-                    text = r.json()['choices'][0]['message']['content']
-                    print(f"📄 Raw response (first 500): {text[:500]}")
-                    result = _extract(text)
-                    print(f"🔢 Extracted suggestions: {len(result)}")
-                    if result:
-                        return result
-                else:
-                    print(f"❌ OpenAI error body: {r.text[:300]}")
-        except Exception as e:
-            print(f"❌ OpenAI exception: {e}")
-
-    print("❌ _ai_call_chunk returning EMPTY")
-    return []
-
-
 @app.post("/api/ai/auto-map", response_model=List[AISuggestion])
 async def ai_auto_map(request: AIAutoMapRequest):
     """
-    AI-powered mapping. Chunked strategy with fuzzy path resolution.
-    Phase 1: cross-product of input/output chunks.
-    Phase 2: second pass on unmatched fields.
+    AI-powered automatic mapping suggestions using Claude or OpenAI
     """
     if not ANTHROPIC_API_KEY and not OPENAI_API_KEY:
         raise HTTPException(
             status_code=400,
             detail="No AI API keys configured. Add ANTHROPIC_API_KEY or OPENAI_API_KEY to .env file"
         )
-
+    
     try:
-        inp_fields = request.input_fields
-        out_fields = request.output_fields
-        sample     = (request.input_sample or "")[:400]
+        # Prepare prompt
+        prompt = f"""You are a data mapping expert. Analyze these schemas and suggest field mappings.
 
-        # Build fuzzy lookup tables: any identifier -> canonical path
-        inp_lookup: Dict[str, str] = {}
-        for f in inp_fields:
-            canon = _ai_path(f)
-            for val in [canon, f.get("name",""), f.get("id",""), f.get("offset","")]:
-                if val and val.strip():
-                    inp_lookup[val.strip()] = canon
+INPUT SCHEMA ({len(request.input_fields)} fields):
+{json.dumps(request.input_fields, indent=2)}
 
-        out_lookup: Dict[str, str] = {}
-        for f in out_fields:
-            canon = _ai_path(f)
-            for val in [canon, f.get("name",""), f.get("id",""), f.get("offset","")]:
-                if val and val.strip():
-                    out_lookup[val.strip()] = canon
+OUTPUT SCHEMA ({len(request.output_fields)} fields):
+{json.dumps(request.output_fields, indent=2)}
 
-        # best_match: canonical_target_path -> suggestion dict
-        best_match: Dict[str, Dict] = {}
+{"INPUT DATA SAMPLE:\n" + request.input_sample + "\n" if request.input_sample else ""}
+{"OUTPUT DATA SAMPLE:\n" + request.output_sample + "\n" if request.output_sample else ""}
 
-        print(f"🚀 AI automap start: {len(inp_fields)} input fields, {len(out_fields)} output fields")
-        print(f"🔑 inp_lookup size: {len(inp_lookup)}, out_lookup size: {len(out_lookup)}")
-        print(f"📋 Sample inp_lookup keys: {list(inp_lookup.keys())[:5]}")
-        print(f"📋 Sample out_lookup keys: {list(out_lookup.keys())[:5]}")
-
-        async def _process_chunks(i_list: List[Dict], o_list: List[Dict]):
-            inp_chunks = _ai_chunks(i_list, 1200)
-            out_chunks = _ai_chunks(o_list, 1200)
-            print(f"📦 Chunks: {len(inp_chunks)} inp x {len(out_chunks)} out = {len(inp_chunks)*len(out_chunks)} calls")
-            for i_chunk in inp_chunks:
-                for o_chunk in out_chunks:
-                    raw = await _ai_call_chunk(i_chunk, o_chunk, sample)
-                    print(f"  → raw suggestions from chunk: {len(raw)}")
-                    for s in raw:
-                        conf = float(s.get("confidence", 0))
-                        src_raw = s.get("source_field","")
-                        tgt_raw = s.get("target_field","")
-                        src_canon = _fuzzy_resolve(src_raw, inp_lookup)
-                        tgt_canon = _fuzzy_resolve(tgt_raw, out_lookup)
-                        print(f"    '{src_raw}' → '{tgt_raw}' | conf={conf} | resolved: {src_canon} → {tgt_canon}")
-                        if conf < 0.5:
-                            print(f"    ⚠️ SKIPPED: conf < 0.5")
-                            continue
-                        if not src_canon or not tgt_canon:
-                            print(f"    ⚠️ SKIPPED: fuzzy resolve failed (src={src_canon}, tgt={tgt_canon})")
-                            continue
-                        if tgt_canon not in best_match or conf > best_match[tgt_canon]["confidence"]:
-                            best_match[tgt_canon] = {
-                                "source_field":      src_canon,
-                                "target_field":      tgt_canon,
-                                "confidence":        conf,
-                                "reasoning":         s.get("reasoning", ""),
-                                "suggested_formula": s.get("suggested_formula"),
-                            }
-
-        # Phase 1: all fields
-        await _process_chunks(inp_fields, out_fields)
-        print(f"✅ Phase 1 done: {len(best_match)} matches")
-
-        # Phase 2: second pass on unmatched
-        matched_src = {v["source_field"] for v in best_match.values()}
-        matched_tgt = set(best_match.keys())
-        unmatched_inp = [f for f in inp_fields if _ai_path(f) not in matched_src]
-        unmatched_out = [f for f in out_fields if _ai_path(f) not in matched_tgt]
-        print(f"🔄 Phase 2: {len(unmatched_inp)} unmatched inp, {len(unmatched_out)} unmatched out")
-        if unmatched_inp and unmatched_out:
-            await _process_chunks(unmatched_inp, unmatched_out)
-
-        results = sorted(best_match.values(), key=lambda x: x["confidence"], reverse=True)
-        print(f"🎯 FINAL RESULTS: {len(results)} suggestions")
-        return results
-
-    except Exception as e:
-        raise HTTPException(500, f"AI error: {str(e)}")
-
-
-# ===========================================================================
-# AI DEBUG ENDPOINT
-# ===========================================================================
-
-@app.post("/api/ai/debug")
-async def ai_debug(request: AIAutoMapRequest):
-    """
-    Debug endpoint: runs one single AI call with first 5 input + 5 output fields,
-    returns full prompt, raw response, extracted suggestions, and fuzzy resolution.
-    Call from browser: POST /api/ai/debug with same body as /api/ai/auto-map
-    """
-    inp5 = request.input_fields[:5]
-    out5 = request.output_fields[:5]
-    sample = (request.input_sample or "")[:300]
-
-    inp_c = [_ai_compact(f) for f in inp5]
-    out_c = [_ai_compact(f) for f in out5]
-
-    prompt = f"""You are a data mapping expert. Match input fields to output fields.
-
-INPUT FIELDS:
-{json.dumps(inp_c, indent=2)}
-
-OUTPUT FIELDS:
-{json.dumps(out_c, indent=2)}
-
-Return ONLY a JSON array. Use "path" or "name" values from the lists above.
+For each output field, suggest which input field(s) to map from. Return ONLY a JSON array like this:
 [
   {{
-    "source_field": "path or name from input",
-    "target_field": "path or name from output",
-    "confidence": 0.9,
-    "reasoning": "brief reason",
-    "suggested_formula": null
+    "source_field": "input field path",
+    "target_field": "output field path",
+    "confidence": 0.95,
+    "reasoning": "why this mapping makes sense",
+    "suggested_formula": "optional formula if transformation needed"
   }}
 ]
-Return ONLY valid JSON array, no markdown."""
 
-    result = {
-        "config": {
-            "ANTHROPIC_KEY_SET": bool(ANTHROPIC_API_KEY),
-            "OPENAI_KEY_SET": bool(OPENAI_API_KEY),
-            "inp_fields_received": len(request.input_fields),
-            "out_fields_received": len(request.output_fields),
-        },
-        "compact_input": inp_c,
-        "compact_output": out_c,
-        "prompt": prompt,
-        "prompt_chars": len(prompt),
-        "prompt_tokens_est": len(prompt) // 4,
-        "http_status": None,
-        "raw_response": None,
-        "http_error": None,
-        "extracted": [],
-        "fuzzy_resolved": [],
-    }
+Rules:
+- confidence: 0-1 (0.9+ = very confident, 0.7-0.9 = confident, 0.5-0.7 = uncertain)
+- Only suggest mappings with confidence > 0.5
+- If multiple inputs needed, use formula like: "field1 && field2"
+- Consider field names, business terms, descriptions, and data types
+- Return ONLY valid JSON, no markdown"""
 
-    import re as _re
-
-    if ANTHROPIC_API_KEY:
-        try:
+        suggestions = []
+        
+        # Try Claude first
+        if ANTHROPIC_API_KEY:
             async with httpx.AsyncClient() as client:
-                r = await client.post(
+                response = await client.post(
                     'https://api.anthropic.com/v1/messages',
                     headers={
                         'Content-Type': 'application/json',
@@ -1476,31 +1213,27 @@ Return ONLY valid JSON array, no markdown."""
                         'anthropic-version': '2023-06-01'
                     },
                     json={
-                        'model': 'claude-haiku-4-5-20251001',
-                        'max_tokens': 1000,
+                        'model': 'claude-sonnet-4-20250514',
+                        'max_tokens': 4000,
                         'messages': [{'role': 'user', 'content': prompt}]
                     },
-                    timeout=30.0
+                    timeout=60.0
                 )
-                result["http_status"] = r.status_code
-                if r.status_code == 200:
-                    text = r.json()['content'][0]['text']
-                    result["raw_response"] = text
-                    m = _re.search(r'\[[\s\S]*\]', text)
-                    if m:
-                        try:
-                            result["extracted"] = json.loads(m.group(0))
-                        except Exception as e:
-                            result["parse_error"] = str(e)
-                            result["matched_text"] = m.group(0)
-                else:
-                    result["http_error"] = r.text
-        except Exception as e:
-            result["exception"] = str(e)
-    elif OPENAI_API_KEY:
-        try:
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    text = data['content'][0]['text']
+                    
+                    # Extract JSON from response
+                    import re
+                    json_match = re.search(r'\[[\s\S]*\]', text)
+                    if json_match:
+                        suggestions = json.loads(json_match.group(0))
+        
+        # Fallback to OpenAI if Claude failed or not available
+        if not suggestions and OPENAI_API_KEY:
             async with httpx.AsyncClient() as client:
-                r = await client.post(
+                response = await client.post(
                     'https://api.openai.com/v1/chat/completions',
                     headers={
                         'Content-Type': 'application/json',
@@ -1509,264 +1242,29 @@ Return ONLY valid JSON array, no markdown."""
                     json={
                         'model': 'gpt-4-turbo-preview',
                         'messages': [
-                            {'role': 'system', 'content': 'Respond with valid JSON only.'},
+                            {'role': 'system', 'content': 'You are a data mapping expert. Always respond with valid JSON only.'},
                             {'role': 'user', 'content': prompt}
                         ],
-                        'temperature': 0.2,
-                        'max_tokens': 1000
+                        'temperature': 0.3,
+                        'max_tokens': 4000
                     },
-                    timeout=30.0
+                    timeout=60.0
                 )
-                result["http_status"] = r.status_code
-                if r.status_code == 200:
-                    text = r.json()['choices'][0]['message']['content']
-                    result["raw_response"] = text
-                    m = _re.search(r'\[[\s\S]*\]', text)
-                    if m:
-                        try:
-                            result["extracted"] = json.loads(m.group(0))
-                        except Exception as e:
-                            result["parse_error"] = str(e)
-                else:
-                    result["http_error"] = r.text
-        except Exception as e:
-            result["exception"] = str(e)
-
-    # Show fuzzy resolution for extracted suggestions
-    inp_lookup = {}
-    for f in inp5:
-        canon = _ai_path(f)
-        for val in [canon, f.get("name",""), f.get("id","")]:
-            if val and val.strip():
-                inp_lookup[val.strip()] = canon
-
-    out_lookup = {}
-    for f in out5:
-        canon = _ai_path(f)
-        for val in [canon, f.get("name",""), f.get("id","")]:
-            if val and val.strip():
-                out_lookup[val.strip()] = canon
-
-    result["inp_lookup"] = inp_lookup
-    result["out_lookup"] = out_lookup
-
-    for s in result["extracted"]:
-        src_r = s.get("source_field","")
-        tgt_r = s.get("target_field","")
-        src_c = _fuzzy_resolve(src_r, inp_lookup)
-        tgt_c = _fuzzy_resolve(tgt_r, out_lookup)
-        result["fuzzy_resolved"].append({
-            "source_raw": src_r, "source_resolved": src_c,
-            "target_raw": tgt_r, "target_resolved": tgt_c,
-            "confidence": s.get("confidence"),
-            "would_be_kept": bool(src_c and tgt_c and s.get("confidence",0) >= 0.5)
-        })
-
-    return result
-
-
-# ===========================================================================
-# AI AUTO-MAP STREAMING (Server-Sent Events) — "AI at Work" live log
-# ===========================================================================
-
-from fastapi.responses import StreamingResponse as _StreamingResponse
-import asyncio as _asyncio
-
-@app.post("/api/ai/auto-map-stream")
-async def ai_auto_map_stream(request: AIAutoMapRequest):
-    """
-    Same logic as /api/ai/auto-map but streams progress as Server-Sent Events.
-    Each event is a JSON line: { "type": "log"|"chunk_done"|"done"|"error", ... }
-    """
-    if not ANTHROPIC_API_KEY and not OPENAI_API_KEY:
-        async def _err():
-            yield 'data: ' + json.dumps({"type":"error","msg":"No API keys configured"}) + '\n\n'
-        return _StreamingResponse(_err(), media_type="text/event-stream")
-
-    inp_fields = request.input_fields
-    out_fields = request.output_fields
-    sample     = (request.input_sample or "")[:400]
-
-    async def _generate():
-        try:
-            def _ev(obj): return 'data: ' + json.dumps(obj) + '\n\n'
-
-            yield _ev({"type":"log","level":"info","msg":f"🚀 Starting AI automap: {len(inp_fields)} input × {len(out_fields)} output fields"})
-            yield _ev({"type":"log","level":"info","msg":f"🔑 ANTHROPIC={'✅' if ANTHROPIC_API_KEY else '❌'}  OPENAI={'✅' if OPENAI_API_KEY else '❌'}"})
-
-            # Build lookup tables
-            inp_lookup: Dict[str, str] = {}
-            for f in inp_fields:
-                canon = _ai_path(f)
-                for val in [canon, f.get("name",""), f.get("id",""), f.get("offset","")]:
-                    if val and val.strip():
-                        inp_lookup[val.strip()] = canon
-            out_lookup: Dict[str, str] = {}
-            for f in out_fields:
-                canon = _ai_path(f)
-                for val in [canon, f.get("name",""), f.get("id",""), f.get("offset","")]:
-                    if val and val.strip():
-                        out_lookup[val.strip()] = canon
-
-            inp_chunks = _ai_chunks(inp_fields, 1200)
-            out_chunks = _ai_chunks(out_fields, 1200)
-            total_calls = len(inp_chunks) * len(out_chunks)
-            yield _ev({"type":"log","level":"info","msg":f"📦 Phase 1: {len(inp_chunks)} inp chunks × {len(out_chunks)} out chunks = {total_calls} calls"})
-
-            best_match: Dict[str, Dict] = {}
-            call_n = 0
-
-            async def _run_chunk(i_chunk, o_chunk, phase):
-                nonlocal call_n
-                call_n += 1
-                inp_c = [_ai_compact(f) for f in i_chunk]
-                out_c = [_ai_compact(f) for f in o_chunk]
-                prompt_text = (
-                    f"You are a data mapping expert. Match input fields to output fields.\n\n"
-                    f"INPUT FIELDS:\n{json.dumps(inp_c, indent=2)}\n\n"
-                    f"OUTPUT FIELDS:\n{json.dumps(out_c, indent=2)}\n\n"
-                    f"{'DATA SAMPLE:\\n' + sample[:300] if sample else ''}\n\n"
-                    f"Return ONLY a JSON array. Use EXACT path or name values from the lists above. "
-                    f"Only include matches confidence>=0.5.\n"
-                    f'[{{"source_field":"...","target_field":"...","confidence":0.9,"reasoning":"...","suggested_formula":null}}]\n'
-                    f"Return ONLY valid JSON array, no markdown."
-                )
-                prompt_tokens = len(prompt_text) // 4
-                yield _ev({"type":"log","level":"call",
-                    "msg":f"🤖 [{phase}] Call {call_n}/{total_calls}: {len(i_chunk)} inp × {len(o_chunk)} out | ~{prompt_tokens} tokens",
-                    "call": call_n, "inp_count": len(i_chunk), "out_count": len(o_chunk),
-                    "inp_sample": [_ai_compact(f)["path"] for f in i_chunk[:3]],
-                    "out_sample": [_ai_compact(f)["path"] for f in o_chunk[:3]],
-                })
-
-                raw = await _ai_call_chunk(i_chunk, o_chunk, sample)
-
-                valid_inp = {_ai_compact(f)["path"] for f in i_chunk}
-                valid_out = {_ai_compact(f)["path"] for f in o_chunk}
-
-                accepted, skipped = [], []
-                for s in raw:
-                    conf = float(s.get("confidence", 0))
-                    src_canon = _fuzzy_resolve(s.get("source_field",""), inp_lookup)
-                    tgt_canon = _fuzzy_resolve(s.get("target_field",""), out_lookup)
-                    if not src_canon or not tgt_canon or conf < 0.5:
-                        skipped.append({"src": s.get("source_field"), "tgt": s.get("target_field"), "reason": "no_resolve" if not src_canon or not tgt_canon else "low_conf"})
-                        continue
-                    if tgt_canon not in best_match or conf > best_match[tgt_canon]["confidence"]:
-                        best_match[tgt_canon] = {"source_field": src_canon, "target_field": tgt_canon,
-                            "confidence": conf, "reasoning": s.get("reasoning",""), "suggested_formula": s.get("suggested_formula")}
-                    accepted.append({"src": src_canon, "tgt": tgt_canon, "conf": conf, "reason": s.get("reasoning","")[:60]})
-
-                yield _ev({"type":"chunk_done","call": call_n,
-                    "msg": f"  ✅ {len(accepted)} accepted, {len(skipped)} skipped → total matches so far: {len(best_match)}",
-                    "accepted": accepted, "skipped": skipped})
-
-            for i_chunk in inp_chunks:
-                for o_chunk in out_chunks:
-                    async for ev in _run_chunk(i_chunk, o_chunk, "P1"):
-                        yield ev
-
-            yield _ev({"type":"log","level":"info","msg":f"✅ Phase 1 done: {len(best_match)} matches"})
-
-            # Phase 2
-            matched_src = {v["source_field"] for v in best_match.values()}
-            matched_tgt = set(best_match.keys())
-            unmatched_inp = [f for f in inp_fields if _ai_path(f) not in matched_src]
-            unmatched_out = [f for f in out_fields if _ai_path(f) not in matched_tgt]
-
-            if unmatched_inp and unmatched_out:
-                u_inp_chunks = _ai_chunks(unmatched_inp, 1200)
-                u_out_chunks = _ai_chunks(unmatched_out, 1200)
-                p2_calls = len(u_inp_chunks) * len(u_out_chunks)
-                total_calls += p2_calls
-                yield _ev({"type":"log","level":"info","msg":f"🔄 Phase 2: {len(unmatched_inp)} unmatched inp, {len(unmatched_out)} unmatched out → {p2_calls} calls"})
-                for i_chunk in u_inp_chunks:
-                    for o_chunk in u_out_chunks:
-                        async for ev in _run_chunk(i_chunk, o_chunk, "P2"):
-                            yield ev
-                yield _ev({"type":"log","level":"info","msg":f"✅ Phase 2 done: {len(best_match)} total matches"})
-            else:
-                yield _ev({"type":"log","level":"info","msg":f"⏭️ Phase 2 skipped (all fields matched or no output left)"})
-
-            results = sorted(best_match.values(), key=lambda x: x["confidence"], reverse=True)
-            green  = sum(1 for r in results if r["confidence"] >= 0.75)
-            yellow = sum(1 for r in results if 0.5 <= r["confidence"] < 0.75)
-            yield _ev({"type":"done","suggestions": results,
-                "msg": f"🎯 Done: {len(results)} suggestions ({green} 🟢 confident, {yellow} 🟡 uncertain)",
-                "green": green, "yellow": yellow})
-
-        except Exception as e:
-            yield 'data: ' + json.dumps({"type":"error","msg": str(e)}) + '\n\n'
-
-    return _StreamingResponse(_generate(), media_type="text/event-stream",
-        headers={"Cache-Control":"no-cache","X-Accel-Buffering":"no"})
-
-
-# ===========================================================================
-# MAPPING DIAGRAM EXPORT (SVG)
-# ===========================================================================
-
-@app.post("/api/mapping/diagram")
-async def export_mapping_diagram(request: Dict[str, Any]):
-    """Generate an SVG diagram of the current mapping connections."""
-    try:
-        connections = request.get("connections", [])
-        project_name = request.get("projectName", "Mapping")
-        inp_name = request.get("inputSchemaName", "Input")
-        out_name = request.get("outputSchemaName", "Output")
-
-        if not connections:
-            raise HTTPException(400, "No connections to diagram")
-
-        # Build simple SVG
-        row_h = 28
-        pad = 20
-        col_w = 220
-        gap = 140
-        n = len(connections)
-        height = pad * 2 + row_h * (n + 1) + 40
-        width = col_w * 2 + gap + pad * 2
-
-        lines = []
-        lines.append(f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" font-family="monospace" font-size="12">')
-        lines.append(f'<rect width="{width}" height="{height}" fill="#f8f9fa"/>')
-        # Title
-        lines.append(f'<text x="{width//2}" y="20" text-anchor="middle" font-size="14" font-weight="bold" fill="#333">{project_name}</text>')
-        # Column headers
-        lines.append(f'<text x="{pad+col_w//2}" y="42" text-anchor="middle" font-weight="bold" fill="#00796B">{inp_name}</text>')
-        lines.append(f'<text x="{pad+col_w+gap+col_w//2}" y="42" text-anchor="middle" font-weight="bold" fill="#1565C0">{out_name}</text>')
-
-        colors = {"0.9": "#2e7d32", "0.8": "#388e3c", "0.7": "#f57c00", "0.6": "#e65100", "0.5": "#c62828"}
-
-        for i, conn in enumerate(connections):
-            y = 55 + i * row_h
-            src = conn.get("sourceName") or conn.get("source", "")
-            tgt = conn.get("targetName") or conn.get("target", "")
-            conf = conn.get("confidence", 1.0)
-            color = "#1565C0" if conf >= 0.75 else "#e65100" if conf >= 0.5 else "#888"
-
-            # Source box
-            lines.append(f'<rect x="{pad}" y="{y-14}" width="{col_w}" height="20" rx="3" fill="#E0F2F1" stroke="#00796B" stroke-width="1"/>')
-            lines.append(f'<text x="{pad+6}" y="{y}" fill="#00796B">{src[:28]}</text>')
-            # Arrow
-            x1 = pad + col_w
-            x2 = pad + col_w + gap
-            lines.append(f'<line x1="{x1}" y1="{y-4}" x2="{x2}" y2="{y-4}" stroke="{color}" stroke-width="1.5" marker-end="url(#arr)"/>')
-            # Target box
-            lines.append(f'<rect x="{x2}" y="{y-14}" width="{col_w}" height="20" rx="3" fill="#E3F2FD" stroke="#1565C0" stroke-width="1"/>')
-            lines.append(f'<text x="{x2+6}" y="{y}" fill="#1565C0">{tgt[:28]}</text>')
-
-        # Arrowhead marker
-        lines.append('<defs><marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#888"/></marker></defs>')
-        lines.append('</svg>')
-
-        svg = '\n'.join(lines)
-        return Response(content=svg, media_type="image/svg+xml",
-            headers={"Content-Disposition": "attachment; filename=mapping_diagram.svg"})
-    except HTTPException:
-        raise
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    text = data['choices'][0]['message']['content']
+                    
+                    # Extract JSON from response
+                    import re
+                    json_match = re.search(r'\[[\s\S]*\]', text)
+                    if json_match:
+                        suggestions = json.loads(json_match.group(0))
+        
+        return suggestions
+    
     except Exception as e:
-        raise HTTPException(500, str(e))
+        raise HTTPException(500, f"AI error: {str(e)}")
 
 
 # ===========================================================================
@@ -2250,20 +1748,13 @@ async def execute_transform(
         print(f"📏 Content length: {len(content)} chars")
         print(f"📝 First 200 chars: {content[:200]}")
         
-        # Detect input format — IDoc flat files look like CSV but are actually fixed-width
-        stripped = content.strip()
-        if stripped.startswith('<'):
+        # Detect input format
+        if content.strip().startswith('<'):
             input_fmt = 'xml'
-        elif stripped.startswith('{') or stripped.startswith('['):
+        elif content.strip().startswith('{'):
             input_fmt = 'json'
         else:
-            # Check if it looks like an IDoc flat file (lines starting with segment names like E1EDK01)
-            first_lines = stripped.split('\n')[:5]
-            is_idoc = any(
-                len(l) > 10 and (l.startswith('EDI_DC') or (len(l.split()) >= 2 and l[:8].replace('0','').isalpha()))
-                for l in first_lines if l.strip()
-            )
-            input_fmt = 'idoc' if is_idoc else 'csv'
+            input_fmt = 'csv'
         
         print(f"📊 Input format: {input_fmt}")
         print(f"📤 Output format: {output_format}")
@@ -2363,6 +1854,44 @@ async def list_xsd():
     for xsd in SCHEMAS_DIR.rglob("*.xsd"):
         files.append({"name": xsd.name, "path": str(xsd.relative_to(SCHEMAS_DIR))})
     return {"files": files}
+
+
+# ============================================================================
+# DIAGRAM ENDPOINT
+# ============================================================================
+
+@app.post("/api/mapping/diagram")
+async def generate_mapping_diagram(request: Request):
+    """Generate SVG diagram of the current mapping"""
+    if not _diagram_available:
+        raise HTTPException(500, "diagram_generator.py non trovato nel backend")
+    
+    try:
+        body = await request.json()
+        connections = body.get("connections", [])
+        project_name = body.get("projectName", "Mappatura")
+        input_name = body.get("inputSchemaName", "Input")
+        output_name = body.get("outputSchemaName", "Output")
+        
+        if not connections:
+            raise HTTPException(400, "Nessuna connessione fornita")
+        
+        svg_content = _generate_svg(
+            connections=connections,
+            project_name=project_name,
+            input_schema_name=input_name,
+            output_schema_name=output_name
+        )
+        
+        return Response(
+            content=svg_content,
+            media_type="image/svg+xml",
+            headers={"Content-Disposition": f'attachment; filename="mapping_diagram.svg"'}
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(500, f"Errore generazione diagramma: {str(e)}")
 
 
 # ============================================================================

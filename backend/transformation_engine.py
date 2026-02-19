@@ -47,15 +47,6 @@ from pathlib import Path
 from dataclasses import dataclass, asdict
 import re
 
-# Formulas registry (optional) — se formulas.py disponibile, usato per CUSTOM e nuove formule
-try:
-    from formulas import execute_formula as _execute_formula
-    _formulas_available = True
-except ImportError:
-    _execute_formula = None
-    _formulas_available = False
-
-
 
 # ===========================================================================
 # XSD VALIDATION
@@ -435,10 +426,50 @@ class TransformationEngine:
             return self._parse_xml_to_dict(content)
         elif format_type == 'json':
             return json.loads(content)
+        elif format_type == 'idoc':
+            return self._parse_idoc_to_dict(content)
         elif format_type == 'csv':
             return self._parse_csv_to_dict(content)
         else:
             raise ValueError(f"Unsupported input format: {format_type}")
+
+    def _parse_idoc_to_dict(self, content: str) -> Dict:
+        """
+        Parse IDoc flat file to nested dict.
+        Each line: SEGMENT_NAME  DOCNUM  SEGNUM  PSGNUM  HLEVEL  FIELD_VALUES...
+        We use the schema offset/length to extract field values.
+        Result: { 'E1EDK01': {'CURCY': 'PLN', 'BELNR': '...'}, 'E1EDKA1': [{...}, {...}], ... }
+        """
+        result = {}
+        for raw_line in content.split('\n'):
+            line = raw_line.rstrip('\r')
+            if not line.strip():
+                continue
+            # Segment name is the first token (up to first whitespace or fixed position)
+            parts = line.split()
+            if not parts:
+                continue
+            seg_name = parts[0]  # e.g. "E1EDK01005" or "E1EDK01"
+            # Strip numeric suffix from segment name (SAP adds occurrence counter)
+            seg_base = ''.join(c for c in seg_name if not c.isdigit() or seg_name.index(c) < 6)
+            # Actually: segment name is first 8 chars, rest is occurrence
+            seg_key = seg_name[:8].rstrip('0').rstrip() if len(seg_name) > 6 else seg_name
+            if not seg_key:
+                seg_key = seg_name
+
+            # The payload starts after the fixed header (40 chars typical for IDoc flat)
+            # Header: SEGNAM(8) + MANDT(3) + DOCNUM(16) + SEGNUM(6) + PSGNUM(6) + HLEVEL(2) = 41
+            payload = line[40:] if len(line) > 40 else ''
+
+            seg_entry = {'_raw': payload, '_line': line}
+            result.setdefault(seg_key, [])
+            result[seg_key].append(seg_entry)
+
+        # Flatten single-occurrence segments to dict (not list)
+        flat = {}
+        for k, v in result.items():
+            flat[k] = v[0] if len(v) == 1 else v
+        return flat
     
     def _parse_xml_to_dict(self, xml_content: str) -> Dict:
         """Parse XML to dictionary"""
@@ -598,16 +629,50 @@ class TransformationEngine:
         
         for field_key, field_data in fields.items():
             if field_data.get('id') == field_id or field_data.get('name') == field_id or field_key == field_id:
-                # Try offset first (FatturaPA), then xml_path, then path
-                path = field_data.get('offset') or field_data.get('xml_path') or field_data.get('path', '')
-                print(f"    ✅ Found field: {field_key} → path: {path}")
-                if path:
-                    value = self._get_value_by_path(data, path)
+                offset = field_data.get('offset')
+                length = field_data.get('length')
+                xml_path = field_data.get('xml_path') or ''
+                path = field_data.get('path', '')
+
+                # IDoc flat file: offset is numeric → extract from _raw payload
+                # path format is "SEGMENT.FIELDNAME" e.g. "E1EDK01.CURCY"
+                try:
+                    off_int = int(offset) if offset else None
+                    len_int = int(length) if length else None
+                except (ValueError, TypeError):
+                    off_int = None
+                    len_int = None
+
+                if off_int is not None and len_int is not None and '.' in str(path):
+                    seg_field = str(path).split('.', 1)
+                    seg_name = seg_field[0]  # e.g. "E1EDK01"
+                    # Find segment in parsed IDoc dict
+                    seg_data = data.get(seg_name) or data.get(seg_name + '001') or data.get(seg_name + '005')
+                    if seg_data is None:
+                        # Try prefix match
+                        for k in data:
+                            if k.startswith(seg_name):
+                                seg_data = data[k]
+                                break
+                    if seg_data:
+                        if isinstance(seg_data, list):
+                            seg_data = seg_data[0]
+                        raw = seg_data.get('_raw', '')
+                        if raw:
+                            # offset in schema is relative to segment payload start
+                            val = raw[off_int:off_int + len_int].strip()
+                            print(f"    💎 IDoc extracted: {seg_name}[{off_int}:{off_int+len_int}] = '{val}'")
+                            return val if val else None
+
+                # XML/JSON path
+                use_path = xml_path or offset or path
+                print(f"    ✅ Found field: {field_key} → path: {use_path}")
+                if use_path:
+                    value = self._get_value_by_path(data, use_path)
                     print(f"    💎 Extracted value: {value}")
                     return value
         
         print(f"    ⚠️  Field '{field_id}' not found in schema, trying as direct path")
-        # Fallback: try field_id as path
         return self._get_value_by_path(data, field_id)
     
     def _execute_structured_formula(self, transformation: Dict, source_value: Any, 
@@ -700,12 +765,6 @@ class TransformationEngine:
                 return source_value
             return None
         
-        # CUSTOM — espressione Python libera (da formulas.py)
-        elif trans_type == 'CUSTOM':
-            if _execute_formula:
-                return _execute_formula(transformation, source_value)
-            return source_value
-
         # Unknown type
         return source_value
     
