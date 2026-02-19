@@ -1,5 +1,16 @@
 #!/usr/bin/env python3
 """
+Version: 20260216_115000
+Version: 20260216_111828
+Last Modified: 2026-02-16T11:18:36.971041
+
+FIXES:
+- Rimossa definizione duplicata di SCHEMAS_DIR (usava Path sbagliato)
+- Usa Path("schemas") consistentemente in tutto il file
+"""
+
+#!/usr/bin/env python3
+"""
 Mapping System API
 FastAPI backend for visual mapper
 
@@ -11,7 +22,7 @@ Endpoints:
 - /api/ai - AI-powered auto-mapping
 """
 
-from fastapi import FastAPI, File, UploadFile, HTTPException
+from fastapi import FastAPI, File, UploadFile, HTTPException, Form, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, FileResponse, Response
 from pydantic import BaseModel
@@ -23,8 +34,22 @@ from datetime import datetime
 from dotenv import load_dotenv
 import httpx
 
-# Load environment variables
-load_dotenv()
+# Load environment variables - search in current dir and parent dir, both .env and _env
+from pathlib import Path as _Path
+_found = False
+for _base in [_Path('.'), _Path('..'), _Path(__file__).parent, _Path(__file__).parent.parent]:
+    for _name in ['.env', '_env', 'env']:
+        _envfile = _base / _name
+        if _envfile.exists():
+            load_dotenv(dotenv_path=str(_envfile), override=True)
+            print(f"\u2705 Loaded env from: {_envfile.resolve()}")
+            _found = True
+            break
+    if _found:
+        break
+if not _found:
+    load_dotenv()
+    print("\u26a0\ufe0f  No .env file found, using system environment variables")
 
 # Import our modules
 from schema_parser import SchemaParser
@@ -35,6 +60,12 @@ from csv_parser import CSVSchemaParser, MappingCSVExporter
 # === INTEGRATED COMPONENTS (AUTO-ADDED) ===
 from storage_layer import StorageFactory
 from transformation_engine import TransformationEngine, XSDValidator
+from formulas import list_formulas as _list_formulas
+try:
+    from diagram_generator import generate_svg as _generate_svg
+    _diagram_available = True
+except ImportError:
+    _diagram_available = False
 from auth_system import AuthManager
 import yaml
 from pathlib import Path
@@ -84,23 +115,347 @@ if AUTH_ENABLED and storage:
 else:
     print(f"🔓 Authentication: DISABLED")
 
-# Schemas
-SCHEMAS_DIR = Path(__file__).parent.parent / 'schemas'
+# Schemas - usa path relativo alla directory di lavoro corrente
+# (dove viene eseguito il backend, di solito la directory principale del progetto)
+SCHEMAS_DIR = Path("schemas")
 SCHEMAS_DIR.mkdir(exist_ok=True)
 
 # Transformation
 transformation_engine = TransformationEngine()
 
-def find_xsd(format_name, io='input'):
+def detect_ubl_document_type(xml_content: str = None, mapping_rules: dict = None) -> str:
+    """
+    Auto-detect UBL document type from XML content or mapping rules
+    
+    Returns: 'Invoice', 'CreditNote', 'DebitNote', 'Order', 'DespatchAdvice', etc.
+    """
+    # DEBUG: Log what we receive
+    if mapping_rules:
+        print(f"🔍 DEBUG mapping_rules keys: {list(mapping_rules.keys())}")
+        if 'outputSchema' in mapping_rules:
+            print(f"🔍 DEBUG outputSchema keys: {list(mapping_rules['outputSchema'].keys()) if isinstance(mapping_rules['outputSchema'], dict) else 'NOT A DICT'}")
+            if isinstance(mapping_rules['outputSchema'], dict):
+                print(f"🔍 DEBUG rootElement in outputSchema: {'rootElement' in mapping_rules['outputSchema']}")
+                if 'rootElement' in mapping_rules['outputSchema']:
+                    print(f"🔍 DEBUG rootElement value: {mapping_rules['outputSchema']['rootElement']}")
+    
+    # Strategy 1: Check mapping rules for output schema root element
+    if mapping_rules:
+        if isinstance(mapping_rules, dict) and 'outputSchema' in mapping_rules:
+            root_elem = mapping_rules['outputSchema'].get('rootElement', '')
+            if root_elem:
+                print(f"🔍 Document type from mapping rules: {root_elem}")
+                return root_elem  # ← PRENDE DA QUI!
+    
+    # Strategy 2: Try to detect from XML content (output or input)
+    if xml_content:
+        try:
+            import xml.etree.ElementTree as ET
+            # Parse just enough to get root tag
+            root = ET.fromstring(xml_content.encode('utf-8') if isinstance(xml_content, str) else xml_content)
+            
+            # Extract tag name (remove namespace)
+            tag = root.tag
+            if '}' in tag:
+                tag = tag.split('}')[1]
+            
+            # Check if it's a known UBL document type
+            known_types = [
+                'Invoice', 'CreditNote', 'DebitNote', 'Reminder',
+                'Order', 'OrderResponse', 'OrderChange', 'OrderCancellation',
+                'DespatchAdvice', 'ReceiptAdvice', 'ApplicationResponse',
+                'Catalogue', 'CatalogueRequest', 'CatalogueItemSpecificationUpdate',
+                'Statement', 'SelfBilledInvoice', 'SelfBilledCreditNote'
+            ]
+            
+            for known_type in known_types:
+                if known_type.lower() in tag.lower():
+                    print(f"🔍 Document type detected from XML: {known_type}")
+                    return known_type
+            
+            print(f"🔍 Unknown document type from XML: {tag}")
+            return tag
+        except Exception as e:
+            print(f"⚠️  Could not parse XML to detect type: {e}")
+    
+    # Default fallback
+    print(f"⚠️  Could not detect document type, defaulting to Invoice")
+    return 'Invoice'
+
+
+def find_xsd(format_name, io='input', document_type=None):
+    """
+    Find XSD file for a format - COMPLETELY DYNAMIC
+    
+    Args:
+        format_name: Schema format (e.g., 'ubl', 'fatturapa')
+        io: 'input' or 'output'
+        document_type: Specific document type (e.g., 'Invoice', 'CreditNote', 'Order')
+                      If provided, will look for UBL-{document_type}-*.xsd
+    
+    Takes ANY .xsd file in the directory, WHATEVER its name is.
+    Returns ABSOLUTE PATH so imports can be resolved correctly.
+    
+    NO hardcoding, NO assumptions about filenames!
+    """
+    # Build path: schemas/{io}/{format_name}/
+    base_dir = SCHEMAS_DIR / io / format_name
+    
+    # Try exact match first
+    if not (base_dir.exists() and base_dir.is_dir()):
+        # Try case-insensitive match and variations (e.g., UBL-21 for ubl)
+        print(f"📂 Exact path not found: {base_dir}, trying fuzzy match...")
+        io_dir = SCHEMAS_DIR / io
+        if io_dir.exists():
+            for subdir in io_dir.iterdir():
+                if subdir.is_dir():
+                    # Match case-insensitive
+                    if format_name.lower() in subdir.name.lower():
+                        print(f"✅ Found schema directory (case-insensitive): {subdir.name}")
+                        base_dir = subdir
+                        break
+                    # Match with version suffix removed (e.g., UBL-21 → UBL for ubl)
+                    clean_subdir = subdir.name.lower().replace('-', '').replace('.', '')
+                    clean_format = format_name.lower().replace('-', '').replace('.', '')
+                    if clean_format in clean_subdir or clean_subdir in clean_format:
+                        print(f"✅ Found schema directory (fuzzy match): {subdir.name}")
+                        base_dir = subdir
+                        break
+    
+    if base_dir.exists() and base_dir.is_dir():
+        print(f"📂 Searching XSD in: {base_dir}")
+        
+        # Search recursively for ANY .xsd file
+        xsd_files = list(base_dir.rglob("*.xsd"))
+        
+        if not xsd_files:
+            print(f"⚠️  No XSD files found in {base_dir}")
+            return None
+        
+        print(f"📋 Found {len(xsd_files)} XSD files")
+        
+        # If document_type is specified, look for that specific type
+        if document_type:
+            print(f"🎯 Looking for {document_type} XSD specifically...")
+            
+            # Pattern 1: EXACT match UBL-{DocumentType}-*.xsd in maindoc
+            # CRITICAL: Must match EXACTLY to avoid FreightInvoice matching Invoice
+            exact_candidates = [
+                f for f in xsd_files
+                if f.name.startswith(f"UBL-{document_type}-")  # MUST START WITH!
+                and ("maindoc" in str(f).lower() or f.parent.name.lower() == "maindoc")
+                and not any(skip in f.name.lower() for skip in ['common', 'component', 'type', 'extension'])
+            ]
+            
+            if exact_candidates:
+                xsd_path = str(exact_candidates[0].resolve())  # ABSOLUTE PATH!
+                print(f"✅ Found {document_type} XSD (exact match): {xsd_path}")
+                return xsd_path
+            
+            # Pattern 2: Loose match {DocumentType} in maindoc (for other schemas)
+            type_candidates = [
+                f for f in xsd_files
+                if document_type.lower() in f.name.lower()
+                and ("maindoc" in str(f).lower() or f.parent.name.lower() == "maindoc")
+                and not any(skip in f.name.lower() for skip in ['common', 'component', 'type', 'extension'])
+            ]
+            
+            if type_candidates:
+                xsd_path = str(type_candidates[0].resolve())  # ABSOLUTE PATH!
+                print(f"✅ Found {document_type} XSD: {xsd_path}")
+                return xsd_path
+            
+            # Pattern 3: Any file matching the document type
+            type_files = [f for f in xsd_files if document_type.lower() in f.name.lower()]
+            if type_files:
+                xsd_path = str(type_files[0].resolve())
+                print(f"✅ Found {document_type} XSD (fallback): {xsd_path}")
+                return xsd_path
+        
+        # STRATEGY: Prefer main document XSD (has document type name and "maindoc" or is in root)
+        # This works for UBL structure: xsd/maindoc/UBL-{Type}-2.1.xsd
+        
+        # 1. Look for main XSD in maindoc folder (any document type)
+        main_candidates = [
+            f for f in xsd_files 
+            if ("maindoc" in str(f).lower() or f.parent.name.lower() == "maindoc")
+            and not any(skip in f.name.lower() for skip in ['common', 'component', 'type', 'extension'])
+        ]
+        
+        if main_candidates:
+            # Prefer Invoice if multiple found and no type specified
+            invoice_files = [f for f in main_candidates if "invoice" in f.name.lower()]
+            if invoice_files:
+                xsd_path = str(invoice_files[0].resolve())
+                print(f"✅ Found Invoice XSD: {xsd_path}")
+                return xsd_path
+            
+            # Otherwise take first main doc
+            xsd_path = str(main_candidates[0].resolve())
+            print(f"✅ Found main XSD: {xsd_path}")
+            return xsd_path
+        
+        # 2. Fallback: Take the FIRST XSD in the root directory
+        root_xsds = [f for f in xsd_files if f.parent == base_dir]
+        if root_xsds:
+            xsd_path = str(root_xsds[0].resolve())  # ABSOLUTE PATH!
+            print(f"✅ Using root XSD: {xsd_path}")
+            return xsd_path
+        
+        # 3. Last resort: ANY XSD file
+        xsd_path = str(xsd_files[0].resolve())  # ABSOLUTE PATH!
+        print(f"⚠️  Using first XSD found: {xsd_path}")
+        return xsd_path
+    
+    # If directory doesn't exist, try searching in parent directories
+    io_dir = SCHEMAS_DIR / io
+    if io_dir.exists():
+        print(f"📂 Format directory not found, searching in: {io_dir}")
+        # Search ALL subdirectories
+        for subdir in io_dir.iterdir():
+            if subdir.is_dir():
+                # Check if directory name matches format (case-insensitive, partial match)
+                if format_name.lower() in subdir.name.lower() or subdir.name.lower() in format_name.lower():
+                    print(f"📂 Checking subdirectory: {subdir.name}")
+                    # Recursively search in this directory
+                    xsd_files = list(subdir.rglob("*.xsd"))
+                    if xsd_files:
+                        # If document type specified, look for it
+                        if document_type:
+                            type_candidates = [
+                                f for f in xsd_files
+                                if document_type.lower() in f.name.lower()
+                                and "maindoc" in str(f).lower()
+                            ]
+                            if type_candidates:
+                                xsd_path = str(type_candidates[0].resolve())
+                                print(f"✅ Found {document_type} XSD in {subdir.name}: {xsd_path}")
+                                return xsd_path
+                        
+                        # Same strategy as above
+                        main_candidates = [
+                            f for f in xsd_files 
+                            if "maindoc" in str(f).lower()
+                            and not any(skip in f.name.lower() for skip in ['common', 'component'])
+                        ]
+                        if main_candidates:
+                            xsd_path = str(main_candidates[0].resolve())
+                            print(f"✅ Found XSD in {subdir.name}: {xsd_path}")
+                            return xsd_path
+                        
+                        xsd_path = str(xsd_files[0].resolve())
+                        print(f"✅ Found XSD in {subdir.name}: {xsd_path}")
+                        return xsd_path
+    
+    print(f"❌ No XSD found for format '{format_name}' in {io}")
+    return None
+
+def find_schematron(format_name, io='input'):
+    """Find Schematron file for a format (searches recursively for rules.sch)"""
+    # First try exact match
     d = SCHEMAS_DIR / io / format_name
     if d.exists():
-        xsd = list(d.glob("*.xsd"))
-        if xsd: return str(xsd[0])
+        # Look for rules.sch specifically (standard name)
+        rules_sch = d / "rules.sch"
+        if rules_sch.exists():
+            return str(rules_sch)
+        # Fallback: any SCH file
+        sch = list(d.glob("*.sch"))
+        if sch:
+            return str(sch[0])
+    
+    # If not found, search in ALL subdirectories
+    io_dir = SCHEMAS_DIR / io
+    if io_dir.exists():
+        for schema_dir in io_dir.iterdir():
+            if schema_dir.is_dir():
+                rules_sch = schema_dir / "rules.sch"
+                if rules_sch.exists():
+                    # Check if directory name matches format
+                    if format_name.lower() in schema_dir.name.lower() or schema_dir.name.lower() in format_name.lower():
+                        print(f"📂 Found schematron in subdirectory: {schema_dir.name}")
+                        return str(rules_sch)
+    
     return None
+
+def get_validation_files(input_format: str, output_format: str, input_content: str = None, mapping_rules: dict = None):
+    """
+    Get XSD and Schematron files for input and output formats
+    Auto-detects XML type if content provided
+    Auto-detects UBL document type (Invoice, CreditNote, etc.)
+    
+    Returns:
+        (input_xsd, input_sch, output_xsd, output_sch)
+    """
+    # Auto-detect XML format from content
+    input_schema_type = None
+    output_schema_type = None
+    document_type = None
+    
+    if input_format.lower() == 'xml' and input_content:
+        # Try to detect if it's FatturaPA or UBL
+        if '<FatturaElettronica' in input_content or 'FatturaPA' in input_content:
+            input_schema_type = 'fatturapa'
+            print(f"  🔍 Auto-detected input: FatturaPA")
+        elif '<Invoice' in input_content or 'UBL' in input_content:
+            input_schema_type = 'ubl'
+            print(f"  🔍 Auto-detected input: UBL")
+        else:
+            input_schema_type = 'fatturapa'  # Default
+            print(f"  ⚠️  Could not detect XML type, defaulting to FatturaPA")
+    else:
+        # Map format types to schema directory names
+        format_map = {
+            'xml': 'fatturapa',  # Default
+            'fatturapa': 'fatturapa',
+            'ubl': 'ubl',
+            'peppol': 'ubl',
+            'idoc': None,  # IDOC doesn't use XSD
+            'json': None,
+            'csv': None
+        }
+        input_schema_type = format_map.get(input_format.lower())
+    
+    # Output format
+    format_map = {
+        'xml': 'ubl',  # Assume output is UBL by default
+        'fatturapa': 'fatturapa',
+        'ubl': 'ubl',
+        'peppol': 'ubl',
+        'idoc': None,
+        'json': None,
+        'csv': None
+    }
+    output_schema_type = format_map.get(output_format.lower())
+    
+    # Auto-detect UBL document type for output
+    if output_schema_type in ['ubl', 'peppol']:
+        document_type = detect_ubl_document_type(
+            xml_content=input_content,
+            mapping_rules=mapping_rules
+        )
+        print(f"  📄 Document type: {document_type}")
+    
+    # Find XSD files with document type awareness
+    input_xsd = find_xsd(input_schema_type, 'input') if input_schema_type else None
+    input_sch = find_schematron(input_schema_type, 'input') if input_schema_type else None
+    
+    # For output, pass document type to find the right XSD
+    output_xsd = find_xsd(output_schema_type, 'output', document_type=document_type) if output_schema_type else None
+    output_sch = find_schematron(output_schema_type, 'output') if output_schema_type else None
+    
+    if input_xsd or input_sch or output_xsd or output_sch:
+        print(f"\n📋 Validation files:")
+        if input_xsd: print(f"  Input XSD: {input_xsd}")
+        if input_sch: print(f"  Input Schematron: {input_sch}")
+        if output_xsd: print(f"  Output XSD: {output_xsd}")
+        if output_sch: print(f"  Output Schematron: {output_sch}")
+    
+    return input_xsd, input_sch, output_xsd, output_sch
 
 
 # Storage
-SCHEMAS_DIR = Path("schemas")
+# SCHEMAS_DIR già definito all'inizio del file (riga 88)
 MAPPINGS_DIR = Path("mappings")
 IDOC_DEFS_DIR = Path("idoc_definitions")
 
@@ -164,72 +519,19 @@ async def root():
 
 
 # ============================================================================
+# FORMULAS ENDPOINT
+# ============================================================================
+
+@app.get("/api/formulas")
+async def get_formulas():
+    """Return the list of available transformation formulas from formulas.py"""
+    return {"formulas": _list_formulas()}
+
+
+# ============================================================================
 # SCHEMA ENDPOINTS
 # ============================================================================
 
-@app.post("/api/schemas/upload")
-async def upload_schema(
-    file: UploadFile = File(...),
-    name: str = "",
-    schema_type: str = "auto",
-    direction: str = "input"
-):
-    """Upload and parse schema file"""
-    try:
-        content = await file.read()
-        filename = name or file.filename
-        
-        # Save file
-        schema_dir = SCHEMAS_DIR / direction
-        file_path = schema_dir / filename
-        
-        with open(file_path, 'wb') as f:
-            f.write(content)
-        
-        # Parse schema
-        parser = SchemaParser()
-        
-        if schema_type == "auto":
-            # Auto-detect
-            if filename.endswith('.xsd'):
-                schema_type = "xsd"
-            elif filename.endswith('.json'):
-                schema_type = "json_schema"
-            elif filename.endswith('.xml'):
-                schema_type = "sample_xml"
-            elif filename.endswith('.csv'):
-                schema_type = "csv"
-        
-        if schema_type == "xsd":
-            schema = parser.parse_xsd(str(file_path))
-        elif schema_type == "json_schema":
-            schema = parser.parse_json_schema(str(file_path))
-        elif schema_type == "sample_xml":
-            schema = parser.parse_sample_xml(str(file_path), name)
-        elif schema_type == "idoc":
-            schema = parser.parse_idoc_definition(str(file_path))
-        elif schema_type == "csv":
-            # Use CSV parser
-            csv_parser = CSVSchemaParser()
-            is_output = (direction == "output")
-            schema = csv_parser.parse_csv(str(file_path), is_output=is_output)
-            parser = csv_parser  # Use for tree generation
-        else:
-            raise HTTPException(400, "Unknown schema type")
-        
-        # Cache
-        schema_id = f"{direction}_{filename}"
-        schemas_cache[schema_id] = schema
-        
-        return {
-            "success": True,
-            "schema_id": schema_id,
-            "schema": schema,
-            "tree": parser.to_tree_structure()
-        }
-    
-    except Exception as e:
-        raise HTTPException(500, str(e))
 
 
 @app.get("/api/schemas")
@@ -249,6 +551,61 @@ async def list_schemas():
             })
     
     return schemas
+
+
+@app.get("/api/schemas/list")
+async def list_available_schemas():
+    """List all available schemas in schemas/input and schemas/output"""
+    try:
+        # Use global SCHEMAS_DIR instead of reconstructing path
+        schemas_dir = SCHEMAS_DIR
+        
+        input_schemas = []
+        output_schemas = []
+        
+        # List input schemas
+        input_dir = schemas_dir / 'input'
+        if input_dir.exists():
+            for schema_name in os.listdir(input_dir):
+                schema_path = input_dir / schema_name
+                if schema_path.is_dir():
+                    # Look for ANY .xsd file, not just schema.xsd
+                    xsd_files = list(schema_path.rglob("*.xsd"))
+                    sch_files = list(schema_path.rglob("*.sch"))
+                    
+                    input_schemas.append({
+                        'name': schema_name,
+                        'hasXsd': len(xsd_files) > 0,
+                        'hasSchematron': len(sch_files) > 0,
+                        'xsdCount': len(xsd_files),
+                        'schCount': len(sch_files)
+                    })
+        
+        # List output schemas
+        output_dir = schemas_dir / 'output'
+        if output_dir.exists():
+            for schema_name in os.listdir(output_dir):
+                schema_path = output_dir / schema_name
+                if schema_path.is_dir():
+                    # Look for ANY .xsd file, not just schema.xsd
+                    from pathlib import Path
+                    xsd_files = list(Path(schema_path).rglob("*.xsd"))
+                    sch_files = list(Path(schema_path).rglob("*.sch"))
+                    
+                    output_schemas.append({
+                        'name': schema_name,
+                        'hasXsd': len(xsd_files) > 0,
+                        'hasSchematron': len(sch_files) > 0,
+                        'xsdCount': len(xsd_files),
+                        'schCount': len(sch_files)
+                    })
+        
+        return {
+            'input': sorted(input_schemas, key=lambda x: x['name']),
+            'output': sorted(output_schemas, key=lambda x: x['name'])
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.get("/api/schemas/{schema_id}")
@@ -1376,12 +1733,20 @@ async def delete_stored_schema(stored_id: str):
 @app.post("/api/transform/execute")
 async def execute_transform(
     file: UploadFile = File(...),
-    output_format: str = 'xml',
-    validate: bool = False
+    output_format: str = Form('xml'),
+    validate: bool = Form(False),
+    mapping_rules: str = Form(None)  # JSON string of mapping rules
 ):
-    """Execute transformation"""
+    """Execute transformation with mapping rules"""
     try:
         content = (await file.read()).decode('utf-8')
+        
+        print(f"\n{'='*60}")
+        print(f"🔄 TRANSFORM EXECUTE")
+        print(f"{'='*60}")
+        print(f"📁 File: {file.filename}")
+        print(f"📏 Content length: {len(content)} chars")
+        print(f"📝 First 200 chars: {content[:200]}")
         
         # Detect input format
         if content.strip().startswith('<'):
@@ -1391,15 +1756,67 @@ async def execute_transform(
         else:
             input_fmt = 'csv'
         
-        # Transform (TODO: use actual mapping)
-        result = transformation_engine.transform(
+        print(f"📊 Input format: {input_fmt}")
+        print(f"📤 Output format: {output_format}")
+        
+        # Parse mapping rules from JSON string
+        import json
+        rules = {'connections': []}
+        
+        print(f"📦 mapping_rules received: {mapping_rules is not None}")
+        
+        if mapping_rules:
+            try:
+                rules = json.loads(mapping_rules)
+                print(f"✅ Parsed mapping_rules successfully")
+                print(f"🔗 Connections: {len(rules.get('connections', []))}")
+                print(f"📋 First connection: {rules.get('connections', [None])[0] if rules.get('connections') else 'None'}")
+            except Exception as e:
+                print(f"❌ Failed to parse mapping_rules: {e}")
+                print(f"   Raw value: {mapping_rules[:500]}")
+        else:
+            print(f"⚠️  No mapping_rules provided!")
+        
+        # Get validation files (XSD and Schematron) - auto-detect XML type and document type
+        input_xsd, input_sch, output_xsd, output_sch = get_validation_files(
+            input_fmt, 
+            output_format,
+            input_content=content,  # Pass content for auto-detection
+            mapping_rules=rules     # Pass mapping rules for document type detection
+        )
+        
+        # Create TransformationEngine with validation files
+        engine = TransformationEngine(
+            input_xsd=input_xsd,
+            output_xsd=output_xsd,
+            input_schematron=input_sch,
+            output_schematron=output_sch
+        )
+        
+        print(f"\n🚀 Calling transformation_engine.transform...")
+        
+        # Transform with actual mapping
+        result = engine.transform(
             input_content=content,
             input_format=input_fmt,
             output_format=output_format,
-            mapping_rules={'connections': []},
+            mapping_rules=rules,
             validate_input=validate,
             validate_output=validate
         )
+        
+        print(f"✅ Transform complete!")
+        
+        # Check if output_content is valid before accessing it
+        if result.output_content:
+            print(f"📤 Output length: {len(result.output_content)} chars")
+            print(f"📝 Output preview: {result.output_content[:200]}")
+        else:
+            print(f"⚠️ WARNING: output_content is None or empty!")
+            print(f"🔍 Result success: {result.success}")
+            print(f"🔍 Result errors: {result.validation_errors if hasattr(result, 'validation_errors') else 'N/A'}")
+        
+        print(f"{'='*60}\n")
         
         if result.success:
             return Response(
@@ -1410,6 +1827,7 @@ async def execute_transform(
         else:
             return {"success": False, "errors": result.validation_errors}
     except Exception as e:
+        print(f"Transform error: {e}")
         raise HTTPException(500, str(e))
 
 @app.post("/api/xsd/upload")
@@ -1436,6 +1854,44 @@ async def list_xsd():
     for xsd in SCHEMAS_DIR.rglob("*.xsd"):
         files.append({"name": xsd.name, "path": str(xsd.relative_to(SCHEMAS_DIR))})
     return {"files": files}
+
+
+# ============================================================================
+# DIAGRAM ENDPOINT
+# ============================================================================
+
+@app.post("/api/mapping/diagram")
+async def generate_mapping_diagram(request: Request):
+    """Generate SVG diagram of the current mapping"""
+    if not _diagram_available:
+        raise HTTPException(500, "diagram_generator.py non trovato nel backend")
+    
+    try:
+        body = await request.json()
+        connections = body.get("connections", [])
+        project_name = body.get("projectName", "Mappatura")
+        input_name = body.get("inputSchemaName", "Input")
+        output_name = body.get("outputSchemaName", "Output")
+        
+        if not connections:
+            raise HTTPException(400, "Nessuna connessione fornita")
+        
+        svg_content = _generate_svg(
+            connections=connections,
+            project_name=project_name,
+            input_schema_name=input_name,
+            output_schema_name=output_name
+        )
+        
+        return Response(
+            content=svg_content,
+            media_type="image/svg+xml",
+            headers={"Content-Disposition": f'attachment; filename="mapping_diagram.svg"'}
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(500, f"Errore generazione diagramma: {str(e)}")
 
 
 # ============================================================================
@@ -1791,6 +2247,383 @@ async def get_me(user = Depends(get_current_user)):
 async def logout():
     """Logout (client should delete token)"""
     return {"success": True, "message": "Logged out successfully"}
+
+
+@app.get("/api/schemas/{schema_id}/document-types")
+async def get_document_types(schema_id: str):
+    """
+    Get available document types for a schema
+    
+    Returns list of document types with their XSD files.
+    Example: For UBL-21, returns [Invoice, CreditNote, DebitNote, ...]
+    """
+    try:
+        # Map schema IDs to their directories
+        schema_dirs = {
+            'UBL-21': 'UBL-21',
+            'ubl': 'ubl',
+            'peppol': 'UBL-21',
+            'fatturapa': 'FatturaPA',
+            'FatturaPA': 'FatturaPA'
+        }
+        
+        schema_dir = schema_dirs.get(schema_id, schema_id)
+        schema_path = SCHEMAS_DIR / 'output' / schema_dir
+        
+        if not schema_path.exists():
+            return {
+                "success": False,
+                "error": f"Schema directory not found: {schema_id}"
+            }
+        
+        # Find all XSD files in maindoc folder
+        maindoc_path = schema_path / 'xsd' / 'maindoc'
+        if not maindoc_path.exists():
+            # Try root directory
+            maindoc_path = schema_path
+        
+        document_types = []
+        
+        if maindoc_path.exists():
+            for xsd_file in maindoc_path.glob("*.xsd"):
+                filename = xsd_file.name
+                
+                # Skip common/component files
+                if any(skip in filename.lower() for skip in ['common', 'component', 'extension', 'aggregate', 'basic']):
+                    continue
+                
+                # Extract document type from filename
+                # Pattern: UBL-{DocumentType}-2.1.xsd
+                if filename.startswith('UBL-'):
+                    doc_type = filename.replace('UBL-', '').replace('-2.1.xsd', '').replace('-2.0.xsd', '').replace('.xsd', '')
+                else:
+                    doc_type = filename.replace('.xsd', '')
+                
+                # Add to list with metadata
+                document_types.append({
+                    'type': doc_type,
+                    'label': doc_type,
+                    'filename': filename,
+                    'path': str(xsd_file)
+                })
+        
+        # Sort by type name
+        document_types.sort(key=lambda x: x['type'])
+        
+        print(f"📋 Found {len(document_types)} document types for {schema_id}")
+        
+        return {
+            "success": True,
+            "schema_id": schema_id,
+            "document_types": document_types,
+            "count": len(document_types)
+        }
+    
+    except Exception as e:
+        print(f"❌ Error getting document types: {e}")
+        return {
+            "success": False,
+            "error": str(e)
+        }
+
+
+# ============================================================
+# SCHEMA MANAGEMENT APIs
+# ============================================================
+
+@app.post("/api/schemas/upload")
+async def upload_schema(file: UploadFile = File(...)):
+    """
+    Upload schema file (ZIP with XSD or CSV)
+    
+    Supports:
+    1. ZIP file containing XSD schemas
+    2. CSV file with schema definition
+    
+    Auto-detects file type and processes accordingly.
+    """
+    try:
+        import zipfile
+        import tempfile
+        import shutil
+        
+        # Check file extension
+        file_ext = os.path.splitext(file.filename)[1].lower()
+        
+        # ============================================================
+        # CSV FILE UPLOAD
+        # ============================================================
+        if file_ext == '.csv':
+            print(f"📊 CSV schema upload: {file.filename}")
+            
+            # Import CSV parser
+            from csv_parser import CSVSchemaParser
+            
+            # Save CSV temporarily
+            with tempfile.NamedTemporaryFile(delete=False, suffix='.csv') as temp_csv:
+                content = await file.read()
+                temp_csv.write(content)
+                temp_csv_path = temp_csv.name
+            
+            try:
+                # Parse CSV
+                parser = CSVSchemaParser()
+                schema_data = parser.parse_csv(temp_csv_path)
+                
+                # Extract metadata (now included by parser)
+                schema_name = schema_data.get('name', 'schema')
+                root_element = schema_data.get('rootElement', 'root')
+                format_type = schema_data.get('format', 'xml')
+                namespace = schema_data.get('namespace', '')
+                
+                print(f"✅ Parsed CSV: {schema_data['field_count']} fields")
+                print(f"📋 Schema: {schema_name}")
+                print(f"📦 Format: {format_type}")
+                print(f"🎯 Root element: {root_element}")
+                print(f"🔗 Namespace: {namespace}")
+                
+                # Return schema data (already has all metadata)
+                return {
+                    "success": True,
+                    "message": f"CSV schema '{schema_name}' parsed successfully",
+                    "schema": schema_data,
+                    "type": "csv",
+                    "fields_count": schema_data['field_count']
+                }
+            
+            finally:
+                # Clean up temp file
+                os.unlink(temp_csv_path)
+        
+        # ============================================================
+        # ZIP FILE UPLOAD (existing code)
+        # ============================================================
+        import zipfile
+        import tempfile
+        import shutil
+        
+        # File extensions to remove (documentation, images, etc.)
+        UNWANTED_EXTENSIONS = {
+            '.html', '.htm', '.pdf', '.png', '.jpg', '.jpeg', '.gif', 
+            '.svg', '.css', '.js', '.txt', '.md', '.xml',  # Remove .txt and .md docs
+            '.doc', '.docx', '.odt', '.rtf',  # Office docs
+            '.zip', '.tar', '.gz'  # Archives
+        }
+        
+        # Keep only these file types
+        WANTED_EXTENSIONS = {'.xsd', '.sch'}
+        
+        def should_keep_file(filename):
+            """Decide if file should be kept"""
+            name_lower = filename.lower()
+            ext = os.path.splitext(name_lower)[1]
+            
+            # Keep XSD and Schematron
+            if ext in WANTED_EXTENSIONS:
+                return True
+            
+            # Remove unwanted
+            if ext in UNWANTED_EXTENSIONS:
+                return False
+            
+            # Keep files without extension or unknown extensions
+            return True
+        
+        def clean_directory(directory):
+            """Remove unwanted files from directory recursively"""
+            removed_count = 0
+            for root, dirs, files in os.walk(directory, topdown=False):
+                for filename in files:
+                    if not should_keep_file(filename):
+                        file_path = os.path.join(root, filename)
+                        os.remove(file_path)
+                        removed_count += 1
+                
+                # Remove empty directories
+                for dirname in dirs:
+                    dir_path = os.path.join(root, dirname)
+                    if os.path.exists(dir_path) and not os.listdir(dir_path):
+                        os.rmdir(dir_path)
+            
+            return removed_count
+        
+        def find_schema_xsd(directory):
+            """Find schema.xsd or main XSD file recursively"""
+            for root, dirs, files in os.walk(directory):
+                for filename in files:
+                    if filename.lower() in ['schema.xsd', 'invoice.xsd', 'ubl-invoice-2.1.xsd']:
+                        return os.path.join(root, filename)
+            
+            # Fallback: any .xsd file
+            for root, dirs, files in os.walk(directory):
+                for filename in files:
+                    if filename.endswith('.xsd'):
+                        return os.path.join(root, filename)
+            
+            return None
+        
+        def get_schema_name_from_zip(extract_dir):
+            """Intelligently determine schema name"""
+            items = os.listdir(extract_dir)
+            
+            # Case 1: Single root directory (simple structure)
+            if len(items) == 1 and os.path.isdir(os.path.join(extract_dir, items[0])):
+                return items[0], os.path.join(extract_dir, items[0])
+            
+            # Case 2: Multiple items or files at root (complex structure like UBL)
+            # Use extract_dir itself as schema root
+            return 'extracted_schema', extract_dir
+        
+        # Create temp directory
+        with tempfile.TemporaryDirectory() as temp_dir:
+            # Save uploaded ZIP
+            zip_path = os.path.join(temp_dir, 'upload.zip')
+            with open(zip_path, 'wb') as f:
+                content = await file.read()
+                f.write(content)
+            
+            # Extract ZIP
+            extract_dir = os.path.join(temp_dir, 'extracted')
+            with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+                zip_ref.extractall(extract_dir)
+            
+            print(f"📦 Extracted ZIP to: {extract_dir}")
+            print(f"📂 Contents: {os.listdir(extract_dir)}")
+            
+            # Determine schema name and root
+            schema_name, schema_root = get_schema_name_from_zip(extract_dir)
+            print(f"📋 Schema name: {schema_name}")
+            print(f"📁 Schema root: {schema_root}")
+            
+            # Clean unwanted files
+            removed = clean_directory(schema_root)
+            print(f"🧹 Removed {removed} unwanted files")
+            
+            # Find main XSD file
+            main_xsd = find_schema_xsd(schema_root)
+            if not main_xsd:
+                raise HTTPException(
+                    status_code=400,
+                    detail="No .xsd file found in ZIP"
+                )
+            
+            print(f"✅ Found main XSD: {main_xsd}")
+            
+            # Check if we need to wrap (complex structure)
+            need_wrapper = False
+            
+            # If main XSD is NOT directly in schema_root, we need wrapper
+            main_xsd_dir = os.path.dirname(main_xsd)
+            if main_xsd_dir != schema_root:
+                need_wrapper = True
+                print(f"🔄 Complex structure detected, will create wrapper")
+            
+            # Prepare final schema directory
+            if need_wrapper:
+                # Create wrapper directory
+                wrapper_dir = os.path.join(temp_dir, 'wrapped')
+                os.makedirs(wrapper_dir, exist_ok=True)
+                
+                # Copy main XSD to root as schema.xsd
+                shutil.copy2(main_xsd, os.path.join(wrapper_dir, 'schema.xsd'))
+                
+                # Copy ALL subdirectories maintaining structure
+                # This preserves xsd/common/, xsd/maindoc/, etc.
+                for item in os.listdir(schema_root):
+                    src_path = os.path.join(schema_root, item)
+                    dest_path = os.path.join(wrapper_dir, item)
+                    
+                    # Skip the main XSD file itself (already copied as schema.xsd)
+                    if src_path == main_xsd:
+                        continue
+                    
+                    # Copy directories recursively
+                    if os.path.isdir(src_path):
+                        shutil.copytree(src_path, dest_path)
+                        print(f"📁 Copied directory: {item}")
+                    # Copy other files (like .sch, other .xsd)
+                    elif src_path.endswith(('.xsd', '.sch')):
+                        shutil.copy2(src_path, dest_path)
+                        print(f"📄 Copied file: {item}")
+                
+                final_source = wrapper_dir
+            else:
+                # Simple structure, use as-is
+                final_source = schema_root
+            
+            print(f"📦 Final source: {final_source}")
+            print(f"📂 Final contents: {os.listdir(final_source)}")
+            
+            # Determine final schema name (use filename from original ZIP if possible)
+            if file.filename:
+                # Remove .zip extension
+                suggested_name = file.filename.replace('.zip', '').replace('.ZIP', '')
+                # Clean name (remove special chars)
+                suggested_name = ''.join(c for c in suggested_name if c.isalnum() or c in ['-', '_'])
+                if suggested_name and suggested_name != 'upload':
+                    schema_name = suggested_name
+            
+            # Copy to schemas/input and schemas/output
+            schemas_base = os.path.join(os.path.dirname(__file__), 'schemas')
+            
+            for dest_type in ['input', 'output']:
+                dest_dir = os.path.join(schemas_base, dest_type, schema_name)
+                
+                # Remove existing if present
+                if os.path.exists(dest_dir):
+                    shutil.rmtree(dest_dir)
+                
+                # Copy schema directory
+                shutil.copytree(final_source, dest_dir)
+                print(f"✅ Copied to {dest_type}/{schema_name}")
+            
+            # Count files
+            file_count = sum(1 for _ in os.walk(final_source) for _ in _[2])
+            
+            return {
+                'success': True,
+                'schemaName': schema_name,
+                'fileCount': file_count,
+                'removedFiles': removed,
+                'hadWrapper': need_wrapper
+            }
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"Upload failed: {str(e)}")
+
+
+@app.delete("/api/schemas/{schema_name}")
+async def delete_schema(schema_name: str):
+    """Delete a schema from both input and output directories"""
+    try:
+        import shutil
+        
+        schemas_base = os.path.join(os.path.dirname(__file__), 'schemas')
+        deleted = []
+        
+        for dest_type in ['input', 'output']:
+            schema_dir = os.path.join(schemas_base, dest_type, schema_name)
+            if os.path.exists(schema_dir):
+                shutil.rmtree(schema_dir)
+                deleted.append(dest_type)
+        
+        if not deleted:
+            raise HTTPException(status_code=404, detail="Schema not found")
+        
+        return {
+            'success': True,
+            'schemaName': schema_name,
+            'deletedFrom': deleted
+        }
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 if __name__ == "__main__":

@@ -24,6 +24,15 @@ class SchemaField:
     description: str = ""
     parent: Optional[str] = None
     children: List[str] = None
+    offset: Optional[str] = None
+    length: Optional[str] = None
+    xml_path: Optional[str] = None
+    business_term: Optional[str] = None
+    required: Optional[bool] = None
+    is_array: Optional[bool] = None
+    condition: Optional[str] = None
+    calculation: Optional[str] = None
+    json_path: Optional[str] = None
     
     def __post_init__(self):
         if self.children is None:
@@ -319,6 +328,10 @@ class SchemaParser:
                 'type': field.type,
                 'cardinality': field.cardinality,
                 'description': field.description,
+                'offset': field.offset,
+                'length': field.length,
+                'xml_path': field.xml_path,
+                'business_term': field.business_term,
                 'children': []
             }
             

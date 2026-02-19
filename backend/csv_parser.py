@@ -1,30 +1,11 @@
 #!/usr/bin/env python3
 """
 CSV Schema Parser
-Parse CSV files with business metadata (business term, description, cardinality, conditions, calculations, offset, length, xmlpath, json_path)
+Parse CSV files with business metadata (business term, description, cardinality, conditions, calculations)
 
-CSV Format (supports both comma and pipe delimiters):
-INPUT: campo,business_term,spiegazione,obbligatorio,numerosità,condizionalità,calcolo,offset,lunghezza,xmlpath,json_path
-OUTPUT: campo,business_term,spiegazione,obbligatorio,numerosità,condizionalità,calcolo,offset,lunghezza,xmlpath,json_path
-
-OR with pipe separator:
-INPUT: campo|business_term|spiegazione|obbligatorio|numerosità|condizionalità|calcolo|offset|lunghezza|xmlpath|json_path
-OUTPUT: campo|business_term|spiegazione|obbligatorio|numerosità|condizionalità|calcolo|offset|lunghezza|xmlpath|json_path
-
-Field Descriptions:
-- campo: Field path (e.g., Invoice.InvoiceNumber)
-- business_term: Business term/label
-- spiegazione: Description
-- obbligatorio: Required (SI/NO)
-- numerosità: Cardinality (1..1, 0..1, 1..N, 0..N)
-- condizionalità: Conditional rules
-- calcolo: Calculation formula (for output)
-- offset: Character offset for IDOC flat files
-- lunghezza: Length for IDOC flat files
-- xmlpath: XPath for XML files (e.g., /Invoice/cbc:ID)
-- json_path: JSONPath for JSON files (e.g., $.Invoice.ID)
-
-The parser automatically detects which delimiter is used by counting occurrences in the first line.
+CSV Format:
+INPUT: campo,business_term,spiegazione,obbligatorio,numerosità,condizionalità
+OUTPUT: campo,business_term,spiegazione,obbligatorio,numerosità,condizionalità,calcolo
 """
 
 import csv
@@ -44,10 +25,9 @@ class CSVField:
     numerosità: str  # 1..1, 0..1, 1..N, 0..N
     condizionalità: str
     calcolo: str = ""  # Only for output
-    offset: str = ""  # Position offset for IDoc
-    lunghezza: str = ""  # Length for IDoc
-    xmlpath: str = ""  # XML path (XPath)
-    json_path: str = ""  # JSON path (JSONPath)
+    offset: str = ""   # Byte offset for IDoc flat files (e.g. "67.0")
+    lunghezza: str = ""  # Field length for IDoc flat files (e.g. "3.0")
+    xmlpath: str = ""  # XPath for XML fields
     
     def to_schema_field(self) -> Dict:
         """Convert to unified schema format"""
@@ -62,6 +42,34 @@ class CSVField:
         is_required = self.obbligatorio.upper() == 'SI'
         is_array = 'N' in self.numerosità or '*' in self.numerosità
         
+        # Detect IDoc: offset is a number (e.g. "67.0")
+        is_idoc = bool(self.offset and self.offset.replace('.', '').replace('-', '').isdigit())
+
+        # For XML/UBL: offset column contains the XPath
+        offset_is_xpath = bool(
+            self.offset and not is_idoc and
+            ('/' in self.offset or ':' in self.offset)
+        )
+
+        # xml_path: explicit xmlpath column > offset-as-xpath > empty
+        # For IDoc: xml_path must be empty so frontend uses flat-file logic
+        if is_idoc:
+            effective_xml_path = ''
+            effective_offset = self.offset
+            effective_length = self.lunghezza
+        elif self.xmlpath:
+            effective_xml_path = self.xmlpath
+            effective_offset = None
+            effective_length = None
+        elif offset_is_xpath:
+            effective_xml_path = self.offset
+            effective_offset = None
+            effective_length = None
+        else:
+            effective_xml_path = ''
+            effective_offset = self.offset or None
+            effective_length = self.lunghezza or None
+
         return {
             'id': field_id,
             'name': parts[-1] if len(parts) > 1 else self.campo,
@@ -74,10 +82,9 @@ class CSVField:
             'is_array': is_array,
             'condition': self.condizionalità,
             'calculation': self.calcolo,
-            'offset': self.offset,
-            'length': self.lunghezza,
-            'xml_path': self.xmlpath,
-            'json_path': self.json_path,
+            'offset': effective_offset,
+            'length': effective_length,
+            'xml_path': effective_xml_path,
             'parent': '.'.join(parts[:-1]) if len(parts) > 1 else None
         }
     
@@ -105,20 +112,15 @@ class CSVSchemaParser:
         self.hierarchy: Dict[str, List[str]] = {}
     
     def parse_csv(self, csv_path: str, is_output: bool = False) -> Dict[str, Any]:
-        """Parse CSV file into schema with auto-detection of delimiter (comma or pipe)"""
+        """Parse CSV file into schema (auto-detects comma or pipe delimiter)"""
         self.fields = {}
         self.hierarchy = {}
-        
+
         # Auto-detect delimiter
         with open(csv_path, 'r', encoding='utf-8-sig') as f:
             first_line = f.readline()
-            # Count delimiters in first line
-            comma_count = first_line.count(',')
-            pipe_count = first_line.count('|')
-            
-            # Choose delimiter with more occurrences
-            delimiter = '|' if pipe_count > comma_count else ','
-        
+        delimiter = '|' if first_line.count('|') > first_line.count(',') else ','
+
         with open(csv_path, 'r', encoding='utf-8-sig') as f:
             reader = csv.DictReader(f, delimiter=delimiter)
             
@@ -129,7 +131,7 @@ class CSVSchemaParser:
                 
                 # Create field
                 field_data = {
-                    'campo': (row['campo'] or '').strip(),
+                    'campo': (row.get('campo') or '').strip(),
                     'business_term': (row.get('business_term') or '').strip(),
                     'spiegazione': (row.get('spiegazione') or '').strip(),
                     'obbligatorio': (row.get('obbligatorio') or 'NO').strip(),
@@ -137,11 +139,10 @@ class CSVSchemaParser:
                     'condizionalità': (row.get('condizionalità') or '').strip(),
                     'calcolo': (row.get('calcolo') or '').strip(),
                     'offset': (row.get('offset') or '').strip(),
-                    'lunghezza': (row.get('lunghezza') or '').strip(),
+                    'lunghezza': (row.get('lunghezza') or row.get('lenght') or '').strip(),
                     'xmlpath': (row.get('xmlpath') or '').strip(),
-                    'json_path': (row.get('json_path') or '').strip(),
                 }
-                
+
                 field = CSVField(**field_data)
                 field_id = field.campo.replace('.', '_')
                 self.fields[field_id] = field
@@ -344,11 +345,7 @@ def create_sample_input_csv(output_path: str):
             'spiegazione': 'Numero documento IDOC',
             'obbligatorio': 'SI',
             'numerosità': '1..1',
-            'condizionalità': '',
-            'calcolo': '', 'offset': '', 'lunghezza': '', 'xmlpath': '', 'offset': '', 'lunghezza': '', 'xmlpath': '',
-            'offset': '0',
-            'lunghezza': '16',
-            'xmlpath': '/IDOC/EDI_DC40/DOCNUM'
+            'condizionalità': ''
         },
         {
             'campo': 'E1EDK01.BELNR',
@@ -356,11 +353,7 @@ def create_sample_input_csv(output_path: str):
             'spiegazione': 'Numero fattura',
             'obbligatorio': 'SI',
             'numerosità': '1..1',
-            'condizionalità': '',
-            'calcolo': '', 'offset': '', 'lunghezza': '', 'xmlpath': '', 'offset': '', 'lunghezza': '', 'xmlpath': '',
-            'offset': '16',
-            'lunghezza': '35',
-            'xmlpath': '/IDOC/E1EDK01/BELNR'
+            'condizionalità': ''
         },
         {
             'campo': 'E1EDK01.DATUM',
@@ -368,11 +361,7 @@ def create_sample_input_csv(output_path: str):
             'spiegazione': 'Data emissione fattura',
             'obbligatorio': 'SI',
             'numerosità': '1..1',
-            'condizionalità': '',
-            'calcolo': '', 'offset': '', 'lunghezza': '', 'xmlpath': '', 'offset': '', 'lunghezza': '', 'xmlpath': '',
-            'offset': '51',
-            'lunghezza': '8',
-            'xmlpath': '/IDOC/E1EDK01/DATUM'
+            'condizionalità': ''
         },
         {
             'campo': 'E1EDK01.WKURS',
@@ -380,11 +369,7 @@ def create_sample_input_csv(output_path: str):
             'spiegazione': 'Tasso di cambio',
             'obbligatorio': 'NO',
             'numerosità': '0..1',
-            'condizionalità': 'IF foreign currency',
-            'calcolo': '', 'offset': '', 'lunghezza': '', 'xmlpath': '', 'offset': '', 'lunghezza': '', 'xmlpath': '',
-            'offset': '59',
-            'lunghezza': '12',
-            'xmlpath': '/IDOC/E1EDK01/WKURS'
+            'condizionalità': 'IF foreign currency'
         },
         {
             'campo': 'E1EDP01.POSEX',
@@ -392,11 +377,7 @@ def create_sample_input_csv(output_path: str):
             'spiegazione': 'Numero riga',
             'obbligatorio': 'SI',
             'numerosità': '1..N',
-            'condizionalità': '',
-            'calcolo': '', 'offset': '', 'lunghezza': '', 'xmlpath': '', 'offset': '', 'lunghezza': '', 'xmlpath': '',
-            'offset': '71',
-            'lunghezza': '6',
-            'xmlpath': '/IDOC/E1EDP01/POSEX'
+            'condizionalità': ''
         },
         {
             'campo': 'E1EDP01.MENGE',
@@ -404,11 +385,7 @@ def create_sample_input_csv(output_path: str):
             'spiegazione': 'Quantità articolo',
             'obbligatorio': 'SI',
             'numerosità': '1..N',
-            'condizionalità': '',
-            'calcolo': '', 'offset': '', 'lunghezza': '', 'xmlpath': '', 'offset': '', 'lunghezza': '', 'xmlpath': '',
-            'offset': '77',
-            'lunghezza': '15',
-            'xmlpath': '/IDOC/E1EDP01/MENGE'
+            'condizionalità': ''
         },
         {
             'campo': 'E1EDP01.PREIS',
@@ -416,11 +393,7 @@ def create_sample_input_csv(output_path: str):
             'spiegazione': 'Prezzo unitario',
             'obbligatorio': 'SI',
             'numerosità': '1..N',
-            'condizionalità': '',
-            'calcolo': '', 'offset': '', 'lunghezza': '', 'xmlpath': '', 'offset': '', 'lunghezza': '', 'xmlpath': '',
-            'offset': '92',
-            'lunghezza': '15',
-            'xmlpath': '/IDOC/E1EDP01/PREIS'
+            'condizionalità': ''
         },
         {
             'campo': 'E1EDP19.MWSKZ',
@@ -428,11 +401,7 @@ def create_sample_input_csv(output_path: str):
             'spiegazione': 'Codice IVA',
             'obbligatorio': 'SI',
             'numerosità': '1..N',
-            'condizionalità': '',
-            'calcolo': '', 'offset': '', 'lunghezza': '', 'xmlpath': '', 'offset': '', 'lunghezza': '', 'xmlpath': '',
-            'offset': '107',
-            'lunghezza': '2',
-            'xmlpath': '/IDOC/E1EDP19/MWSKZ'
+            'condizionalità': ''
         },
         {
             'campo': 'E1EDP19.MSATZ',
@@ -440,15 +409,11 @@ def create_sample_input_csv(output_path: str):
             'spiegazione': 'Aliquota IVA percentuale',
             'obbligatorio': 'SI',
             'numerosità': '1..N',
-            'condizionalità': '',
-            'calcolo': '', 'offset': '', 'lunghezza': '', 'xmlpath': '', 'offset': '', 'lunghezza': '', 'xmlpath': '',
-            'offset': '109',
-            'lunghezza': '5',
-            'xmlpath': '/IDOC/E1EDP19/MSATZ'
+            'condizionalità': ''
         }
     ]
     
-    fieldnames = ['campo', 'business_term', 'spiegazione', 'obbligatorio', 'numerosità', 'condizionalità', 'calcolo', 'offset', 'lunghezza', 'xmlpath']
+    fieldnames = ['campo', 'business_term', 'spiegazione', 'obbligatorio', 'numerosità', 'condizionalità']
     
     with open(output_path, 'w', encoding='utf-8', newline='') as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
@@ -466,7 +431,7 @@ def create_sample_output_csv(output_path: str):
             'obbligatorio': 'SI',
             'numerosità': '1..1',
             'condizionalità': '',
-            'calcolo': '', 'offset': '', 'lunghezza': '', 'xmlpath': '', 'offset': '', 'lunghezza': '', 'xmlpath': ''
+            'calcolo': ''
         },
         {
             'campo': 'Invoice.IssueDate',
@@ -475,7 +440,7 @@ def create_sample_output_csv(output_path: str):
             'obbligatorio': 'SI',
             'numerosità': '1..1',
             'condizionalità': '',
-            'calcolo': '', 'offset': '', 'lunghezza': '', 'xmlpath': '', 'offset': '', 'lunghezza': '', 'xmlpath': ''
+            'calcolo': ''
         },
         {
             'campo': 'Invoice.DocumentCurrencyCode',
@@ -484,7 +449,7 @@ def create_sample_output_csv(output_path: str):
             'obbligatorio': 'SI',
             'numerosità': '1..1',
             'condizionalità': '',
-            'calcolo': '', 'offset': '', 'lunghezza': '', 'xmlpath': '', 'offset': '', 'lunghezza': '', 'xmlpath': ''
+            'calcolo': ''
         },
         {
             'campo': 'InvoiceLine.ID',
@@ -493,7 +458,7 @@ def create_sample_output_csv(output_path: str):
             'obbligatorio': 'SI',
             'numerosità': '1..N',
             'condizionalità': '',
-            'calcolo': '', 'offset': '', 'lunghezza': '', 'xmlpath': '', 'offset': '', 'lunghezza': '', 'xmlpath': ''
+            'calcolo': ''
         },
         {
             'campo': 'InvoiceLine.InvoicedQuantity',
@@ -502,7 +467,7 @@ def create_sample_output_csv(output_path: str):
             'obbligatorio': 'SI',
             'numerosità': '1..N',
             'condizionalità': '',
-            'calcolo': '', 'offset': '', 'lunghezza': '', 'xmlpath': '', 'offset': '', 'lunghezza': '', 'xmlpath': ''
+            'calcolo': ''
         },
         {
             'campo': 'InvoiceLine.LineExtensionAmount',
@@ -511,7 +476,7 @@ def create_sample_output_csv(output_path: str):
             'obbligatorio': 'SI',
             'numerosità': '1..N',
             'condizionalità': '',
-            'calcolo': 'InvoicedQuantity * Price', 'offset': '', 'lunghezza': '', 'xmlpath': ''
+            'calcolo': 'InvoicedQuantity * Price'
         },
         {
             'campo': 'InvoiceLine.Price.PriceAmount',
@@ -520,7 +485,7 @@ def create_sample_output_csv(output_path: str):
             'obbligatorio': 'SI',
             'numerosità': '1..N',
             'condizionalità': '',
-            'calcolo': '', 'offset': '', 'lunghezza': '', 'xmlpath': '', 'offset': '', 'lunghezza': '', 'xmlpath': ''
+            'calcolo': ''
         },
         {
             'campo': 'InvoiceLine.TaxTotal.TaxAmount',
@@ -529,7 +494,7 @@ def create_sample_output_csv(output_path: str):
             'obbligatorio': 'SI',
             'numerosità': '1..N',
             'condizionalità': '',
-            'calcolo': 'LineExtensionAmount * (TaxPercent / 100)', 'offset': '', 'lunghezza': '', 'xmlpath': ''
+            'calcolo': 'LineExtensionAmount * (TaxPercent / 100)'
         },
         {
             'campo': 'InvoiceLine.TaxTotal.TaxSubtotal.TaxCategory.ID',
@@ -538,7 +503,7 @@ def create_sample_output_csv(output_path: str):
             'obbligatorio': 'SI',
             'numerosità': '1..N',
             'condizionalità': '',
-            'calcolo': '', 'offset': '', 'lunghezza': '', 'xmlpath': '', 'offset': '', 'lunghezza': '', 'xmlpath': ''
+            'calcolo': ''
         },
         {
             'campo': 'InvoiceLine.TaxTotal.TaxSubtotal.TaxCategory.Percent',
@@ -547,7 +512,7 @@ def create_sample_output_csv(output_path: str):
             'obbligatorio': 'SI',
             'numerosità': '1..N',
             'condizionalità': '',
-            'calcolo': '', 'offset': '', 'lunghezza': '', 'xmlpath': '', 'offset': '', 'lunghezza': '', 'xmlpath': ''
+            'calcolo': ''
         },
         {
             'campo': 'TaxTotal.TaxAmount',
@@ -556,7 +521,7 @@ def create_sample_output_csv(output_path: str):
             'obbligatorio': 'SI',
             'numerosità': '1..1',
             'condizionalità': '',
-            'calcolo': 'SUM(InvoiceLine.TaxTotal.TaxAmount)', 'offset': '', 'lunghezza': '', 'xmlpath': ''
+            'calcolo': 'SUM(InvoiceLine.TaxTotal.TaxAmount)'
         },
         {
             'campo': 'LegalMonetaryTotal.TaxExclusiveAmount',
@@ -565,7 +530,7 @@ def create_sample_output_csv(output_path: str):
             'obbligatorio': 'SI',
             'numerosità': '1..1',
             'condizionalità': '',
-            'calcolo': 'SUM(InvoiceLine.LineExtensionAmount)', 'offset': '', 'lunghezza': '', 'xmlpath': ''
+            'calcolo': 'SUM(InvoiceLine.LineExtensionAmount)'
         },
         {
             'campo': 'LegalMonetaryTotal.TaxInclusiveAmount',
@@ -574,7 +539,7 @@ def create_sample_output_csv(output_path: str):
             'obbligatorio': 'SI',
             'numerosità': '1..1',
             'condizionalità': '',
-            'calcolo': 'TaxExclusiveAmount + TaxTotal.TaxAmount', 'offset': '', 'lunghezza': '', 'xmlpath': ''
+            'calcolo': 'TaxExclusiveAmount + TaxTotal.TaxAmount'
         },
         {
             'campo': 'LegalMonetaryTotal.PayableAmount',
@@ -583,11 +548,11 @@ def create_sample_output_csv(output_path: str):
             'obbligatorio': 'SI',
             'numerosità': '1..1',
             'condizionalità': '',
-            'calcolo': 'TaxInclusiveAmount', 'offset': '', 'lunghezza': '', 'xmlpath': ''
+            'calcolo': 'TaxInclusiveAmount'
         }
     ]
     
-    fieldnames = ['campo', 'business_term', 'spiegazione', 'obbligatorio', 'numerosità', 'condizionalità', 'calcolo', 'offset', 'lunghezza', 'xmlpath']
+    fieldnames = ['campo', 'business_term', 'spiegazione', 'obbligatorio', 'numerosità', 'condizionalità', 'calcolo']
     
     with open(output_path, 'w', encoding='utf-8', newline='') as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)

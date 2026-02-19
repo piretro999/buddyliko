@@ -36,32 +36,59 @@ class PreviewExtractor:
             # Normalize XPath (remove leading slash if present)
             xpath_normalized = xpath.lstrip('/')
             
-            # Find element
-            # Convert path like "Invoice/InvoiceLines/Line/Price" to XPath
-            parts = xpath_normalized.split('/')
+            # IMPROVED: Handle different XPath formats
+            # Clean up path: remove empty parts, handle spaces
+            parts = [p.strip() for p in xpath_normalized.split('/') if p.strip()]
             
+            # Start from root
             element = root
-            for part in parts:
-                # Handle array notation: Line[0] -> Line
-                if '[' in part:
-                    part = part.split('[')[0]
+            
+            # If first part matches root tag, skip it
+            if parts and parts[0] == element.tag:
+                parts = parts[1:]
+            
+            # Navigate through path
+            for i, part in enumerate(parts):
+                # Handle array notation: Line[0] -> Line, index 0
+                array_index = None
+                if '[' in part and ']' in part:
+                    part_name = part.split('[')[0]
+                    try:
+                        array_index = int(part.split('[')[1].split(']')[0])
+                    except:
+                        array_index = 0
+                    part = part_name
                 
+                # Try direct child first (STRICT - no global fallback to avoid duplicate values)
                 found = element.find(part)
+                
+                # If not found, try one level deeper (handles wrapper roots like FatturaElettronica)
                 if found is None:
-                    # Try to find in children
-                    found = element.find(f".//{part}")
+                    for child in element:
+                        candidate = child.find(part)
+                        if candidate is not None:
+                            found = candidate
+                            break
+                
+                # Still not found? Try case-insensitive direct children only
+                if found is None:
+                    for child in element:
+                        if child.tag.lower() == part.lower():
+                            found = child
+                            break
                 
                 if found is None:
                     return {
                         'value': None,
-                        'error': f'Path not found: {part}',
+                        'error': f'Element not found: {part} (in path: {xpath})',
                         'context': None
                     }
                 
                 element = found
             
-            # Get value
+            # Get value (handle both text and attributes)
             value = element.text if element.text else ''
+            value = value.strip() if value else ''
             
             # Get context (parent + siblings)
             parent = None
