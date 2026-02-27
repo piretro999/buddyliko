@@ -36,30 +36,7 @@ from datetime import datetime
 from dotenv import load_dotenv
 import httpx
 import time as _time_mod
-from ai_token_tracker import AITokenTracker
-from partner_service import PartnerService
-from partner_api import register_partner_endpoints
-from cost_service import CostService, OperationRecord, CostBreakdown
-from standards_service import StandardsService
-from standards_api import register_standards_endpoints
-from batch_service import BatchService
-from batch_api import register_batch_endpoints
-from schedule_service import ScheduleService
-from schedule_api import register_schedule_endpoints
-from webhook_service import WebhookService
-from webhook_api import register_webhook_endpoints
-from budget_service import BudgetService
-from budget_api import register_budget_endpoints
-from marketplace_service import MarketplaceService
-from marketplace_api import register_marketplace_endpoints
-from partnership_service import PartnershipService
-from partnership_api import register_partnership_endpoints
-from report_service import ReportService
-from report_api import register_report_endpoints
-from cost_api import register_cost_endpoints
-# Stub per funzioni non più in cost_api
-def extract_anthropic_usage(resp): return resp.get("usage", {}) if isinstance(resp, dict) else {}
-def extract_openai_usage(resp): return resp.get("usage", {}) if isinstance(resp, dict) else {}
+from ai_token_tracker import AITokenTracker, extract_anthropic_usage, extract_openai_usage
 
 # Load environment variables - search in current dir and parent dir, both .env and _env
 from pathlib import Path as _Path
@@ -275,43 +252,6 @@ try:
 except Exception as _ge:
     print(f"⚠️  Group storage init failed: {_ge}")
 
-
-# ── Organization Service (Phase 0 — Multi-tenancy) ──────────────────
-org_service_instance = None
-_org_get_auth_ctx = None
-_org_require_role = None
-_org_require_scope = None
-try:
-    from org_service import OrganizationService
-    from org_middleware import create_auth_dependencies
-    if hasattr(storage, 'conn') and hasattr(storage, 'RealDictCursor') and auth_manager:
-        org_service_instance = OrganizationService(storage.conn, storage.RealDictCursor)
-        _org_get_auth_ctx, _org_require_role, _org_require_scope, _org_get_user_compat = \
-            create_auth_dependencies(auth_manager, storage, org_service_instance)
-        print("✅ Organization service initialized")
-    else:
-        print("⚠️  Organization service requires PostgreSQL + auth — skipping")
-except Exception as _oe:
-    print(f"⚠️  Organization service init failed: {_oe}")
-
-# ── Token Service (Phase 1 — API Tokens) ────────────────────────────
-token_service_instance = None
-try:
-    from token_service import TokenService
-    if org_service_instance and hasattr(storage, 'conn'):
-        token_service_instance = TokenService(storage.conn, storage.RealDictCursor)
-        # Re-init auth con supporto token
-        from org_middleware import create_auth_dependencies
-        _org_get_auth_ctx, _org_require_role, _org_require_scope, _org_get_user_compat = \
-            create_auth_dependencies(auth_manager, storage, org_service_instance, token_service_instance)
-        print("✅ Token service initialized")
-    else:
-        print("⚠️  Token service requires org_service — skipping")
-except Exception as _te:
-    print(f"⚠️  Token service init failed: {_te}")
-    import traceback as _ttb; _ttb.print_exc()
-
-
 # Audit Log
 audit_log = None
 try:
@@ -414,16 +354,6 @@ except Exception as _be:
         FREE = 'FREE'; PRO = 'PRO'; ENTERPRISE = 'ENTERPRISE'; CUSTOM = 'CUSTOM'
     PLAN_LIMITS = {'FREE': {}, 'PRO': {}, 'ENTERPRISE': {}, 'CUSTOM': {}}
     PLAN_PRICES_EUR = {}
-
-# ── PHASE 2: COST ENGINE ────────────────────────────────────────────────
-cost_service = None
-try:
-    if hasattr(storage, 'conn'):
-        cost_service = CostService(storage.conn, storage.RealDictCursor)
-        print("✅ CostService initialized (Phase 2)")
-except Exception as _ce:
-    print(f"⚠️  CostService init failed: {_ce}")
-
 
 # ── EMAIL SERVICE ────────────────────────────────────────────────────────────
 try:
@@ -767,58 +697,6 @@ def find_schematron(format_name, io='input'):
                         return str(rules_sch)
     
     return None
-
-
-def generate_output_filename(input_filename: str = None, output_schema: str = None, 
-                              mapping_name: str = None, ext: str = 'xml',
-                              naming_rule: str = None) -> str:
-    """
-    Generate output filename based on naming rules.
-    
-    Default pattern: {input}_{schema}_converted.{ext}
-    
-    Template variables:
-        {input}   - input filename without extension
-        {schema}  - output schema name (UBL-21, FatturaPA, etc.)
-        {mapping} - mapping/project name
-        {date}    - YYYYMMDD
-        {time}    - HHMMSS
-        {datetime} - YYYYMMDD_HHMMSS
-    """
-    from datetime import datetime
-    
-    # Extract input name without extension
-    input_base = 'output'
-    if input_filename:
-        input_base = os.path.splitext(input_filename)[0]
-        # Clean up
-        input_base = re.sub(r'[^\w\s-]', '_', input_base).strip()
-    
-    now = datetime.now()
-    
-    # Default rule
-    if not naming_rule:
-        parts = [input_base]
-        if output_schema:
-            parts.append(output_schema)
-        parts.append('converted')
-        return '_'.join(parts) + f'.{ext}'
-    
-    # Apply template
-    result = naming_rule
-    result = result.replace('{input}', input_base)
-    result = result.replace('{schema}', output_schema or 'output')
-    result = result.replace('{mapping}', mapping_name or 'mapping')
-    result = result.replace('{date}', now.strftime('%Y%m%d'))
-    result = result.replace('{time}', now.strftime('%H%M%S'))
-    result = result.replace('{datetime}', now.strftime('%Y%m%d_%H%M%S'))
-    
-    # Ensure extension
-    if not result.endswith(f'.{ext}'):
-        result += f'.{ext}'
-    
-    return result
-
 
 def get_validation_files(input_format: str, output_format: str, input_content: str = None, 
                          mapping_rules: dict = None, input_schema: str = None, output_schema: str = None):
@@ -2901,22 +2779,6 @@ Return ONLY valid JSON array, no markdown, no explanation."""
                             output_tokens=_usage["output_tokens"],
                             http_status=200,
                         )
-                    # ── P2: AI cost tracking ──
-                    if cost_service and _usage:
-                        try:
-                            from ai_token_tracker import calc_cost as _calc_ai_cost
-                            _ai_usd = _calc_ai_cost("claude-haiku-4-5-20251001", _usage["input_tokens"], _usage["output_tokens"])
-                            _op = OperationRecord(
-                                org_id='', auth_type='user', auth_id='',
-                                operation='ai_mapping',
-                                ai_provider='anthropic', ai_model='claude-haiku-4-5-20251001',
-                                ai_input_tokens=_usage["input_tokens"],
-                                ai_output_tokens=_usage["output_tokens"],
-                                ai_cost_usd=_ai_usd,
-                            )
-                            # L'org_id viene impostato dal chiamante se disponibile
-                        except Exception: pass
-                    # ── FINE P2 AI ──
                     # ── FINE TRACKING ──
                     print(f"📄 Raw response (first 500): {text[:500]}")
                     result = _extract(text)
@@ -2972,8 +2834,6 @@ async def ai_auto_map(request: AIAutoMapRequest):
     Phase 1: cross-product of input/output chunks.
     Phase 2: second pass on unmatched fields.
     """
-    # ── P2: AI hard limit ──
-    # (il check hard limit per AI viene fatto nel calculate_cost)
     if not ANTHROPIC_API_KEY and not OPENAI_API_KEY:
         raise HTTPException(
             status_code=400,
@@ -3151,14 +3011,6 @@ Return ONLY valid JSON array, no markdown."""
                             output_tokens=_usage2["output_tokens"],
                             http_status=200,
                         )
-                    # ── P2: AI debug cost ──
-                    if cost_service and _usage2:
-                        try:
-                            from ai_token_tracker import calc_cost as _calc_ai_cost2
-                            _ai_usd2 = _calc_ai_cost2("claude-haiku-4-5-20251001", _usage2["input_tokens"], _usage2["output_tokens"])
-                            # Cost recorded at debug level for monitoring
-                        except Exception: pass
-                    # ── FINE P2 debug ──
                     # ── FINE TRACKING ──
                     m = _re.search(r'\[[\s\S]*\]', text)
                     if m:
@@ -4053,33 +3905,6 @@ async def execute_transform(
                         output_preview=result.output_content[:500] if result.output_content else None
                     )
                 except Exception: pass
-            # ── P2: cost tracking sync ──
-            if cost_service:
-                try:
-                    _org_id = user.get('org_id', '') if user else ''
-                    _org_plan = user.get('org_plan', 'FREE') if user else 'FREE'
-                    _env = user.get('environment', 'live') if user else 'live'
-                    if _org_id:
-                        _op = OperationRecord(
-                            org_id=_org_id,
-                            auth_type=user.get('_auth_type', 'user') if user else 'user',
-                            auth_id=str(user.get('id', '')) if user else '',
-                            auth_name=user.get('name', '') if user else '',
-                            environment=_env,
-                            partner_id=user.get('_partner_id') if user else None,
-                            tags=user.get('_tags', {}) if user else {},
-                            operation='transform',
-                            input_format=input_fmt,
-                            output_format=output_format,
-                            input_bytes=len(content),
-                            output_bytes=len(result.output_content) if result.output_content else 0,
-                            duration_ms=_duration,
-                            status='completed',
-                        )
-                        _cost = cost_service.calculate_cost(_org_id, _org_plan, _op)
-                        cost_service.record_cost(_op, _cost)
-                except Exception as _ce2:
-                    print(f"   ⚠️  Cost tracking sync: {_ce2}")
             # Incrementa usage counter
             if billing_manager:
                 try:
@@ -4088,19 +3913,10 @@ async def execute_transform(
                         billing_manager.increment_usage(str(uid), "transforms_count")
                         billing_manager.increment_usage(str(uid), "bytes_processed", len(content))
                 except Exception: pass
-            _out_filename = generate_output_filename(
-                input_filename=file.filename,
-                output_schema=output_schema,
-                mapping_name=None,
-                ext=_engine_fmt
-            )
             return Response(
                 content=result.output_content,
                 media_type='application/xml' if _engine_fmt == 'xml' else f'application/{_engine_fmt}',
-                headers={
-                    'Content-Disposition': f'attachment; filename="{_out_filename}"',
-                    'X-Output-Filename': _out_filename
-                }
+                headers={'Content-Disposition': f'attachment; filename=output.{_engine_fmt}'}
             )
         else:
             if audit_log:
@@ -4186,153 +4002,6 @@ if group_storage and perm_checker:
         BASE_URL=_BASE_URL
     )
 
-
-# ── Register Organization API (Phase 0) ─────────────────────────────
-if org_service_instance and _org_get_auth_ctx:
-    try:
-        from org_api import register_org_api
-        register_org_api(
-            app=app,
-            org_service=org_service_instance,
-            get_auth_context=_org_get_auth_ctx,
-            require_org_role=_org_require_role,
-            auth_manager=auth_manager,
-            storage=storage
-        )
-    except Exception as _ore:
-        print(f"⚠️  Organization API registration failed: {_ore}")
-
-# ── Register Token API (Phase 1) ────────────────────────────────────
-if token_service_instance and _org_get_auth_ctx:
-    try:
-        from token_api import register_token_api
-        register_token_api(
-            app=app,
-            token_service=token_service_instance,
-            get_auth_context=_org_get_auth_ctx,
-            require_org_role=_org_require_role,
-        )
-    except Exception as _tre:
-        print(f"⚠️  Token API registration failed: {_tre}")
-        import traceback as _trtb; _trtb.print_exc()
-
-# ── Phase 4: Trading Partners ────────────────────────────────────
-partner_service_instance = None
-try:
-    if hasattr(storage, 'conn'):
-        from partner_service import PartnerService
-        partner_service_instance = PartnerService(storage.conn, storage.RealDictCursor)
-        print("✅ PartnerService initialized (Phase 4)")
-except Exception as _pse:
-    print(f"⚠️  PartnerService init failed: {_pse}")
-
-# ── Register Partner API (Phase 4) ──────────────────────────────
-if partner_service_instance and _org_get_auth_ctx:
-    try:
-        register_partner_endpoints(app, _org_get_auth_ctx, _org_require_role, partner_service_instance)
-    except Exception as _pre:
-        print(f"⚠️  Partner API registration failed: {_pre}")
-
-
-
-
-
-
-# ── Register Webhook API (Phase 8A) ────────────────────────────
-webhook_service_instance = None
-if _org_get_auth_ctx and hasattr(storage, 'conn'):
-    try:
-        from webhook_service import WebhookService
-        webhook_service_instance = WebhookService(storage.conn, storage.RealDictCursor)
-        register_webhook_endpoints(app, _org_get_auth_ctx, _org_require_role, webhook_service_instance)
-    except Exception as _we8a:
-        print(f"⚠️  Webhook API registration failed: {_we8a}")
-
-# ── Register Budget API (Phase 8B) ────────────────────────────
-budget_service_instance = None
-if _org_get_auth_ctx and hasattr(storage, 'conn'):
-    try:
-        from budget_service import BudgetService
-        budget_service_instance = BudgetService(
-            storage.conn, storage.RealDictCursor, cost_service, webhook_service_instance)
-        register_budget_endpoints(app, _org_get_auth_ctx, _org_require_role, budget_service_instance)
-    except Exception as _be8b:
-        print(f"⚠️  Budget API registration failed: {_be8b}")
-
-
-# ── Register Batch API (Phase 8 Part 2A) ─────────────────────
-batch_service_instance = None
-if _org_get_auth_ctx and hasattr(storage, 'conn'):
-    try:
-        from batch_service import BatchService
-        batch_service_instance = BatchService(
-            storage.conn, storage.RealDictCursor,
-            cost_service, webhook_service_instance, budget_service_instance)
-        register_batch_endpoints(app, _org_get_auth_ctx, _org_require_role, batch_service_instance)
-    except Exception as _ba8:
-        print(f"⚠️  Batch API registration failed: {_ba8}")
-
-# ── Register Schedule API (Phase 8 Part 2B) ──────────────────
-schedule_service_instance = None
-if _org_get_auth_ctx and hasattr(storage, 'conn'):
-    try:
-        from schedule_service import ScheduleService
-        schedule_service_instance = ScheduleService(
-            storage.conn, storage.RealDictCursor, webhook_service_instance)
-        register_schedule_endpoints(app, _org_get_auth_ctx, _org_require_role, schedule_service_instance)
-        # Start background scheduling loop (check every 60s)
-        schedule_service_instance.start_loop(60)
-    except Exception as _sa8:
-        print(f"⚠️  Schedule API registration failed: {_sa8}")
-
-# ── Register Marketplace API (Phase 7) ────────────────────────
-marketplace_service_instance = None
-if _org_get_auth_ctx and hasattr(storage, 'conn'):
-    try:
-        from marketplace_service import MarketplaceService
-        marketplace_service_instance = MarketplaceService(
-            storage.conn, storage.RealDictCursor,
-            org_service_instance, cost_service)
-        register_marketplace_endpoints(
-            app, _org_get_auth_ctx, _org_require_role,
-            marketplace_service_instance)
-        # Seed builtin templates on startup
-        marketplace_service_instance.seed_builtin()
-    except Exception as _me7:
-        print(f"⚠️  Marketplace API registration failed: {_me7}")
-
-# ── Register Partnership API (Phase 6) ────────────────────────
-partnership_service_instance = None
-if org_service_instance and cost_service and _org_get_auth_ctx:
-    try:
-        from partnership_service import PartnershipService
-        partnership_service_instance = PartnershipService(
-            storage.conn, storage.RealDictCursor, org_service_instance, cost_service)
-        register_partnership_endpoints(
-            app, _org_get_auth_ctx, _org_require_role,
-            partnership_service_instance, storage)
-    except Exception as _pe6:
-        print(f"⚠️  Partnership API registration failed: {_pe6}")
-
-# ── Register Report API (Phase 5) ─────────────────────────────
-report_service_instance = None
-if cost_service and _org_get_auth_ctx:
-    try:
-        from report_service import ReportService
-        report_service_instance = ReportService(storage.conn, storage.RealDictCursor, cost_service)
-        register_report_endpoints(app, _org_get_auth_ctx, _org_require_role, report_service_instance)
-    except Exception as _re5:
-        print(f"⚠️  Report API registration failed: {_re5}")
-
-# ── Register Cost API (Phase 2) ─────────────────────────────────
-if cost_service and _org_get_auth_ctx:
-    try:
-        register_cost_endpoints(app, _org_get_auth_ctx, _org_require_role, cost_service)
-    except Exception as _ce4:
-        print(f"⚠️  Cost API registration failed: {_ce4}")
-
-
-
 @app.get("/api/auth/status")
 async def auth_status():
     """Check if authentication is enabled"""
@@ -4381,17 +4050,6 @@ async def register(request: RegisterRequest):
                 email_service.send_new_user_notification(admin_emails, request.email, user_data.get('name', ''))
     except Exception as e:
         print(f"[AUTH] Errore notifica admin: {e}")
-
-    # Auto-accept pending group invitations for this email
-    try:
-        if group_storage and user_data:
-            joined = group_storage.auto_accept_pending_invitations(
-                str(user_data['id']), request.email
-            )
-            if joined:
-                print(f"[AUTH] Auto-joined groups on registration: {joined}")
-    except Exception as e:
-        print(f"[AUTH] Errore auto-join gruppi: {e}")
 
     if audit_log:
         try:
@@ -4487,93 +4145,6 @@ async def resend_verification(request: Request):
         print(f"[AUTH] Errore reinvio verifica: {e}")
     return {"success": True, "message": "Se l'email è registrata, riceverai il link."}
 
-
-
-# ── PASSWORD RESET (added by 007_password_reset.py) ──────────────────────────
-
-@app.post("/api/auth/forgot-password")
-async def forgot_password(request: Request):
-    """
-    Richiesta reset password — invia email con link di reset.
-    Risponde sempre con successo per non rivelare se l'email esiste.
-    """
-    body = await request.json()
-    email = (body.get('email') or '').strip().lower()
-    
-    if not email:
-        raise HTTPException(400, "Email richiesta")
-    
-    try:
-        success, message, reset_token = auth_manager.reset_password_request(email)
-        
-        if reset_token:
-            # Invia email con il token
-            import email_service
-            email_service.send_password_reset_email(email, reset_token)
-            
-            if audit_log:
-                user = storage.get_user_by_email(email) if storage else None
-                if user:
-                    try:
-                        audit_log.log(
-                            user_id=str(user['id']),
-                            action='PASSWORD_RESET_REQUEST',
-                            outcome='SUCCESS',
-                            details={'email': email}
-                        )
-                    except Exception:
-                        pass
-        
-        # Risposta generica — non rivela se l'email esiste
-        return {
-            "success": True,
-            "message": "Se l'indirizzo email è registrato, riceverai un link per reimpostare la password."
-        }
-    except Exception as e:
-        print(f"[PASSWORD_RESET] Errore: {e}")
-        return {
-            "success": True,
-            "message": "Se l'indirizzo email è registrato, riceverai un link per reimpostare la password."
-        }
-
-
-@app.post("/api/auth/reset-password")
-async def reset_password_confirm(request: Request):
-    """
-    Conferma reset password con token e nuova password.
-    """
-    body = await request.json()
-    token = body.get('token', '')
-    new_password = body.get('new_password', '')
-    
-    if not token:
-        raise HTTPException(400, "Token mancante")
-    
-    if not new_password or len(new_password) < 8:
-        raise HTTPException(400, "La password deve essere di almeno 8 caratteri")
-    
-    success, message = auth_manager.reset_password(token, new_password)
-    
-    if not success:
-        raise HTTPException(400, message)
-    
-    if audit_log:
-        try:
-            import jwt as _jwt
-            payload = _jwt.decode(token, auth_manager.secret_key, algorithms=['HS256'],
-                                  options={"verify_exp": False})
-            audit_log.log(
-                user_id=str(payload.get('user_id', '')),
-                action='PASSWORD_RESET_CONFIRM',
-                outcome='SUCCESS',
-                details={}
-            )
-        except Exception:
-            pass
-    
-    return {"success": True, "message": message}
-
-# ── END PASSWORD RESET ───────────────────────────────────────────────────────
 
 @app.get("/api/auth/mfa/status")
 async def mfa_status(user=Depends(get_current_user)):
@@ -5932,7 +5503,6 @@ async def execute_transform_async(
     mapping_rules: str = Form(None),
     input_schema: str = Form(None),    # Schema directory name (e.g. 'FatturaPA')
     output_schema: str = Form(None),   # Schema directory name (e.g. 'UBL-21')
-    project_name: str = Form(None),    # Mapping/project name for output filename
     user = Depends(get_current_user)
 ):
     """
@@ -5945,20 +5515,7 @@ async def execute_transform_async(
     content = await file.read()
     file_size = len(content)
 
-    # ── P2: sandbox + hard limit check ──
-    if cost_service:
-        _p2_env = user.get('environment', 'live') if user else 'live'
-        _p2_org = user.get('org_id', '') if user else ''
-        _p2_plan = user.get('org_plan', 'FREE') if user else 'FREE'
-        if _p2_env == 'sandbox' and _p2_org:
-            _sb_ok, _sb_rem = cost_service.check_sandbox_limit(_p2_org)
-            if not _sb_ok:
-                raise HTTPException(429, f"Limite sandbox giornaliero raggiunto ({100}/giorno)")
-        elif _p2_org:
-            _hl_ok, _hl_reason = cost_service.check_hard_limit(_p2_org, _p2_plan, 'transform')
-            if not _hl_ok:
-                raise HTTPException(402, _hl_reason)
-        # Piano check
+    # Piano check
     if billing_manager:
         ok, reason = billing_manager.check_limit(str(user.get("id", "")), "transform",
                                                    file_size_bytes=file_size)
@@ -5991,7 +5548,6 @@ async def execute_transform_async(
         "mapping_rules": rules,
         "input_schema": input_schema,
         "output_schema": output_schema,
-        "project_name": project_name,
     }
 
     job_id = job_engine.create_job(
@@ -6066,33 +5622,6 @@ async def execute_transform_async(
         os.unlink(p["tmp_path"])
 
         duration = int((time.time() - start) * 1000)
-        # ── P2: cost tracking async ──
-        if cost_service and result.success:
-            try:
-                _org_id = user.get('org_id', '') if user else ''
-                _org_plan = user.get('org_plan', 'FREE') if user else 'FREE'
-                if _org_id:
-                    _op = OperationRecord(
-                        org_id=_org_id,
-                        auth_type=user.get('_auth_type', 'user') if user else 'user',
-                        auth_id=str(user.get('id', '')) if user else '',
-                        auth_name=user.get('name', '') if user else '',
-                        environment=user.get('environment', 'live') if user else 'live',
-                        partner_id=user.get('_partner_id') if user else None,
-                        tags=user.get('_tags', {}) if user else {},
-                        job_id=jid,
-                        operation='transform',
-                        input_format=input_fmt,
-                        output_format=p['output_format'],
-                        input_bytes=len(file_content),
-                        output_bytes=len(output_content),
-                        duration_ms=duration,
-                        status='completed',
-                    )
-                    _cost = cost_service.calculate_cost(_org_id, _org_plan, _op)
-                    cost_service.record_cost(_op, _cost)
-            except Exception as _ce3:
-                print(f"   ⚠️  Cost tracking async: {_ce3}")
         # Usage tracking per billing
         if billing_manager and result.success and user:
             try:
@@ -6116,12 +5645,7 @@ async def execute_transform_async(
         return {
             "success": result.success,
             "output_file_path": out_tmp,
-            "output_file_name": generate_output_filename(
-                input_filename=p["file_name"],
-                output_schema=p.get("output_schema"),
-                mapping_name=p.get("project_name"),
-                ext=_out_ext
-            ),
+            "output_file_name": f"output.{p['output_format']}",
             "output_size_bytes": len(output_content),
             "errors": result.validation_errors if hasattr(result, "validation_errors") else []
         }
