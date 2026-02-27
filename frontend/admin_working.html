@@ -69,7 +69,24 @@
     </style>
 </head>
 <body>
-    <div id="buddy-topbar"></div>
+    <div class="topbar">
+        <div class="topbar-left">
+            <img src="/assets/logo-icon.svg" class="logo" alt="Buddyliko">
+            <h1 data-i18n="admin.title">🔐 Admin Dashboard</h1>
+        </div>
+        <nav class="topbar-nav">
+            <a href="app.html">🗺️ Mapper</a>
+            <a href="workspace.html" data-i18n="nav.workspace">Workspace</a>
+            <a href="admin.html" class="active" data-i18n="nav.admin">Admin</a>
+            <a href="finance.html" data-i18n="nav.finance">Finance</a>
+        </nav>
+        <div class="topbar-right">
+            <span id="theme-slot"></span>
+            <span id="lang-switcher"></span>
+            <span class="user-info" id="adminName"></span>
+            <button class="btn-logout" onclick="doLogout()" data-i18n="admin.logout">🚪 Logout</button>
+        </div>
+    </div>
 
     <div class="container">
         <div id="alerts"></div>
@@ -89,6 +106,7 @@
             <button class="tab" onclick="showTab('audit')" data-i18n="admin.audit_tab">🔍 Audit Log</button>
             <button class="tab" onclick="showTab('billing')" data-i18n="admin.billing_tab">💳 Billing</button>
             <button class="tab" onclick="showTab('ai-budget')">🤖 AI Budget</button>
+            <button class="tab" onclick="showTab('api-docs')">📡 API Docs</button>
         </div>
 
         <!-- Pending users -->
@@ -110,76 +128,8 @@
         <!-- Groups -->
         <div class="view" id="view-groups">
             <div class="section">
-                <div class="section-title" style="display:flex;justify-content:space-between;align-items:center">
-                    <span data-i18n="admin.groups">Gruppi</span>
-                    <button class="btn btn-success" onclick="toggleNewGroupForm()">➕ Nuovo gruppo</button>
-                </div>
-                <!-- Create group form -->
-                <div id="newGroupForm" style="display:none;background:#f0f7ff;border:1px solid #c3dafe;border-radius:8px;padding:16px;margin-bottom:16px">
-                    <div style="display:grid;grid-template-columns:1fr 2fr 1fr;gap:10px;margin-bottom:10px">
-                        <div><label style="font-size:12px;font-weight:600">Nome gruppo *</label><input id="grpNewName" class="role-select" style="width:100%;padding:6px" placeholder="Es: Team EDI Italia"></div>
-                        <div><label style="font-size:12px;font-weight:600">Descrizione</label><input id="grpNewDesc" class="role-select" style="width:100%;padding:6px" placeholder="Opzionale"></div>
-                        <div><label style="font-size:12px;font-weight:600">Gruppo padre</label><select id="grpNewParent" class="role-select" style="width:100%;padding:6px"><option value="">— Nessuno (root) —</option></select></div>
-                    </div>
-                    <div style="display:flex;gap:8px">
-                        <button class="btn btn-success" onclick="createGroup()">💾 Crea</button>
-                        <button class="btn btn-primary" onclick="toggleNewGroupForm()">Annulla</button>
-                    </div>
-                </div>
+                <div class="section-title" data-i18n="admin.groups">Gruppi</div>
                 <div id="groupsBody"><div class="loading">Caricamento...</div></div>
-            </div>
-            <!-- Group detail panel (hidden by default) -->
-            <div class="section" id="grpDetailPanel" style="display:none">
-                <div class="section-title" style="display:flex;justify-content:space-between;align-items:center">
-                    <span id="grpDetailTitle">👥 Membri del gruppo</span>
-                    <div style="display:flex;gap:8px">
-                        <button class="btn btn-primary btn-sm" onclick="toggleEditGroup()">✏️ Modifica</button>
-                        <button class="btn btn-primary btn-sm" onclick="closeGroupDetail()">✕ Chiudi</button>
-                    </div>
-                </div>
-                <!-- Edit group inline -->
-                <div id="grpEditForm" style="display:none;background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:12px;margin-bottom:12px">
-                    <div style="display:grid;grid-template-columns:1fr 2fr;gap:10px;margin-bottom:8px">
-                        <div><label style="font-size:11px;font-weight:600">Nome</label><input id="grpEditName" class="role-select" style="width:100%;padding:5px"></div>
-                        <div><label style="font-size:11px;font-weight:600">Descrizione</label><input id="grpEditDesc" class="role-select" style="width:100%;padding:5px"></div>
-                    </div>
-                    <button class="btn btn-success btn-sm" onclick="saveGroupEdit()">💾 Salva</button>
-                    <button class="btn btn-primary btn-sm" onclick="toggleEditGroup()" style="margin-left:6px">Annulla</button>
-                </div>
-                <!-- Add member -->
-                <div style="display:flex;gap:8px;margin-bottom:12px;align-items:flex-end;flex-wrap:wrap">
-                    <div style="flex:2;min-width:200px"><label style="font-size:11px;font-weight:600">Aggiungi utente</label><select id="grpAddUser" class="role-select" style="width:100%;padding:6px"><option value="">-- Seleziona --</option></select></div>
-                    <div style="flex:1;min-width:120px"><label style="font-size:11px;font-weight:600">Ruolo</label><select id="grpAddRole" class="role-select" style="width:100%;padding:6px">
-                        <option value="member">Member</option><option value="admin">Admin</option><option value="viewer">Viewer</option>
-                    </select></div>
-                    <button class="btn btn-success" onclick="addMember()" style="white-space:nowrap;height:34px">➕ Aggiungi</button>
-                </div>
-                <!-- Invite by email -->
-                <div style="display:flex;gap:8px;margin-bottom:12px;align-items:flex-end;flex-wrap:wrap;padding:10px;background:#0f172a;border:1px dashed #334155;border-radius:8px">
-                    <div style="flex:2;min-width:200px"><label style="font-size:11px;font-weight:600;color:#94a3b8">📨 Invita via email (anche non iscritti)</label><input id="grpInviteEmail" class="role-select" style="width:100%;padding:6px" placeholder="email@esempio.com"></div>
-                    <div style="flex:1;min-width:120px"><label style="font-size:11px;font-weight:600;color:#94a3b8">Ruolo</label><select id="grpInviteRole" class="role-select" style="width:100%;padding:6px">
-                        <option value="member">Member</option><option value="admin">Admin</option><option value="viewer">Viewer</option>
-                    </select></div>
-                    <button class="btn btn-success" onclick="inviteByEmail()" style="white-space:nowrap;height:34px">📨 Invita</button>
-                </div>
-                <!-- Pending invitations -->
-                <div id="grpInvitationsBody" style="margin-bottom:12px"></div>
-                <!-- Subgroups -->
-                <div id="grpSubgroups" style="margin-bottom:12px"></div>
-                <!-- Group settings -->
-                <div style="margin-bottom:12px">
-                    <div style="font-size:12px;color:#666;cursor:pointer;user-select:none" onclick="toggleGroupSettings()">⚙️ <u>Impostazioni gruppo</u></div>
-                    <div id="grpSettingsPanel" style="display:none;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:12px;margin-top:6px">
-                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
-                            <div><label style="font-size:11px;font-weight:600">Naming rule output</label><input id="grpSetNaming" class="role-select" style="width:100%;padding:5px;font-size:12px" placeholder="{input}_{schema}_{date}"></div>
-                            <div><label style="font-size:11px;font-weight:600">Schema output default</label><input id="grpSetSchema" class="role-select" style="width:100%;padding:5px;font-size:12px" placeholder="UBL-21"></div>
-                        </div>
-                        <div style="margin-bottom:8px"><label style="font-size:11px;font-weight:600">Schemi condivisi (separati da virgola)</label><input id="grpSetSharedSchemas" class="role-select" style="width:100%;padding:5px;font-size:12px" placeholder="UBL-21, FatturaPA, PEPPOL"></div>
-                        <button class="btn btn-success btn-sm" onclick="saveGroupSettings()">💾 Salva impostazioni</button>
-                    </div>
-                </div>
-                <!-- Members table -->
-                <div id="grpMembersBody"><div class="loading">Caricamento...</div></div>
             </div>
         </div>
 
@@ -411,6 +361,32 @@
                 </div>
             </div>
         </div>
+
+        <!-- API Docs (Swagger) -->
+        <div class="view" id="view-api-docs">
+            <div class="section">
+                <div class="section-title" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+                    <span>📡 API Documentation</span>
+                    <div style="display:flex;gap:8px">
+                        <a href="/api/docs" target="_blank" class="btn btn-primary"
+                           style="padding:6px 16px;font-size:12px;text-decoration:none;color:#fff">
+                            🔗 Swagger UI
+                        </a>
+                        <a href="/api/redoc" target="_blank" class="btn"
+                           style="padding:6px 16px;font-size:12px;text-decoration:none;background:#475569;color:#fff">
+                            📖 ReDoc
+                        </a>
+                        <a href="/api/openapi.json" target="_blank" class="btn"
+                           style="padding:6px 16px;font-size:12px;text-decoration:none;background:#334155;color:#fff">
+                            {} OpenAPI JSON
+                        </a>
+                    </div>
+                </div>
+                <iframe id="swagger-frame" src="about:blank"
+                        style="width:100%;height:calc(100vh - 260px);border:1px solid #2e3250;border-radius:8px;margin-top:12px;background:#fff">
+                </iframe>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -439,14 +415,8 @@
                 }
             });
             if (!res.ok) {
-                let errBody;
-                try { errBody = await res.json(); } catch { errBody = { detail: 'HTTP ' + res.status }; }
-                console.error('[apiFetch] Error:', res.status, path, errBody);
-                let msg = errBody.detail || errBody.message || 'Errore';
-                if (typeof msg !== 'string') {
-                    msg = Array.isArray(msg) ? msg.map(e => (typeof e === 'string' ? e : e.msg || JSON.stringify(e))).join('; ') : JSON.stringify(msg);
-                }
-                throw new Error(msg);
+                const err = await res.json().catch(() => ({ detail: T('admin.request_failed') }));
+                throw new Error(err.detail || 'Errore');
             }
             return res.json();
         }
@@ -462,6 +432,10 @@
             if (name === 'dbconn') loadDbConnections();
             if (name === 'audit') { loadAuditLevel(); loadAuditLogs(); }
             if (name === 'ai-budget') loadAIBudgetAdmin();
+            if (name === 'api-docs') {
+                const frame = document.getElementById('swagger-frame');
+                if (frame && frame.src === 'about:blank') frame.src = '/api/docs';
+            }
             if (name === 'billing') {
                 // Popola select mesi ultimi 6
                 const sel = document.getElementById('billingMonth');
@@ -656,334 +630,43 @@
         }
 
         // ================================================================
-        // GROUPS — Full management
+        // GROUPS
         // ================================================================
-        let _grpCurrentId = null;
-        let _grpAllUsers = null;
-        let _grpAllGroups = [];
-
-        function toggleNewGroupForm() {
-            const f = document.getElementById('newGroupForm');
-            const show = f.style.display === 'none';
-            f.style.display = show ? 'block' : 'none';
-            if (show) {
-                const sel = document.getElementById('grpNewParent');
-                sel.innerHTML = '<option value="">— Nessuno (root) —</option>' +
-                    _grpAllGroups.map(g => `<option value="${g.id}">${g.name}</option>`).join('');
-            }
-        }
-
-        async function createGroup() {
-            const name = document.getElementById('grpNewName').value.trim();
-            const desc = document.getElementById('grpNewDesc').value.trim();
-            const parentId = document.getElementById('grpNewParent').value || null;
-            if (!name) { showAlert('Inserisci il nome del gruppo', 'error'); return; }
-            try {
-                await apiFetch('/groups', {
-                    method: 'POST',
-                    body: JSON.stringify({ name, description: desc, parent_id: parentId })
-                });
-                showAlert('Gruppo creato');
-                document.getElementById('grpNewName').value = '';
-                document.getElementById('grpNewDesc').value = '';
-                toggleNewGroupForm();
-                loadGroups();
-            } catch(e) { showAlert('Errore: ' + e.message, 'error'); }
-        }
-
-        async function _ensureUsers() {
-            if (_grpAllUsers) return _grpAllUsers;
-            try {
-                const res = await apiFetch('/admin/users');
-                _grpAllUsers = res.users || [];
-            } catch { _grpAllUsers = []; }
-            return _grpAllUsers;
-        }
-
-        function _esc(s) { return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
-
         async function loadGroups() {
             const el = document.getElementById('groupsBody');
             el.innerHTML = '<div class="loading">' + T('admin.loading') + '</div>';
             try {
                 const res = await apiFetch('/groups');
-                _grpAllGroups = res.groups || [];
-                console.log('[GROUPS] Loaded:', _grpAllGroups.length, 'groups. Sample:', _grpAllGroups[0] ? JSON.stringify(Object.keys(_grpAllGroups[0])) : 'none');
-                if (!_grpAllGroups.length) {
-                    el.innerHTML = '<div class="empty">' + T('admin.no_groups') + '</div>';
-                    return;
-                }
-                await Promise.all(_grpAllGroups.map(async g => {
-                    try {
-                        const m = await apiFetch(`/groups/${g.id}/members`);
-                        g._mc = (m.members || []).length;
-                    } catch { g._mc = '?'; }
-                }));
-
-                const roots = _grpAllGroups.filter(g => !g.parent_id);
-                const children = _grpAllGroups.filter(g => g.parent_id);
-
-                // Resolve owner names
-                const users = await _ensureUsers();
-                const userMap = {};
-                users.forEach(u => { userMap[String(u.id)] = u.email + (u.name ? ' ('+u.name+')' : ''); });
-
-                function renderRow(g, indent) {
-                    const prefix = indent ? '&nbsp;&nbsp;&nbsp;&nbsp;'.repeat(indent) + '↳ ' : '';
-                    const subs = children.filter(c => c.parent_id === g.id);
-                    const ownerLabel = userMap[String(g.owner_id)] || _esc(g.owner_id) || '—';
-                    let html = `<tr>
-                        <td style="cursor:pointer" onclick="openGroupDetail('${g.id}')"><strong style="color:#3b82f6">${prefix}📁 ${_esc(g.name)}</strong></td>
-                        <td>${_esc(g.description) || '—'}</td>
-                        <td><span class="badge">${g._mc}</span></td>
-                        <td style="font-size:12px">${_esc(ownerLabel)}</td>
-                        <td>${g.created_at ? new Date(g.created_at).toLocaleDateString('it-IT') : '—'}</td>
-                        <td style="white-space:nowrap">
-                            <button class="btn btn-primary btn-sm" onclick="openGroupDetail('${g.id}')">👥</button>
-                            <button class="btn btn-danger btn-sm" onclick="deleteGroup('${g.id}','${_esc(g.name)}')">🗑️</button>
-                        </td>
-                    </tr>`;
-                    subs.forEach(s => { html += renderRow(s, (indent||0) + 1); });
-                    return html;
-                }
-
-                el.innerHTML = `<table>
-                    <thead><tr><th>Nome</th><th>Descrizione</th><th>Membri</th><th>Owner</th><th>Creato</th><th>Azioni</th></tr></thead>
-                    <tbody>${roots.map(g => renderRow(g, 0)).join('')}</tbody>
-                </table>`;
+                const groups = res.groups || [];
+                if (!groups.length) { el.innerHTML = '<div class="empty">' + T('admin.no_groups') + '</div>'; return; }
+                el.innerHTML = `
+                    <table>
+                        <thead><tr>
+                            <th>Nome</th><th>Descrizione</th><th>Gruppo padre</th><th>Creato</th><th>Azioni</th>
+                        </tr></thead>
+                        <tbody>
+                            ${groups.map(g => `
+                                <tr>
+                                    <td><strong>${g.name}</strong></td>
+                                    <td>${g.description || '—'}</td>
+                                    <td>${g.parent_id || '—'}</td>
+                                    <td>${g.created_at ? new Date(g.created_at).toLocaleDateString('it-IT') : '—'}</td>
+                                    <td>
+                                        <button class="btn btn-danger btn-sm" onclick="deleteGroup('${g.id}','${g.name}')">Elimina</button>
+                                    </td>
+                                </tr>`).join('')}
+                        </tbody>
+                    </table>`;
             } catch(e) { el.innerHTML = `<div class="empty" style="color:red">${e.message}</div>`; }
         }
 
         async function deleteGroup(id, name) {
-            if (!confirm('Eliminare il gruppo "' + name + '"?\nVerranno eliminati anche sottogruppi e associazioni membri.')) return;
+            if (!confirm(`Eliminare il gruppo "${name}"? Verranno eliminati anche tutti i sottogruppi.`)) return;
             try {
                 await apiFetch(`/groups/${id}`, { method: 'DELETE' });
-                showAlert('Gruppo eliminato');
-                if (_grpCurrentId === id) closeGroupDetail();
+                showAlert(T('admin.group_deleted'));
                 loadGroups();
-            } catch(e) { showAlert('Errore: ' + e.message, 'error'); }
-        }
-
-        async function openGroupDetail(groupId) {
-            _grpCurrentId = groupId;
-            const panel = document.getElementById('grpDetailPanel');
-            panel.style.display = 'block';
-            document.getElementById('grpEditForm').style.display = 'none';
-            try {
-                const gRes = await apiFetch(`/groups/${groupId}`);
-                const g = gRes.group;
-                document.getElementById('grpDetailTitle').innerHTML =
-                    '👥 <strong>' + _esc(g.name) + '</strong>' + (g.description ? ' — ' + _esc(g.description) : '');
-                document.getElementById('grpEditName').value = g.name || '';
-                document.getElementById('grpEditDesc').value = g.description || '';
-            } catch {}
-
-            const users = await _ensureUsers();
-            await _loadMembers(groupId, users);
-            loadGroupInvitations(groupId);
-            loadGroupSettings(groupId);
-
-            // Subgroups
-            const subs = _grpAllGroups.filter(g => g.parent_id === groupId);
-            const subEl = document.getElementById('grpSubgroups');
-            if (subs.length) {
-                subEl.innerHTML = '<div style="font-size:12px;color:#666;margin-bottom:4px">📂 Sottogruppi:</div>' +
-                    '<div style="display:flex;gap:6px;flex-wrap:wrap">' +
-                    subs.map(s => `<span class="badge" style="cursor:pointer;padding:4px 10px;font-size:12px" onclick="openGroupDetail('${s.id}')">📁 ${_esc(s.name)} (${s._mc||'?'})</span>`).join('') +
-                    '</div>';
-            } else { subEl.innerHTML = ''; }
-
-            panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-
-        function closeGroupDetail() {
-            _grpCurrentId = null;
-            document.getElementById('grpDetailPanel').style.display = 'none';
-        }
-
-        function toggleEditGroup() {
-            const f = document.getElementById('grpEditForm');
-            f.style.display = f.style.display === 'none' ? 'block' : 'none';
-        }
-
-        async function saveGroupEdit() {
-            if (!_grpCurrentId) return;
-            const name = document.getElementById('grpEditName').value.trim();
-            const desc = document.getElementById('grpEditDesc').value.trim();
-            if (!name) { showAlert('Il nome è obbligatorio', 'error'); return; }
-            try {
-                await apiFetch(`/groups/${_grpCurrentId}`, {
-                    method: 'PUT',
-                    body: JSON.stringify({ name, description: desc })
-                });
-                showAlert('Gruppo aggiornato');
-                toggleEditGroup();
-                loadGroups();
-                openGroupDetail(_grpCurrentId);
-            } catch(e) { showAlert('Errore: ' + e.message, 'error'); }
-        }
-
-        async function _loadMembers(groupId, users) {
-            const el = document.getElementById('grpMembersBody');
-            el.innerHTML = '<div class="loading">Caricamento membri...</div>';
-            try {
-                const res = await apiFetch(`/groups/${groupId}/members`);
-                const members = res.members || [];
-
-                const memberIds = new Set(members.map(m => String(m.user_id)));
-                const sel = document.getElementById('grpAddUser');
-                sel.innerHTML = '<option value="">-- Seleziona utente --</option>' +
-                    users.filter(u => !memberIds.has(String(u.id))).map(u =>
-                        `<option value="${u.id}">${_esc(u.email)}${u.name ? ' ('+_esc(u.name)+')' : ''}${u.role ? ' ['+u.role+']' : ''}</option>`
-                    ).join('');
-
-                if (!members.length) {
-                    el.innerHTML = '<div class="empty" style="padding:12px;color:#999">Nessun membro — aggiungi il primo dal menu sopra</div>';
-                    return;
-                }
-
-                const roleBadge = r => {
-                    const c = {owner:'#7c3aed',admin:'#2563eb',member:'#059669',viewer:'#6b7280'};
-                    return '<span style="background:'+(c[r]||'#6b7280')+';color:#fff;padding:2px 8px;border-radius:10px;font-size:11px">'+r+'</span>';
-                };
-
-                el.innerHTML = `<table>
-                    <thead><tr><th>Utente</th><th>Email</th><th>Ruolo</th><th>Aggiunto</th><th>Azioni</th></tr></thead>
-                    <tbody>${members.map(m => `<tr>
-                        <td>${_esc(m.user_name) || _esc(m.user_id)}</td>
-                        <td>${_esc(m.email) || '—'}</td>
-                        <td><select class="role-select" style="padding:3px 8px;font-size:12px"
-                                onchange="changeMemberRole('${groupId}','${m.user_id}',this.value)">
-                                ${['owner','admin','member','viewer'].map(r =>
-                                    '<option value="'+r+'" '+(m.role===r?'selected':'')+'>'+r.charAt(0).toUpperCase()+r.slice(1)+'</option>'
-                                ).join('')}
-                            </select></td>
-                        <td>${m.joined_at ? new Date(m.joined_at).toLocaleDateString('it-IT') : '—'}</td>
-                        <td><button class="btn btn-danger btn-sm" onclick="removeMember('${groupId}','${m.user_id}','${_esc(m.email||m.user_name||m.user_id)}')">Rimuovi</button></td>
-                    </tr>`).join('')}</tbody>
-                </table>`;
-            } catch(e) { el.innerHTML = '<div class="empty" style="color:red">'+e.message+'</div>'; }
-        }
-
-        async function addMember() {
-            if (!_grpCurrentId) return;
-            const userId = document.getElementById('grpAddUser').value;
-            const role = document.getElementById('grpAddRole').value;
-            if (!userId) { showAlert('Seleziona un utente', 'error'); return; }
-            try {
-                await apiFetch(`/groups/${_grpCurrentId}/members`, {
-                    method: 'POST',
-                    body: JSON.stringify({ user_id: userId, role })
-                });
-                showAlert('Membro aggiunto');
-                const users = await _ensureUsers();
-                _loadMembers(_grpCurrentId, users);
-                loadGroups();
-            } catch(e) { showAlert('Errore: ' + e.message, 'error'); }
-        }
-
-        async function changeMemberRole(groupId, userId, newRole) {
-            try {
-                await apiFetch(`/groups/${groupId}/members/${userId}`, {
-                    method: 'PUT',
-                    body: JSON.stringify({ role: newRole })
-                });
-                showAlert('Ruolo aggiornato');
-            } catch(e) { showAlert('Errore: ' + e.message, 'error'); }
-        }
-
-        async function removeMember(groupId, userId, label) {
-            if (!confirm('Rimuovere "' + label + '" dal gruppo?')) return;
-            try {
-                await apiFetch(`/groups/${groupId}/members/${userId}`, { method: 'DELETE' });
-                showAlert('Membro rimosso');
-                const users = await _ensureUsers();
-                _loadMembers(groupId, users);
-                loadGroups();
-            } catch(e) { showAlert('Errore: ' + e.message, 'error'); }
-        }
-
-        async function inviteByEmail() {
-            if (!_grpCurrentId) return;
-            const email = document.getElementById('grpInviteEmail').value.trim();
-            const role = document.getElementById('grpInviteRole').value;
-            if (!email || !email.includes('@')) { showAlert('Inserisci un indirizzo email valido', 'error'); return; }
-            try {
-                const res = await apiFetch(`/groups/${_grpCurrentId}/invite`, {
-                    method: 'POST',
-                    body: JSON.stringify({ email, role })
-                });
-                console.log('[INVITE] Response:', JSON.stringify(res));
-                const msg = typeof res.message === 'string' ? res.message : JSON.stringify(res);
-                showAlert(msg, res.email_sent === false ? 'error' : 'success');
-                document.getElementById('grpInviteEmail').value = '';
-                loadGroupInvitations(_grpCurrentId);
-                const users = await _ensureUsers();
-                _loadMembers(_grpCurrentId, users);
-                loadGroups();
-            } catch(e) {
-                console.error('[INVITE] Error:', e);
-                showAlert('Errore invito: ' + String(e.message || e), 'error');
-            }
-        }
-
-        async function loadGroupInvitations(groupId) {
-            const el = document.getElementById('grpInvitationsBody');
-            try {
-                const res = await apiFetch(`/groups/${groupId}/invitations`);
-                const invs = (res.invitations || []).filter(i => i.status === 'pending');
-                if (!invs.length) { el.innerHTML = ''; return; }
-                el.innerHTML = '<div style="font-size:12px;color:#94a3b8;margin-bottom:4px">📨 Inviti in sospeso:</div>' +
-                    '<div style="display:flex;flex-wrap:wrap;gap:6px">' +
-                    invs.map(i =>
-                        '<span class="badge" style="padding:4px 10px;font-size:12px;display:inline-flex;align-items:center;gap:6px">' +
-                        '📧 ' + _esc(i.email) + ' (' + i.role + ')' +
-                        ' <button class="btn btn-danger" style="padding:1px 6px;font-size:10px;line-height:1.2" ' +
-                        'onclick="cancelInvitation(\'' + groupId + '\',\'' + i.id + '\')">✕</button></span>'
-                    ).join('') + '</div>';
-            } catch { el.innerHTML = ''; }
-        }
-
-        async function cancelInvitation(groupId, invId) {
-            try {
-                await apiFetch(`/groups/${groupId}/invitations/${invId}`, { method: 'DELETE' });
-                showAlert('Invito annullato');
-                loadGroupInvitations(groupId);
-            } catch(e) { showAlert('Errore: ' + e.message, 'error'); }
-        }
-
-        function toggleGroupSettings() {
-            const p = document.getElementById('grpSettingsPanel');
-            p.style.display = p.style.display === 'none' ? 'block' : 'none';
-        }
-
-        async function loadGroupSettings(groupId) {
-            try {
-                const res = await apiFetch(`/groups/${groupId}/settings`);
-                const s = res.settings || {};
-                document.getElementById('grpSetNaming').value = s.naming_rule || '';
-                document.getElementById('grpSetSchema').value = s.default_output_schema || '';
-                document.getElementById('grpSetSharedSchemas').value = (s.shared_schemas || []).join(', ');
-            } catch { /* settings might not exist yet */ }
-        }
-
-        async function saveGroupSettings() {
-            if (!_grpCurrentId) return;
-            const naming = document.getElementById('grpSetNaming').value.trim();
-            const schema = document.getElementById('grpSetSchema').value.trim();
-            const shared = document.getElementById('grpSetSharedSchemas').value.split(',').map(s=>s.trim()).filter(Boolean);
-            const settings = {};
-            if (naming) settings.naming_rule = naming;
-            if (schema) settings.default_output_schema = schema;
-            if (shared.length) settings.shared_schemas = shared;
-            if (!Object.keys(settings).length) { showAlert('Nessuna impostazione da salvare', 'error'); return; }
-            try {
-                await apiFetch(`/groups/${_grpCurrentId}/settings`, {
-                    method: 'PUT',
-                    body: JSON.stringify(settings)
-                });
-                showAlert('Impostazioni salvate');
-            } catch(e) { showAlert('Errore: ' + e.message, 'error'); }
+            } catch(e) { showAlert(T('admin.error') + ': ' + e.message, 'error'); }
         }
 
         // ================================================================
@@ -1043,8 +726,7 @@
                     window.location.href = 'app.html';
                     return;
                 }
-                const adminEl = document.getElementById('adminName');
-                if (adminEl) adminEl.textContent = `${user.name || user.email} (${user.role})`;
+                document.getElementById('adminName').textContent = `${user.name || user.email} (${user.role})`;
                 await loadStats();
                 await loadPending();
             } catch(e) {
@@ -1405,7 +1087,7 @@
 // i18n initialization
 (async () => {
     await i18n.init();
-    // [009] lang-switcher handled by topbar.js
+    i18n.createSwitcher('lang-switcher');
     window.addEventListener('langchange', () => {
         // Re-apply data-i18n attributes on lang change
         i18n.applyAll();
@@ -1520,7 +1202,6 @@ async function calibrateBalance() {
 
 const T = (key, rep) => typeof i18n !== 'undefined' && i18n.isLoaded() ? i18n.t(key, rep) : key;
 </script>
-<script src="/assets/topbar.js"></script>
 <script src="/assets/theme.js"></script>
 </body>
 </html>

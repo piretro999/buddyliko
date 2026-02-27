@@ -12,7 +12,6 @@
     
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="/lang/i18n.js"></script>
     
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -735,7 +734,7 @@
         }
         .empty-state {
             text-align: center;
-            padding: 15px 10px;
+            padding: 60px 20px;
             color: #999;
         }
         .connection-list-item {
@@ -1109,13 +1108,6 @@
                 setTimeout(() => alert('❌ Errore collegamento: ' + decodeURIComponent(linkError)), 500);
             }
 
-            // Handle group invitation links (?invite=TOKEN)
-            const inviteToken = urlParams.get('invite');
-            if (inviteToken) {
-                window._pendingInviteToken = inviteToken;
-                window.history.replaceState({}, '', window.location.pathname);
-            }
-
             try {
                 const statusResponse = await fetch(`${API_BASE}/api/auth/status`);
                 if (!statusResponse.ok) { authCheckDiv.remove(); return; }
@@ -1123,14 +1115,7 @@
 
                 if (status.enabled) {
                     const token = localStorage.getItem('buddyliko_token');
-                    if (!token) {
-                        // Preserve invite token through login redirect
-                        if (window._pendingInviteToken) {
-                            localStorage.setItem('buddyliko_pending_invite', window._pendingInviteToken);
-                        }
-                        window.location.href = 'login.html';
-                        return;
-                    }
+                    if (!token) { window.location.href = 'login.html'; return; }
 
                     const meResponse = await fetch(`${API_BASE}/api/auth/me`, {
                         headers: { 'Authorization': `Bearer ${token}` }
@@ -1144,26 +1129,6 @@
                     const meData = await meResponse.json();
                     const userData = meData.user || meData;
                     localStorage.setItem('buddyliko_user', JSON.stringify(userData));
-
-                    // Auto-accept group invitation if present in URL or stored from pre-login
-                    const pendingInvite = window._pendingInviteToken || localStorage.getItem('buddyliko_pending_invite');
-                    if (pendingInvite) {
-                        localStorage.removeItem('buddyliko_pending_invite');
-                        try {
-                            const invRes = await fetch(`${API_BASE}/api/invitations/${pendingInvite}/accept`, {
-                                method: 'POST',
-                                headers: { 'Authorization': `Bearer ${token}` }
-                            });
-                            const invData = await invRes.json();
-                            if (invRes.ok) {
-                                setTimeout(() => alert('✅ Sei entrato nel gruppo!'), 500);
-                            } else {
-                                setTimeout(() => alert('⚠️ Invito: ' + (invData.detail || 'non valido')), 500);
-                            }
-                        } catch(e) { console.error('Invite accept error:', e); }
-                        delete window._pendingInviteToken;
-                    }
-
                     authCheckDiv.remove();
                 } else {
                     authCheckDiv.remove();
@@ -1186,7 +1151,6 @@
         }
     </script>
     
-    <div id="buddy-topbar"></div>
     <div id="root"></div>
     
     <script>
@@ -1432,7 +1396,7 @@
                 React.createElement('div', { style: panelStyle, onClick: e => e.stopPropagation() },
                     React.createElement('div', { style: headerStyle },
                         React.createElement('div', null,
-                            React.createElement('div', { style: { fontWeight: '700', fontSize: '15px', color: '#cdd6f4' } }, '✏️ Custom Formula'),
+                            React.createElement('div', { style: { fontWeight: '700', fontSize: '15px', color: '#cdd6f4' } }, i18n.t('app.custom_formula'))),
                             React.createElement('div', { style: { fontSize: '11px', color: '#6c7086', marginTop: '2px' } },
                                 connection.sourceName + '  →  ' + connection.targetName)
                         ),
@@ -1463,11 +1427,11 @@
                             )
                         ),
                         React.createElement('div', { style: hintBox },
-                            React.createElement('strong', { style: { color: '#cba6f7' } }, 'Suggerimenti: '),
+                            React.createElement('strong', { style: { color: '#cba6f7' } }, i18n.t('app.suggestions') + ' ')),
                             React.createElement('span', null, '"value" contiene sempre il valore del campo sorgente come stringa. '),
                             React.createElement('span', null, 'Puoi usare qualsiasi espressione Python su una riga. '),
                             React.createElement('br', null),
-                            React.createElement('strong', { style: { color: '#89dceb' } }, 'Esempi: '),
+                            React.createElement('strong', { style: { color: '#89dceb' } }, i18n.t('app.examples') + ' ')),
                             React.createElement('code', { style: { color: '#a6e3a1' } }, 'value.strip().upper()'),
                             React.createElement('span', null, ' · '),
                             React.createElement('code', { style: { color: '#a6e3a1' } }, 'value[0:4] + "-" + value[4:6]'),
@@ -1498,16 +1462,16 @@
                     ),
                     React.createElement('div', { className: 'formula-editor-body' },
                         React.createElement('div', { style: { padding: '15px', background: '#f0f0f0', borderRadius: '6px', fontSize: '13px', marginBottom: '15px' } },
-                            React.createElement('strong', null, '🤖 How AI Auto-Map Works:'),
+                            React.createElement('strong', null, i18n.t('app.ai_how_works')),
                             React.createElement('ul', { style: { marginTop: '8px', paddingLeft: '20px', lineHeight: '1.6' } },
-                                React.createElement('li', null, 'AI analyzes your input and output schemas'),
-                                React.createElement('li', null, 'Considers field names, types, business terms, and data samples'),
-                                React.createElement('li', null, 'Suggests intelligent mappings with confidence scores'),
-                                React.createElement('li', null, 'Recommends transformation formulas when needed')
+                                React.createElement('li', null, i18n.t('app.ai_step1')),
+                                React.createElement('li', null, i18n.t('app.ai_step2')),
+                                React.createElement('li', null, i18n.t('app.ai_step3')),
+                                React.createElement('li', null, i18n.t('app.ai_step4'))
                             )
                         ),
                         React.createElement('div', { style: { padding: '15px', background: '#fff3cd', borderRadius: '6px', fontSize: '12px', marginBottom: '15px' } },
-                            React.createElement('strong', { style: { display: 'block', marginBottom: '8px' } }, '🔑 API Keys Configuration:'),
+                            React.createElement('strong', { style: { display: 'block', marginBottom: '8px' } }, i18n.t('app.api_keys'))),
                             React.createElement('div', { style: { lineHeight: '1.6' } },
                                 'API keys are configured in the backend ',
                                 React.createElement('code', { style: { background: '#fff', padding: '2px 6px', borderRadius: '3px' } }, '.env'),
@@ -1519,7 +1483,7 @@
                         ),
                         React.createElement('div', { style: { fontSize: '12px' } },
                             React.createElement('div', { style: { marginBottom: '10px' } },
-                                React.createElement('strong', null, '🤖 Get Claude API Key:'),
+                                React.createElement('strong', null, i18n.t('app.get_claude_key')),
                                 React.createElement('br'),
                                 React.createElement('a', { 
                                     href: 'https://console.anthropic.com/settings/keys', 
@@ -1528,7 +1492,7 @@
                                 }, 'https://console.anthropic.com/settings/keys')
                             ),
                             React.createElement('div', null,
-                                React.createElement('strong', null, '🧠 Get OpenAI API Key:'),
+                                React.createElement('strong', null, i18n.t('app.get_openai_key')),
                                 React.createElement('br'),
                                 React.createElement('a', { 
                                     href: 'https://platform.openai.com/api-keys', 
@@ -1542,7 +1506,7 @@
                         React.createElement('button', {
                             className: 'btn btn-primary',
                             onClick: onClose
-                        }, '✅ Got It')
+                        }, i18n.t('app.got_it')))
                     )
                 )
             );
@@ -1880,7 +1844,7 @@
                                 className: 'btn btn-primary',
                                 onClick: createSchema,
                                 disabled: !schemaName
-                            }, '✨ Create New'),
+                            }, i18n.t('app.create_new'))),
                             React.createElement('button', {
                                 className: 'btn btn-secondary',
                                 onClick: () => setShowLoadPanel(!showLoadPanel)
@@ -1900,10 +1864,10 @@
                         },
                             React.createElement('h4', { 
                                 style: { marginTop: 0, marginBottom: '10px' }
-                            }, '📚 Saved Schemas'),
+                            }, i18n.t('app.saved_schemas'))),
                             savedSchemas.length === 0 ? React.createElement('p', {
                                 style: { color: '#999', textAlign: 'center', padding: '20px' }
-                            }, 'No saved schemas yet. Create and save one first!') : null,
+                            }, i18n.t('app.no_schemas'))) : null,
                             savedSchemas.map(schema => 
                                 React.createElement('div', {
                                     key: schema.id,
@@ -1932,7 +1896,7 @@
                                     React.createElement('button', {
                                         className: 'btn btn-sm btn-primary',
                                         onClick: () => loadSavedSchema(schema.id)
-                                    }, '📥 Load'),
+                                    }, i18n.t('app.load'))),
                                     React.createElement('button', {
                                         className: 'btn btn-sm btn-danger',
                                         onClick: () => deleteSavedSchema(schema.id)
@@ -1976,11 +1940,11 @@
                                     React.createElement('button', {
                                         className: 'btn btn-sm btn-primary',
                                         onClick: addField
-                                    }, '➕ Add'),
+                                    }, i18n.t('app.add'))),
                                     React.createElement('button', {
                                         className: 'btn btn-sm btn-secondary',
                                         onClick: importCSV
-                                    }, '📥 Import')
+                                    }, i18n.t('app.import')))
                                 )
                             ),
                             schemaTree.length === 0 ? React.createElement('div', {
@@ -1989,7 +1953,7 @@
                                     padding: '40px', 
                                     color: '#999' 
                                 }
-                            }, 'No fields yet. Click "Add" to start.') : null,
+                            }, i18n.t('app.no_fields'))) : null,
                             schemaTree.map(node => renderTreeNode(node))
                         ),
                         
@@ -2017,7 +1981,7 @@
                                             color: '#666',
                                             textTransform: 'uppercase'
                                         } 
-                                    }, 'Name:'),
+                                    }, i18n.t('app.name'))),
                                     React.createElement('div', { 
                                         style: { 
                                             fontWeight: 'bold', 
@@ -2037,7 +2001,7 @@
                                             color: '#666',
                                             textTransform: 'uppercase'
                                         }
-                                    }, 'Type:'),
+                                    }, i18n.t('app.type'))),
                                     React.createElement('div', { 
                                         style: { 
                                             padding: '8px',
@@ -2059,7 +2023,7 @@
                                             color: '#666',
                                             textTransform: 'uppercase'
                                         }
-                                    }, 'Path:'),
+                                    }, i18n.t('app.path'))),
                                     React.createElement('div', { 
                                         style: { 
                                             fontSize: '12px', 
@@ -2081,7 +2045,7 @@
                                             color: '#666',
                                             textTransform: 'uppercase'
                                         }
-                                    }, 'Description:'),
+                                    }, i18n.t('app.description'))),
                                     React.createElement('textarea', {
                                         value: selectedField.description || '',
                                         onChange: (e) => updateField(selectedField.id, { 
@@ -2117,7 +2081,7 @@
                                         }),
                                         React.createElement('span', {
                                             style: { fontWeight: 'bold' }
-                                        }, 'Required field')
+                                        }, i18n.t('app.required_field')))
                                     )
                                 )
                             ) : React.createElement('p', { 
@@ -2126,7 +2090,7 @@
                                     textAlign: 'center',
                                     padding: '40px 20px'
                                 } 
-                            }, 'Select a field from the tree to edit its properties')
+                            }, i18n.t('app.select_field')))
                         )
                     ),
                     
@@ -2144,24 +2108,24 @@
                         React.createElement('button', {
                             className: 'btn btn-success',
                             onClick: saveCurrentSchema,
-                            title: 'Save this schema for reuse in other projects'
-                        }, '💾 Save Schema'),
+                            title: i18n.t('app.save_schema')
+                        }, i18n.t('app.save_schema'))),
                         React.createElement('button', {
                             className: 'btn btn-success',
                             onClick: exportCSV
-                        }, '📥 Export CSV Schema'),
+                        }, i18n.t('app.export_csv_schema'))),
                         React.createElement('button', {
                             className: 'btn btn-secondary',
                             onClick: () => exportSample('xml')
-                        }, '📄 Sample XML'),
+                        }, i18n.t('app.sample_xml'))),
                         React.createElement('button', {
                             className: 'btn btn-secondary',
                             onClick: () => exportSample('json')
-                        }, '📄 Sample JSON'),
+                        }, i18n.t('app.sample_json'))),
                         React.createElement('button', {
                             className: 'btn btn-secondary',
                             onClick: () => exportSample('csv')
-                        }, '📄 Sample CSV'),
+                        }, i18n.t('app.sample_csv'))),
                         React.createElement('div', { 
                             style: { flex: 1, borderRight: '2px solid #ddd', marginLeft: '10px' } 
                         }),
@@ -2190,7 +2154,7 @@
                                     setStatus(`❌ Error: ${err.message}`);
                                 }
                             }
-                        }, '📥 Use as Input Schema'),
+                        }, i18n.t('app.use_as_input'))),
                         onSchemaSelect && React.createElement('button', {
                             className: 'btn btn-success',
                             onClick: async () => {
@@ -2216,21 +2180,21 @@
                                     setStatus(`❌ Error: ${err.message}`);
                                 }
                             }
-                        }, '📤 Use as Output Schema'),
+                        }, i18n.t('app.use_as_output'))),
                         React.createElement('button', {
                             className: 'btn btn-primary',
                             onClick: () => {
                                 onClose();
                             },
                             style: { marginLeft: 'auto' }
-                        }, '✅ Done')
+                        }, i18n.t('app.done')))
                     ),
                     
                     React.createElement('button', {
                         className: 'btn btn-secondary',
                         onClick: onClose,
                         style: { marginTop: '10px', width: '100%' }
-                    }, '❌ Close')
+                    }, i18n.t('app.close')))
                 )
             );
         }
@@ -2320,7 +2284,7 @@
                         React.createElement('div', { style: { display: 'flex', alignItems: 'center', gap: '10px' } },
                             React.createElement('span', { style: { fontSize: '20px' } }, '🤖'),
                             React.createElement('div', null,
-                                React.createElement('div', { style: { color: '#cdd6f4', fontWeight: 'bold', fontSize: '15px' } }, 'AI at Work'),
+                                React.createElement('div', { style: { color: '#cdd6f4', fontWeight: 'bold', fontSize: '15px' } }, i18n.t('app.ai_at_work'))),
                                 React.createElement('div', { style: { color: '#a6adc8', fontSize: '11px' } },
                                     processing
                                         ? `Processing… ${log.filter(e => e.type === 'chunk_done').length} calls done`
@@ -2341,7 +2305,7 @@
                                     color: processing ? '#cdd6f4' : '#1e1e2e',
                                     padding: '4px 12px', cursor: 'pointer', fontWeight: 'bold', fontSize: '12px' },
                                 title: processing ? 'Close (AI still running in background)' : 'Close'
-                            }, '✕ Close')
+                            }, i18n.t('app.close')))
                         )
                     ),
                     // Progress bar
@@ -2359,7 +2323,7 @@
                         style: { flex: 1, overflowY: 'auto', padding: '16px 20px', scrollbarColor: '#45475a #1e1e2e' }
                     },
                         log.length === 0
-                            ? React.createElement('div', { style: { color: '#6c7086', fontFamily: 'monospace', fontSize: '12px' } }, 'Waiting for AI to start…')
+                            ? React.createElement('div', { style: { color: '#6c7086', fontFamily: 'monospace', fontSize: '12px' } }, i18n.t('app.ai_waiting')))
                             : log.map((evt, i) => renderLine(evt, i)),
                         React.createElement('div', { ref: bottomRef })
                     ),
@@ -2527,7 +2491,7 @@
                         className: 'btn btn-primary',
                         onClick: approveAll,
                         style: { fontSize: '11px', padding: '5px 10px' }
-                    }, '✅ Approve All')
+                    }, i18n.t('app.approve_all')))
                 ),
                 React.createElement('div', {
                     style: {
@@ -2540,14 +2504,14 @@
                         style: { textAlign: 'center', padding: '40px', color: '#666' }
                     },
                         React.createElement('div', { style: { fontSize: '48px', marginBottom: '10px' } }, '🤖'),
-                        React.createElement('div', null, 'AI is analyzing your schemas...'),
-                        React.createElement('div', { style: { fontSize: '12px', marginTop: '5px' } }, 'This may take 10-30 seconds')
+                        React.createElement('div', null, i18n.t('app.ai_analyzing')),
+                        React.createElement('div', { style: { fontSize: '12px', marginTop: '5px' } }, i18n.t('app.ai_wait')))
                     ) : suggestions.length === 0 ? React.createElement('div', {
                         style: { textAlign: 'center', padding: '40px', color: '#666' }
                     },
                         React.createElement('div', { style: { fontSize: '48px', marginBottom: '10px' } }, '🎉'),
-                        React.createElement('div', null, 'No suggestions remaining'),
-                        React.createElement('div', { style: { fontSize: '12px', marginTop: '5px' } }, 'All mappings reviewed!')
+                        React.createElement('div', null, i18n.t('app.no_suggestions')),
+                        React.createElement('div', { style: { fontSize: '12px', marginTop: '5px' } }, i18n.t('app.all_reviewed')))
                     ) : suggestions.map((suggestion, idx) =>
                         React.createElement('div', {
                             key: idx,
@@ -2633,12 +2597,12 @@
                                             className: 'btn btn-success',
                                             style: { flex: 1, fontSize: '11px', padding: '8px' },
                                             onClick: () => onApprove(suggestion)
-                                        }, '✅ Apply'),
+                                        }, i18n.t('app.apply'))),
                                         React.createElement('button', {
                                             className: 'btn btn-danger',
                                             style: { flex: 1, fontSize: '11px', padding: '8px' },
                                             onClick: () => onReject(suggestion)
-                                        }, '✕ Reject')
+                                        }, i18n.t('app.reject')))
                                     )
                                 )
                             )
@@ -2670,6 +2634,13 @@
             const [availableFormulas, setAvailableFormulas] = useState([]);
             const [editingConnection, setEditingConnection] = useState(null);
             
+            // i18n force-update on language change
+            const [, setLangTick] = useState(0);
+            React.useEffect(() => {
+                window.__buddylikoForceUpdate = () => setLangTick(t => t + 1);
+                return () => { window.__buddylikoForceUpdate = null; };
+            }, []);
+            
             // AI Integration
             const [aiSuggestions, setAiSuggestions] = useState([]);
             const [showAiPanel, setShowAiPanel] = useState(false);
@@ -2688,9 +2659,6 @@
             const [showAccountModal, setShowAccountModal] = useState(false);
             const [linkedProviders, setLinkedProviders] = useState(null);
             const [accountTab, setAccountTab] = useState('providers');
-            const [myGroups, setMyGroups] = useState([]);
-            const [pendingInvitations, setPendingInvitations] = useState([]);
-            const [groupsLoaded, setGroupsLoaded] = useState(false);
 
             // DB Connector
             const [dbConnections, setDbConnections] = useState([]);
@@ -3470,37 +3438,7 @@
                     sessionStorage.removeItem('buddyliko_open_file');
                     try {
                         const ref = JSON.parse(openFile);
-                        if (ref.action === 'schema' && ref.fileId && ref.direction) {
-                            // CSV/schema file from workspace: download and upload as schema
-                            (async () => {
-                                try {
-                                    showStatus('⏳ Caricamento schema dal Workspace...', 'info');
-                                    const token = localStorage.getItem('buddyliko_token');
-                                    // Get file info for filename
-                                    const infoRes = await fetch(`${API_URL}/workspace/files/${ref.fileId}`, {
-                                        headers: { 'Authorization': `Bearer ${token}` }
-                                    });
-                                    const fileInfo = infoRes.ok ? await infoRes.json() : {};
-                                    const fileName = fileInfo.file?.name || fileInfo.name || 'schema.csv';
-
-                                    // Download file content
-                                    const dlRes = await fetch(`${API_URL}/workspace/files/${ref.fileId}/download`, {
-                                        headers: { 'Authorization': `Bearer ${token}` }
-                                    });
-                                    if (!dlRes.ok) throw new Error('Download fallito');
-                                    const blob = await dlRes.blob();
-                                    const file = new File([blob], fileName, { type: blob.type });
-
-                                    // Upload as schema via the existing uploadSchema function
-                                    uploadSchema(file, ref.direction, 'auto');
-                                } catch(e) {
-                                    showStatus('❌ Errore caricamento schema: ' + e.message, 'error');
-                                }
-                            })();
-                        } else if (ref.fileId) {
-                            // Project file: load from workspace API
-                            loadProjectFromWorkspace(ref.fileId);
-                        }
+                        if (ref.fileId) loadProjectFromWorkspace(ref.fileId);
                     } catch(e) { console.error('open_file parse error', e); }
                 }
             }, []);
@@ -3619,7 +3557,7 @@
                 setDbSelectedConn(conn);
                 try {
                     const res = await fetch(`${API_URL}/dbconn/${conn.id}/tables`, { headers: { 'Authorization': `Bearer ${token}` } });
-                    if (!res.ok) throw new Error('Errore caricamento tabelle');
+                    if (!res.ok) throw new Error(i18n.t('common.error'));
                     const d = await res.json();
                     setDbTables(d.tables || []);
                     setDbPanelView('tables');
@@ -3636,7 +3574,7 @@
                         method: 'POST', headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
                         body: JSON.stringify({ table_name: tableName, limit: 20 })
                     });
-                    if (!res.ok) throw new Error('Errore anteprima');
+                    if (!res.ok) throw new Error(i18n.t('common.error'));
                     const d = await res.json();
                     setDbPreviewData(d);
                     setDbPanelView('preview');
@@ -3654,7 +3592,7 @@
                     });
                     const d = await res.json();
                     if (d.success) showStatus('✅ Connessione OK!', 'success');
-                    else showStatus(`❌ ${d.message || 'Test fallito'}`, 'error');
+                    else showStatus(`❌ ${d.message || i18n.t('common.failed')}`, 'error');
                     loadDbConnections_();
                 } catch (e) { showStatus(`❌ ${e.message}`, 'error'); }
                 setDbLoading(false);
@@ -3666,7 +3604,7 @@
                 const token = localStorage.getItem('buddyliko_token');
                 try {
                     await fetch(`${API_URL}/dbconn/${connId}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
-                    showStatus('Connessione eliminata', 'success');
+                    showStatus(i18n.t('admin.connection_deleted'), 'success');
                     loadDbConnections_();
                 } catch (e) { showStatus(`❌ ${e.message}`, 'error'); }
             };
@@ -3695,7 +3633,7 @@
                     if (d.success !== false) {
                         showStatus(`✅ Scritto su ${tableName}: ${d.inserted||0} inseriti, ${d.updated||0} aggiornati${d.errors?.length ? `, ${d.errors.length} errori` : ''}`, 'success');
                     } else {
-                        showStatus(`❌ ${d.detail || 'Errore scrittura'}`, 'error');
+                        showStatus(`❌ ${d.detail || i18n.t('common.error')}`, 'error');
                     }
                 } catch (e) { showStatus(`❌ ${e.message}`, 'error'); }
                 setDbLoading(false);
@@ -3804,9 +3742,6 @@
                         formData.append('output_format', 'xml');
                         formData.append('validate', 'false');
                         formData.append('mapping_rules', JSON.stringify(mappingRules));
-                        if (mappingName) formData.append('project_name', mappingName);
-                        if (outputSchemaId) formData.append('output_schema', outputSchemaId);
-                        if (inputSchemaId) formData.append('input_schema', inputSchemaId);
 
                         const submitRes = await fetch(`${API_URL}/transform/execute-async`, {
                             method: 'POST',
@@ -3824,31 +3759,16 @@
                             });
                             if (syncRes.ok) {
                                 const blob = await syncRes.blob();
-                                // Get filename from Content-Disposition header or generate default
-                                const cd = syncRes.headers.get('X-Output-Filename');
-                                const dlName = cd || `${file.name.replace(/\.[^.]+$/, '')}_${outputSchemaId || 'converted'}.xml`;
-                                _downloadBlob(blob, dlName);
+                                _downloadBlob(blob, 'transformed_output.xml');
                                 modal.success('✅ Trasformazione completata!');
                             } else {
                                 const err = await syncRes.json().catch(() => ({}));
-                                modal.error('❌ ' + (err.detail || err.errors?.join(', ') || 'Errore sconosciuto'));
+                                modal.error('❌ ' + (err.detail || err.errors?.join(', ') || i18n.t('common.error')));
                             }
                             return;
                         }
 
-                        const asyncData = await submitRes.json();
-
-                        // Engine fast path — result returned directly
-                        if (asyncData.engine_used) {
-                            const outStr = typeof asyncData.result === 'string' ? asyncData.result : JSON.stringify(asyncData.result, null, 2);
-                            const blob = new Blob([outStr], { type: 'application/xml' });
-                            const dlName = `${file.name.replace(/\.[^.]+$/, '')}_${outputSchemaId || 'converted'}.xml`;
-                            _downloadBlob(blob, dlName);
-                            modal.success(`⚡ Trasformazione completata via engine (${asyncData.duration_ms}ms)`);
-                            return;
-                        }
-
-                        const job_id = asyncData.job_id;
+                        const { job_id } = await submitRes.json();
                         modal.update(`⏳ Job ${job_id.substring(0,8)}... in coda`);
 
                         // Poll every 2 seconds
@@ -4010,7 +3930,7 @@
                     });
                     if (!resp.ok) {
                         const err = await resp.json().catch(() => ({}));
-                        throw new Error(err.detail || 'Code generation failed');
+                        throw new Error(err.detail || i18n.t('common.failed'));
                     }
                     const blob = await resp.blob();
                     const url = URL.createObjectURL(blob);
@@ -4035,7 +3955,7 @@
                 
                 const confirm = window.confirm(
                     '🔄 REVERSE MAPPING\n\n' +
-                    'This will:\n' +
+                    '\n' +
                     '• Swap Input ↔ Output schemas\n' +
                     '• Reverse all connections\n' +
                     '• Invert transformations where possible\n\n' +
@@ -4068,7 +3988,7 @@
                     });
                     
                     if (!response.ok) {
-                        throw new Error('Reverse failed');
+                        throw new Error(i18n.t('common.failed'));
                     }
                     
                     const data = await response.json();
@@ -4316,7 +4236,7 @@
 
                     if (!response.ok) {
                         const error = await response.json();
-                        throw new Error(error.detail || 'Backend AI error');
+                        throw new Error(error.detail || i18n.t('common.error'));
                     }
 
                     // Parse SSE stream
@@ -4634,8 +4554,7 @@
                     billingStatus,
                     setShowBillingModal,
                     importEdiAsSchema,
-                    usageAlerts,
-                    executeTransformAsync
+                    usageAlerts
                 }),
                 
                 selectedConnection && React.createElement(PropertiesPanel, {
@@ -4789,7 +4708,7 @@
                                 React.createElement('div', { style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'8px',marginTop:'12px'} },
                                     React.createElement('div', { style:{background:'#f5f5f5',borderRadius:'8px',padding:'10px',textAlign:'center'} },
                                         React.createElement('div', { style:{fontSize:'18px',fontWeight:'700'} }, usage.codegen_count || 0),
-                                        React.createElement('div', { style:{fontSize:'11px',color:'#666'} }, 'Code gen')
+                                        React.createElement('div', { style:{fontSize:'11px',color:'#666'} }, i18n.t('account.code_gen')))
                                     ),
                                     React.createElement('div', { style:{background:'#f5f5f5',borderRadius:'8px',padding:'10px',textAlign:'center'} },
                                         React.createElement('div', { style:{fontSize:'18px',fontWeight:'700'} },
@@ -4797,7 +4716,7 @@
                                             usage.bytes_processed > 1024 ? `${(usage.bytes_processed/1024).toFixed(0)} KB` :
                                             `${usage.bytes_processed||0} B`
                                         ),
-                                        React.createElement('div', { style:{fontSize:'11px',color:'#666'} }, 'Dati processati')
+                                        React.createElement('div', { style:{fontSize:'11px',color:'#666'} }, i18n.t('account.bytes_processed')))
                                     )
                                 )
                             );
@@ -4834,8 +4753,8 @@
                                         });
                                         const d = await r.json();
                                         if(d.checkout_url) window.open(d.checkout_url,'_blank');
-                                        else alert(d.detail || 'Errore checkout');
-                                    } catch(e) { alert('Stripe non configurato su questo server'); }
+                                        else alert(d.detail || i18n.t('common.error'));
+                                    } catch(e) { alert(i18n.t('account.billing_unavailable')); }
                                 }
                             }, i18n.t('app.upgrade_pro')),
                             React.createElement('button', {
@@ -4849,8 +4768,8 @@
                                         });
                                         const d = await r.json();
                                         if(d.checkout_url) window.open(d.checkout_url,'_blank');
-                                        else alert(d.detail || 'Errore checkout');
-                                    } catch(e) { alert('Stripe non configurato su questo server'); }
+                                        else alert(d.detail || i18n.t('common.error'));
+                                    } catch(e) { alert(i18n.t('account.billing_unavailable')); }
                                 }
                             }, i18n.t('app.enterprise_plan'))
                         ),
@@ -4862,7 +4781,7 @@
                                     const r = await fetch(`${API_URL}/billing/portal`,{method:'POST',headers:{'Authorization':`Bearer ${token}`}});
                                     const d = await r.json();
                                     if(d.portal_url) window.open(d.portal_url,'_blank');
-                                } catch(e) { alert('Portale non disponibile'); }
+                                } catch(e) { alert(i18n.t('account.billing_unavailable')); }
                             }
                         }, i18n.t('app.manage_sub'))
                     )
@@ -4887,7 +4806,7 @@
                         ),
                         // Tabs
                         React.createElement('div',{style:{display:'flex',gap:'4px',marginBottom:'20px',background:'#0f1225',padding:'4px',borderRadius:'8px'}},
-                            [['providers','🔗 Login'],['password','🔒 Password'],['groups','📁 Gruppi'],['usage','📊 Consumo']].map(([tab,label]) =>
+                            [['providers','🔗 Login collegati'],['password','🔒 Password'],['usage','📊 Consumo']].map(([tab,label]) =>
                                 React.createElement('button',{key:tab,onClick:()=>setAccountTab(tab),
                                     style:{flex:1,padding:'8px',border:'none',borderRadius:'6px',cursor:'pointer',fontSize:'13px',fontWeight:'500',
                                            background:accountTab===tab?'#2563eb':'transparent',
@@ -4992,103 +4911,6 @@
                                     style:{padding:'10px',background:'#2563eb',border:'none',borderRadius:'6px',color:'#fff',fontSize:'14px',fontWeight:'600',cursor:'pointer'}
                                 },linkedProviders?.has_password?'🔒 Cambia password':'🔒 Imposta password')
                             )
-                        ),
-
-                        // ── TAB GROUPS ──
-                        accountTab==='groups' && React.createElement('div',null,
-                            // Load groups data when tab opens
-                            (() => {
-                                if (accountTab==='groups' && !groupsLoaded) {
-                                    setGroupsLoaded(true);
-                                    const tk = localStorage.getItem('buddyliko_token');
-                                    if (tk) {
-                                        fetch(`${API_URL}/users/me/groups`,{headers:{'Authorization':`Bearer ${tk}`}})
-                                            .then(r=>r.json()).then(d=>setMyGroups(d.groups||[])).catch(()=>{});
-                                        fetch(`${API_URL}/users/me/invitations`,{headers:{'Authorization':`Bearer ${tk}`}})
-                                            .then(r=>r.json()).then(d=>setPendingInvitations(d.invitations||[])).catch(()=>{});
-                                    }
-                                }
-                                return null;
-                            })(),
-                            // Pending invitations
-                            pendingInvitations.length > 0 && React.createElement('div',{
-                                style:{background:'#1e3a5f',border:'1px solid #2563eb44',borderRadius:'8px',padding:'12px',marginBottom:'16px'}
-                            },
-                                React.createElement('div',{style:{color:'#93c5fd',fontSize:'13px',fontWeight:'600',marginBottom:'8px'}},
-                                    `📨 ${pendingInvitations.length} invit${pendingInvitations.length===1?'o':'i'} in sospeso`),
-                                pendingInvitations.map(inv =>
-                                    React.createElement('div',{key:inv.id,
-                                        style:{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'8px',
-                                               background:'#0f1225',borderRadius:'6px',marginBottom:'4px'}},
-                                        React.createElement('span',{style:{color:'#e2e8f0',fontSize:'13px'}},`📁 ${inv.group_name}`),
-                                        React.createElement('button',{
-                                            onClick: async () => {
-                                                const tk=localStorage.getItem('buddyliko_token');
-                                                const r=await fetch(`${API_URL}/invitations/${inv.token}/accept`,
-                                                    {method:'POST',headers:{'Authorization':`Bearer ${tk}`}});
-                                                if(r.ok){
-                                                    showStatus('✅ Sei entrato nel gruppo!','success');
-                                                    setPendingInvitations(prev=>prev.filter(i=>i.id!==inv.id));
-                                                    // Reload groups
-                                                    fetch(`${API_URL}/users/me/groups`,{headers:{'Authorization':`Bearer ${tk}`}})
-                                                        .then(r=>r.json()).then(d=>setMyGroups(d.groups||[])).catch(()=>{});
-                                                } else { showStatus('❌ Errore','error'); }
-                                            },
-                                            style:{padding:'4px 12px',background:'#059669',border:'none',borderRadius:'6px',
-                                                   color:'#fff',fontSize:'12px',cursor:'pointer',fontWeight:'600'}
-                                        },'Accetta')
-                                    )
-                                )
-                            ),
-                            // My groups list
-                            React.createElement('div',{style:{marginBottom:'12px'}},
-                                myGroups.length === 0
-                                    ? React.createElement('p',{style:{color:'#64748b',textAlign:'center',padding:'20px'}},
-                                        'Non fai parte di nessun gruppo.')
-                                    : myGroups.map(g =>
-                                        React.createElement('div',{key:g.id,
-                                            style:{display:'flex',justifyContent:'space-between',alignItems:'center',
-                                                   padding:'12px',background:'#0f1225',borderRadius:'8px',
-                                                   border:'1px solid #2e3250',marginBottom:'6px'}},
-                                            React.createElement('div',null,
-                                                React.createElement('div',{style:{color:'#e2e8f0',fontWeight:'500',fontSize:'14px'}},
-                                                    '📁 '+g.name),
-                                                React.createElement('div',{style:{color:'#64748b',fontSize:'12px'}},
-                                                    (g.description||'Nessuna descrizione')+' · Ruolo: '+(g.member_role||'member'))
-                                            ),
-                                            g.member_role !== 'owner' && React.createElement('button',{
-                                                onClick: async () => {
-                                                    if(!confirm('Vuoi uscire dal gruppo "'+g.name+'"?')) return;
-                                                    const tk=localStorage.getItem('buddyliko_token');
-                                                    const me = JSON.parse(localStorage.getItem('buddyliko_user')||'{}')?.id || '';
-                                                    const r=await fetch(`${API_URL}/groups/${g.id}/members/${me}`,
-                                                        {method:'DELETE',headers:{'Authorization':`Bearer ${tk}`}});
-                                                    if(r.ok){
-                                                        showStatus('Uscito dal gruppo','success');
-                                                        setMyGroups(prev=>prev.filter(x=>x.id!==g.id));
-                                                    } else { showStatus('❌ Errore','error'); }
-                                                },
-                                                style:{padding:'6px 12px',background:'#7f1d1d',border:'1px solid #ef444433',
-                                                       color:'#fca5a5',borderRadius:'6px',cursor:'pointer',fontSize:'12px'}
-                                            },'Esci')
-                                        )
-                                    )
-                            ),
-                            // Refresh button
-                            React.createElement('button',{
-                                onClick: async () => {
-                                    const tk=localStorage.getItem('buddyliko_token');
-                                    const [gRes, iRes] = await Promise.all([
-                                        fetch(`${API_URL}/users/me/groups`,{headers:{'Authorization':`Bearer ${tk}`}}).then(r=>r.json()),
-                                        fetch(`${API_URL}/users/me/invitations`,{headers:{'Authorization':`Bearer ${tk}`}}).then(r=>r.json())
-                                    ]);
-                                    setMyGroups(gRes.groups||[]);
-                                    setPendingInvitations(iRes.invitations||[]);
-                                    showStatus('Aggiornato','success');
-                                },
-                                style:{padding:'8px',background:'#0f1225',border:'1px solid #2e3250',borderRadius:'6px',
-                                       color:'#94a3b8',fontSize:'13px',cursor:'pointer',width:'100%'}
-                            },'🔄 Aggiorna')
                         ),
 
                         // ── TAB USAGE ──
@@ -5318,6 +5140,16 @@
         
         function Sidebar({ inputSchema, outputSchema, connections, activeTab, setActiveTab, setShowUploadModal, setUploadDirection, downloadSampleCSV, exportFieldsCSV, statusMessage, setDraggedField, selectedConnection, setSelectedConnection, uploadExampleFile, inputExample, outputExample, loadAvailableSchemas, showStatus, availableInputSchemas, availableOutputSchemas, inputSchemaId, setInputSchemaId, outputSchemaId, setOutputSchemaId, exportDiagram, setShowAccountModal }) {
             return React.createElement('div', { className: 'sidebar' },
+                React.createElement('div', { className: 'sidebar-header' },
+                    React.createElement('img', {
+                        src: '/assets/logo-new.png',
+                        alt: 'Buddyliko',
+                        style: {
+                            width: '100%',
+                            display: 'block'
+                        }
+                    })
+                ),
                 React.createElement('div', { className: 'sidebar-content' },
                     statusMessage && React.createElement('div', { 
                         className: `status-message status-${statusMessage.type}` 
@@ -5326,11 +5158,11 @@
                         React.createElement('div', { 
                             className: `tab ${activeTab === 'input' ? 'active' : ''}`,
                             onClick: () => setActiveTab('input')
-                        }, '📥 Input'),
+                        }, i18n.t('app.input'))),
                         React.createElement('div', { 
                             className: `tab ${activeTab === 'output' ? 'active' : ''}`,
                             onClick: () => setActiveTab('output')
-                        }, '📤 Output'),
+                        }, i18n.t('app.output'))),
                         React.createElement('div', { 
                             className: `tab ${activeTab === 'connections' ? 'active' : ''}`,
                             onClick: () => setActiveTab('connections')
@@ -5338,11 +5170,11 @@
                         React.createElement('div', { 
                             className: `tab ${activeTab === 'schemas' ? 'active' : ''}`,
                             onClick: () => setActiveTab('schemas')
-                        }, '📋 Schemas')
+                        }, i18n.t('app.schemas')))
                     ),
                     activeTab === 'input' && React.createElement('div', null,
                         React.createElement('div', { style: { marginBottom: '10px' } },
-                            React.createElement('label', { style: { display: 'block', marginBottom: '5px', fontWeight: 'bold', fontSize: '13px' } }, '📋 Select Schema Type:'),
+                            React.createElement('label', { style: { display: 'block', marginBottom: '5px', fontWeight: 'bold', fontSize: '13px' } }, i18n.t('app.select_schema_type'))),
                             React.createElement('select', {
                                 id: 'inputSchemaTypeSelect',
                                 className: 'schema-type-select',
@@ -5350,7 +5182,7 @@
                                 value: inputSchemaId,
                                 onChange: (e) => setInputSchemaId(e.target.value)
                             },
-                                React.createElement('option', { value: '' }, '-- Select schema type --'),
+                                React.createElement('option', { value: '' }, i18n.t('app.select_schema'))),
                                 availableInputSchemas.map(schema => 
                                     React.createElement('option', { 
                                         key: schema.name, 
@@ -5365,7 +5197,7 @@
                                 setUploadDirection('input');
                                 setShowUploadModal(true);
                             }
-                        }, '📤 Upload Input Schema'),
+                        }, i18n.t('app.upload_input'))),
                         React.createElement('label', {
                             className: 'btn btn-secondary btn-full',
                             style: { cursor: 'pointer' }
@@ -5385,13 +5217,13 @@
                         inputSchema ? React.createElement('div', { style: { fontSize: '12px', color: '#666', marginBottom: '10px' } },
                             `${inputSchema.field_count} fields - Drag to canvas`
                         ) : React.createElement('div', { className: 'empty-state' },
-                            React.createElement('div', { style: { fontSize: '28px' } }, '📋'),
-                            React.createElement('p', { style: { fontSize: '12px', margin: '4px 0 0' } }, 'Upload CSV schema')
+                            React.createElement('div', { style: { fontSize: '48px' } }, '📋'),
+                            React.createElement('p', null, i18n.t('app.upload_csv_schema'))
                         )
                     ),
                     activeTab === 'output' && React.createElement('div', null,
                         React.createElement('div', { style: { marginBottom: '10px' } },
-                            React.createElement('label', { style: { display: 'block', marginBottom: '5px', fontWeight: 'bold', fontSize: '13px' } }, '📋 Select Schema Type:'),
+                            React.createElement('label', { style: { display: 'block', marginBottom: '5px', fontWeight: 'bold', fontSize: '13px' } }, i18n.t('app.select_schema_type'))),
                             React.createElement('select', {
                                 id: 'outputSchemaTypeSelect',
                                 className: 'schema-type-select',
@@ -5399,7 +5231,7 @@
                                 value: outputSchemaId,
                                 onChange: (e) => setOutputSchemaId(e.target.value)
                             },
-                                React.createElement('option', { value: '' }, '-- Select schema type --'),
+                                React.createElement('option', { value: '' }, i18n.t('app.select_schema'))),
                                 availableOutputSchemas.map(schema => 
                                     React.createElement('option', { 
                                         key: schema.name, 
@@ -5414,7 +5246,7 @@
                                 setUploadDirection('output');
                                 setShowUploadModal(true);
                             }
-                        }, '📤 Upload Output Schema'),
+                        }, i18n.t('app.upload_output'))),
                         React.createElement('label', {
                             className: 'btn btn-secondary btn-full',
                             style: { cursor: 'pointer' }
@@ -5434,8 +5266,8 @@
                         outputSchema ? React.createElement('div', { style: { fontSize: '12px', color: '#666', marginBottom: '10px' } },
                             `${outputSchema.field_count} fields - Drag to canvas`
                         ) : React.createElement('div', { className: 'empty-state' },
-                            React.createElement('div', { style: { fontSize: '28px' } }, '📋'),
-                            React.createElement('p', { style: { fontSize: '12px', margin: '4px 0 0' } }, 'Upload CSV schema')
+                            React.createElement('div', { style: { fontSize: '48px' } }, '📋'),
+                            React.createElement('p', null, i18n.t('app.upload_csv_schema'))
                         )
                     ),
                     activeTab === 'connections' && React.createElement('div', {
@@ -5452,7 +5284,7 @@
                         })
                     ),
                     activeTab === 'schemas' && React.createElement('div', { style: { padding: '10px' } },
-                        React.createElement('h3', { style: { marginBottom: '15px', fontSize: '16px' } }, '📋 Schema Management'),
+                        React.createElement('h3', { style: { marginBottom: '15px', fontSize: '16px' } }, i18n.t('app.schema_mgmt'))),
                         React.createElement('p', { style: { fontSize: '13px', color: '#666', marginBottom: '15px' } }, 
                             'Upload a ZIP file containing schema.xsd and rules.sch. The schema will be added to both input/ and output/ directories.'
                         ),
@@ -5482,7 +5314,7 @@
                                         
                                         if (!res.ok) {
                                             const error = await res.json();
-                                            throw new Error(error.detail || 'Upload failed');
+                                            throw new Error(error.detail || i18n.t('common.failed'));
                                         }
                                         
                                         const data = await res.json();
@@ -5501,7 +5333,7 @@
                             })
                         ),
                         React.createElement('div', { style: { marginTop: '20px', padding: '10px', background: '#f0f0f0', borderRadius: '6px', fontSize: '12px' } },
-                            React.createElement('strong', null, 'ZIP Structure:'),
+                            React.createElement('strong', null, i18n.t('app.zip_structure')),
                             React.createElement('pre', { style: { margin: '5px 0', fontFamily: 'monospace', fontSize: '11px' } },
                                 `schema_name/\n  ├── schema.xsd (required)\n  └── rules.sch (optional)`
                             )
@@ -5510,14 +5342,87 @@
                             className: 'btn btn-secondary btn-full',
                             style: { marginTop: '10px' },
                             onClick: loadAvailableSchemas
-                        }, '🔄 Refresh Schema List')
+                        }, i18n.t('app.refresh_schemas')))
                     )
                 ),
-                null // [009] sidebar footer removed — user info in topbar
+                React.createElement('div', { className: 'sidebar-footer' },
+                    React.createElement('div', { className: 'user-info' },
+                        React.createElement('div', { className: 'user-avatar' },
+                            (localStorage.getItem('buddyliko_user') ? 
+                                JSON.parse(localStorage.getItem('buddyliko_user')).name?.charAt(0).toUpperCase() : 
+                                'U')
+                        ),
+                        React.createElement('div', { className: 'user-details' },
+                            React.createElement('div', { className: 'user-name' },
+                                (localStorage.getItem('buddyliko_user') ? 
+                                    JSON.parse(localStorage.getItem('buddyliko_user')).name || 'User' : 
+                                    i18n.t('common.none'))
+                            ),
+                            React.createElement('div', { className: 'user-email' },
+                                (localStorage.getItem('buddyliko_user') ? 
+                                    JSON.parse(localStorage.getItem('buddyliko_user')).email || '' : 
+                                    i18n.t('common.none'))
+                            )
+                        )
+                    ),
+                    React.createElement('div', { id: 'app-lang-switcher', style: { marginBottom: '8px' } }),
+                    localStorage.getItem('buddyliko_token') && React.createElement(React.Fragment, null,
+                        React.createElement('button', {
+                            style: {
+                                marginRight: '8px',
+                                background: '#22263a',
+                                border: '1px solid #2e3250',
+                                color: '#94a3b8',
+                                borderRadius: '6px',
+                                padding: '6px 12px',
+                                cursor: 'pointer',
+                                fontSize: '12px',
+                                fontFamily: 'inherit'
+                            },
+                            onClick: () => { window.location.href = 'workspace.html'; }
+                        }, i18n.t('app.workspace')),
+                        React.createElement('button', {
+                            style: {
+                                marginRight: '8px',
+                                background: '#22263a',
+                                border: '1px solid #2e3250',
+                                color: '#94a3b8',
+                                borderRadius: '6px',
+                                padding: '6px 12px',
+                                cursor: 'pointer',
+                                fontSize: '12px',
+                                fontFamily: 'inherit'
+                            },
+                            onClick: () => setShowAccountModal(true)
+                        }, i18n.t('app.account')),
+                        React.createElement('button', {
+                            style: {
+                                marginRight: '8px',
+                                background: '#1e3a5f',
+                                border: '1px solid #2563eb44',
+                                color: '#93c5fd',
+                                borderRadius: '6px',
+                                padding: '6px 12px',
+                                cursor: 'pointer',
+                                fontSize: '12px',
+                                fontFamily: 'inherit'
+                            },
+                            onClick: () => { window.location.href = 'account.html'; }
+                        }, i18n.t('app.subscription')),
+                        React.createElement('button', {
+                            className: 'btn-logout',
+                            onClick: () => {
+                                if (confirm(i18n.t('app.confirm_logout'))) {
+                                    logout();
+                                }
+                            }
+                        }, i18n.t('app.logout'))
+                    )
+                )
             );
         }
         
-        function MainCanvas({ inputSchema, outputSchema, connections, draggedField, setDraggedField, addConnection, mappingName, setMappingName, saveMapping, canvasRef, fieldPositions, updateFieldPositions, selectedConnection, setSelectedConnection, saveSessionToBackend, clearSession, sessionLoaded, inputExample, outputExample, hoverPopup, setHoverPopup, hoverTimeoutRef, setShowFormulaEditor, setEditingConnection, runAIAutoMap, runBusinessRulesAutomap, aiProcessing, setShowSettings, searchQuery, setSearchQuery, performSearch, nextSearchResult, searchResults, currentSearchIndex, saveProject, loadProject, reverseMapping, setPopupPinned, popupPinned, setShowSchemaEditor, hideConnected, setHideConnected, onOpenNodeImport, onFieldContextMenu, onEditNode, onDeleteNode, exportDiagram, aiWorkLog, setShowAiWork, generateCode, dbConnections, setShowDbConnPanel, billingStatus, setShowBillingModal, importEdiAsSchema, usageAlerts, executeTransformAsync }) {
+        function MainCanvas({ inputSchema, outputSchema, connections, draggedField, setDraggedField, addConnection, mappingName, setMappingName, saveMapping, canvasRef, fieldPositions, updateFieldPositions, selectedConnection, setSelectedConnection, saveSessionToBackend, clearSession, sessionLoaded, inputExample, outputExample, hoverPopup, setHoverPopup, hoverTimeoutRef, setShowFormulaEditor, setEditingConnection, runAIAutoMap, runBusinessRulesAutomap, aiProcessing, setShowSettings, searchQuery, setSearchQuery, performSearch, nextSearchResult, searchResults, currentSearchIndex, saveProject, loadProject, reverseMapping, setPopupPinned, popupPinned, setShowSchemaEditor, hideConnected, setHideConnected, onOpenNodeImport, onFieldContextMenu, onEditNode, onDeleteNode, exportDiagram, aiWorkLog, setShowAiWork, generateCode, dbConnections, setShowDbConnPanel, billingStatus, setShowBillingModal, importEdiAsSchema, usageAlerts }) {
             const [dropTarget, setDropTarget] = useState(null);
             
             const handleDrop = (targetField, targetType) => {
@@ -5553,7 +5458,7 @@
                             onClick: performSearch,
                             disabled: !searchQuery.trim(),
                             title: 'Search for fields matching pattern'
-                        }, '🔍 Search'),
+                        }, i18n.t('app.search'))),
                         React.createElement('button', {
                             className: 'btn btn-secondary',
                             onClick: nextSearchResult,
@@ -5571,19 +5476,19 @@
                     React.createElement('button', {
                         className: 'btn btn-success',
                         onClick: saveMapping
-                    }, '💾 Save Mapping'),
+                    }, i18n.t('app.save_mapping'))),
                     React.createElement('button', {
                         className: 'btn btn-secondary',
                         onClick: () => window.exportMappingCSV?.(),
                         disabled: connections.length === 0,
                         title: 'Export mapping as CSV'
-                    }, '📊 Export CSV'),
+                    }, i18n.t('app.export_csv_schema'))),
                     React.createElement('button', {
                         className: 'btn btn-secondary',
                         onClick: () => window.exportMappingJSON?.(),
                         disabled: connections.length === 0,
                         title: 'Export mapping as JSON'
-                    }, '📄 Export JSON'),
+                    }, i18n.t('app.export_json'))),
                     React.createElement('button', {
                         className: 'btn btn-secondary',
                         onClick: exportDiagram,
@@ -5604,25 +5509,25 @@
                         onClick: saveProject,
                         disabled: !inputSchema || !outputSchema,
                         title: 'Save complete project (schemas + examples + mappings) — name not required'
-                    }, '📦 Save Project'),
+                    }, i18n.t('app.save_project'))),
                     React.createElement('button', {
                         className: 'btn btn-primary',
                         onClick: loadProject,
                         title: 'Load project from file'
-                    }, '📂 Load Project'),
+                    }, i18n.t('app.load_project'))),
                     React.createElement('button', {
                         className: 'btn btn-warning',
                         onClick: generateCode,
                         disabled: !inputSchema || !outputSchema || connections.length === 0,
                         title: 'Generate optimized Python + C# code from this mapping',
                         style: { background: '#7c3aed', borderColor: '#7c3aed', color: 'white' }
-                    }, '⚡ Generate Code'),
+                    }, i18n.t('app.generate_code'))),
                     React.createElement('button', {
                         className: 'btn btn-danger',
                         onClick: reverseMapping,
                         disabled: !inputSchema || !outputSchema || connections.length === 0,
                         title: 'Reverse mapping: Swap input↔output and invert transformations'
-                    }, '🔄 Reverse'),
+                    }, i18n.t('app.reverse'))),
                     React.createElement('button', {
                         className: `btn ${hideConnected ? 'btn-success' : 'btn-secondary'}`,
                         onClick: () => setHideConnected(!hideConnected),
@@ -5634,7 +5539,7 @@
                         onClick: () => executeTransformAsync(),
                         disabled: !inputSchema || !outputSchema || connections.length === 0,
                         title: 'Execute transformation — async with progress polling, auto-downloads result'
-                    }, '🔄 Execute Transform'),
+                    }, i18n.t('app.execute_transform'))),
                     React.createElement('button', {
                         className: 'btn btn-primary',
                         onClick: runAIAutoMap,
@@ -5659,34 +5564,38 @@
                         onClick: runBusinessRulesAutomap,
                         disabled: !inputSchema || !outputSchema,
                         title: 'Automatically match fields with identical business terms'
-                    }, '📋 Business Rules'),
+                    }, i18n.t('app.business_rules'))),
                     React.createElement('button', {
                         className: 'btn btn-primary',
                         onClick: () => setShowSchemaEditor(true),
                         title: 'Visual schema structure builder'
-                    }, '🏗️ Schema Editor'),
-                    // [009] Settings button removed
+                    }, i18n.t('app.schema_editor'))),
+                    React.createElement('button', {
+                        className: 'btn btn-secondary',
+                        onClick: () => setShowSettings(true),
+                        title: 'Configure AI API keys'
+                    }, i18n.t('app.settings'))),
                     React.createElement('button', {
                         className: 'btn btn-primary',
                         onClick: saveSessionToBackend,
                         title: 'Save current session to server'
-                    }, '💾 Save Session'),
+                    }, i18n.t('app.save_session'))),
                     React.createElement('button', {
                         className: 'btn btn-secondary',
                         onClick: clearSession,
                         title: 'Clear all and start fresh'
-                    }, '🗑️ Clear Session'),
+                    }, i18n.t('app.clear_session'))),
                     // EDI / HL7 import buttons
                     React.createElement('button', {
                         className: 'btn btn-secondary',
                         onClick: () => importEdiAsSchema('input'),
                         title: 'Import EDI X12 / EDIFACT / HL7 v2 / FHIR as input schema'
-                    }, '📡 EDI/HL7 Input'),
+                    }, i18n.t('app.edi_input'))),
                     React.createElement('button', {
                         className: 'btn btn-secondary',
                         onClick: () => importEdiAsSchema('output'),
                         title: 'Import EDI X12 / EDIFACT / HL7 v2 / FHIR as output schema'
-                    }, '📡 EDI/HL7 Output'),
+                    }, i18n.t('app.edi_output'))),
                     // DB Connector
                     React.createElement('button', {
                         className: 'btn btn-secondary',
@@ -5697,7 +5606,7 @@
                         `${connections.length} connection(s)`,
                         sessionLoaded && React.createElement('span', {
                             style: { marginLeft: '10px', fontSize: '11px', color: '#4caf50' }
-                        }, '● Auto-save active'),
+                        }, i18n.t('app.autosave'))),
                         // Billing usage indicator
                         billingStatus && React.createElement('span', {
                             style: {
@@ -5916,9 +5825,9 @@
                         )
                     ),
                     (!inputSchema || !outputSchema) && React.createElement('div', { className: 'empty-state' },
-                        React.createElement('div', { style: { fontSize: '36px' } }, '📊'),
-                        React.createElement('h3', { style: { fontSize: '14px', margin: '8px 0 4px' } }, 'Upload Schemas to Start'),
-                        React.createElement('p', { style: { fontSize: '12px' } }, 'Upload input & output CSV schemas, then drag to connect')
+                        React.createElement('div', { style: { fontSize: '64px' } }, '📊'),
+                        React.createElement('h3', null, 'Upload Schemas to Start'),
+                        React.createElement('p', null, i18n.t('app.upload_subtitle'))
                     )
                 )
             );
@@ -7164,8 +7073,8 @@
         function ConnectionsList({ connections, selectedConnection, setSelectedConnection }) {
             if (connections.length === 0) {
                 return React.createElement('div', { className: 'empty-state' },
-                    React.createElement('p', null, 'No connections yet'),
-                    React.createElement('small', null, 'Drag input fields to output fields')
+                    React.createElement('p', null, i18n.t('app.no_connections')),
+                    React.createElement('small', null, i18n.t('app.drag_hint'))
                 );
             }
             
@@ -7217,7 +7126,7 @@
 
             const t = (transType || '').toUpperCase();
 
-            if (t === 'DIRECT') return React.createElement('div', { style: { fontSize: '12px', color: '#888', padding: '8px 0' } }, '→ Nessun parametro: il valore viene copiato così com\'è.');
+            if (t === 'DIRECT') return React.createElement('div', { style: { fontSize: '12px', color: '#888', padding: '8px 0' } }, i18n.t('app.no_params'))è.');
 
             if (t === 'CONCAT') return React.createElement('div', null,
                 hint('Unisce più valori. Trascina più campi sorgente sulla stessa destinazione per abilitare il multi-source.'),
@@ -7383,7 +7292,7 @@
                 : STATIC_FORMULAS;
 
             return React.createElement('div', { className: 'properties-panel' },
-                React.createElement('h3', { style: { marginBottom: '16px' } }, '⚙️ Connection Properties'),
+                React.createElement('h3', { style: { marginBottom: '16px' } }, i18n.t('app.conn_properties'))),
 
                 // Source / Target
                 React.createElement('div', { className: 'form-group' },
@@ -7397,7 +7306,7 @@
 
                 // Formula selector
                 React.createElement('div', { className: 'form-group' },
-                    React.createElement('label', null, 'Transformation Rule:'),
+                    React.createElement('label', null, i18n.t('app.transformation')),
                     React.createElement('select', {
                         value: transType,
                         onChange: e => handleTypeChange(e.target.value),
@@ -7420,8 +7329,8 @@
 
                 // Delete / Close
                 React.createElement('div', { style: { display: 'flex', gap: '10px', marginTop: '24px' } },
-                    React.createElement('button', { className: 'btn btn-danger', style: { flex: 1 }, onClick: () => deleteConnection(connection.id) }, '🗑️ Delete'),
-                    React.createElement('button', { className: 'btn btn-secondary', style: { flex: 1 }, onClick: () => setSelectedConnection(null) }, '✕ Close')
+                    React.createElement('button', { className: 'btn btn-danger', style: { flex: 1 }, onClick: () => deleteConnection(connection.id) }, i18n.t('app.delete'))),
+                    React.createElement('button', { className: 'btn btn-secondary', style: { flex: 1 }, onClick: () => setSelectedConnection(null) }, i18n.t('app.close')))
                 )
             );
         }
@@ -7464,9 +7373,9 @@
                             value: type,
                             onChange: (e) => setType(e.target.value)
                         },
-                            React.createElement('option', { value: 'csv' }, '📊 CSV (Recommended)'),
-                            React.createElement('option', { value: 'xsd' }, '📄 XSD'),
-                            React.createElement('option', { value: 'idoc' }, '📊 IDOC')
+                            React.createElement('option', { value: 'csv' }, i18n.t('app.csv_recommended'))),
+                            React.createElement('option', { value: 'xsd' }, i18n.t('app.xsd'))),
+                            React.createElement('option', { value: 'idoc' }, i18n.t('app.idoc')))
                         )
                     ),
                     React.createElement('div', {
@@ -7496,12 +7405,12 @@
                         })
                     ),
                     React.createElement('div', { style: { display: 'flex', gap: '10px', marginTop: '20px', justifyContent: 'flex-end' } },
-                        React.createElement('button', { className: 'btn btn-secondary', onClick: onClose }, 'Cancel'),
+                        React.createElement('button', { className: 'btn btn-secondary', onClick: onClose }, i18n.t('app.cancel'))),
                         React.createElement('button', {
                             className: 'btn btn-primary',
                             onClick: () => file && onUpload(file, direction, type),
                             disabled: !file
-                        }, 'Upload')
+                        }, i18n.t('workspace.upload')))
                     )
                 )
             );
@@ -7509,11 +7418,22 @@
         
         // Init i18n before rendering
         i18n.init().then(() => {
+            // Create lang switcher helper
+            window.T = (key, rep) => i18n.t(key, rep);
+            // langchange listener for re-render
+            window.addEventListener('langchange', () => {
+                // Force React re-render by dispatching state change
+                if (window.__buddylikoForceUpdate) window.__buddylikoForceUpdate();
+            });
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(React.createElement(App));
+        // Create lang switcher after React renders
+        setTimeout(() => {
+            const el = document.getElementById('app-lang-switcher');
+            if (el) i18n.createSwitcher('app-lang-switcher');
+        }, 100);
         }); // end i18n.init()
     </script>
-<script src="/assets/topbar.js"></script>
 <script src="/assets/theme.js"></script>
 </body>
 </html>

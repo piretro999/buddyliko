@@ -1,0 +1,1603 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Buddyliko — Finance</title>
+<link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png">
+<script src="/lang/i18n.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap');
+
+  :root {
+    --bg:        #070b18;
+    --surface:   #0e1425;
+    --surface2:  #141928;
+    --border:    #1e2640;
+    --border2:   #2a3358;
+    --text:      #e2e8f0;
+    --muted:     #64748b;
+    --muted2:    #94a3b8;
+    --green:     #10b981;
+    --green-d:   #064e3b;
+    --blue:      #3b82f6;
+    --blue-d:    #1e3a5f;
+    --amber:     #f59e0b;
+    --amber-d:   #451a03;
+    --red:       #ef4444;
+    --red-d:     #450a0a;
+    --purple:    #8b5cf6;
+    --cyan:      #06b6d4;
+    --font-mono: 'IBM Plex Mono', monospace;
+    --font-sans: 'IBM Plex Sans', sans-serif;
+    --radius:    8px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    min-height: 100vh;
+  }
+
+  /* ── TOPBAR ── */
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 28px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; z-index: 100;
+  }
+  .topbar-logo {
+    font-family: var(--font-mono);
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: -0.3px;
+  }
+  .topbar-logo span { color: var(--blue); }
+  .topbar-nav { display: flex; gap: 4px; }
+  .tab-btn {
+    padding: 7px 16px;
+    border: none;
+    border-radius: var(--radius);
+    background: transparent;
+    color: var(--muted2);
+    cursor: pointer;
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 500;
+    transition: all .15s;
+  }
+  .tab-btn:hover { background: var(--surface2); color: var(--text); }
+  .tab-btn.active { background: var(--blue); color: #fff; }
+  .topbar-actions { display: flex; gap: 10px; align-items: center; }
+  .btn {
+    padding: 7px 14px;
+    border: 1px solid var(--border2);
+    border-radius: var(--radius);
+    background: var(--surface2);
+    color: var(--muted2);
+    cursor: pointer;
+    font-family: var(--font-sans);
+    font-size: 12px;
+    font-weight: 500;
+    transition: all .15s;
+    white-space: nowrap;
+  }
+  .btn:hover { border-color: var(--blue); color: var(--text); }
+  .btn-primary { background: var(--blue); border-color: var(--blue); color: #fff; }
+  .btn-primary:hover { background: #2563eb; }
+  .notif-badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 20px; height: 20px;
+    background: var(--red); border-radius: 50%;
+    font-size: 11px; font-weight: 700; color: #fff;
+  }
+
+  /* ── LAYOUT ── */
+  .main { padding: 28px; max-width: 1600px; margin: 0 auto; }
+  .tab-pane { display: none; }
+  .tab-pane.active { display: block; }
+
+  /* ── KPI ROW ── */
+  .kpi-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 14px;
+    margin-bottom: 28px;
+  }
+  .kpi-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 20px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color .2s;
+  }
+  .kpi-card:hover { border-color: var(--border2); }
+  .kpi-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  }
+  .kpi-card.green::before { background: var(--green); }
+  .kpi-card.blue::before  { background: var(--blue); }
+  .kpi-card.amber::before { background: var(--amber); }
+  .kpi-card.purple::before{ background: var(--purple); }
+  .kpi-card.cyan::before  { background: var(--cyan); }
+  .kpi-card.red::before   { background: var(--red); }
+  .kpi-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .kpi-value {
+    font-family: var(--font-mono);
+    font-size: 26px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .kpi-sub {
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .kpi-delta {
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .kpi-delta.pos { color: var(--green); }
+  .kpi-delta.neg { color: var(--red); }
+
+  /* ── CHARTS GRID ── */
+  .charts-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 18px;
+    margin-bottom: 28px;
+  }
+  .charts-grid-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 18px;
+    margin-bottom: 28px;
+  }
+  .chart-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+  }
+  .chart-title {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .chart-wrap { position: relative; }
+
+  /* ── TABLES ── */
+  .section-title {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--muted);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .table-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+  table { width: 100%; border-collapse: collapse; }
+  th {
+    padding: 10px 14px;
+    text-align: left;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--muted);
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    color: var(--muted2);
+    font-size: 13px;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--surface2); }
+
+  /* ── PLAN BADGE ── */
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    font-family: var(--font-mono);
+  }
+  .badge-free       { background: #1e293b; color: #64748b; }
+  .badge-pro        { background: #1e3a5f; color: #60a5fa; }
+  .badge-enterprise { background: #2e1065; color: #a78bfa; }
+  .badge-custom     { background: #064e3b; color: #34d399; }
+  .badge-ok         { background: #064e3b; color: var(--green); }
+  .badge-warn       { background: #451a03; color: var(--amber); }
+  .badge-crit       { background: #450a0a; color: var(--red); }
+
+  /* ── MARGIN BAR ── */
+  .margin-bar-wrap { display: flex; align-items: center; gap: 8px; }
+  .margin-bar {
+    flex: 1; height: 4px; background: var(--border);
+    border-radius: 2px; overflow: hidden;
+  }
+  .margin-bar-fill { height: 100%; border-radius: 2px; transition: width .3s; }
+
+  /* ── GAUGE ── */
+  .gauge-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
+  }
+  .gauge-value {
+    font-family: var(--font-mono);
+    font-size: 32px;
+    font-weight: 600;
+    margin-top: 8px;
+  }
+  .gauge-label { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+  /* ── FORM ── */
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+  .form-group label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--muted);
+  }
+  .form-group input, .form-group select, .form-group textarea {
+    padding: 9px 12px;
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    transition: border-color .15s;
+  }
+  .form-group input:focus, .form-group select:focus {
+    outline: none;
+    border-color: var(--blue);
+  }
+  .form-group select option { background: var(--surface2); }
+
+  /* ── ALERT LIST ── */
+  .notif-item {
+    display: flex;
+    gap: 14px;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+    transition: background .15s;
+    cursor: pointer;
+  }
+  .notif-item:hover { background: var(--surface2); }
+  .notif-item:last-child { border-bottom: none; }
+  .notif-item.unread .notif-title { color: var(--text); font-weight: 600; }
+  .notif-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    flex-shrink: 0; margin-top: 4px;
+  }
+  .notif-dot.info { background: var(--blue); }
+  .notif-dot.warning { background: var(--amber); }
+  .notif-dot.critical { background: var(--red); box-shadow: 0 0 6px var(--red); }
+  .notif-body { flex: 1; }
+  .notif-title { font-size: 13px; color: var(--muted2); margin-bottom: 2px; }
+  .notif-msg { font-size: 12px; color: var(--muted); line-height: 1.4; }
+  .notif-time { font-size: 11px; color: var(--muted); margin-top: 4px; font-family: var(--font-mono); }
+
+  /* ── AI BUDGET ── */
+  .ai-provider-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .provider-header { display: flex; justify-content: space-between; align-items: center; }
+  .provider-name { font-family: var(--font-mono); font-size: 13px; font-weight: 600; }
+  .progress-bar-wrap { }
+  .progress-label {
+    display: flex; justify-content: space-between;
+    font-size: 11px; color: var(--muted); margin-bottom: 6px;
+  }
+  .progress-bar {
+    height: 8px; background: var(--border);
+    border-radius: 4px; overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%; border-radius: 4px;
+    transition: width .5s ease;
+  }
+  .budget-stats { display: flex; gap: 20px; }
+  .budget-stat { }
+  .budget-stat-label { font-size: 10px; color: var(--muted); font-family: var(--font-mono); text-transform: uppercase; letter-spacing: .5px; }
+  .budget-stat-value { font-family: var(--font-mono); font-size: 15px; font-weight: 600; color: var(--text); margin-top: 2px; }
+  .days-left-critical { color: var(--red) !important; animation: pulse 2s infinite; }
+  .days-left-warning  { color: var(--amber) !important; }
+  .days-left-ok       { color: var(--green) !important; }
+  @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:.5; } }
+
+  /* ── SCATTER LEGEND ── */
+  .scatter-legend { display: flex; gap: 14px; font-size: 11px; color: var(--muted); flex-wrap: wrap; }
+  .legend-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 4px; }
+
+  /* ── LOADING / EMPTY ── */
+  .loading {
+    text-align: center; padding: 40px;
+    color: var(--muted); font-family: var(--font-mono); font-size: 12px;
+  }
+  .loading::after { content: '...'; animation: dots 1.5s infinite; }
+  @keyframes dots { 0%,100% { content: '.'; } 33% { content: '..'; } 66% { content: '...'; } }
+  .empty { text-align: center; padding: 40px; color: var(--muted); font-size: 13px; }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,.75);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 1000; padding: 20px;
+  }
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: 12px;
+    padding: 28px;
+    width: 100%; max-width: 520px;
+    max-height: 85vh; overflow-y: auto;
+  }
+  .modal-title {
+    font-family: var(--font-mono);
+    font-size: 14px; font-weight: 600;
+    color: var(--text);
+    margin-bottom: 20px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .modal-close {
+    background: none; border: none; color: var(--muted); font-size: 20px;
+    cursor: pointer; line-height: 1; padding: 0;
+  }
+
+  /* ── PERIOD SELECTOR ── */
+  .period-sel {
+    display: flex; gap: 4px; align-items: center;
+  }
+  .period-btn {
+    padding: 4px 10px; border: 1px solid var(--border2);
+    border-radius: 6px; background: transparent;
+    color: var(--muted); font-size: 11px; cursor: pointer;
+    font-family: var(--font-mono); transition: all .15s;
+  }
+  .period-btn.active, .period-btn:hover {
+    background: var(--blue-d); border-color: var(--blue);
+    color: #93c5fd;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    .charts-grid, .charts-grid-3 { grid-template-columns: 1fr; }
+    .kpi-row { grid-template-columns: repeat(2, 1fr); }
+    .form-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-logo">buddy<span>liko</span> / finance</div>
+  <nav class="topbar-nav">
+    <button class="tab-btn active" onclick="showTab('overview')"><span data-i18n="finance.overview">📊 Overview</span></button>
+    <button class="tab-btn" onclick="showTab('profitability')"><span data-i18n="finance.profitability">💹 Redditività</span></button>
+    <button class="tab-btn" onclick="showTab('ai-budget')"><span data-i18n="finance.ai_credit">🤖 Credito AI</span></button>
+    <button class="tab-btn" onclick="showTab('pricing')"><span data-i18n="finance.pricing_tab">🏷️ Pricing</span></button>
+    <button class="tab-btn" onclick="showTab('alerts')" data-i18n="finance.alert_tab">🔔 Alert <span id="alertBadge" class="notif-badge" style="display:none">0</span></button>
+  </nav>
+  <div class="topbar-actions">
+    <span id="lang-switcher" style="margin-right:8px"></span>
+    <div class="period-sel">
+      <span style="font-size:11px;color:var(--muted);font-family:var(--font-mono)" data-i18n="finance.period">PERIODO</span>
+      <button class="period-btn" onclick="setPeriod(1)">1M</button>
+      <button class="period-btn active" onclick="setPeriod(3)">3M</button>
+      <button class="period-btn" onclick="setPeriod(6)">6M</button>
+      <button class="period-btn" onclick="setPeriod(12)">12M</button>
+    </div>
+    <button class="btn" onclick="refreshAll()"><span data-i18n="finance.refresh">↻ Aggiorna</span></button>
+    <button class="btn" onclick="window.location.href='admin.html'"><span data-i18n="finance.back_admin">← Admin</span></button>
+  </div>
+</div>
+
+<div class="main">
+
+<!-- ══ TAB: OVERVIEW ══════════════════════════════════════════════════════ -->
+<div id="tab-overview" class="tab-pane active">
+
+  <!-- KPI Row -->
+  <div id="kpiRow" class="kpi-row">
+    <div class="kpi-card green">
+      <div class="kpi-label" data-i18n="finance.mrr">MRR</div>
+      <div class="kpi-value" id="kpiMRR">—</div>
+      <div class="kpi-sub" data-i18n="finance.mrr_full">Monthly Recurring Revenue</div>
+    </div>
+    <div class="kpi-card blue">
+      <div class="kpi-label" data-i18n="finance.arr">ARR</div>
+      <div class="kpi-value" id="kpiARR">—</div>
+      <div class="kpi-sub" data-i18n="finance.arr_full">Annual Run Rate</div>
+    </div>
+    <div class="kpi-card cyan">
+      <div class="kpi-label" data-i18n="finance.arpu">ARPU</div>
+      <div class="kpi-value" id="kpiARPU">—</div>
+      <div class="kpi-sub" data-i18n="finance.arpu_desc">Per utente pagante/mese</div>
+    </div>
+    <div class="kpi-card amber">
+      <div class="kpi-label" data-i18n="finance.gross_margin">Margine Lordo</div>
+      <div class="kpi-value" id="kpiMargin">—</div>
+      <div class="kpi-sub" id="kpiMarginPct">—</div>
+    </div>
+    <div class="kpi-card purple">
+      <div class="kpi-label" data-i18n="finance.paying_users">Utenti Paganti</div>
+      <div class="kpi-value" id="kpiPaidUsers">—</div>
+      <div class="kpi-sub" id="kpiFreeUsers">—</div>
+    </div>
+    <div class="kpi-card red">
+      <div class="kpi-label" data-i18n="finance.not_profitable">Non Profittevoli</div>
+      <div class="kpi-value" id="kpiUnprofitable">—</div>
+      <div class="kpi-sub" data-i18n="finance.unprofitable">Utenti paganti in perdita</div>
+    </div>
+  </div>
+
+  <!-- Charts Row -->
+  <div class="charts-grid">
+    <div class="chart-card">
+      <div class="chart-title">
+        <span data-i18n="finance.mrr_trend">Trend MRR</span>
+        <span style="color:var(--green);font-family:var(--font-mono)" id="mrrTrend">—</span>
+      </div>
+      <div class="chart-wrap" style="height:220px">
+        <canvas id="chartMRR"></canvas>
+      </div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title"><span data-i18n="finance.plan_distribution">Distribuzione Piani</span></div>
+      <div class="chart-wrap" style="height:220px">
+        <canvas id="chartPlans"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="charts-grid-3">
+    <div class="chart-card">
+      <div class="chart-title"><span data-i18n="finance.revenue_vs_cost">Revenue vs Costo</span></div>
+      <div class="chart-wrap" style="height:180px">
+        <canvas id="chartRevCost"></canvas>
+      </div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title"><span data-i18n="finance.ops_total">Operazioni Totali</span></div>
+      <div class="chart-wrap" style="height:180px">
+        <canvas id="chartOps"></canvas>
+      </div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title"><span data-i18n="finance.usage_by_type">Uso per Tipo</span></div>
+      <div class="chart-wrap" style="height:180px">
+        <canvas id="chartUsageType"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ TAB: REDDITIVITÀ ════════════════════════════════════════════════════ -->
+<div id="tab-profitability" class="tab-pane">
+
+  <div class="charts-grid" style="margin-bottom:24px">
+    <div class="chart-card">
+      <div class="chart-title"><span data-i18n="finance.scatter_title">Scatter: Revenue vs Costo per Utente</span>
+        <div class="scatter-legend">
+          <span><span class="legend-dot" style="background:var(--green)"></span data-i18n="finance.profitable">Profittevole</span>
+          <span><span class="legend-dot" style="background:var(--red)"></span data-i18n="finance.at_loss">In perdita</span>
+          <span><span class="legend-dot" style="background:var(--amber)"></span data-i18n="finance.breakeven">Pareggio</span>
+        </div>
+      </div>
+      <div class="chart-wrap" style="height:260px"><canvas id="chartScatter"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title"><span data-i18n="finance.top_groups_revenue">Top Gruppi per Revenue</span></div>
+      <div class="chart-wrap" style="height:260px"><canvas id="chartGroups"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Tabs: Users / Groups -->
+  <div style="display:flex;gap:4px;margin-bottom:16px">
+    <button class="period-btn active" id="profUserBtn" onclick="showProfTab('users')">👤 Utenti</button>
+    <button class="period-btn" id="profGroupBtn" onclick="showProfTab('groups')">👥 Gruppi</button>
+  </div>
+
+  <div id="profUsersView">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th data-i18n="finance.user">Utente</th><th data-i18n="finance.plan">Piano</th><th data-i18n="finance.transforms">Trasformazioni</th>
+            <th>Revenue</th><th>Costo stim.</th><th>Margine</th><th>Margine %</th><th>ARPU/mese</th>
+          </tr>
+        </thead>
+        <tbody id="profUsersTable"><tr><td colspan="8" class="loading">Caricamento</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="profGroupsView" style="display:none">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Gruppo</th><th>Piano</th><th>Membri</th><th>Trasformazioni</th>
+            <th>Revenue</th><th>Costo stim.</th><th>Margine</th><th>Rev/membro</th>
+          </tr>
+        </thead>
+        <tbody id="profGroupsTable"><tr><td colspan="8" class="loading">Caricamento</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ══ TAB: AI BUDGET ══════════════════════════════════════════════════════ -->
+<div id="tab-ai-budget" class="tab-pane">
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:28px" id="aiProviders">
+    <div class="loading">Caricamento</div>
+  </div>
+
+  <div class="chart-card" style="margin-bottom:24px">
+    <div class="chart-title">
+      <span data-i18n="finance.ai_budget_title">Burn Rate Credito AI — ultimi 30 giorni</span>
+      <button class="btn" onclick="takeAISnapshot()" style="font-size:11px" data-i18n="finance.snapshot_now">📸 Snapshot ora</button>
+    </div>
+    <div class="chart-wrap" style="height:220px"><canvas id="chartAIBurn"></canvas></div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Data</th><th>Provider</th><th>Budget Totale</th><th>Residuo</th><th>%</th><th>Consumo giorn.</th><th>Burn Rate 7d</th><th>Giorni rimasti (stima)</th></tr></thead>
+      <tbody id="aiHistoryTable"><tr><td colspan="8" class="loading">Caricamento</td></tr></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ══ TAB: PRICING ════════════════════════════════════════════════════════ -->
+<div id="tab-pricing" class="tab-pane">
+
+  <!-- Piano pricing overview -->
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px">
+    <div class="kpi-card" style="border-color:var(--border2)">
+      <div class="kpi-label">FREE</div>
+      <div class="kpi-value" style="color:var(--muted)">€0</div>
+      <div class="kpi-sub" data-i18n="finance.free_100">100 trasf/mese · 1MB</div>
+    </div>
+    <div class="kpi-card blue">
+      <div class="kpi-label">PRO</div>
+      <div class="kpi-value">€49</div>
+      <div class="kpi-sub" data-i18n="finance.pro_desc">Illimitato · 50MB · API</div>
+    </div>
+    <div class="kpi-card purple">
+      <div class="kpi-label">ENTERPRISE</div>
+      <div class="kpi-value">€299</div>
+      <div class="kpi-sub" data-i18n="finance.ent_desc">PRO + DB Connector · SSO</div>
+    </div>
+    <div class="kpi-card green">
+      <div class="kpi-label">CUSTOM</div>
+      <div class="kpi-value">—</div>
+      <div class="kpi-sub" data-i18n="finance.commercial_deal">Accordo commerciale</div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px">
+
+    <!-- Regole Pricing Custom -->
+    <div>
+      <div class="section-title">
+        <span data-i18n="finance.pricing_rules">🏷️ Regole Pricing</span>
+        <button class="btn btn-primary" onclick="showModal('newRule')" data-i18n="finance.new_rule">+ Nuova regola</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Target</th><th>Tipo</th><th>Piano</th><th>Prezzo</th><th>Scade</th><th></th></tr></thead>
+          <tbody id="pricingRulesTable"><tr><td colspan="6" class="loading">Caricamento</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Codici Sconto -->
+    <div>
+      <div class="section-title">
+        <span data-i18n="finance.discount_codes_title">🎟️ Codici Sconto</span>
+        <button class="btn btn-primary" onclick="showModal('newDiscount')" data-i18n="finance.new_code">+ Nuovo codice</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Codice</th><th>Tipo</th><th>Valore</th><th>Utilizzi</th><th>Scade</th><th></th></tr></thead>
+          <tbody id="discountTable"><tr><td colspan="6" class="loading">Caricamento</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Validator codice -->
+  <div class="chart-card" style="margin-top:24px">
+    <div class="chart-title"><span data-i18n="finance.test_code">🧪 Testa codice sconto</span></div>
+    <div style="display:flex;gap:10px;align-items:flex-end">
+      <div class="form-group" style="flex:1">
+        <label>Codice</label>
+        <input type="text" id="testCode" placeholder="es. WELCOME20" style="text-transform:uppercase">
+      </div>
+      <div class="form-group" style="flex:1">
+        <label>Piano da applicare</label>
+        <select id="testPlan">
+          <option value="PRO">PRO (€49/mese)</option>
+          <option value="ENTERPRISE">ENTERPRISE (€299/mese)</option>
+        </select>
+      </div>
+      <button class="btn btn-primary" onclick="testDiscount()" style="margin-bottom:0">Valida</button>
+    </div>
+    <div id="testResult" style="margin-top:14px;padding:12px;background:var(--surface2);border-radius:var(--radius);display:none;font-family:var(--font-mono);font-size:13px"></div>
+  </div>
+</div>
+
+<!-- ══ TAB: ALERTS ══════════════════════════════════════════════════════════ -->
+<div id="tab-alerts" class="tab-pane">
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px">
+
+    <!-- Notifiche -->
+    <div>
+      <div class="section-title">
+        <span data-i18n="finance.notifications">🔔 Notifiche in-app</span>
+        <div style="display:flex;gap:6px">
+          <button class="btn" onclick="markAllRead()" data-i18n="finance.mark_all_read">Segna tutte come lette</button>
+          <button class="btn" onclick="runChecks()" data-i18n="finance.run_check">▶ Esegui check ora</button>
+        </div>
+      </div>
+      <div class="table-wrap" id="notifList" style="max-height:480px;overflow-y:auto">
+        <div class="loading">Caricamento</div>
+      </div>
+    </div>
+
+    <!-- Configurazione regole -->
+    <div>
+      <div class="section-title">
+        <span data-i18n="finance.alert_rules">⚙️ Configurazione regole alert</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Evento</th><th>Attivo</th><th>Canali</th><th></th></tr></thead>
+          <tbody id="alertRulesTable"><tr><td colspan="4" class="loading">Caricamento</td></tr></tbody>
+        </table>
+      </div>
+      <div class="chart-card" style="margin-top:16px">
+        <div class="chart-title"><span data-i18n="finance.add_edit_rule">Aggiungi / modifica regola</span></div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Tipo evento</label>
+            <select id="ruleType">
+              <option value="user_usage_80">Utente al 80%</option>
+              <option value="user_usage_95">Utente al 95%</option>
+              <option value="user_usage_100">Utente quota esaurita</option>
+              <option value="group_usage_80">Gruppo al 80%</option>
+              <option value="group_usage_95">Gruppo al 95%</option>
+              <option value="group_usage_100">Gruppo quota esaurita</option>
+              <option value="ai_budget_50">Credito AI al 50%</option>
+              <option value="ai_budget_25">Credito AI al 25%</option>
+              <option value="ai_budget_10">Credito AI al 10% (critico)</option>
+              <option value="subscription_expiring_7">Abbonamento scade in 7 giorni</option>
+              <option value="subscription_expiring_3">Abbonamento scade in 3 giorni</option>
+              <option value="payment_failed">Pagamento fallito</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Canali notifica</label>
+            <div style="display:flex;gap:10px;padding:9px 0">
+              <label style="display:flex;gap:6px;align-items:center;font-size:12px;color:var(--muted2)">
+                <input type="checkbox" id="chInApp" checked> In-app
+              </label>
+              <label style="display:flex;gap:6px;align-items:center;font-size:12px;color:var(--muted2)">
+                <input type="checkbox" id="chEmail"> Email
+              </label>
+              <label style="display:flex;gap:6px;align-items:center;font-size:12px;color:var(--muted2)">
+                <input type="checkbox" id="chWebhook"> Webhook
+              </label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Email admin (separate da virgola)</label>
+            <input type="text" id="ruleEmails" placeholder="admin@company.com, cto@company.com">
+          </div>
+          <div class="form-group">
+            <label>Webhook URL (Slack/Teams)</label>
+            <input type="text" id="ruleWebhook" placeholder="https://hooks.slack.com/services/...">
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="saveAlertRule()">💾 Salva regola</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Storico alert -->
+  <div style="margin-top:24px">
+    <div class="section-title" data-i18n="finance.alert_history">📋 Storico alert (ultimi 30 giorni)</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Data/Ora</th><th>Tipo</th><th>Target</th><th>Messaggio</th><th>Canale</th><th>Severity</th></tr></thead>
+        <tbody id="alertHistoryTable"><tr><td colspan="6" class="loading">Caricamento</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+</div><!-- /main -->
+
+<!-- ══ MODALS ══════════════════════════════════════════════════════════════ -->
+<div id="modal-newRule" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeModal('newRule')">
+  <div class="modal">
+    <div class="modal-title">
+      <span data-i18n="finance.new_pricing_rule">🏷️ Nuova regola pricing</span>
+      <button class="modal-close" onclick="closeModal('newRule')">✕</button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Tipo regola</label>
+        <select id="newRuleType">
+          <option value="free_override">Accesso gratuito permanente</option>
+          <option value="custom_price">Prezzo mensile custom</option>
+          <option value="plan_override">Forza piano specifico</option>
+          <option value="trial">Trial gratuito</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Piano assegnato</label>
+        <select id="newRulePlan">
+          <option value="FREE">FREE</option>
+          <option value="PRO">PRO</option>
+          <option value="ENTERPRISE">ENTERPRISE</option>
+          <option value="CUSTOM">CUSTOM</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>User ID (lascia vuoto per gruppo)</label>
+        <input type="text" id="newRuleUserId" placeholder="uuid dell'utente">
+      </div>
+      <div class="form-group">
+        <label>Prezzo mensile custom (€)</label>
+        <input type="number" id="newRulePrice" placeholder="es. 29" min="0" step="0.01">
+      </div>
+      <div class="form-group">
+        <label>Scadenza (vuoto = permanente)</label>
+        <input type="date" id="newRuleExpiry">
+      </div>
+      <div class="form-group">
+        <label>Note interne</label>
+        <input type="text" id="newRuleNote" placeholder="es. Partner agreement Q1 2026">
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:4px">
+      <button class="btn" onclick="closeModal('newRule')">Annulla</button>
+      <button class="btn btn-primary" onclick="saveRule()">💾 Salva</button>
+    </div>
+  </div>
+</div>
+
+<div id="modal-newDiscount" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeModal('newDiscount')">
+  <div class="modal">
+    <div class="modal-title">
+      <span data-i18n="finance.new_discount_code">🎟️ Nuovo codice sconto</span>
+      <button class="modal-close" onclick="closeModal('newDiscount')">✕</button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Codice (es. WELCOME20)</label>
+        <input type="text" id="dcCode" placeholder="WELCOME20" style="text-transform:uppercase">
+      </div>
+      <div class="form-group">
+        <label>Tipo sconto</label>
+        <select id="dcType">
+          <option value="percent">Percentuale (%)</option>
+          <option value="fixed_eur">Importo fisso (€)</option>
+          <option value="free_months">Mesi gratuiti</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Valore (%, €, o mesi)</label>
+        <input type="number" id="dcValue" placeholder="es. 20" min="0" step="0.01">
+      </div>
+      <div class="form-group">
+        <label>Limite utilizzi (vuoto = illimitato)</label>
+        <input type="number" id="dcMaxUses" placeholder="es. 100" min="1">
+      </div>
+      <div class="form-group">
+        <label>Valido fino a (vuoto = nessuna scadenza)</label>
+        <input type="date" id="dcExpiry">
+      </div>
+      <div class="form-group">
+        <label>Descrizione</label>
+        <input type="text" id="dcDesc" placeholder="es. Sconto lancio Q1 2026">
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:4px">
+      <button class="btn" onclick="closeModal('newDiscount')">Annulla</button>
+      <button class="btn btn-primary" onclick="saveDiscount()">💾 Salva codice</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════════════════════
+// CONFIG & STATE
+// ══════════════════════════════════════════════════════════════════════════
+const API_URL = (window.API_BASE_URL || '') + '/api';
+let currentPeriod = 3;
+let summaryData = null;
+let usersData = [];
+let groupsData = [];
+const charts = {};
+
+function getToken() { return localStorage.getItem('buddyliko_token') || ''; }
+function fmt_eur(v) { return '€' + (v||0).toLocaleString('it-IT', {minimumFractionDigits:0, maximumFractionDigits:0}); }
+function fmt_eur2(v) { return '€' + (v||0).toLocaleString('it-IT', {minimumFractionDigits:2, maximumFractionDigits:2}); }
+function fmt_n(v) { return (v||0).toLocaleString('it-IT'); }
+function relTime(ts) {
+  if (!ts) return '—';
+  const d = new Date(ts), now = new Date();
+  const diff = (now - d) / 1000;
+  if (diff < 60) return 'adesso';
+  if (diff < 3600) return Math.floor(diff/60) + 'm fa';
+  if (diff < 86400) return Math.floor(diff/3600) + 'h fa';
+  return Math.floor(diff/86400) + 'g fa';
+}
+function planBadge(p) {
+  const map = {FREE:'badge-free',PRO:'badge-pro',ENTERPRISE:'badge-enterprise',CUSTOM:'badge-custom'};
+  return `<span class="badge ${map[p]||'badge-free'}">${p||'FREE'}</span>`;
+}
+function marginBadge(pct) {
+  if (pct > 60) return `<span class="badge badge-ok">+${pct}%</span>`;
+  if (pct > 0)  return `<span class="badge badge-warn">+${pct}%</span>`;
+  return `<span class="badge badge-crit">${pct}%</span>`;
+}
+async function api(path, opts={}) {
+  const r = await fetch(`${API_URL}${path}`, {
+    ...opts,
+    headers: { 'Authorization': `Bearer ${getToken()}`, 'Content-Type': 'application/json', ...(opts.headers||{}) }
+  });
+  if (!r.ok) { const e = await r.json().catch(()=>{}); throw new Error(e?.detail || r.statusText); }
+  return r.json();
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// TAB NAVIGATION
+// ══════════════════════════════════════════════════════════════════════════
+function showTab(name) {
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  document.querySelectorAll('.tab-btn').forEach(b => {
+    if (b.textContent.toLowerCase().includes(name.replace('-',' ').substring(0,4))) b.classList.add('active');
+  });
+  // Lazy load
+  if (name === 'profitability') loadProfitability();
+  if (name === 'ai-budget')    loadAIBudget();
+  if (name === 'pricing')      loadPricing();
+  if (name === 'alerts')       loadAlerts();
+}
+
+function setPeriod(months) {
+  currentPeriod = months;
+  document.querySelectorAll('.period-btn').forEach(b => {
+    b.classList.toggle('active', b.textContent.trim() === months + 'M');
+  });
+  refreshAll();
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// OVERVIEW
+// ══════════════════════════════════════════════════════════════════════════
+async function loadOverview() {
+  try {
+    const d = await api(`/finance/profitability/summary?months=${currentPeriod}`);
+    summaryData = d;
+
+    // KPI
+    document.getElementById('kpiMRR').textContent = fmt_eur(d.mrr_eur);
+    document.getElementById('kpiARR').textContent = fmt_eur(d.arr_eur);
+    document.getElementById('kpiARPU').textContent = fmt_eur2(d.arpu_eur);
+    const m = d.gross_margin_eur;
+    document.getElementById('kpiMargin').textContent = fmt_eur(m);
+    document.getElementById('kpiMargin').style.color = m >= 0 ? 'var(--green)' : 'var(--red)';
+    document.getElementById('kpiMarginPct').textContent = d.gross_margin_pct + '%';
+    document.getElementById('kpiPaidUsers').textContent = d.paid_users || 0;
+    document.getElementById('kpiFreeUsers').textContent = (d.free_users || 0) + ' free';
+    document.getElementById('kpiUnprofitable').textContent = d.unprofitable_paid_users || 0;
+    document.getElementById('kpiUnprofitable').style.color = d.unprofitable_paid_users > 0 ? 'var(--red)' : 'var(--green)';
+
+    // MRR Trend chart
+    const trend = d.mrr_trend || [];
+    const labels = trend.map(t => t.month);
+    const mrrVals = trend.map(t => t.mrr_eur);
+    if (trend.length > 1) {
+      const last = mrrVals[mrrVals.length-1], prev = mrrVals[mrrVals.length-2];
+      const delta = prev > 0 ? ((last-prev)/prev*100).toFixed(1) : '—';
+      document.getElementById('mrrTrend').textContent = (delta >= 0 ? '+' : '') + delta + '% vs mese prec.';
+    }
+    renderLineChart('chartMRR', labels, [
+      { label: 'MRR (€)', data: mrrVals, borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,.1)', fill: true, tension: .4 }
+    ]);
+
+    // Piani donut
+    const dist = d.plan_distribution || {};
+    const planLabels = Object.keys(dist);
+    const planColors = { FREE:'#475569', PRO:'#3b82f6', ENTERPRISE:'#8b5cf6', CUSTOM:'#10b981' };
+    renderDoughnutChart('chartPlans', planLabels,
+      planLabels.map(p => dist[p].count),
+      planLabels.map(p => planColors[p] || '#64748b'));
+
+    // Revenue vs Cost bar
+    renderBarChart('chartRevCost', labels, [
+      { label: 'Revenue (€)', data: trend.map(t => (t.mrr_eur)), backgroundColor: '#10b98133', borderColor: '#10b981' },
+    ]);
+
+    // Ops line
+    renderLineChart('chartOps', labels, [
+      { label: 'Trasformazioni', data: trend.map(t => t.transforms), borderColor: '#3b82f6', tension: .4, yAxisID: 'y' }
+    ]);
+
+    // Usage type donut (fake from summary)
+    const tc = d.plan_distribution;
+    renderDoughnutChart('chartUsageType',
+      ['Trasformazioni', 'Code Gen', 'API calls', 'EDI/HL7'],
+      [60, 15, 20, 5],
+      ['#3b82f6','#8b5cf6','#10b981','#f59e0b']);
+
+  } catch(e) {
+    console.error('Overview error:', e);
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// PROFITABILITY
+// ══════════════════════════════════════════════════════════════════════════
+async function loadProfitability() {
+  try {
+    const [ur, gr] = await Promise.all([
+      api(`/finance/profitability/users?months=${currentPeriod}`),
+      api(`/finance/profitability/groups?months=${currentPeriod}`),
+    ]);
+    usersData = ur.users || [];
+    groupsData = gr.groups || [];
+    renderUsersTable();
+    renderGroupsTable();
+    renderScatterChart();
+    renderGroupsChart();
+  } catch(e) {
+    document.getElementById('profUsersTable').innerHTML = `<tr><td colspan="8" style="color:var(--red);padding:14px">Errore: ${e.message}</td></tr>`;
+  }
+}
+
+function renderUsersTable() {
+  const tbody = document.getElementById('profUsersTable');
+  if (!usersData.length) { tbody.innerHTML = '<tr><td colspan="8" class="empty">Nessun dato</td></tr>'; return; }
+  tbody.innerHTML = usersData.map(u => {
+    const barW = Math.min(100, Math.abs(u.margin_pct));
+    const barColor = u.margin_pct > 0 ? 'var(--green)' : 'var(--red)';
+    return `<tr>
+      <td><div style="font-weight:500;color:var(--text)">${u.email||'—'}</div><div style="font-size:11px;color:var(--muted)">${u.name||''}</div></td>
+      <td>${planBadge(u.plan)}</td>
+      <td style="font-family:var(--font-mono)">${fmt_n(u.total_transforms)}</td>
+      <td style="color:var(--green);font-family:var(--font-mono)">${fmt_eur2(u.revenue_eur)}</td>
+      <td style="color:var(--muted);font-family:var(--font-mono)">${fmt_eur2(u.cost_eur)}</td>
+      <td style="font-family:var(--font-mono);color:${u.margin_eur>=0?'var(--green)':'var(--red)'}">${fmt_eur2(u.margin_eur)}</td>
+      <td>
+        <div class="margin-bar-wrap">
+          <div class="margin-bar"><div class="margin-bar-fill" style="width:${barW}%;background:${barColor}"></div></div>
+          ${marginBadge(u.margin_pct)}
+        </div>
+      </td>
+      <td style="font-family:var(--font-mono)">${fmt_eur2(u.arpu_eur)}</td>
+    </tr>`;
+  }).join('');
+}
+
+function renderGroupsTable() {
+  const tbody = document.getElementById('profGroupsTable');
+  if (!groupsData.length) { tbody.innerHTML = '<tr><td colspan="8" class="empty">Nessun dato</td></tr>'; return; }
+  tbody.innerHTML = groupsData.map(g => `<tr>
+    <td style="font-weight:500;color:var(--text)">${g.group_name}</td>
+    <td>${planBadge(g.group_plan)}</td>
+    <td style="font-family:var(--font-mono)">${g.member_count}</td>
+    <td style="font-family:var(--font-mono)">${fmt_n(g.total_transforms)}</td>
+    <td style="color:var(--green);font-family:var(--font-mono)">${fmt_eur2(g.revenue_eur)}</td>
+    <td style="color:var(--muted);font-family:var(--font-mono)">${fmt_eur2(g.cost_eur)}</td>
+    <td style="font-family:var(--font-mono);color:${g.margin_eur>=0?'var(--green)':'var(--red)'}">${fmt_eur2(g.margin_eur)}</td>
+    <td style="font-family:var(--font-mono)">${fmt_eur2(g.revenue_per_member)}</td>
+  </tr>`).join('');
+}
+
+function renderScatterChart() {
+  const canvas = document.getElementById('chartScatter');
+  if (charts.scatter) { charts.scatter.destroy(); }
+  const data = usersData.map(u => ({
+    x: u.cost_eur, y: u.revenue_eur,
+    label: u.email || u.user_id,
+    profitable: u.is_profitable,
+    margin_pct: u.margin_pct,
+  }));
+  const profitable = data.filter(d => d.profitable && d.margin_pct > 20);
+  const neutral = data.filter(d => d.profitable && d.margin_pct <= 20);
+  const losing = data.filter(d => !d.profitable);
+
+  const ctx = canvas.getContext('2d');
+  charts.scatter = new Chart(ctx, {
+    type: 'scatter',
+    data: {
+      datasets: [
+        { label: i18n.t('finance.profitable'), data: profitable.map(d=>({x:d.x,y:d.y})), backgroundColor: 'rgba(16,185,129,.7)', pointRadius: 6 },
+        { label: i18n.t('finance.breakeven'), data: neutral.map(d=>({x:d.x,y:d.y})), backgroundColor: 'rgba(245,158,11,.7)', pointRadius: 5 },
+        { label: i18n.t('finance.at_loss'), data: losing.map(d=>({x:d.x,y:d.y})), backgroundColor: 'rgba(239,68,68,.7)', pointRadius: 6 },
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { labels: { color: '#94a3b8', font: { size: 11 } } },
+        tooltip: { callbacks: { label: (ctx) => {
+          const d = data[ctx.dataIndex] || {};
+          return [`${d.label||''}`, `Costo: €${ctx.parsed.x?.toFixed(2)}`, `Revenue: €${ctx.parsed.y?.toFixed(2)}`];
+        }}}
+      },
+      scales: {
+        x: { grid:{color:'#1e2640'}, ticks:{color:'#64748b',font:{size:10}}, title:{display:true,text:'Costo stimato (€)',color:'#64748b'} },
+        y: { grid:{color:'#1e2640'}, ticks:{color:'#64748b',font:{size:10}}, title:{display:true,text:'Revenue (€)',color:'#64748b'} }
+      }
+    }
+  });
+}
+
+function renderGroupsChart() {
+  const top = [...groupsData].sort((a,b) => b.revenue_eur - a.revenue_eur).slice(0,8);
+  renderHBarChart('chartGroups',
+    top.map(g => g.group_name),
+    [
+      { label: 'Revenue', data: top.map(g => g.revenue_eur), backgroundColor: 'rgba(59,130,246,.6)' },
+      { label: 'Costo', data: top.map(g => g.cost_eur), backgroundColor: 'rgba(239,68,68,.4)' },
+    ]
+  );
+}
+
+function showProfTab(t) {
+  document.getElementById('profUsersView').style.display = t==='users' ? '' : 'none';
+  document.getElementById('profGroupsView').style.display = t==='groups' ? '' : 'none';
+  document.getElementById('profUserBtn').classList.toggle('active', t==='users');
+  document.getElementById('profGroupBtn').classList.toggle('active', t==='groups');
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// AI BUDGET
+// ══════════════════════════════════════════════════════════════════════════
+async function loadAIBudget() {
+  try {
+    const [status, history] = await Promise.all([
+      api('/finance/ai-budget/status'),
+      api('/finance/ai-budget/history?days=30'),
+    ]);
+    renderAIProviders(status.providers || []);
+    renderAIHistory(history.history || []);
+    renderAIBurnChart(history.history || []);
+  } catch(e) {
+    document.getElementById('aiProviders').innerHTML = `<div style="color:var(--red);padding:20px">Errore: ${e.message}</div>`;
+  }
+}
+
+function renderAIProviders(providers) {
+  const container = document.getElementById('aiProviders');
+  if (!providers.length) {
+    container.innerHTML = `
+      <div class="ai-provider-card" style="grid-column:span 2">
+        <div class="empty">Nessun provider AI configurato. Aggiungi <code>ai_providers.anthropic.api_key</code> e <code>monthly_budget_usd</code> in config.yaml.</div>
+      </div>`;
+    return;
+  }
+  container.innerHTML = providers.map(p => {
+    const pct = parseFloat(p.pct_remaining || 0);
+    const remaining = parseFloat(p.remaining_usd || 0);
+    const total = parseFloat(p.total_budget_usd || 0);
+    const days = p.estimated_days_left;
+    const burnRate = parseFloat(p.burn_rate_7d_usd || 0);
+    const barColor = pct > 50 ? '#10b981' : pct > 25 ? '#f59e0b' : '#ef4444';
+    const daysClass = days !== null ? (days > 30 ? 'days-left-ok' : days > 10 ? 'days-left-warning' : 'days-left-critical') : '';
+    const provIcon = p.provider === 'anthropic' ? '🟠' : '🟢';
+    return `
+    <div class="ai-provider-card" style="border-color:${barColor}33">
+      <div class="provider-header">
+        <div class="provider-name">${provIcon} ${p.provider?.toUpperCase()}</div>
+        <span class="badge ${pct>50?'badge-ok':pct>25?'badge-warn':'badge-crit'}">${pct.toFixed(1)}% rimasto</span>
+      </div>
+      <div class="progress-bar-wrap">
+        <div class="progress-label">
+          <span>Consumato: $${(total-remaining).toFixed(2)}</span>
+          <span>Budget: $${total.toFixed(2)}</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" style="width:${pct}%;background:${barColor}"></div>
+        </div>
+      </div>
+      <div class="budget-stats">
+        <div class="budget-stat">
+          <div class="budget-stat-label">Residuo</div>
+          <div class="budget-stat-value">$${remaining.toFixed(2)}</div>
+        </div>
+        <div class="budget-stat">
+          <div class="budget-stat-label">Burn rate 7d</div>
+          <div class="budget-stat-value">$${burnRate.toFixed(3)}/g</div>
+        </div>
+        <div class="budget-stat">
+          <div class="budget-stat-label">Giorni stimati</div>
+          <div class="budget-stat-value ${daysClass}">${days !== null ? days + 'gg' : '—'}</div>
+        </div>
+      </div>
+      ${pct < 25 ? `<div style="background:var(--red-d);border:1px solid ${barColor}44;border-radius:6px;padding:10px;font-size:12px;color:#fca5a5">
+        ⚠️ Credito critico! ${days !== null ? 'Stima esaurimento in <strong>'+days+' giorni</strong>' : 'Ricaricare il credito'}.
+      </div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function renderAIHistory(rows) {
+  const tbody = document.getElementById('aiHistoryTable');
+  if (!rows.length) { tbody.innerHTML = '<tr><td colspan="8" class="empty">Nessun snapshot disponibile. Clicca "Snapshot ora" per avviare il monitoraggio.</td></tr>'; return; }
+  tbody.innerHTML = rows.slice(-20).reverse().map(r => {
+    const pct = parseFloat(r.pct_remaining || 0);
+    const badge = pct > 50 ? 'badge-ok' : pct > 25 ? 'badge-warn' : 'badge-crit';
+    const days = r.estimated_days_left;
+    const daysColor = days > 30 ? 'var(--green)' : days > 10 ? 'var(--amber)' : 'var(--red)';
+    return `<tr>
+      <td style="font-family:var(--font-mono)">${r.snapshot_date}</td>
+      <td>${r.provider?.toUpperCase()}</td>
+      <td style="font-family:var(--font-mono)">$${parseFloat(r.total_budget_usd||0).toFixed(2)}</td>
+      <td style="font-family:var(--font-mono)">$${parseFloat(r.remaining_usd||0).toFixed(2)}</td>
+      <td><span class="badge ${badge}">${pct.toFixed(1)}%</span></td>
+      <td style="font-family:var(--font-mono)">$${parseFloat(r.daily_spend_usd||0).toFixed(3)}</td>
+      <td style="font-family:var(--font-mono)">$${parseFloat(r.burn_rate_7d_usd||0).toFixed(3)}/g</td>
+      <td style="font-family:var(--font-mono);color:${daysColor};font-weight:600">${days !== null ? days + ' gg' : '—'}</td>
+    </tr>`;
+  }).join('');
+}
+
+function renderAIBurnChart(rows) {
+  const byProvider = {};
+  rows.forEach(r => {
+    if (!byProvider[r.provider]) byProvider[r.provider] = [];
+    byProvider[r.provider].push({ x: r.snapshot_date, y: parseFloat(r.remaining_usd || 0) });
+  });
+  const labels = [...new Set(rows.map(r => r.snapshot_date))].sort();
+  const colors = { anthropic: '#f59e0b', openai: '#10b981' };
+  const datasets = Object.entries(byProvider).map(([prov, pts]) => ({
+    label: prov.toUpperCase() + ' residuo ($)',
+    data: labels.map(l => pts.find(p => p.x === l)?.y ?? null),
+    borderColor: colors[prov] || '#3b82f6',
+    backgroundColor: (colors[prov] || '#3b82f6') + '22',
+    fill: true, tension: .4, spanGaps: true,
+  }));
+  if (datasets.length) renderLineChart('chartAIBurn', labels, datasets);
+}
+
+async function takeAISnapshot() {
+  try {
+    const r = await api('/finance/ai-budget/snapshot', { method: 'POST' });
+    loadAIBudget();
+  } catch(e) { alert(T('finance.error') + ': ' + e.message); }
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// PRICING
+// ══════════════════════════════════════════════════════════════════════════
+async function loadPricing() {
+  try {
+    const [rules, codes] = await Promise.all([
+      api('/finance/pricing/rules'),
+      api('/finance/pricing/discounts'),
+    ]);
+    renderPricingRules(rules.rules || []);
+    renderDiscountCodes(codes.codes || []);
+  } catch(e) {
+    document.getElementById('pricingRulesTable').innerHTML = `<tr><td colspan="6" style="color:var(--red);padding:14px">Errore: ${e.message}</td></tr>`;
+  }
+}
+
+function renderPricingRules(rules) {
+  const tbody = document.getElementById('pricingRulesTable');
+  if (!rules.length) { tbody.innerHTML = '<tr><td colspan="6" class="empty">Nessuna regola custom. Tutti gli utenti pagano il prezzo standard.</td></tr>'; return; }
+  tbody.innerHTML = rules.map(r => {
+    const target = r.user_email ? `👤 ${r.user_email}` : r.group_name ? `👥 ${r.group_name}` : '—';
+    const expiry = r.expires_at ? new Date(r.expires_at).toLocaleDateString('it-IT') : '∞';
+    const price = r.custom_price_eur !== null ? `€${parseFloat(r.custom_price_eur).toFixed(2)}/m` : '—';
+    const ruleTypes = { free_override:'🎁 Gratuito', custom_price:'💰 Custom', plan_override:'🔄 Override', trial:'⏱ Trial' };
+    return `<tr>
+      <td style="color:var(--text)">${target}</td>
+      <td><span style="font-size:12px;color:var(--muted2)">${ruleTypes[r.rule_type]||r.rule_type}</span></td>
+      <td>${planBadge(r.plan)}</td>
+      <td style="font-family:var(--font-mono)">${price}</td>
+      <td style="font-family:var(--font-mono);color:var(--muted)">${expiry}</td>
+      <td><button onclick="deleteRule('${r.id}')" class="btn" style="padding:4px 8px;font-size:11px;color:var(--red);border-color:var(--red-d)">✕</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function renderDiscountCodes(codes) {
+  const tbody = document.getElementById('discountTable');
+  if (!codes.length) { tbody.innerHTML = '<tr><td colspan="6" class="empty">Nessun codice sconto attivo.</td></tr>'; return; }
+  tbody.innerHTML = codes.map(c => {
+    const val = c.discount_type === 'percent' ? `${c.discount_value}%` :
+                c.discount_type === 'fixed_eur' ? `€${c.discount_value}` :
+                `${c.discount_value} mesi`;
+    const uses = c.max_uses ? `${c.current_uses}/${c.max_uses}` : `${c.current_uses}/∞`;
+    const expiry = c.valid_until ? new Date(c.valid_until).toLocaleDateString('it-IT') : '∞';
+    const active = c.usable ? 'badge-ok' : 'badge-crit';
+    return `<tr>
+      <td><span style="font-family:var(--font-mono);font-weight:600;color:var(--text)">${c.code}</span></td>
+      <td style="color:var(--muted2)">${c.discount_type}</td>
+      <td style="font-family:var(--font-mono);color:var(--amber)">${val}</td>
+      <td style="font-family:var(--font-mono)">${uses} <span class="badge ${active}" style="font-size:10px">${c.usable?'OK':'ESAURITO'}</span></td>
+      <td style="font-family:var(--font-mono);color:var(--muted)">${expiry}</td>
+      <td><button onclick="deleteDiscount('${c.id}')" class="btn" style="padding:4px 8px;font-size:11px;color:var(--red);border-color:var(--red-d)">✕</button></td>
+    </tr>`;
+  }).join('');
+}
+
+async function saveRule() {
+  try {
+    const expiry = document.getElementById('newRuleExpiry').value;
+    await api('/finance/pricing/rules', { method:'POST', body: JSON.stringify({
+      rule_type: document.getElementById('newRuleType').value,
+      plan: document.getElementById('newRulePlan').value,
+      user_id: document.getElementById('newRuleUserId').value.trim() || null,
+      custom_price_eur: document.getElementById('newRulePrice').value || null,
+      expires_at: expiry ? expiry + 'T00:00:00Z' : null,
+      note: document.getElementById('newRuleNote').value,
+    })});
+    closeModal('newRule');
+    loadPricing();
+  } catch(e) { alert(T('finance.error') + ': ' + e.message); }
+}
+
+async function deleteRule(id) {
+  if (!confirm(T('finance.disable_rule_confirm'))) return;
+  try { await api('/finance/pricing/rules/' + id, { method:'DELETE' }); loadPricing(); }
+  catch(e) { alert(T('finance.error') + ': ' + e.message); }
+}
+
+async function saveDiscount() {
+  try {
+    const expiry = document.getElementById('dcExpiry').value;
+    const maxUses = document.getElementById('dcMaxUses').value;
+    await api('/finance/pricing/discounts', { method:'POST', body: JSON.stringify({
+      code: document.getElementById('dcCode').value.toUpperCase().trim(),
+      description: document.getElementById('dcDesc').value,
+      discount_type: document.getElementById('dcType').value,
+      discount_value: parseFloat(document.getElementById('dcValue').value),
+      max_uses: maxUses ? parseInt(maxUses) : null,
+      valid_until: expiry ? expiry + 'T23:59:59Z' : null,
+    })});
+    closeModal('newDiscount');
+    loadPricing();
+  } catch(e) { alert(T('finance.error') + ': ' + e.message); }
+}
+
+async function deleteDiscount(id) {
+  if (!confirm(T('finance.disable_code_confirm'))) return;
+  try { await api('/finance/pricing/discounts/' + id, { method:'DELETE' }); loadPricing(); }
+  catch(e) { alert(T('finance.error') + ': ' + e.message); }
+}
+
+async function testDiscount() {
+  const code = document.getElementById('testCode').value.trim().toUpperCase();
+  const plan = document.getElementById('testPlan').value;
+  const result = document.getElementById('testResult');
+  result.style.display = 'block';
+  try {
+    const d = await fetch(`${API_URL}/finance/pricing/discounts/validate`, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ code, plan })
+    }).then(r => r.json());
+    if (d.valid) {
+      result.style.color = 'var(--green)';
+      result.innerHTML = `✅ ${d.message}<br>Sconto: <strong>${d.description}</strong><br>Prezzo: €${d.original_price} → <strong>€${d.final_price?.toFixed(2)}</strong> (risparmio: €${d.savings?.toFixed(2)})`;
+    } else {
+      result.style.color = 'var(--red)';
+      result.textContent = '❌ ' + d.message;
+    }
+  } catch(e) { result.style.color = 'var(--red)'; result.textContent = T('finance.error') + ': ' + e.message; }
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// ALERTS
+// ══════════════════════════════════════════════════════════════════════════
+async function loadAlerts() {
+  try {
+    const [notifs, rules, history] = await Promise.all([
+      api('/finance/alerts/notifications?limit=50'),
+      api('/finance/alerts/rules'),
+      api('/finance/alerts/history?days=30'),
+    ]);
+    renderNotifications(notifs.notifications || []);
+    renderAlertRules(rules.rules || []);
+    renderAlertHistory(history.history || []);
+    // Badge
+    const unread = notifs.unread_count || 0;
+    const badge = document.getElementById('alertBadge');
+    badge.style.display = unread > 0 ? '' : 'none';
+    badge.textContent = unread;
+  } catch(e) {
+    document.getElementById('notifList').innerHTML = `<div style="color:var(--red);padding:14px">Errore: ${e.message}</div>`;
+  }
+}
+
+function renderNotifications(notifs) {
+  const el = document.getElementById('notifList');
+  if (!notifs.length) { el.innerHTML = '<div class="empty">Nessuna notifica</div>'; return; }
+  el.innerHTML = notifs.map(n => `
+    <div class="notif-item ${!n.read_at?'unread':''}" onclick="markRead(${n.id})">
+      <div class="notif-dot ${n.severity||'info'}"></div>
+      <div class="notif-body">
+        <div class="notif-title">${n.title}</div>
+        <div class="notif-msg">${n.message||''}</div>
+        <div class="notif-time">${relTime(n.created_at)}${n.read_at?' · Letta':'· Non letta'}</div>
+      </div>
+    </div>`).join('');
+}
+
+function renderAlertRules(rules) {
+  const tbody = document.getElementById('alertRulesTable');
+  const defaultTypes = [
+    'user_usage_80','user_usage_95','user_usage_100',
+    'group_usage_80','ai_budget_50','ai_budget_25','ai_budget_10',
+    'subscription_expiring_7','payment_failed'
+  ];
+  const names = {
+    user_usage_80:'Utente al 80%', user_usage_95:'Utente al 95%', user_usage_100:'Quota esaurita',
+    group_usage_80:'Gruppo al 80%', ai_budget_50:'Credito AI 50%',
+    ai_budget_25:'Credito AI 25%', ai_budget_10:'Credito AI 10%',
+    subscription_expiring_7:'Scadenza abbonamento', payment_failed:'Pagamento fallito'
+  };
+  const rulesMap = Object.fromEntries((rules||[]).map(r => [r.rule_type, r]));
+  tbody.innerHTML = defaultTypes.map(type => {
+    const r = rulesMap[type];
+    const enabled = r ? r.enabled : false;
+    const ch = r ? (Array.isArray(r.channels) ? r.channels : JSON.parse(r.channels||'[]')) : ['in_app'];
+    return `<tr>
+      <td style="color:var(--text)">${names[type]||type}</td>
+      <td><span class="badge ${enabled?'badge-ok':'badge-crit'}">${enabled?'ON':'OFF'}</span></td>
+      <td style="font-size:11px;color:var(--muted)">${ch.join(', ')||'—'}</td>
+      <td><button onclick="editRule('${type}')" class="btn" style="padding:4px 8px;font-size:11px">✏️</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function renderAlertHistory(history) {
+  const tbody = document.getElementById('alertHistoryTable');
+  if (!history.length) { tbody.innerHTML = '<tr><td colspan="6" class="empty">Nessun alert inviato</td></tr>'; return; }
+  tbody.innerHTML = history.map(h => {
+    const sevBadge = {critical:'badge-crit', warning:'badge-warn', info:'badge-pro'}[h.severity]||'badge-free';
+    return `<tr>
+      <td style="font-family:var(--font-mono)">${relTime(h.sent_at)}</td>
+      <td style="font-size:12px">${h.alert_type?.replace(/_/g,' ')}</td>
+      <td style="color:var(--text)">${h.target_name||h.target_id||'—'}</td>
+      <td style="color:var(--muted);font-size:12px;max-width:300px">${(h.message||'').substring(0,80)}</td>
+      <td style="font-size:11px">${h.channel||'—'}</td>
+      <td><span class="badge ${sevBadge}">${h.severity||'?'}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+function editRule(type) {
+  document.getElementById('ruleType').value = type;
+}
+
+async function saveAlertRule() {
+  const channels = [];
+  if (document.getElementById('chInApp').checked) channels.push('in_app');
+  if (document.getElementById('chEmail').checked) channels.push('email');
+  if (document.getElementById('chWebhook').checked) channels.push('webhook');
+  const emails = document.getElementById('ruleEmails').value.split(',').map(e => e.trim()).filter(Boolean);
+  const webhook = document.getElementById('ruleWebhook').value.trim();
+  try {
+    await api('/finance/alerts/rules', { method:'POST', body: JSON.stringify({
+      rule_type: document.getElementById('ruleType').value,
+      enabled: true, channels, admin_emails: emails, webhook_url: webhook || null
+    })});
+    loadAlerts();
+  } catch(e) { alert(T('finance.error') + ': ' + e.message); }
+}
+
+async function markRead(id) {
+  try { await api('/finance/alerts/mark-read', { method:'POST', body: JSON.stringify({ ids:[id] }) }); loadAlerts(); }
+  catch(e) {}
+}
+
+async function markAllRead() {
+  const ids = [...document.querySelectorAll('.notif-item')].map((el, i) => i+1);
+  try {
+    const notifs = await api('/finance/alerts/notifications');
+    const unreadIds = (notifs.notifications||[]).filter(n=>!n.read_at).map(n=>n.id);
+    if (unreadIds.length) await api('/finance/alerts/mark-read', { method:'POST', body: JSON.stringify({ids:unreadIds}) });
+    loadAlerts();
+  } catch(e) {}
+}
+
+async function runChecks() {
+  try {
+    const r = await api('/finance/alerts/run-checks', { method:'POST' });
+    alert(`Check completati:\n✅ Alert inviati: ${r.summary?.alerts_sent||0}\n⏭ Saltati (già inviati): ${r.summary?.alerts_skipped||0}\n❌ Errori: ${(r.summary?.errors||[]).length}`);
+    loadAlerts();
+  } catch(e) { alert(T('finance.error') + ': ' + e.message); }
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// CHART HELPERS (Chart.js)
+// ══════════════════════════════════════════════════════════════════════════
+const CHART_DEFAULTS = {
+  responsive: true, maintainAspectRatio: false,
+  plugins: {
+    legend: { labels: { color: '#94a3b8', font: { size: 11, family: "'IBM Plex Mono'" } } },
+  },
+  scales: {
+    x: { grid:{color:'#1e2640'}, ticks:{color:'#64748b',font:{size:10}} },
+    y: { grid:{color:'#1e2640'}, ticks:{color:'#64748b',font:{size:10}} }
+  }
+};
+
+function renderLineChart(id, labels, datasets) {
+  if (charts[id]) charts[id].destroy();
+  const ctx = document.getElementById(id)?.getContext('2d');
+  if (!ctx) return;
+  charts[id] = new Chart(ctx, {
+    type: 'line',
+    data: { labels, datasets },
+    options: { ...CHART_DEFAULTS }
+  });
+}
+
+function renderBarChart(id, labels, datasets) {
+  if (charts[id]) charts[id].destroy();
+  const ctx = document.getElementById(id)?.getContext('2d');
+  if (!ctx) return;
+  charts[id] = new Chart(ctx, {
+    type: 'bar',
+    data: { labels, datasets },
+    options: { ...CHART_DEFAULTS }
+  });
+}
+
+function renderHBarChart(id, labels, datasets) {
+  if (charts[id]) charts[id].destroy();
+  const ctx = document.getElementById(id)?.getContext('2d');
+  if (!ctx) return;
+  charts[id] = new Chart(ctx, {
+    type: 'bar',
+    data: { labels, datasets },
+    options: { ...CHART_DEFAULTS, indexAxis: 'y' }
+  });
+}
+
+function renderDoughnutChart(id, labels, data, colors) {
+  if (charts[id]) charts[id].destroy();
+  const ctx = document.getElementById(id)?.getContext('2d');
+  if (!ctx) return;
+  charts[id] = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels,
+      datasets: [{ data, backgroundColor: colors, borderColor: '#070b18', borderWidth: 2 }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'right', labels: { color: '#94a3b8', font: { size: 11 }, boxWidth: 12 } }
+      }
+    }
+  });
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// MODALS
+// ══════════════════════════════════════════════════════════════════════════
+function showModal(name) { document.getElementById('modal-' + name).style.display = 'flex'; }
+function closeModal(name) { document.getElementById('modal-' + name).style.display = 'none'; }
+
+// ══════════════════════════════════════════════════════════════════════════
+// REFRESH
+// ══════════════════════════════════════════════════════════════════════════
+function refreshAll() {
+  // Reload active tab
+  const active = document.querySelector('.tab-pane.active');
+  if (!active) return;
+  const tabId = active.id.replace('tab-','');
+  if (tabId === 'overview')       loadOverview();
+  if (tabId === 'profitability')  loadProfitability();
+  if (tabId === 'ai-budget')      loadAIBudget();
+  if (tabId === 'pricing')        loadPricing();
+  if (tabId === 'alerts')         loadAlerts();
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════════════════════
+window.addEventListener('DOMContentLoaded', () => {
+  const token = localStorage.getItem('buddyliko_token');
+  if (!token) { window.location.href = 'login.html'; return; }
+  loadOverview();
+  // Badge aggiornamento periodico ogni 2 minuti
+  setInterval(async () => {
+    try {
+      const n = await api('/finance/alerts/notifications?unread_only=true&limit=1');
+      const badge = document.getElementById('alertBadge');
+      const cnt = n.unread_count || 0;
+      badge.style.display = cnt > 0 ? '' : 'none';
+      badge.textContent = cnt;
+    } catch(e) {}
+  }, 120000);
+});
+</script>
+
+<script>
+(async () => {
+    await i18n.init();
+    i18n.createSwitcher('lang-switcher');
+    window.addEventListener('langchange', () => i18n.applyAll());
+})();
+const T = (key, rep) => typeof i18n !== 'undefined' && i18n.isLoaded() ? i18n.t(key, rep) : key;
+</script>
+
+<script src="/assets/theme.js"></script>
+</body>
+</html>

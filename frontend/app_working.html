@@ -735,7 +735,7 @@
         }
         .empty-state {
             text-align: center;
-            padding: 15px 10px;
+            padding: 60px 20px;
             color: #999;
         }
         .connection-list-item {
@@ -1109,13 +1109,6 @@
                 setTimeout(() => alert('❌ Errore collegamento: ' + decodeURIComponent(linkError)), 500);
             }
 
-            // Handle group invitation links (?invite=TOKEN)
-            const inviteToken = urlParams.get('invite');
-            if (inviteToken) {
-                window._pendingInviteToken = inviteToken;
-                window.history.replaceState({}, '', window.location.pathname);
-            }
-
             try {
                 const statusResponse = await fetch(`${API_BASE}/api/auth/status`);
                 if (!statusResponse.ok) { authCheckDiv.remove(); return; }
@@ -1123,14 +1116,7 @@
 
                 if (status.enabled) {
                     const token = localStorage.getItem('buddyliko_token');
-                    if (!token) {
-                        // Preserve invite token through login redirect
-                        if (window._pendingInviteToken) {
-                            localStorage.setItem('buddyliko_pending_invite', window._pendingInviteToken);
-                        }
-                        window.location.href = 'login.html';
-                        return;
-                    }
+                    if (!token) { window.location.href = 'login.html'; return; }
 
                     const meResponse = await fetch(`${API_BASE}/api/auth/me`, {
                         headers: { 'Authorization': `Bearer ${token}` }
@@ -1144,26 +1130,6 @@
                     const meData = await meResponse.json();
                     const userData = meData.user || meData;
                     localStorage.setItem('buddyliko_user', JSON.stringify(userData));
-
-                    // Auto-accept group invitation if present in URL or stored from pre-login
-                    const pendingInvite = window._pendingInviteToken || localStorage.getItem('buddyliko_pending_invite');
-                    if (pendingInvite) {
-                        localStorage.removeItem('buddyliko_pending_invite');
-                        try {
-                            const invRes = await fetch(`${API_BASE}/api/invitations/${pendingInvite}/accept`, {
-                                method: 'POST',
-                                headers: { 'Authorization': `Bearer ${token}` }
-                            });
-                            const invData = await invRes.json();
-                            if (invRes.ok) {
-                                setTimeout(() => alert('✅ Sei entrato nel gruppo!'), 500);
-                            } else {
-                                setTimeout(() => alert('⚠️ Invito: ' + (invData.detail || 'non valido')), 500);
-                            }
-                        } catch(e) { console.error('Invite accept error:', e); }
-                        delete window._pendingInviteToken;
-                    }
-
                     authCheckDiv.remove();
                 } else {
                     authCheckDiv.remove();
@@ -1186,7 +1152,6 @@
         }
     </script>
     
-    <div id="buddy-topbar"></div>
     <div id="root"></div>
     
     <script>
@@ -2688,9 +2653,6 @@
             const [showAccountModal, setShowAccountModal] = useState(false);
             const [linkedProviders, setLinkedProviders] = useState(null);
             const [accountTab, setAccountTab] = useState('providers');
-            const [myGroups, setMyGroups] = useState([]);
-            const [pendingInvitations, setPendingInvitations] = useState([]);
-            const [groupsLoaded, setGroupsLoaded] = useState(false);
 
             // DB Connector
             const [dbConnections, setDbConnections] = useState([]);
@@ -3470,37 +3432,7 @@
                     sessionStorage.removeItem('buddyliko_open_file');
                     try {
                         const ref = JSON.parse(openFile);
-                        if (ref.action === 'schema' && ref.fileId && ref.direction) {
-                            // CSV/schema file from workspace: download and upload as schema
-                            (async () => {
-                                try {
-                                    showStatus('⏳ Caricamento schema dal Workspace...', 'info');
-                                    const token = localStorage.getItem('buddyliko_token');
-                                    // Get file info for filename
-                                    const infoRes = await fetch(`${API_URL}/workspace/files/${ref.fileId}`, {
-                                        headers: { 'Authorization': `Bearer ${token}` }
-                                    });
-                                    const fileInfo = infoRes.ok ? await infoRes.json() : {};
-                                    const fileName = fileInfo.file?.name || fileInfo.name || 'schema.csv';
-
-                                    // Download file content
-                                    const dlRes = await fetch(`${API_URL}/workspace/files/${ref.fileId}/download`, {
-                                        headers: { 'Authorization': `Bearer ${token}` }
-                                    });
-                                    if (!dlRes.ok) throw new Error('Download fallito');
-                                    const blob = await dlRes.blob();
-                                    const file = new File([blob], fileName, { type: blob.type });
-
-                                    // Upload as schema via the existing uploadSchema function
-                                    uploadSchema(file, ref.direction, 'auto');
-                                } catch(e) {
-                                    showStatus('❌ Errore caricamento schema: ' + e.message, 'error');
-                                }
-                            })();
-                        } else if (ref.fileId) {
-                            // Project file: load from workspace API
-                            loadProjectFromWorkspace(ref.fileId);
-                        }
+                        if (ref.fileId) loadProjectFromWorkspace(ref.fileId);
                     } catch(e) { console.error('open_file parse error', e); }
                 }
             }, []);
@@ -3824,10 +3756,7 @@
                             });
                             if (syncRes.ok) {
                                 const blob = await syncRes.blob();
-                                // Get filename from Content-Disposition header or generate default
-                                const cd = syncRes.headers.get('X-Output-Filename');
-                                const dlName = cd || `${file.name.replace(/\.[^.]+$/, '')}_${outputSchemaId || 'converted'}.xml`;
-                                _downloadBlob(blob, dlName);
+                                _downloadBlob(blob, 'transformed_output.xml');
                                 modal.success('✅ Trasformazione completata!');
                             } else {
                                 const err = await syncRes.json().catch(() => ({}));
@@ -3842,8 +3771,7 @@
                         if (asyncData.engine_used) {
                             const outStr = typeof asyncData.result === 'string' ? asyncData.result : JSON.stringify(asyncData.result, null, 2);
                             const blob = new Blob([outStr], { type: 'application/xml' });
-                            const dlName = `${file.name.replace(/\.[^.]+$/, '')}_${outputSchemaId || 'converted'}.xml`;
-                            _downloadBlob(blob, dlName);
+                            _downloadBlob(blob, 'transformed_output.xml');
                             modal.success(`⚡ Trasformazione completata via engine (${asyncData.duration_ms}ms)`);
                             return;
                         }
@@ -4887,7 +4815,7 @@
                         ),
                         // Tabs
                         React.createElement('div',{style:{display:'flex',gap:'4px',marginBottom:'20px',background:'#0f1225',padding:'4px',borderRadius:'8px'}},
-                            [['providers','🔗 Login'],['password','🔒 Password'],['groups','📁 Gruppi'],['usage','📊 Consumo']].map(([tab,label]) =>
+                            [['providers','🔗 Login collegati'],['password','🔒 Password'],['usage','📊 Consumo']].map(([tab,label]) =>
                                 React.createElement('button',{key:tab,onClick:()=>setAccountTab(tab),
                                     style:{flex:1,padding:'8px',border:'none',borderRadius:'6px',cursor:'pointer',fontSize:'13px',fontWeight:'500',
                                            background:accountTab===tab?'#2563eb':'transparent',
@@ -4992,103 +4920,6 @@
                                     style:{padding:'10px',background:'#2563eb',border:'none',borderRadius:'6px',color:'#fff',fontSize:'14px',fontWeight:'600',cursor:'pointer'}
                                 },linkedProviders?.has_password?'🔒 Cambia password':'🔒 Imposta password')
                             )
-                        ),
-
-                        // ── TAB GROUPS ──
-                        accountTab==='groups' && React.createElement('div',null,
-                            // Load groups data when tab opens
-                            (() => {
-                                if (accountTab==='groups' && !groupsLoaded) {
-                                    setGroupsLoaded(true);
-                                    const tk = localStorage.getItem('buddyliko_token');
-                                    if (tk) {
-                                        fetch(`${API_URL}/users/me/groups`,{headers:{'Authorization':`Bearer ${tk}`}})
-                                            .then(r=>r.json()).then(d=>setMyGroups(d.groups||[])).catch(()=>{});
-                                        fetch(`${API_URL}/users/me/invitations`,{headers:{'Authorization':`Bearer ${tk}`}})
-                                            .then(r=>r.json()).then(d=>setPendingInvitations(d.invitations||[])).catch(()=>{});
-                                    }
-                                }
-                                return null;
-                            })(),
-                            // Pending invitations
-                            pendingInvitations.length > 0 && React.createElement('div',{
-                                style:{background:'#1e3a5f',border:'1px solid #2563eb44',borderRadius:'8px',padding:'12px',marginBottom:'16px'}
-                            },
-                                React.createElement('div',{style:{color:'#93c5fd',fontSize:'13px',fontWeight:'600',marginBottom:'8px'}},
-                                    `📨 ${pendingInvitations.length} invit${pendingInvitations.length===1?'o':'i'} in sospeso`),
-                                pendingInvitations.map(inv =>
-                                    React.createElement('div',{key:inv.id,
-                                        style:{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'8px',
-                                               background:'#0f1225',borderRadius:'6px',marginBottom:'4px'}},
-                                        React.createElement('span',{style:{color:'#e2e8f0',fontSize:'13px'}},`📁 ${inv.group_name}`),
-                                        React.createElement('button',{
-                                            onClick: async () => {
-                                                const tk=localStorage.getItem('buddyliko_token');
-                                                const r=await fetch(`${API_URL}/invitations/${inv.token}/accept`,
-                                                    {method:'POST',headers:{'Authorization':`Bearer ${tk}`}});
-                                                if(r.ok){
-                                                    showStatus('✅ Sei entrato nel gruppo!','success');
-                                                    setPendingInvitations(prev=>prev.filter(i=>i.id!==inv.id));
-                                                    // Reload groups
-                                                    fetch(`${API_URL}/users/me/groups`,{headers:{'Authorization':`Bearer ${tk}`}})
-                                                        .then(r=>r.json()).then(d=>setMyGroups(d.groups||[])).catch(()=>{});
-                                                } else { showStatus('❌ Errore','error'); }
-                                            },
-                                            style:{padding:'4px 12px',background:'#059669',border:'none',borderRadius:'6px',
-                                                   color:'#fff',fontSize:'12px',cursor:'pointer',fontWeight:'600'}
-                                        },'Accetta')
-                                    )
-                                )
-                            ),
-                            // My groups list
-                            React.createElement('div',{style:{marginBottom:'12px'}},
-                                myGroups.length === 0
-                                    ? React.createElement('p',{style:{color:'#64748b',textAlign:'center',padding:'20px'}},
-                                        'Non fai parte di nessun gruppo.')
-                                    : myGroups.map(g =>
-                                        React.createElement('div',{key:g.id,
-                                            style:{display:'flex',justifyContent:'space-between',alignItems:'center',
-                                                   padding:'12px',background:'#0f1225',borderRadius:'8px',
-                                                   border:'1px solid #2e3250',marginBottom:'6px'}},
-                                            React.createElement('div',null,
-                                                React.createElement('div',{style:{color:'#e2e8f0',fontWeight:'500',fontSize:'14px'}},
-                                                    '📁 '+g.name),
-                                                React.createElement('div',{style:{color:'#64748b',fontSize:'12px'}},
-                                                    (g.description||'Nessuna descrizione')+' · Ruolo: '+(g.member_role||'member'))
-                                            ),
-                                            g.member_role !== 'owner' && React.createElement('button',{
-                                                onClick: async () => {
-                                                    if(!confirm('Vuoi uscire dal gruppo "'+g.name+'"?')) return;
-                                                    const tk=localStorage.getItem('buddyliko_token');
-                                                    const me = JSON.parse(localStorage.getItem('buddyliko_user')||'{}')?.id || '';
-                                                    const r=await fetch(`${API_URL}/groups/${g.id}/members/${me}`,
-                                                        {method:'DELETE',headers:{'Authorization':`Bearer ${tk}`}});
-                                                    if(r.ok){
-                                                        showStatus('Uscito dal gruppo','success');
-                                                        setMyGroups(prev=>prev.filter(x=>x.id!==g.id));
-                                                    } else { showStatus('❌ Errore','error'); }
-                                                },
-                                                style:{padding:'6px 12px',background:'#7f1d1d',border:'1px solid #ef444433',
-                                                       color:'#fca5a5',borderRadius:'6px',cursor:'pointer',fontSize:'12px'}
-                                            },'Esci')
-                                        )
-                                    )
-                            ),
-                            // Refresh button
-                            React.createElement('button',{
-                                onClick: async () => {
-                                    const tk=localStorage.getItem('buddyliko_token');
-                                    const [gRes, iRes] = await Promise.all([
-                                        fetch(`${API_URL}/users/me/groups`,{headers:{'Authorization':`Bearer ${tk}`}}).then(r=>r.json()),
-                                        fetch(`${API_URL}/users/me/invitations`,{headers:{'Authorization':`Bearer ${tk}`}}).then(r=>r.json())
-                                    ]);
-                                    setMyGroups(gRes.groups||[]);
-                                    setPendingInvitations(iRes.invitations||[]);
-                                    showStatus('Aggiornato','success');
-                                },
-                                style:{padding:'8px',background:'#0f1225',border:'1px solid #2e3250',borderRadius:'6px',
-                                       color:'#94a3b8',fontSize:'13px',cursor:'pointer',width:'100%'}
-                            },'🔄 Aggiorna')
                         ),
 
                         // ── TAB USAGE ──
@@ -5318,6 +5149,16 @@
         
         function Sidebar({ inputSchema, outputSchema, connections, activeTab, setActiveTab, setShowUploadModal, setUploadDirection, downloadSampleCSV, exportFieldsCSV, statusMessage, setDraggedField, selectedConnection, setSelectedConnection, uploadExampleFile, inputExample, outputExample, loadAvailableSchemas, showStatus, availableInputSchemas, availableOutputSchemas, inputSchemaId, setInputSchemaId, outputSchemaId, setOutputSchemaId, exportDiagram, setShowAccountModal }) {
             return React.createElement('div', { className: 'sidebar' },
+                React.createElement('div', { className: 'sidebar-header' },
+                    React.createElement('img', {
+                        src: '/assets/logo-new.png',
+                        alt: 'Buddyliko',
+                        style: {
+                            width: '100%',
+                            display: 'block'
+                        }
+                    })
+                ),
                 React.createElement('div', { className: 'sidebar-content' },
                     statusMessage && React.createElement('div', { 
                         className: `status-message status-${statusMessage.type}` 
@@ -5385,8 +5226,8 @@
                         inputSchema ? React.createElement('div', { style: { fontSize: '12px', color: '#666', marginBottom: '10px' } },
                             `${inputSchema.field_count} fields - Drag to canvas`
                         ) : React.createElement('div', { className: 'empty-state' },
-                            React.createElement('div', { style: { fontSize: '28px' } }, '📋'),
-                            React.createElement('p', { style: { fontSize: '12px', margin: '4px 0 0' } }, 'Upload CSV schema')
+                            React.createElement('div', { style: { fontSize: '48px' } }, '📋'),
+                            React.createElement('p', null, 'Upload CSV schema')
                         )
                     ),
                     activeTab === 'output' && React.createElement('div', null,
@@ -5434,8 +5275,8 @@
                         outputSchema ? React.createElement('div', { style: { fontSize: '12px', color: '#666', marginBottom: '10px' } },
                             `${outputSchema.field_count} fields - Drag to canvas`
                         ) : React.createElement('div', { className: 'empty-state' },
-                            React.createElement('div', { style: { fontSize: '28px' } }, '📋'),
-                            React.createElement('p', { style: { fontSize: '12px', margin: '4px 0 0' } }, 'Upload CSV schema')
+                            React.createElement('div', { style: { fontSize: '48px' } }, '📋'),
+                            React.createElement('p', null, 'Upload CSV schema')
                         )
                     ),
                     activeTab === 'connections' && React.createElement('div', {
@@ -5513,7 +5354,79 @@
                         }, '🔄 Refresh Schema List')
                     )
                 ),
-                null // [009] sidebar footer removed — user info in topbar
+                React.createElement('div', { className: 'sidebar-footer' },
+                    React.createElement('div', { className: 'user-info' },
+                        React.createElement('div', { className: 'user-avatar' },
+                            (localStorage.getItem('buddyliko_user') ? 
+                                JSON.parse(localStorage.getItem('buddyliko_user')).name?.charAt(0).toUpperCase() : 
+                                'U')
+                        ),
+                        React.createElement('div', { className: 'user-details' },
+                            React.createElement('div', { className: 'user-name' },
+                                (localStorage.getItem('buddyliko_user') ? 
+                                    JSON.parse(localStorage.getItem('buddyliko_user')).name || 'User' : 
+                                    'Anonymous')
+                            ),
+                            React.createElement('div', { className: 'user-email' },
+                                (localStorage.getItem('buddyliko_user') ? 
+                                    JSON.parse(localStorage.getItem('buddyliko_user')).email || '' : 
+                                    'Not logged in')
+                            )
+                        )
+                    ),
+                    localStorage.getItem('buddyliko_token') && React.createElement(React.Fragment, null,
+                        React.createElement('button', {
+                            style: {
+                                marginRight: '8px',
+                                background: '#22263a',
+                                border: '1px solid #2e3250',
+                                color: '#94a3b8',
+                                borderRadius: '6px',
+                                padding: '6px 12px',
+                                cursor: 'pointer',
+                                fontSize: '12px',
+                                fontFamily: 'inherit'
+                            },
+                            onClick: () => { window.location.href = 'workspace.html'; }
+                        }, i18n.t('app.workspace')),
+                        React.createElement('button', {
+                            style: {
+                                marginRight: '8px',
+                                background: '#22263a',
+                                border: '1px solid #2e3250',
+                                color: '#94a3b8',
+                                borderRadius: '6px',
+                                padding: '6px 12px',
+                                cursor: 'pointer',
+                                fontSize: '12px',
+                                fontFamily: 'inherit'
+                            },
+                            onClick: () => setShowAccountModal(true)
+                        }, i18n.t('app.account')),
+                        React.createElement('button', {
+                            style: {
+                                marginRight: '8px',
+                                background: '#1e3a5f',
+                                border: '1px solid #2563eb44',
+                                color: '#93c5fd',
+                                borderRadius: '6px',
+                                padding: '6px 12px',
+                                cursor: 'pointer',
+                                fontSize: '12px',
+                                fontFamily: 'inherit'
+                            },
+                            onClick: () => { window.location.href = 'account.html'; }
+                        }, i18n.t('app.subscription')),
+                        React.createElement('button', {
+                            className: 'btn-logout',
+                            onClick: () => {
+                                if (confirm('Are you sure you want to logout?')) {
+                                    logout();
+                                }
+                            }
+                        }, i18n.t('app.logout'))
+                    )
+                )
             );
         }
         
@@ -5665,7 +5578,11 @@
                         onClick: () => setShowSchemaEditor(true),
                         title: 'Visual schema structure builder'
                     }, '🏗️ Schema Editor'),
-                    // [009] Settings button removed
+                    React.createElement('button', {
+                        className: 'btn btn-secondary',
+                        onClick: () => setShowSettings(true),
+                        title: 'Configure AI API keys'
+                    }, '⚙️ Settings'),
                     React.createElement('button', {
                         className: 'btn btn-primary',
                         onClick: saveSessionToBackend,
@@ -5916,9 +5833,9 @@
                         )
                     ),
                     (!inputSchema || !outputSchema) && React.createElement('div', { className: 'empty-state' },
-                        React.createElement('div', { style: { fontSize: '36px' } }, '📊'),
-                        React.createElement('h3', { style: { fontSize: '14px', margin: '8px 0 4px' } }, 'Upload Schemas to Start'),
-                        React.createElement('p', { style: { fontSize: '12px' } }, 'Upload input & output CSV schemas, then drag to connect')
+                        React.createElement('div', { style: { fontSize: '64px' } }, '📊'),
+                        React.createElement('h3', null, 'Upload Schemas to Start'),
+                        React.createElement('p', null, 'Upload input & output CSV schemas, then drag to connect')
                     )
                 )
             );
@@ -7513,7 +7430,6 @@
         root.render(React.createElement(App));
         }); // end i18n.init()
     </script>
-<script src="/assets/topbar.js"></script>
 <script src="/assets/theme.js"></script>
 </body>
 </html>

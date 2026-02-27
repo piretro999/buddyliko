@@ -1,243 +1,462 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="it">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Buddyliko - Transform Your Data</title>
-    <meta name="description" content="Visual data mapping and transformation platform. Inspired by Swahili 'Badiliko' (change).">
-    <meta name="theme-color" content="#00BCD4">
-    
-    <!-- Favicons -->
-    <link rel="icon" type="image/svg+xml" href="/assets/logo-icon.svg">
-    
+    <title>Buddyliko — Your Buddy in Transformations</title>
+    <meta name="description" content="Visual data mapping and transformation platform. Connect databases, files, EDI and APIs with a professional drag-and-drop mapper.">
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png">
+    <link rel="apple-touch-icon" href="/assets/favicon-180.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="/lang/i18n.js"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #00BCD4 0%, #3F51B5 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
+        *{margin:0;padding:0;box-sizing:border-box}
+        :root{
+            --white:#ffffff;
+            --offwhite:#f7fafd;
+            --blue-50:#e3f2fd;
+            --blue-100:#bbdefb;
+            --blue-200:#90caf9;
+            --blue-400:#42a5f5;
+            --blue-500:#2196f3;
+            --blue-600:#1e88e5;
+            --blue-700:#1565c0;
+            --blue-800:#0d47a1;
+            --blue-900:#0a2f6b;
+            --navy:#071e3d;
+            --green:#10b981;
+            --green-bg:#ecfdf5;
+            --orange:#f59e0b;
+            --orange-bg:#fffbeb;
+            --text:#1e293b;
+            --text2:#475569;
+            --text3:#94a3b8;
+            --border:#e2e8f0;
+            --card-shadow:0 1px 3px rgba(0,0,0,.06), 0 4px 12px rgba(0,0,0,.04);
+            --card-shadow-hover:0 8px 30px rgba(33,150,243,.12), 0 2px 8px rgba(0,0,0,.06);
         }
-        
-        .loader-container {
-            text-align: center;
-            color: white;
-            animation: fadeIn 0.5s ease-in;
+        html{scroll-behavior:smooth}
+        body{font-family:'Nunito',system-ui,sans-serif;background:var(--white);color:var(--text);line-height:1.7;overflow-x:hidden}
+        a{color:var(--blue-600);text-decoration:none}
+        a:hover{text-decoration:underline}
+
+        /* ── NAV ── */
+        nav{
+            position:fixed;top:0;left:0;right:0;z-index:100;
+            background:rgba(255,255,255,.92);
+            backdrop-filter:blur(16px);
+            border-bottom:1px solid var(--border);
+            padding:0 40px;
+            display:flex;align-items:center;justify-content:space-between;
+            height:72px;
         }
-        
-        .logo-animation {
-            width: 120px;
-            height: 120px;
-            margin: 0 auto 30px;
-            animation: logoEntry 1s ease-out;
+        .nav-brand{display:flex;align-items:center;gap:12px;text-decoration:none}
+        .nav-brand img{height:44px;border-radius:10px}
+        .nav-brand span{font-size:22px;font-weight:800;color:var(--blue-800);letter-spacing:-.5px}
+        .nav-links{display:flex;gap:8px;align-items:center}
+        .nav-links a{color:var(--text2);font-size:14px;font-weight:600;padding:8px 16px;border-radius:8px;transition:all .2s}
+        .nav-links a:hover{color:var(--blue-700);background:var(--blue-50);text-decoration:none}
+        .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 28px;border-radius:10px;font-weight:700;font-size:14px;cursor:pointer;border:none;transition:all .25s;font-family:inherit;text-decoration:none}
+        .btn:hover{text-decoration:none}
+        .btn-primary{background:var(--blue-600);color:#fff;box-shadow:0 2px 8px rgba(33,150,243,.3)}
+        .btn-primary:hover{background:var(--blue-700);transform:translateY(-2px);box-shadow:0 6px 20px rgba(33,150,243,.35)}
+        .btn-outline{border:2px solid var(--border);color:var(--text);background:transparent}
+        .btn-outline:hover{border-color:var(--blue-400);color:var(--blue-700);background:var(--blue-50)}
+        .btn-login{background:var(--blue-50);color:var(--blue-700);border:2px solid var(--blue-100)}
+        .btn-login:hover{background:var(--blue-100)}
+
+        /* ── HERO ── */
+        .hero{
+            padding:120px 40px 80px;
+            background:linear-gradient(165deg, var(--white) 0%, var(--blue-50) 40%, #dbeafe 100%);
+            position:relative;
+            overflow:hidden;
         }
-        
-        .logo-animation svg {
-            width: 100%;
-            height: 100%;
-            filter: drop-shadow(0 10px 30px rgba(0,0,0,0.3));
+        .hero::after{
+            content:'';position:absolute;bottom:-2px;left:0;right:0;height:80px;
+            background:linear-gradient(to bottom,transparent,var(--white));
         }
-        
-        h1 {
-            font-size: 42px;
-            font-weight: 700;
-            margin-bottom: 10px;
-            letter-spacing: -1px;
-            animation: slideUp 0.8s ease-out 0.3s both;
+        .hero-inner{
+            max-width:1200px;margin:0 auto;
+            display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;
         }
-        
-        .tagline {
-            font-size: 18px;
-            opacity: 0.95;
-            font-weight: 500;
-            margin-bottom: 40px;
-            animation: slideUp 0.8s ease-out 0.5s both;
+        .hero-text{position:relative;z-index:2}
+        .hero-badge{
+            display:inline-flex;align-items:center;gap:6px;
+            background:var(--orange-bg);border:1px solid rgba(245,158,11,.25);color:#92400e;
+            padding:6px 18px;border-radius:24px;font-size:13px;font-weight:700;margin-bottom:24px;
         }
-        
-        .spinner-container {
-            margin: 30px auto;
-            animation: slideUp 0.8s ease-out 0.7s both;
+        .hero h1{
+            font-size:clamp(36px,5vw,56px);font-weight:900;
+            line-height:1.15;letter-spacing:-.02em;
+            color:var(--navy);margin-bottom:20px;
         }
-        
-        .spinner {
-            width: 50px;
-            height: 50px;
-            border: 4px solid rgba(255,255,255,0.3);
-            border-top-color: white;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto;
+        .hero h1 .accent{
+            background:linear-gradient(135deg,var(--blue-500),var(--blue-800));
+            -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
         }
-        
-        .loading-text {
-            margin-top: 20px;
-            font-size: 15px;
-            opacity: 0.9;
-            animation: pulse 2s ease-in-out infinite;
+        .hero .subtitle{font-size:clamp(16px,2vw,19px);color:var(--text2);margin-bottom:32px;max-width:520px}
+        .hero-cta{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:32px}
+        .hero-visual{display:flex;justify-content:center;align-items:center;position:relative;z-index:2}
+        .hero-visual img{
+            width:100%;max-width:420px;
+            filter:drop-shadow(0 20px 40px rgba(13,71,161,.2));
+            animation:float 6s ease-in-out infinite;
         }
-        
-        .etymology {
-            margin-top: 50px;
-            padding-top: 30px;
-            border-top: 1px solid rgba(255,255,255,0.2);
-            font-size: 13px;
-            opacity: 0.85;
-            animation: slideUp 0.8s ease-out 1s both;
+        @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+        .warning-box{
+            background:rgba(255,255,255,.8);backdrop-filter:blur(8px);
+            border:1px solid rgba(245,158,11,.2);border-radius:12px;
+            padding:16px 20px;max-width:520px;
         }
-        
-        .etymology strong {
-            font-weight: 600;
+        .warning-box .wt{font-size:14px;font-weight:800;color:#92400e;margin-bottom:4px}
+        .warning-box .wd{font-size:13px;color:var(--text2);line-height:1.6}
+
+        /* ── SECTIONS ── */
+        .section{padding:100px 40px}
+        .section-header{text-align:center;max-width:640px;margin:0 auto 56px}
+        .section-title{font-size:clamp(28px,4vw,42px);font-weight:900;color:var(--navy);margin-bottom:14px;letter-spacing:-.02em}
+        .section-sub{font-size:clamp(15px,1.8vw,17px);color:var(--text2)}
+
+        /* ── FEATURES ── */
+        .features-bg{background:var(--white)}
+        .features-grid{
+            display:grid;grid-template-columns:repeat(3,1fr);gap:24px;
+            max-width:1100px;margin:0 auto;
         }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+        .feature-card{
+            background:var(--white);
+            border:1px solid var(--border);border-radius:16px;
+            padding:32px 28px;
+            transition:all .3s ease;
+            position:relative;overflow:hidden;
         }
-        
-        @keyframes logoEntry {
-            from {
-                transform: scale(0) rotate(-180deg);
-                opacity: 0;
-            }
-            to {
-                transform: scale(1) rotate(0deg);
-                opacity: 1;
-            }
+        .feature-card::before{
+            content:'';position:absolute;top:0;left:0;right:0;height:4px;
+            background:linear-gradient(90deg,var(--blue-400),var(--blue-700));
+            opacity:0;transition:opacity .3s;
         }
-        
-        @keyframes slideUp {
-            from {
-                transform: translateY(30px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
+        .feature-card:hover{
+            transform:translateY(-6px);
+            box-shadow:var(--card-shadow-hover);
+            border-color:var(--blue-200);
         }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        .feature-card:hover::before{opacity:1}
+        .feature-icon{
+            width:56px;height:56px;border-radius:14px;
+            display:flex;align-items:center;justify-content:center;
+            font-size:28px;margin-bottom:18px;
+            background:var(--blue-50);
         }
-        
-        @keyframes pulse {
-            0%, 100% { opacity: 0.9; }
-            50% { opacity: 0.6; }
+        .feature-card h3{font-size:18px;font-weight:800;color:var(--navy);margin-bottom:8px}
+        .feature-card p{color:var(--text2);font-size:14px;line-height:1.7}
+
+        /* ── USE CASES ── */
+        .usecases-bg{background:var(--offwhite)}
+        .usecases{
+            display:grid;grid-template-columns:repeat(4,1fr);gap:20px;
+            max-width:1100px;margin:0 auto;
+        }
+        .usecase{
+            background:var(--white);border:1px solid var(--border);
+            border-radius:14px;padding:28px 24px;
+            transition:all .3s;position:relative;
+        }
+        .usecase::after{
+            content:'→';position:absolute;top:24px;right:20px;
+            font-size:20px;color:var(--blue-200);transition:all .3s;
+        }
+        .usecase:hover{border-color:var(--blue-300);box-shadow:var(--card-shadow);transform:translateY(-3px)}
+        .usecase:hover::after{color:var(--blue-500);transform:translateX(3px)}
+        .usecase h4{font-size:15px;font-weight:800;color:var(--blue-700);margin-bottom:8px}
+        .usecase p{font-size:13px;color:var(--text2);line-height:1.7}
+
+        /* ── PRICING ── */
+        .pricing-bg{background:var(--white)}
+        .pricing-grid{
+            display:grid;grid-template-columns:repeat(3,1fr);gap:24px;
+            max-width:980px;margin:0 auto;
+        }
+        .pricing-card{
+            background:var(--white);border:2px solid var(--border);
+            border-radius:20px;padding:40px 28px 36px;text-align:center;
+            position:relative;transition:all .3s;
+        }
+        .pricing-card:hover{transform:translateY(-4px);box-shadow:var(--card-shadow-hover)}
+        .pricing-card.popular{
+            border-color:var(--blue-500);
+            box-shadow:0 0 0 1px var(--blue-500),0 8px 30px rgba(33,150,243,.12);
+        }
+        .pricing-card.popular::before{
+            content:attr(data-popular);position:absolute;top:-14px;left:50%;transform:translateX(-50%);
+            background:var(--blue-600);color:#fff;
+            font-size:11px;font-weight:800;padding:5px 20px;border-radius:20px;letter-spacing:.5px;text-transform:uppercase;
+        }
+        .pricing-card h3{font-size:22px;font-weight:800;color:var(--navy);margin-bottom:8px}
+        .pricing-card .price{font-size:52px;font-weight:900;color:var(--blue-700);margin:16px 0 4px}
+        .pricing-card .price span{font-size:16px;font-weight:600;color:var(--text3)}
+        .pricing-card .period{color:var(--text3);font-size:13px;margin-bottom:28px;font-weight:600}
+        .pricing-features{text-align:left;margin-bottom:28px;padding:0}
+        .pricing-features li{list-style:none;padding:7px 0;font-size:14px;color:var(--text2);display:flex;align-items:center;gap:10px}
+        .pricing-features li::before{content:'✓';color:var(--green);font-weight:900;font-size:16px;flex-shrink:0}
+        .pricing-features li.no::before{content:'✗';color:var(--text3)}.pricing-features li.no{color:var(--text3)}
+
+        /* ── CTA ── */
+        .cta-section{
+            text-align:center;padding:100px 40px;
+            background:linear-gradient(165deg,var(--blue-50) 0%,#dbeafe 50%,var(--blue-100) 100%);
+            position:relative;
+        }
+        .cta-section h2{font-size:clamp(26px,4vw,40px);font-weight:900;color:var(--navy);margin-bottom:16px}
+        .cta-section p{color:var(--text2);margin-bottom:32px;font-size:17px;max-width:520px;margin-left:auto;margin-right:auto}
+        .cta-mascot{width:80px;margin:0 auto 24px;animation:float 5s ease-in-out infinite}
+
+        /* ── FOOTER ── */
+        footer{
+            padding:40px;
+            border-top:1px solid var(--border);
+            display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;
+            color:var(--text3);font-size:13px;font-weight:600;
+            background:var(--white);
+        }
+        footer a{color:var(--text3)}footer a:hover{color:var(--blue-600)}
+
+        /* ── RESPONSIVE ── */
+        @media(max-width:1024px){
+            .features-grid{grid-template-columns:repeat(2,1fr)}
+            .usecases{grid-template-columns:repeat(2,1fr)}
+        }
+        @media(max-width:768px){
+            nav{padding:0 20px;height:64px}
+            .nav-brand span{display:none}
+            .nav-links{gap:4px}
+            .nav-links a.hide-mobile{display:none}
+            .section{padding:60px 20px}
+            .hero{padding:100px 20px 60px}
+            .hero-inner{grid-template-columns:1fr;text-align:center}
+            .hero .subtitle{margin-left:auto;margin-right:auto}
+            .hero-cta{justify-content:center}
+            .hero-visual img{max-width:260px}
+            .warning-box{margin:0 auto}
+            .features-grid{grid-template-columns:1fr}
+            .usecases{grid-template-columns:1fr}
+            .pricing-grid{grid-template-columns:1fr;max-width:400px}
+            .pricing-card .price{font-size:40px}
+            footer{flex-direction:column;text-align:center;padding:30px 20px}
+        }
+        @media(max-width:480px){
+            .hero h1{font-size:30px}
+            .btn{padding:10px 20px;font-size:13px}
         }
     </style>
 </head>
 <body>
-    <div class="loader-container">
-        <div class="logo-animation">
-            <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-                <defs>
-                    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
-                        <stop offset="100%" style="stop-color:#E0F7FA;stop-opacity:1" />
-                    </linearGradient>
-                </defs>
-                <circle cx="32" cy="32" r="30" fill="url(#gradient)" opacity="0.2"/>
-                <path d="M 20 32 A 12 12 0 1 1 44 32" stroke="white" stroke-width="4" fill="none" stroke-linecap="round"/>
-                <path d="M 44 32 L 40 29 M 44 32 L 40 35" stroke="white" stroke-width="4" stroke-linecap="round"/>
-                <path d="M 44 32 A 12 12 0 1 1 20 32" stroke="white" stroke-width="4" fill="none" stroke-linecap="round"/>
-                <path d="M 20 32 L 24 29 M 20 32 L 24 35" stroke="white" stroke-width="4" stroke-linecap="round"/>
-                <text x="32" y="42" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="white" text-anchor="middle">B</text>
-            </svg>
+
+<nav>
+    <a href="/" class="nav-brand">
+        <img src="/assets/logo-new.png" alt="Buddyliko">
+        <span>Buddyliko</span>
+    </a>
+    <div class="nav-links">
+        <a href="#features" class="hide-mobile" data-i18n="nav.features">Funzionalità</a>
+        <a href="#pricing" class="hide-mobile" data-i18n="nav.pricing">Prezzi</a>
+        <span id="lang-switcher"></span>
+        <a href="login.html" class="btn btn-login" data-i18n="nav.login">Login</a>
+    </div>
+</nav>
+
+<section class="hero">
+    <div class="hero-inner">
+        <div class="hero-text">
+            <div class="hero-badge" data-i18n="hero.badge">🚧 Servizio non ancora attivo — Accesso solo su invito</div>
+            <h1 data-i18n-html="hero.title">Il tuo <span class="accent">Buddy</span> nelle<br>trasformazioni dati</h1>
+            <p class="subtitle" data-i18n="hero.subtitle">Mapper visuale drag-and-drop per collegare database, file CSV/XML, formati EDI/HL7 e API. Il tuo Buddy trasforma i dati, senza scrivere codice.</p>
+
+            <div class="warning-box">
+                <div class="wt" data-i18n="hero.warning_title">⚠️ Buddyliko è in fase di sviluppo</div>
+                <div class="wd" data-i18n-html="hero.warning_text">Il servizio non è ancora disponibile al pubblico.</div>
+            </div>
+
+            <div class="hero-cta" style="margin-top:28px">
+                <a href="#features" class="btn btn-primary" data-i18n="hero.cta">Scopri di più ↓</a>
+            </div>
         </div>
-        
-        <h1>Buddyliko</h1>
-        <p class="tagline">Transform Your Data</p>
-        
-        <div class="spinner-container">
-            <div class="spinner"></div>
-            <p class="loading-text">Loading your workspace...</p>
-        </div>
-        
-        <div class="etymology">
-            <strong>Badiliko</strong> (Swahili) — <em>Change, Transformation</em>
+        <div class="hero-visual">
+            <img src="/assets/logo-new.png" alt="Buddyliko — Your Buddy">
         </div>
     </div>
-    
-    <script>
-        const API_BASE = 'http://localhost:8080';
-        
-        async function init() {
-            try {
-                // Check if auth is enabled
-                const statusResponse = await fetch(`${API_BASE}/api/auth/status`);
-                const status = await statusResponse.json();
-                
-                if (!status.enabled) {
-                    // Auth disabled, go directly to app
-                    setTimeout(() => {
-                        window.location.href = '/app.html';
-                    }, 2000);
-                    return;
-                }
-                
-                // Auth enabled, check if user has token
-                const token = localStorage.getItem('datamapper_token');
-                
-                if (!token) {
-                    // No token, redirect to login
-                    setTimeout(() => {
-                        window.location.href = '/login.html';
-                    }, 2000);
-                    return;
-                }
-                
-                // Verify token
-                const meResponse = await fetch(`${API_BASE}/api/auth/me`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                
-                if (meResponse.ok) {
-                    // Token valid, go to app
-                    setTimeout(() => {
-                        window.location.href = '/app.html';
-                    }, 2000);
-                } else {
-                    // Token invalid, remove and go to login
-                    localStorage.removeItem('datamapper_token');
-                    localStorage.removeItem('datamapper_user');
-                    setTimeout(() => {
-                        window.location.href = '/login.html';
-                    }, 2000);
-                }
-                
-            } catch (e) {
-                // Connection error, try to go to app anyway
-                console.error('Init error:', e);
-                setTimeout(() => {
-                    window.location.href = '/app.html';
-                }, 2000);
-            }
-        }
-        
-        // Check for token in URL (from OAuth callback)
-        const urlParams = new URLSearchParams(window.location.search);
-        const tokenFromUrl = urlParams.get('token');
-        
-        if (tokenFromUrl) {
-            localStorage.setItem('datamapper_token', tokenFromUrl);
-            window.location.href = '/app.html';
-        } else {
-            init();
-        }
-        
-        // Easter egg in console
-        console.log(`
-🌍 Buddyliko v2.0
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Badiliko (Swahili) = Change
-Transform your data with confidence
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Built with ❤️ using FastAPI + React
-        `);
-    </script>
+</section>
+
+<section class="section features-bg" id="features">
+    <div class="section-header">
+        <h2 class="section-title" data-i18n="features.title">Tutto ciò che serve per trasformare i dati</h2>
+        <p class="section-sub" data-i18n="features.subtitle">Un'unica piattaforma per mapping, trasformazione e integrazione dati B2B.</p>
+    </div>
+    <div class="features-grid">
+        <div class="feature-card">
+            <div class="feature-icon">🔗</div>
+            <h3 data-i18n="features.mapper.title">Mapper visuale</h3>
+            <p data-i18n="features.mapper.desc">Drag-and-drop per collegare campi sorgente e destinazione.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">🗄️</div>
+            <h3 data-i18n="features.db.title">Database Connector</h3>
+            <p data-i18n="features.db.desc">Collegati direttamente a PostgreSQL, MySQL, SQL Server e SQLite.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">📋</div>
+            <h3 data-i18n="features.formats.title">Formati multipli</h3>
+            <p data-i18n="features.formats.desc">CSV, JSON, XML, Excel, EDI X12/EDIFACT, HL7.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">🤖</div>
+            <h3 data-i18n="features.ai.title">AI Auto-mapping</h3>
+            <p data-i18n="features.ai.desc">Lascia che il tuo Buddy mappi automaticamente i campi.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">⚡</div>
+            <h3 data-i18n="features.codegen.title">Code Generation</h3>
+            <p data-i18n="features.codegen.desc">Genera codice Python, JavaScript o XSLT dalle tue mappature.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">👥</div>
+            <h3 data-i18n="features.collab.title">Collaborazione</h3>
+            <p data-i18n="features.collab.desc">Workspace condiviso con gruppi, permessi e audit log.</p>
+        </div>
+    </div>
+</section>
+
+<section class="section usecases-bg">
+    <div class="section-header">
+        <h2 class="section-title" data-i18n="usecases.title">Casi d'uso</h2>
+        <p class="section-sub" data-i18n="usecases.subtitle">Buddyliko risolve problemi reali di trasformazione dati B2B.</p>
+    </div>
+    <div class="usecases">
+        <div class="usecase">
+            <h4 data-i18n="usecases.sap.title">SAP IDoc → UBL 2.1</h4>
+            <p data-i18n="usecases.sap.desc">Trasforma fatture SAP IDoc in formato UBL 2.1.</p>
+        </div>
+        <div class="usecase">
+            <h4 data-i18n="usecases.fattura.title">FatturaPA ↔ UBL PEPPOL</h4>
+            <p data-i18n="usecases.fattura.desc">Converti FatturaPA in UBL PEPPOL e viceversa.</p>
+        </div>
+        <div class="usecase">
+            <h4 data-i18n="usecases.edifact.title">EDIFACT INVOIC</h4>
+            <p data-i18n="usecases.edifact.desc">Mappa fatture EDIFACT D96A verso i formati del tuo gestionale.</p>
+        </div>
+        <div class="usecase">
+            <h4 data-i18n="usecases.multi.title">Fatturazione multi-paese</h4>
+            <p data-i18n="usecases.multi.desc">Gestisci requisiti di fatturazione elettronica per più paesi EU.</p>
+        </div>
+    </div>
+</section>
+
+<section class="section pricing-bg" id="pricing">
+    <div class="section-header">
+        <h2 class="section-title" data-i18n="pricing.title">Piani e prezzi</h2>
+        <p class="section-sub" data-i18n="pricing.subtitle">Scegli il piano adatto alle tue esigenze.</p>
+    </div>
+    <div class="pricing-grid" id="pricingGrid">
+        <div style="text-align:center;color:var(--text3);padding:40px;grid-column:1/-1" data-i18n="pricing.loading">Caricamento prezzi...</div>
+    </div>
+</section>
+
+<section class="cta-section">
+    <img src="/assets/logo-new.png" class="cta-mascot" alt="Buddyliko">
+    <h2 data-i18n="cta.title">Il tuo Buddy sarà disponibile a breve</h2>
+    <p data-i18n="cta.subtitle">Il servizio è in fase di sviluppo. L'accesso è riservato esclusivamente agli utenti invitati.</p>
+</section>
+
+<footer>
+    <div data-i18n="footer.rights">© 2026 Buddyliko. Tutti i diritti riservati.</div>
+    <div style="display:flex;gap:24px;flex-wrap:wrap;justify-content:center">
+        <a href="/privacy.html" data-i18n="footer.privacy">Privacy Policy</a>
+        <a href="/terms.html" data-i18n="footer.terms">Termini di servizio</a>
+        <a href="/cdn-cgi/l/email-protection#d9bbbcb2b0b7bd99bbacbdbda0b5b0b2b6f7bab6b4" data-i18n="footer.contact">Contatti</a>
+    </div>
+</footer>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+<script>
+(async function() {
+    await i18n.init();
+    i18n.createSwitcher('lang-switcher');
+    window.addEventListener('langchange', () => loadPricing());
+    loadPricing();
+})();
+
+async function loadPricing() {
+    const T = i18n.t.bind(i18n);
+    const grid = document.getElementById('pricingGrid');
+    try {
+        const r = await fetch(`${window.location.origin}/api/billing/config`);
+        const d = await r.json();
+        const plans = d.plans || {};
+        const free = plans.FREE || {prices:{monthly:0,yearly:0},limits:{}};
+        const pro = plans.PRO || {prices:{monthly:49,yearly:490},limits:{}};
+        const ent = plans.ENTERPRISE || {prices:{monthly:299,yearly:2990},limits:{}};
+
+        function lim(l, key, fb) { return l.limits?.[key] ?? fb; }
+        function fmtLim(v) { return v===-1||v===true ? T('pricing.unlimited') : v===false ? 'No' : v; }
+        const na = T('pricing.not_available');
+
+        grid.innerHTML = `
+        <div class="pricing-card">
+            <h3>Free</h3>
+            <div class="price">&euro;${free.prices.monthly}</div>
+            <div class="period">${T('pricing.forever')}</div>
+            <ul class="pricing-features">
+                <li>${fmtLim(lim(free,'transforms_per_month',100))} ${T('pricing.transforms_month')}</li>
+                <li>${T('pricing.files_up_to')} ${lim(free,'max_file_size_mb',1)} MB</li>
+                <li>${T('pricing.full_mapper')}</li>
+                <li>${T('pricing.formats_basic')}</li>
+                <li class="${lim(free,'code_generation',false)?'':'no'}">${T('pricing.codegen')}</li>
+                <li class="${lim(free,'db_connector',false)?'':'no'}">${T('pricing.db_connector')}</li>
+                <li class="${lim(free,'api_access',false)?'':'no'}">${T('pricing.api_access')}</li>
+            </ul>
+            <span class="btn btn-outline" style="width:100%;opacity:.5;cursor:default">${na}</span>
+        </div>
+        <div class="pricing-card popular" data-popular="${T('pricing.popular')}">
+            <h3>Pro</h3>
+            <div class="price">&euro;${pro.prices.monthly}<span>${T('pricing.month')}</span></div>
+            <div class="period">&euro;${pro.prices.yearly}${T('pricing.year')} (${T('pricing.save2')})</div>
+            <ul class="pricing-features">
+                <li>${T('pricing.unlimited_transforms')}</li>
+                <li>${T('pricing.files_up_to')} ${lim(pro,'max_file_size_mb',50)} MB</li>
+                <li>${T('pricing.codegen')}</li>
+                <li>${T('pricing.edi_formats')}</li>
+                <li>${T('pricing.async_transforms')}</li>
+                <li>${T('pricing.up_to_users',{n:lim(pro,'max_users',5)})}</li>
+                <li class="${lim(pro,'db_connector',false)?'':'no'}">${T('pricing.db_connector')}</li>
+            </ul>
+            <span class="btn btn-primary" style="width:100%;opacity:.5;cursor:default">${na}</span>
+        </div>
+        <div class="pricing-card">
+            <h3>Enterprise</h3>
+            <div class="price">&euro;${ent.prices.monthly}<span>${T('pricing.month')}</span></div>
+            <div class="period">&euro;${ent.prices.yearly}${T('pricing.year')} (${T('pricing.save2')})</div>
+            <ul class="pricing-features">
+                <li>${T('pricing.all_pro')}</li>
+                <li>${T('pricing.files_up_to')} ${lim(ent,'max_file_size_mb',500)} MB</li>
+                <li>${T('pricing.full_db')}</li>
+                <li>${T('pricing.unlimited_users')}</li>
+                <li>${T('pricing.audit_log')}</li>
+                <li>${T('pricing.api_access')}</li>
+            </ul>
+            <span class="btn btn-outline" style="width:100%;opacity:.5;cursor:default">${na}</span>
+        </div>`;
+    } catch(e) {
+        const na = i18n.t('pricing.not_available');
+        grid.innerHTML = `
+        <div class="pricing-card"><h3>Free</h3><div class="price">&euro;0</div><div class="period">${i18n.t('pricing.forever')}</div><span class="btn btn-outline" style="width:100%;opacity:.5;cursor:default">${na}</span></div>
+        <div class="pricing-card popular" data-popular="${i18n.t('pricing.popular')}"><h3>Pro</h3><div class="price">&euro;49<span>${i18n.t('pricing.month')}</span></div><span class="btn btn-primary" style="width:100%;opacity:.5;cursor:default">${na}</span></div>
+        <div class="pricing-card"><h3>Enterprise</h3><div class="price">&euro;299<span>${i18n.t('pricing.month')}</span></div><span class="btn btn-outline" style="width:100%;opacity:.5;cursor:default">${na}</span></div>`;
+    }
+}
+</script>
+<script src="/assets/theme.js"></script>
 </body>
 </html>

@@ -1,352 +1,151 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="it">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Buddyliko - Account Settings</title>
+    <title>Account Settings — Buddyliko</title>
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png">
+    <script src="/lang/i18n.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #1E88E5 0%, #42A5F5 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-        
-        .container {
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            max-width: 600px;
-            width: 100%;
-            padding: 40px;
-        }
-        
-        h1 {
-            color: #1E88E5;
-            margin-bottom: 10px;
-            font-size: 28px;
-        }
-        
-        .subtitle {
-            color: #666;
-            margin-bottom: 30px;
-            font-size: 14px;
-        }
-        
-        .section {
-            margin-bottom: 30px;
-        }
-        
-        .section-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .provider-card {
-            border: 2px solid #e0e0e0;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 12px;
-            transition: all 0.3s;
-        }
-        
-        .provider-card.linked {
-            border-color: #4CAF50;
-            background: #f1f8f4;
-        }
-        
-        .provider-card:hover {
-            border-color: #1E88E5;
-            box-shadow: 0 4px 12px rgba(30, 136, 229, 0.2);
-        }
-        
-        .provider-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 10px;
-        }
-        
-        .provider-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        
-        .provider-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            background: #f5f5f5;
-        }
-        
-        .provider-icon.google { background: #fff; border: 2px solid #4285F4; }
-        .provider-icon.facebook { background: #1877F2; color: white; }
-        .provider-icon.github { background: #24292e; color: white; }
-        .provider-icon.email { background: #666; color: white; }
-        
-        .provider-details {
-            flex: 1;
-        }
-        
-        .provider-name {
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 4px;
-        }
-        
-        .provider-email {
-            font-size: 13px;
-            color: #666;
-        }
-        
-        .provider-meta {
-            font-size: 12px;
-            color: #999;
-            margin-top: 8px;
-        }
-        
-        .badge {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        .badge.primary {
-            background: #FFD700;
-            color: #000;
-        }
-        
-        .badge.linked {
-            background: #4CAF50;
-            color: white;
-        }
-        
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, #1E88E5, #42A5F5);
-            color: white;
-        }
-        
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(30, 136, 229, 0.4);
-        }
-        
-        .btn-secondary {
-            background: white;
-            color: #666;
-            border: 2px solid #e0e0e0;
-        }
-        
-        .btn-secondary:hover {
-            border-color: #1E88E5;
-            color: #1E88E5;
-        }
-        
-        .btn-danger {
-            background: white;
-            color: #f44336;
-            border: 2px solid #f44336;
-        }
-        
-        .btn-danger:hover {
-            background: #f44336;
-            color: white;
-        }
-        
-        .btn-small {
-            padding: 6px 14px;
-            font-size: 12px;
-        }
-        
-        .alert {
-            padding: 12px 16px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 14px;
-        }
-        
-        .alert.success {
-            background: #e8f5e9;
-            color: #2e7d32;
-            border-left: 4px solid #4caf50;
-        }
-        
-        .alert.error {
-            background: #ffebee;
-            color: #c62828;
-            border-left: 4px solid #f44336;
-        }
-        
-        .alert.warning {
-            background: #fff3e0;
-            color: #e65100;
-            border-left: 4px solid #ff9800;
-        }
-        
-        .alert.info {
-            background: #e3f2fd;
-            color: #1565c0;
-            border-left: 4px solid #2196f3;
-        }
-        
-        .loading {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #1E88E5;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        .user-info {
-            background: #f5f5f5;
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 30px;
-        }
-        
-        .user-info h2 {
-            font-size: 20px;
-            color: #333;
-            margin-bottom: 8px;
-        }
-        
-        .user-info p {
-            color: #666;
-            font-size: 14px;
-            margin: 4px 0;
-        }
+        *{margin:0;padding:0;box-sizing:border-box}
+        :root{--bg:#f8fafc;--card:#fff;--border:#e2e8f0;--blue:#2196f3;--blue2:#1565c0;--green:#10b981;--purple:#7c3aed;--red:#ef4444;--orange:#f59e0b;--text:#1e293b;--text2:#64748b;--text3:#94a3b8}
+        body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+        a{color:var(--blue);text-decoration:none}
+
+        .container{max-width:700px;margin:0 auto;padding:32px 24px}
+        h1{font-size:28px;font-weight:700;margin-bottom:8px}
+        .page-sub{color:var(--text2);margin-bottom:32px;font-size:15px}
+        .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:28px;margin-bottom:20px}
+        .card h2{font-size:18px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+        .provider-card{border:2px solid var(--border);border-radius:12px;padding:20px;margin-bottom:12px;transition:all .3s}
+        .provider-card.linked{border-color:var(--green);background:#f0fdf4}
+        .provider-card:hover{border-color:var(--blue);box-shadow:0 4px 12px rgba(33,150,243,.1)}
+        .provider-header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+        .provider-info{display:flex;align-items:center;gap:12px}
+        .provider-icon{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;background:#f5f5f5}
+        .provider-icon.google{background:#fff;border:2px solid #4285F4}
+        .provider-icon.github{background:#24292e;color:white}
+        .provider-icon.email{background:#666;color:white}
+        .provider-name{font-weight:600;color:var(--text)}
+        .provider-email{font-size:13px;color:var(--text2)}
+        .provider-meta{font-size:12px;color:var(--text3);margin-top:4px}
+        .badge{display:inline-block;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600}
+        .badge-primary{background:#FFD700;color:#000}
+        .badge-linked{background:var(--green);color:white}
+        .btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s}
+        .btn:hover{transform:translateY(-1px)}
+        .btn-primary{background:var(--blue);color:#fff}.btn-primary:hover{background:var(--blue2)}
+        .btn-outline{border:2px solid var(--border);color:var(--text2);background:#fff}.btn-outline:hover{border-color:var(--blue);color:var(--blue)}
+        .btn-danger{border:2px solid var(--red);color:var(--red);background:#fff}.btn-danger:hover{background:var(--red);color:#fff}
+        .btn-sm{padding:6px 12px;font-size:12px}
+        .alert{padding:12px 16px;border-radius:8px;margin-bottom:16px;font-size:14px;display:flex;align-items:center;gap:10px;animation:fadeIn .3s}
+        .alert-success{background:#e8f5e9;color:#2e7d32;border-left:4px solid #4caf50}
+        .alert-error{background:#ffebee;color:#c62828;border-left:4px solid #f44336}
+        .alert-info{background:#e3f2fd;color:#1565c0;border-left:4px solid #2196f3}
+        .user-info{background:#f1f5f9;padding:20px;border-radius:12px;margin-bottom:24px}
+        .user-info h3{font-size:18px;margin-bottom:8px}
+        .user-info p{color:var(--text2);font-size:14px;margin:4px 0}
+        .btn-actions{display:flex;gap:8px;flex-wrap:wrap}
+        @keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+        @media(max-width:768px){.container{padding:20px 16px}.provider-header{flex-direction:column;align-items:flex-start}}
     </style>
 </head>
 <body>
+    <div id="buddy-topbar"></div>
+
     <div class="container">
-        <h1>🔐 Account Settings</h1>
-        <p class="subtitle">Manage your authentication methods</p>
-        
+        <h1 data-i18n="account_settings.title">Impostazioni Account</h1>
+        <p class="page-sub" data-i18n="account_settings.subtitle">Gestisci i tuoi metodi di autenticazione</p>
+
         <div id="alerts"></div>
-        
-        <div class="user-info" id="userInfo" style="display: none;">
-            <h2 id="userName"></h2>
-            <p><strong>Email:</strong> <span id="userEmail"></span></p>
-            <p><strong>Role:</strong> <span id="userRole"></span></p>
-            <p><strong>Status:</strong> <span id="userStatus"></span></p>
+
+        <div class="user-info" id="userInfo" style="display:none">
+            <h3 id="userName"></h3>
+            <p><strong data-i18n="account.email">Email</strong>: <span id="userEmail"></span></p>
+            <p><strong data-i18n="account.role">Ruolo</strong>: <span id="userRole"></span></p>
+            <p><strong data-i18n="account.status">Stato</strong>: <span id="userStatus"></span></p>
         </div>
-        
-        <div class="section">
-            <div class="section-title">
-                🔑 Linked Authentication Methods
-            </div>
-            
+
+        <div class="card">
+            <h2>🔑 <span data-i18n="account_settings.linked_logins">Metodi di autenticazione collegati</span></h2>
             <div id="providersContainer">
-                <div class="alert info">
-                    <span class="loading"></span>
-                    Loading your account...
+                <div class="alert alert-info">
+                    <span data-i18n="account_settings.loading_account">Caricamento account...</span>
                 </div>
             </div>
         </div>
-        
-        <div class="section" id="availableProviders" style="display: none;">
-            <div class="section-title">
-                ➕ Available Providers
-            </div>
-            
+
+        <div class="card" id="availableProviders" style="display:none">
+            <h2>➕ <span data-i18n="account_settings.available_providers">Provider disponibili</span></h2>
             <div id="availableContainer"></div>
         </div>
+
+        <!-- MFA Section -->
+        <div class="card" id="mfaSection">
+            <h2>🔐 <span data-i18n="account_settings.mfa_title">Autenticazione a due fattori (MFA)</span></h2>
+            <p style="color:var(--text2);font-size:14px;margin-bottom:20px" data-i18n="account_settings.mfa_description">Aggiungi un livello di sicurezza extra al tuo account richiedendo un codice di verifica al login.</p>
+
+            <div id="mfaStatus" style="margin-bottom:20px">
+                <div class="alert alert-info"><span data-i18n="common.loading">Caricamento...</span></div>
+            </div>
+
+            <!-- TOTP Setup (hidden by default) -->
+            <div id="mfaTotpSetup" style="display:none">
+                <div style="border:2px solid var(--border);border-radius:12px;padding:24px;margin-bottom:16px;text-align:center">
+                    <h3 style="margin-bottom:12px;font-size:16px" data-i18n="account_settings.mfa_totp_setup_title">Configura app Authenticator</h3>
+                    <p style="color:var(--text2);font-size:13px;margin-bottom:16px" data-i18n="account_settings.mfa_totp_scan">Scansiona il QR code con Google Authenticator, Authy o un'app compatibile:</p>
+                    <div id="mfaQrCode" style="display:inline-block;padding:12px;background:#fff;border-radius:8px;margin-bottom:12px"></div>
+                    <div style="margin-bottom:16px">
+                        <button onclick="toggleManualKey()" style="background:none;border:none;color:var(--blue);font-size:12px;cursor:pointer" data-i18n="account_settings.mfa_totp_manual">Non riesci a scansionare? Inserisci il codice manualmente</button>
+                        <div id="mfaManualKey" style="display:none;margin-top:8px">
+                            <code id="mfaSecretKey" style="display:inline-block;padding:8px 16px;background:#f1f5f9;border-radius:6px;font-size:14px;font-weight:600;letter-spacing:2px;user-select:all;word-break:break-all"></code>
+                        </div>
+                    </div>
+                    <p style="color:var(--text2);font-size:13px;margin-bottom:12px" data-i18n="account_settings.mfa_totp_enter_code">Inserisci il codice a 6 cifre dall'app per confermare:</p>
+                    <div style="display:flex;gap:8px;justify-content:center;align-items:center;flex-wrap:wrap">
+                        <input type="text" id="mfaTotpCode" placeholder="000000" maxlength="6" inputmode="numeric"
+                               style="width:160px;text-align:center;font-size:24px;letter-spacing:6px;padding:10px;border:2px solid var(--border);border-radius:8px;font-weight:700">
+                        <button class="btn btn-primary" onclick="confirmTotp()" data-i18n="account_settings.mfa_totp_confirm">Conferma</button>
+                        <button class="btn btn-outline" onclick="cancelTotpSetup()" data-i18n="common.cancel">Annulla</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-    
+
+    <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
     <script>
-        const API_URL = 'http://localhost:8080/api';
+        const API_URL = '/api';
+        let accessToken = localStorage.getItem('buddyliko_token');
         let currentUser = null;
-        let accessToken = localStorage.getItem('access_token');
-        
-        // Show alert
-        function showAlert(message, type = 'info') {
-            const alerts = document.getElementById('alerts');
-            const alert = document.createElement('div');
-            alert.className = `alert ${type}`;
-            alert.innerHTML = message;
-            alerts.appendChild(alert);
-            
-            setTimeout(() => {
-                alert.remove();
-            }, 5000);
+        const T = (key, rep) => typeof i18n !== 'undefined' && i18n.isLoaded() ? i18n.t(key, rep) : key;
+
+        if (!accessToken) { window.location.href = 'login.html'; }
+
+        function showAlert(msg, type = 'success') {
+            const div = document.createElement('div');
+            div.className = `alert alert-${type}`;
+            div.textContent = msg;
+            const el = document.getElementById('alerts');
+            el.insertBefore(div, el.firstChild);
+            setTimeout(() => div.remove(), 3500);
         }
-        
-        // Get current user
+
         async function getCurrentUser() {
-            if (!accessToken) {
-                window.location.href = '/login.html';
-                return;
-            }
-            
             try {
-                const response = await fetch(`${API_URL}/auth/me`, {
-                    headers: {
-                        'Authorization': `Bearer ${accessToken}`
-                    }
-                });
-                
-                if (!response.ok) {
-                    throw new Error('Not authenticated');
-                }
-                
-                currentUser = await response.json();
+                const r = await fetch(`${API_URL}/auth/me`, { headers: { 'Authorization': `Bearer ${accessToken}` } });
+                if (!r.ok) { window.location.href = 'login.html'; return; }
+                const data = await r.json();
+                currentUser = data.user || data;
                 displayUser();
                 loadProviders();
-            } catch (error) {
-                showAlert('Not authenticated. Please login first.', 'error');
-                setTimeout(() => {
-                    window.location.href = '/login.html';
-                }, 2000);
+            } catch (e) {
+                showAlert(T('account_settings.access_denied'), 'error');
+                setTimeout(() => window.location.href = 'login.html', 2000);
             }
         }
-        
-        // Display user info
+
         function displayUser() {
             document.getElementById('userInfo').style.display = 'block';
             document.getElementById('userName').textContent = currentUser.name;
@@ -354,222 +153,296 @@
             document.getElementById('userRole').textContent = currentUser.role;
             document.getElementById('userStatus').textContent = currentUser.status;
         }
-        
-        // Load linked providers
+
         async function loadProviders() {
             try {
-                const response = await fetch(`${API_URL}/auth/providers`, {
-                    headers: {
-                        'Authorization': `Bearer ${accessToken}`
-                    }
-                });
-                
-                const providers = await response.json();
-                displayProviders(providers);
-            } catch (error) {
-                showAlert('Failed to load providers', 'error');
+                const r = await fetch(`${API_URL}/auth/providers`, { headers: { 'Authorization': `Bearer ${accessToken}` } });
+                const data = await r.json();
+                displayProviders(data.providers || data);
+            } catch (e) {
+                showAlert(T('account_settings.failed_load'), 'error');
             }
         }
-        
-        // Display providers
+
         function displayProviders(providers) {
             const container = document.getElementById('providersContainer');
             const availableContainer = document.getElementById('availableContainer');
-            
             container.innerHTML = '';
             availableContainer.innerHTML = '';
-            
-            const allProviders = ['EMAIL', 'GOOGLE', 'FACEBOOK', 'GITHUB'];
+
+            const allProviders = ['EMAIL', 'GOOGLE', 'GITHUB'];
             const linkedProviders = providers.map(p => p.provider);
-            
-            // Show linked providers
-            providers.forEach(provider => {
-                const card = createProviderCard(provider, true);
-                container.appendChild(card);
-            });
-            
-            // Show available providers
+
+            providers.forEach(p => container.appendChild(createProviderCard(p, true)));
+
             const available = allProviders.filter(p => !linkedProviders.includes(p));
             if (available.length > 0) {
                 document.getElementById('availableProviders').style.display = 'block';
-                available.forEach(providerName => {
-                    const card = createProviderCard({provider: providerName}, false);
-                    availableContainer.appendChild(card);
-                });
+                available.forEach(name => availableContainer.appendChild(createProviderCard({ provider: name }, false)));
             }
         }
-        
-        // Create provider card
+
         function createProviderCard(provider, isLinked) {
             const card = document.createElement('div');
             card.className = `provider-card ${isLinked ? 'linked' : ''}`;
-            
-            const icons = {
-                EMAIL: '✉️',
-                GOOGLE: '🔵',
-                FACEBOOK: '🔷',
-                GITHUB: '⚫'
-            };
-            
-            const names = {
-                EMAIL: 'Email / Password',
-                GOOGLE: 'Google',
-                FACEBOOK: 'Facebook',
-                GITHUB: 'GitHub'
-            };
-            
-            let html = `
-                <div class="provider-header">
-                    <div class="provider-info">
-                        <div class="provider-icon ${provider.provider.toLowerCase()}">
-                            ${icons[provider.provider]}
-                        </div>
-                        <div class="provider-details">
-                            <div class="provider-name">${names[provider.provider]}</div>
-            `;
-            
+            const icons = { EMAIL: '✉️', GOOGLE: '🔵', GITHUB: '⚫' };
+            const names = { EMAIL: 'Email / Password', GOOGLE: 'Google', GITHUB: 'GitHub' };
+
+            let html = `<div class="provider-header"><div class="provider-info">
+                <div class="provider-icon ${provider.provider.toLowerCase()}">${icons[provider.provider] || '🔑'}</div>
+                <div><div class="provider-name">${names[provider.provider] || provider.provider}</div>`;
+
             if (isLinked) {
-                if (provider.provider_email) {
-                    html += `<div class="provider-email">${provider.provider_email}</div>`;
-                }
-                if (provider.is_primary) {
-                    html += `<div class="provider-meta"><span class="badge primary">⭐ Primary</span></div>`;
-                } else {
-                    html += `<div class="provider-meta"><span class="badge linked">✓ Linked</span></div>`;
-                }
-                if (provider.last_used_at) {
-                    const date = new Date(provider.last_used_at).toLocaleDateString();
-                    html += `<div class="provider-meta">Last used: ${date}</div>`;
-                }
+                if (provider.provider_email) html += `<div class="provider-email">${provider.provider_email}</div>`;
+                if (provider.is_primary) html += `<div class="provider-meta"><span class="badge badge-primary">${T('account_settings.primary')}</span></div>`;
+                else html += `<div class="provider-meta"><span class="badge badge-linked">${T('account_settings.linked')}</span></div>`;
+                if (provider.last_used_at) html += `<div class="provider-meta">${T('account_settings.last_used')}: ${new Date(provider.last_used_at).toLocaleDateString()}</div>`;
             }
-            
-            html += `
-                        </div>
-                    </div>
-                    <div>
-            `;
-            
+
+            html += `</div></div><div class="btn-actions">`;
+
             if (isLinked) {
-                if (!provider.is_primary) {
-                    html += `
-                        <button class="btn btn-secondary btn-small" onclick="setPrimary('${provider.provider}')">
-                            ⭐ Set Primary
-                        </button>
-                    `;
-                }
-                if (provider.provider !== 'EMAIL') {
-                    html += `
-                        <button class="btn btn-danger btn-small" onclick="unlinkProvider('${provider.provider}')">
-                            ❌ Unlink
-                        </button>
-                    `;
-                }
+                if (!provider.is_primary) html += `<button class="btn btn-outline btn-sm" onclick="setPrimary('${provider.provider}')">${T('account_settings.set_primary')}</button>`;
+                if (provider.provider !== 'EMAIL') html += `<button class="btn btn-danger btn-sm" onclick="unlinkProvider('${provider.provider}')">❌ ${T('account_settings.unlink')}</button>`;
             } else {
-                html += `
-                    <button class="btn btn-primary btn-small" onclick="linkProvider('${provider.provider}')">
-                        🔗 Link ${names[provider.provider]}
-                    </button>
-                `;
+                html += `<button class="btn btn-primary btn-sm" onclick="linkProvider('${provider.provider}')">${T('account_settings.link_provider', { provider: names[provider.provider] || provider.provider })}</button>`;
             }
-            
-            html += `
-                    </div>
-                </div>
-            `;
-            
+
+            html += `</div></div>`;
             card.innerHTML = html;
             return card;
         }
-        
-        // Link provider
+
         async function linkProvider(provider) {
-            const providerLower = provider.toLowerCase();
-            
             try {
-                // Get auth URL
-                const response = await fetch(`${API_URL}/auth/${providerLower}/login`, {
-                    headers: {
-                        'Authorization': `Bearer ${accessToken}`
-                    }
-                });
-                
-                const data = await response.json();
-                
-                // Redirect to OAuth
-                window.location.href = data.url;
-            } catch (error) {
-                showAlert(`Failed to start ${provider} linking`, 'error');
+                const r = await fetch(`${API_URL}/auth/${provider.toLowerCase()}/login`, { headers: { 'Authorization': `Bearer ${accessToken}` } });
+                const data = await r.json();
+                window.location.href = data.url || data.auth_url;
+            } catch (e) {
+                showAlert(T('account_settings.failed_link', { provider }), 'error');
             }
         }
-        
-        // Unlink provider
+
         async function unlinkProvider(provider) {
-            if (!confirm(`Are you sure you want to unlink ${provider}?`)) {
-                return;
-            }
-            
+            if (!confirm(T('account_settings.unlink_confirm', { provider }))) return;
             try {
-                const response = await fetch(`${API_URL}/auth/providers/${provider.toLowerCase()}/unlink`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Authorization': `Bearer ${accessToken}`
-                    }
-                });
-                
-                if (response.ok) {
-                    showAlert(`${provider} unlinked successfully`, 'success');
-                    loadProviders();
-                } else {
-                    const error = await response.json();
-                    showAlert(error.detail || 'Failed to unlink provider', 'error');
-                }
-            } catch (error) {
-                showAlert('Failed to unlink provider', 'error');
-            }
+                const r = await fetch(`${API_URL}/auth/providers/${provider.toLowerCase()}/unlink`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${accessToken}` } });
+                if (r.ok) { showAlert(T('account_settings.unlinked_success', { provider })); loadProviders(); }
+                else { const e = await r.json(); showAlert(e.detail || T('account_settings.failed_unlink'), 'error'); }
+            } catch (e) { showAlert(T('account_settings.failed_unlink'), 'error'); }
         }
-        
-        // Set primary provider
+
         async function setPrimary(provider) {
             try {
-                const response = await fetch(`${API_URL}/auth/providers/${provider.toLowerCase()}/set-primary`, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${accessToken}`
-                    }
-                });
-                
-                if (response.ok) {
-                    showAlert(`${provider} set as primary`, 'success');
-                    loadProviders();
-                } else {
-                    showAlert('Failed to set primary provider', 'error');
-                }
-            } catch (error) {
-                showAlert('Failed to set primary provider', 'error');
-            }
+                const r = await fetch(`${API_URL}/auth/providers/${provider.toLowerCase()}/set-primary`, { method: 'POST', headers: { 'Authorization': `Bearer ${accessToken}` } });
+                if (r.ok) { showAlert(T('account_settings.primary_set', { provider })); loadProviders(); }
+                else showAlert(T('account_settings.failed_primary'), 'error');
+            } catch (e) { showAlert(T('account_settings.failed_primary'), 'error'); }
         }
-        
+
         // Handle OAuth callback
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.has('code') && urlParams.has('state')) {
-            const code = urlParams.get('code');
-            const state = urlParams.get('state');
-            
-            // Determine provider from referrer or URL path
-            // This is a simplified version - in production use proper state management
-            showAlert('Processing OAuth callback...', 'info');
-            
-            // Clean URL
             window.history.replaceState({}, document.title, window.location.pathname);
-            
-            // Reload providers
-            setTimeout(() => {
-                getCurrentUser();
-            }, 1000);
+            setTimeout(() => getCurrentUser(), 1000);
         }
-        
-        // Initialize
-        getCurrentUser();
+
+        // Init
+        (async () => {
+            await i18n.init();
+            // [009] lang-switcher handled by topbar.js
+            window.addEventListener('langchange', () => { loadProviders(); loadMfaStatus(); });
+            getCurrentUser();
+            loadMfaStatus();
+        })();
+
+        // =============================================================
+        // MFA MANAGEMENT
+        // =============================================================
+        let mfaPendingSecret = null;
+
+        async function loadMfaStatus() {
+            try {
+                const r = await fetch(`${API_URL}/auth/mfa/status`, { headers: { 'Authorization': `Bearer ${accessToken}` } });
+                if (!r.ok) return;
+                const data = await r.json();
+                renderMfaStatus(data);
+            } catch (e) {
+                console.error('MFA status error:', e);
+            }
+        }
+
+        function renderMfaStatus(data) {
+            const container = document.getElementById('mfaStatus');
+            const enabled = data.enabled;
+            const methods = data.methods || [];
+            const hasTotp = methods.includes('totp');
+            const hasEmail = methods.includes('email');
+
+            if (enabled) {
+                let html = `<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+                    <span style="font-size:20px">✅</span>
+                    <span style="font-weight:600;color:var(--green)" data-i18n="account_settings.mfa_active">${T('account_settings.mfa_active')}</span></div>`;
+                html += `<div style="display:flex;flex-direction:column;gap:10px">`;
+
+                if (hasTotp) {
+                    html += `<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px">
+                        <div style="display:flex;align-items:center;gap:8px">
+                            <span>📱</span>
+                            <span style="font-weight:600;font-size:14px">${T('account_settings.mfa_totp_label')}</span>
+                            <span class="badge badge-linked">${T('account_settings.mfa_method_active')}</span>
+                        </div></div>`;
+                }
+                if (hasEmail) {
+                    html += `<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px">
+                        <div style="display:flex;align-items:center;gap:8px">
+                            <span>📧</span>
+                            <span style="font-weight:600;font-size:14px">${T('account_settings.mfa_email_label')}</span>
+                            <span class="badge badge-linked">${T('account_settings.mfa_method_active')}</span>
+                        </div></div>`;
+                }
+                html += `</div>`;
+
+                // Add buttons to add missing methods or disable
+                html += `<div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap">`;
+                if (!hasTotp) {
+                    html += `<button class="btn btn-primary btn-sm" onclick="startTotpSetup()">📱 ${T('account_settings.mfa_add_totp')}</button>`;
+                }
+                if (!hasEmail) {
+                    html += `<button class="btn btn-primary btn-sm" onclick="enableEmailMfa()">📧 ${T('account_settings.mfa_add_email')}</button>`;
+                }
+                html += `<button class="btn btn-danger btn-sm" onclick="disableMfa()">❌ ${T('account_settings.mfa_disable')}</button>`;
+                html += `</div>`;
+
+                container.innerHTML = html;
+            } else {
+                container.innerHTML = `
+                    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+                        <span style="font-size:20px">⚠️</span>
+                        <span style="font-weight:600;color:var(--orange)" data-i18n="account_settings.mfa_inactive">${T('account_settings.mfa_inactive')}</span>
+                    </div>
+                    <p style="color:var(--text2);font-size:13px;margin-bottom:16px" data-i18n="account_settings.mfa_inactive_desc">${T('account_settings.mfa_inactive_desc')}</p>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap">
+                        <button class="btn btn-primary" onclick="startTotpSetup()">📱 ${T('account_settings.mfa_setup_totp')}</button>
+                        <button class="btn btn-outline" onclick="enableEmailMfa()">📧 ${T('account_settings.mfa_setup_email')}</button>
+                    </div>`;
+            }
+        }
+
+        async function startTotpSetup() {
+            try {
+                const r = await fetch(`${API_URL}/auth/mfa/setup-totp`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${accessToken}` }
+                });
+                if (!r.ok) { showAlert(T('account_settings.mfa_setup_failed'), 'error'); return; }
+                const data = await r.json();
+                mfaPendingSecret = data.secret;
+
+                // Show setup UI
+                document.getElementById('mfaTotpSetup').style.display = 'block';
+                document.getElementById('mfaSecretKey').textContent = data.secret;
+
+                // Generate QR code
+                const qrContainer = document.getElementById('mfaQrCode');
+                qrContainer.innerHTML = '';
+                if (typeof qrcode !== 'undefined') {
+                    const qr = qrcode(0, 'M');
+                    qr.addData(data.uri);
+                    qr.make();
+                    qrContainer.innerHTML = qr.createSvgTag(4, 0);
+                } else {
+                    // Fallback: show URI text
+                    qrContainer.innerHTML = `<p style="font-size:12px;color:var(--text2);word-break:break-all">${data.uri}</p>`;
+                }
+
+                document.getElementById('mfaTotpCode').value = '';
+                document.getElementById('mfaTotpCode').focus();
+            } catch (e) {
+                showAlert(T('account_settings.mfa_setup_failed'), 'error');
+            }
+        }
+
+        function toggleManualKey() {
+            const el = document.getElementById('mfaManualKey');
+            el.style.display = el.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function cancelTotpSetup() {
+            document.getElementById('mfaTotpSetup').style.display = 'none';
+            mfaPendingSecret = null;
+        }
+
+        async function confirmTotp() {
+            const code = document.getElementById('mfaTotpCode').value.trim();
+            if (code.length !== 6) {
+                showAlert(T('login.mfa_enter_6'), 'error');
+                return;
+            }
+            try {
+                const r = await fetch(`${API_URL}/auth/mfa/confirm-totp`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ code })
+                });
+                const data = await r.json();
+                if (r.ok) {
+                    showAlert(T('account_settings.mfa_totp_activated'), 'success');
+                    cancelTotpSetup();
+                    loadMfaStatus();
+                } else {
+                    showAlert(data.detail || T('account_settings.mfa_code_invalid'), 'error');
+                }
+            } catch (e) {
+                showAlert(T('account_settings.mfa_setup_failed'), 'error');
+            }
+        }
+
+        async function enableEmailMfa() {
+            try {
+                const r = await fetch(`${API_URL}/auth/mfa/enable-email`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${accessToken}` }
+                });
+                const data = await r.json();
+                if (r.ok) {
+                    showAlert(T('account_settings.mfa_email_activated'), 'success');
+                    loadMfaStatus();
+                } else {
+                    showAlert(data.detail || T('account_settings.mfa_setup_failed'), 'error');
+                }
+            } catch (e) {
+                showAlert(T('account_settings.mfa_setup_failed'), 'error');
+            }
+        }
+
+        async function disableMfa() {
+            if (!confirm(T('account_settings.mfa_disable_confirm'))) return;
+            try {
+                const r = await fetch(`${API_URL}/auth/mfa/disable`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${accessToken}` }
+                });
+                if (r.ok) {
+                    showAlert(T('account_settings.mfa_disabled'), 'success');
+                    loadMfaStatus();
+                } else {
+                    showAlert(T('account_settings.mfa_disable_failed'), 'error');
+                }
+            } catch (e) {
+                showAlert(T('account_settings.mfa_disable_failed'), 'error');
+            }
+        }
+
+        // Enter key on TOTP input
+        document.getElementById('mfaTotpCode').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') confirmTotp();
+        });
     </script>
+<script src="/assets/topbar.js"></script>
+<script src="/assets/theme.js"></script>
 </body>
 </html>

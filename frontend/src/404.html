@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 — Buddyliko</title>
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png">
+    <script src="/lang/i18n.js"></script>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        :root{--bg:#060b18;--text:#e2e8f0;--text2:#94a3b8;--blue:#2196f3;--purple:#7c3aed;--border:#1e293b}
+        body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:20px}
+        .container{max-width:500px}
+        .buddy{font-size:60px;margin-bottom:16px}
+        .code{font-size:clamp(80px,20vw,160px);font-weight:900;background:linear-gradient(135deg,var(--blue),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1}
+        h2{font-size:clamp(20px,4vw,28px);margin:16px 0 12px;color:var(--text)}
+        p{color:var(--text2);font-size:16px;margin-bottom:32px}
+        a{display:inline-block;padding:12px 32px;background:linear-gradient(135deg,var(--blue),var(--purple));color:#fff;border-radius:8px;text-decoration:none;font-weight:600;transition:all .2s}
+        a:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(33,150,243,.3)}
+        .lang-corner{position:fixed;top:16px;right:16px}
+    </style>
+</head>
+<body>
+    <div class="lang-corner" id="lang-switcher"></div>
+    <div class="container">
+        <div class="buddy">🤖</div>
+        <div class="code">404</div>
+        <h2 data-i18n="error_404.title">Oops! Your Buddy can't find this page</h2>
+        <p data-i18n="error_404.description">La pagina che stai cercando non esiste o è stata spostata.</p>
+        <a href="/" data-i18n="error_404.back_home">← Torna alla home</a>
+    </div>
+    <script>
+    (async () => {
+        await i18n.init();
+        i18n.createSwitcher('lang-switcher');
+    })();
+    </script>
+<script src="/assets/theme.js"></script>
+</body>
+</html>

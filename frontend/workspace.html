@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workspace - Buddyliko</title>
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico"><link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png"><script src="/lang/i18n.js"></script>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background:#0a0e1a; color:#e2e8f0; min-height:100vh; }
+        ::-webkit-scrollbar { width:6px; }
+        ::-webkit-scrollbar-track { background:#1a1e2e; }
+        ::-webkit-scrollbar-thumb { background:#3e4460; border-radius:3px; }
+        .topbar { background:linear-gradient(135deg,#0d1220,#141b2d); border-bottom:1px solid #2e3250; padding:12px 24px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:100; }
+        .topbar-left { display:flex; align-items:center; gap:16px; }
+        .topbar-left h1 { font-size:18px; font-weight:600; color:#e2e8f0; }
+        .topbar-left .logo { width:28px; height:28px; }
+        .topbar-nav { display:flex; gap:6px; }
+        .topbar-nav a { padding:6px 14px; border-radius:6px; text-decoration:none; font-size:13px; color:#94a3b8; transition:all .15s; }
+        .topbar-nav a:hover { background:#1e2235; color:#e2e8f0; }
+        .topbar-nav a.active { background:#1e3a5f; color:#93c5fd; }
+        .topbar-right { display:flex; align-items:center; gap:12px; }
+        .topbar-right .user-info { font-size:12px; color:#94a3b8; }
+        .btn { padding:7px 14px; border:none; border-radius:6px; cursor:pointer; font-size:12px; font-weight:600; transition:all .15s; display:inline-flex; align-items:center; gap:5px; }
+        .btn:hover { opacity:.85; transform:translateY(-1px); }
+        .btn-primary { background:#2563eb; color:white; }
+        .btn-success { background:#059669; color:white; }
+        .btn-danger { background:#dc2626; color:white; }
+        .btn-ghost { background:transparent; border:1px solid #3e4460; color:#94a3b8; }
+        .btn-ghost:hover { border-color:#6366f1; color:#e2e8f0; }
+        .btn-sm { padding:4px 10px; font-size:11px; }
+        .layout { display:flex; height:calc(100vh - 53px); }
+        .sidebar { width:260px; background:#0d1220; border-right:1px solid #2e3250; display:flex; flex-direction:column; flex-shrink:0; }
+        .sidebar-section { padding:12px 16px; }
+        .sidebar-title { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.8px; color:#64748b; margin-bottom:8px; }
+        .sidebar-item { padding:8px 12px; border-radius:6px; cursor:pointer; font-size:13px; display:flex; align-items:center; gap:8px; color:#94a3b8; transition:all .15s; margin-bottom:2px; }
+        .sidebar-item:hover { background:#1a1e2e; color:#e2e8f0; }
+        .sidebar-item.active { background:#1e3a5f; color:#93c5fd; }
+        .sidebar-item .count { margin-left:auto; background:#2e3250; padding:1px 7px; border-radius:10px; font-size:10px; }
+        .main { flex:1; overflow-y:auto; padding:24px; }
+        .card { background:#141b2d; border:1px solid #2e3250; border-radius:10px; padding:20px; margin-bottom:16px; }
+        .card-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
+        .card-title { font-size:15px; font-weight:600; color:#e2e8f0; }
+        table { width:100%; border-collapse:collapse; }
+        th { padding:8px 12px; text-align:left; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:#64748b; border-bottom:1px solid #2e3250; }
+        td { padding:10px 12px; font-size:13px; border-bottom:1px solid #1e2235; color:#cbd5e1; }
+        tr:hover td { background:#1a1e2e; }
+        .badge { display:inline-block; padding:2px 8px; border-radius:10px; font-size:10px; font-weight:700; }
+        .badge-schema { background:#1e3a5f; color:#93c5fd; }
+        .badge-project { background:#1e3b1e; color:#86efac; }
+        .badge-csv { background:#3b1e3b; color:#f0abfc; }
+        .badge-transform { background:#3b2e1e; color:#fbbf24; }
+        .badge-document { background:#1e2e3b; color:#7dd3fc; }
+        .badge-example { background:#2e1e1e; color:#fca5a5; }
+        .empty { padding:40px; text-align:center; color:#64748b; font-size:13px; }
+        .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.6); display:flex; align-items:center; justify-content:center; z-index:1000; padding:20px; }
+        .modal { background:#141b2d; border:1px solid #2e3250; border-radius:12px; padding:24px; max-width:500px; width:100%; max-height:80vh; overflow-y:auto; }
+        .modal h3 { font-size:16px; margin-bottom:16px; color:#e2e8f0; }
+        .form-group { margin-bottom:14px; }
+        .form-label { display:block; font-size:12px; color:#94a3b8; margin-bottom:4px; font-weight:600; }
+        .form-input { width:100%; padding:8px 12px; background:#0a0e1a; border:1px solid #3e4460; border-radius:6px; color:#e2e8f0; font-size:13px; }
+        .form-input:focus { outline:none; border-color:#6366f1; }
+        select.form-input { cursor:pointer; }
+        .toast { position:fixed; top:16px; right:16px; padding:12px 20px; border-radius:8px; font-size:13px; z-index:2000; animation:slideIn .3s ease; }
+        .toast-success { background:#059669; color:white; }
+        .toast-error { background:#dc2626; color:white; }
+        @keyframes slideIn { from { transform:translateX(100px); opacity:0; } to { transform:translateX(0); opacity:1; } }
+        .search-box { padding:8px 12px; background:#0a0e1a; border:1px solid #3e4460; border-radius:6px; color:#e2e8f0; font-size:13px; width:100%; }
+        .search-box:focus { outline:none; border-color:#6366f1; }
+        .member-row { display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid #1e2235; }
+        .member-row:last-child { border-bottom:none; }
+        .stats-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:12px; margin-bottom:20px; }
+        .stat-card { background:#0d1220; border:1px solid #2e3250; border-radius:8px; padding:14px; text-align:center; }
+        .stat-value { font-size:24px; font-weight:700; color:#93c5fd; }
+        .stat-label { font-size:11px; color:#64748b; margin-top:2px; }
+        .file-actions { display:flex; gap:4px; }
+        .share-link { background:#0a0e1a; padding:8px; border-radius:6px; font-family:monospace; font-size:11px; color:#94a3b8; word-break:break-all; margin-top:8px; }
+    </style>
+</head>
+<body>
+<div id="buddy-topbar"></div>
+    <div id="root"></div>
+    <script>
+    const { useState, useEffect, useCallback } = React;
+    const API = '/api';
+    const T = (key, rep) => typeof i18n !== 'undefined' && i18n.isLoaded() ? i18n.t(key, rep) : key;
+    const getToken = () => localStorage.getItem('buddyliko_token');
+    const headers = () => ({ 'Authorization': `Bearer ${getToken()}`, 'Content-Type': 'application/json' });
+
+    async function api(path, opts = {}) {
+        const res = await fetch(API + path, { ...opts, headers: { ...headers(), ...(opts.headers || {}) } });
+        if (!res.ok) {
+            let errBody;
+            try { errBody = await res.json(); } catch { errBody = { detail: 'HTTP ' + res.status }; }
+            let msg = errBody.detail || errBody.message || T('common.error') + ' ' + res.status;
+            if (typeof msg !== 'string') {
+                msg = Array.isArray(msg) ? msg.map(e => (typeof e === 'string' ? e : e.msg || JSON.stringify(e))).join('; ') : JSON.stringify(msg);
+            }
+            throw new Error(msg);
+        }
+        return res.json();
+    }
+
+    // ================================================================
+    // TOAST
+    // ================================================================
+    function Toast({ message, type, onClose }) {
+        useEffect(() => { const t = setTimeout(onClose, 3500); return () => clearTimeout(t); }, []);
+        return React.createElement('div', { className: `toast toast-${type}` }, message);
+    }
+
+    // ================================================================
+    // MAIN APP
+    // ================================================================
+    function App() {
+        const [user, setUser] = useState(null);
+        const [view, setView] = useState('files');
+        const [toast, setToast] = useState(null);
+        const [files, setFiles] = useState([]);
+        const [groups, setGroups] = useState([]);
+        const [myGroups, setMyGroups] = useState([]);
+        const [selectedGroup, setSelectedGroup] = useState(null);
+        const [members, setMembers] = useState([]);
+        const [showUpload, setShowUpload] = useState(false);
+        const [showNewGroup, setShowNewGroup] = useState(false);
+        const [showShare, setShowShare] = useState(null);
+        const [shareLinks, setShareLinks] = useState([]);
+        const [fileFilter, setFileFilter] = useState('');
+        const [searchQuery, setSearchQuery] = useState('');
+        const [stats, setStats] = useState(null);
+
+        const notify = (message, type = 'success') => setToast({ message, type });
+
+        // Init
+        useEffect(() => {
+            if (!getToken()) { window.location.href = 'login.html'; return; }
+            api('/auth/me').then(res => setUser(res.user || res)).catch(() => { window.location.href = 'login.html'; });
+        }, []);
+
+        useEffect(() => {
+            if (!user) return;
+            loadFiles();
+            loadGroups();
+            loadMyGroups();
+        }, [user]);
+
+        const loadFiles = async (groupId, fileType) => {
+            try {
+                let path = '/workspace/files?scope=mine';
+                if (groupId) path = `/workspace/files?group_id=${groupId}`;
+                if (fileType) path += `&file_type=${fileType}`;
+                const res = await api(path);
+                setFiles(res.files || []);
+            } catch (e) { notify(e.message, 'error'); }
+        };
+
+        const loadGroups = async () => {
+            try {
+                const res = await api('/groups');
+                setGroups(res.groups || []);
+            } catch (e) { /* may not have permission */ }
+        };
+
+        const loadMyGroups = async () => {
+            try {
+                const res = await api('/users/me/groups');
+                setMyGroups(res.groups || []);
+            } catch (e) { }
+        };
+
+        const loadMembers = async (groupId) => {
+            try {
+                const res = await api(`/groups/${groupId}/members`);
+                setMembers(res.members || []);
+            } catch (e) { notify(e.message, 'error'); }
+        };
+
+        const deleteFile = async (id, name) => {
+            if (!confirm(T('admin.file_delete_confirm').replace('{name}', name))) return;
+            try {
+                await api(`/workspace/files/${id}`, { method: 'DELETE' });
+                notify(T('admin.file_deleted'));
+                loadFiles();
+            } catch (e) { notify(e.message, 'error'); }
+        };
+
+        const downloadFile = async (id, fileName) => {
+            try {
+                const res = await fetch(`${API}/workspace/files/${id}/download`, {
+                    headers: { 'Authorization': `Bearer ${getToken()}` }
+                });
+                if (!res.ok) {
+                    const err = await res.json().catch(() => ({}));
+                    throw new Error(err.detail || 'Download fallito');
+                }
+                const blob = await res.blob();
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = fileName || 'download';
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                URL.revokeObjectURL(url);
+            } catch (e) { notify(e.message, 'error'); }
+        };
+
+        const openInApp = async (fileId) => {
+            // Use the same key that app.html checks on load
+            sessionStorage.setItem('buddyliko_open_file', JSON.stringify({ fileId }));
+            window.location.href = 'app.html';
+        };
+
+        const createGroup = async (name, description) => {
+            try {
+                await api('/groups', { method: 'POST', body: JSON.stringify({ name, description }) });
+                notify(T('common.success'));
+                setShowNewGroup(false);
+                loadGroups();
+                loadMyGroups();
+            } catch (e) { notify(e.message, 'error'); }
+        };
+
+        const deleteGroup = async (id, name) => {
+            if (!confirm(T('admin.group_delete_confirm').replace('{name}', name))) return;
+            try {
+                await api(`/groups/${id}`, { method: 'DELETE' });
+                notify(T('admin.group_deleted'));
+                setSelectedGroup(null);
+                loadGroups();
+                loadMyGroups();
+            } catch (e) { notify(e.message, 'error'); }
+        };
+
+        const addMember = async (groupId, email, role) => {
+            try {
+                const res = await api(`/groups/${groupId}/invite`, {
+                    method: 'POST',
+                    body: JSON.stringify({ email, role: role || 'viewer' })
+                });
+                notify(res.message || T('common.success'));
+                loadMembers(groupId);
+            } catch (e) { notify(e.message, 'error'); }
+        };
+
+        const removeMember = async (groupId, userId) => {
+            if (!confirm(T('common.confirm'))) return;
+            try {
+                await api(`/groups/${groupId}/members/${userId}`, { method: 'DELETE' });
+                notify(T('common.success'));
+                loadMembers(groupId);
+            } catch (e) { notify(e.message, 'error'); }
+        };
+
+        const loadShareLinks = async (fileId) => {
+            try {
+                const res = await api(`/workspace/files/${fileId}/share`);
+                setShareLinks(res.links || []);
+            } catch (e) { setShareLinks([]); }
+        };
+
+        const createShareLink = async (fileId, permission, expiresHours) => {
+            try {
+                const body = { permission: permission || 'view' };
+                if (expiresHours) body.expires_hours = parseInt(expiresHours);
+                const res = await api(`/workspace/files/${fileId}/share`, {
+                    method: 'POST', body: JSON.stringify(body)
+                });
+                notify(T('common.success'));
+                loadShareLinks(fileId);
+            } catch (e) { notify(e.message, 'error'); }
+        };
+
+        const uploadFile = async (file, fileType, groupId) => {
+            try {
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('file_type', fileType);
+                if (groupId) formData.append('group_id', groupId);
+                const res = await fetch(API + '/workspace/upload', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${getToken()}` },
+                    body: formData
+                });
+                if (!res.ok) {
+                    const err = await res.json().catch(() => ({}));
+                    throw new Error(err.detail || T('common.failed'));
+                }
+                notify(T('common.success'));
+                setShowUpload(false);
+                loadFiles();
+            } catch (e) { notify(e.message, 'error'); }
+        };
+
+        const loadFileInApp = async (fileId, direction) => {
+            // Pass file reference to app.html — it will fetch and upload as schema
+            sessionStorage.setItem('buddyliko_open_file', JSON.stringify({
+                fileId, direction, action: 'schema'
+            }));
+            window.location.href = 'app.html';
+        };
+
+        const typeBadge = (type) => {
+            const cls = { schema: 'badge-schema', project: 'badge-project', csv: 'badge-csv',
+                          transform: 'badge-transform', document: 'badge-document', example: 'badge-example' };
+            return React.createElement('span', { className: `badge ${cls[type] || 'badge-schema'}` }, type);
+        };
+
+        const formatSize = (b) => {
+            if (!b) return '—';
+            if (b < 1024) return b + ' B';
+            if (b < 1048576) return (b / 1024).toFixed(1) + ' KB';
+            return (b / 1048576).toFixed(1) + ' MB';
+        };
+
+        const formatDate = (d) => d ? new Date(d).toLocaleDateString('it-IT') : '—';
+
+        const filteredFiles = files.filter(f => {
+            if (fileFilter && f.file_type !== fileFilter) return false;
+            if (searchQuery && !(f.name || '').toLowerCase().includes(searchQuery.toLowerCase())) return false;
+            return true;
+        });
+
+        if (!user) return React.createElement('div', { style: { display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', color: '#64748b' } }, i18n.t('common.loading'));
+
+        // ── TOPBAR ──
+        const topbar = null; // [009] unified topbar via topbar.js
+
+        // ── SIDEBAR ──
+        const sidebar = React.createElement('div', { className: 'sidebar' },
+            React.createElement('div', { className: 'sidebar-section' },
+                React.createElement('div', { className: 'sidebar-title' }, i18n.t('workspace.navigation')),
+                React.createElement('div', { className: `sidebar-item ${view === 'files' ? 'active' : ''}`, onClick: () => { setView('files'); setSelectedGroup(null); loadFiles(); } }, i18n.t('workspace.my_files')),
+                React.createElement('div', { className: `sidebar-item ${view === 'projects' ? 'active' : ''}`, onClick: () => { setView('projects'); setFileFilter('project'); loadFiles(); } }, i18n.t('workspace.projects')),
+                React.createElement('div', { className: `sidebar-item ${view === 'schemas' ? 'active' : ''}`, onClick: () => { setView('schemas'); setFileFilter('schema'); loadFiles(); } }, i18n.t('workspace.schemas'))
+            ),
+            React.createElement('div', { className: 'sidebar-section', style: { borderTop: '1px solid #2e3250', flex: 1 } },
+                React.createElement('div', { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center' } },
+                    React.createElement('div', { className: 'sidebar-title' }, i18n.t('admin.groups')),
+                    React.createElement('button', { className: 'btn btn-ghost btn-sm', onClick: () => setShowNewGroup(true) }, '+')
+                ),
+                myGroups.length === 0
+                    ? React.createElement('div', { style: { fontSize: '12px', color: '#64748b', padding: '8px' } }, i18n.t('workspace.no_groups'))
+                    : myGroups.map(g => React.createElement('div', {
+                        key: g.id,
+                        className: `sidebar-item ${selectedGroup === g.id ? 'active' : ''}`,
+                        onClick: () => { setSelectedGroup(g.id); setView('group'); loadFiles(g.id); loadMembers(g.id); }
+                    },
+                        '👥 ' + g.name,
+                        React.createElement('span', { className: 'count' }, g.member_count || '—')
+                    ))
+            )
+        );
+
+        // ── UPLOAD MODAL ──
+        const uploadModal = showUpload && React.createElement('div', { className: 'modal-overlay', onClick: e => { if (e.target === e.currentTarget) setShowUpload(false); } },
+            React.createElement('div', { className: 'modal' },
+                React.createElement('h3', null, i18n.t('workspace.upload_file')),
+                React.createElement(UploadForm, { onUpload: uploadFile, onClose: () => setShowUpload(false), groups: myGroups })
+            )
+        );
+
+        // ── NEW GROUP MODAL ──
+        const newGroupModal = showNewGroup && React.createElement('div', { className: 'modal-overlay', onClick: e => { if (e.target === e.currentTarget) setShowNewGroup(false); } },
+            React.createElement('div', { className: 'modal' },
+                React.createElement('h3', null, i18n.t('workspace.new_group')),
+                React.createElement(NewGroupForm, { onCreate: createGroup, onClose: () => setShowNewGroup(false) })
+            )
+        );
+
+        // ── SHARE MODAL ──
+        const shareModal = showShare && React.createElement('div', { className: 'modal-overlay', onClick: e => { if (e.target === e.currentTarget) setShowShare(null); } },
+            React.createElement('div', { className: 'modal' },
+                React.createElement('h3', null, i18n.t('workspace.share_file')),
+                React.createElement(SharePanel, {
+                    fileId: showShare, links: shareLinks,
+                    onCreateLink: createShareLink, onClose: () => setShowShare(null)
+                })
+            )
+        );
+
+        // ── MAIN CONTENT ──
+        let mainContent;
+
+        if (view === 'group' && selectedGroup) {
+            const group = [...groups, ...myGroups].find(g => g.id === selectedGroup);
+            mainContent = React.createElement('div', null,
+                React.createElement('div', { className: 'card' },
+                    React.createElement('div', { className: 'card-header' },
+                        React.createElement('div', null,
+                            React.createElement('div', { className: 'card-title' }, '👥 ' + (group ? group.name : i18n.t('admin.groups'))),
+                            group && group.description ? React.createElement('div', { style: { fontSize: '12px', color: '#64748b', marginTop: '4px' } }, group.description) : null
+                        ),
+                        React.createElement('div', { style: { display: 'flex', gap: '6px' } },
+                            React.createElement('button', { className: 'btn btn-danger btn-sm', onClick: () => deleteGroup(selectedGroup, group ? group.name : '') }, i18n.t('workspace.delete_group'))
+                        )
+                    ),
+                    // Members
+                    React.createElement('div', { className: 'sidebar-title', style: { marginTop: '12px' } }, i18n.t('workspace.members')),
+                    React.createElement(MembersList, { members, groupId: selectedGroup, onAdd: addMember, onRemove: removeMember }),
+                ),
+                // Group files
+                React.createElement('div', { className: 'card' },
+                    React.createElement('div', { className: 'card-header' },
+                        React.createElement('div', { className: 'card-title' }, i18n.t('workspace.group_files')),
+                        React.createElement('button', { className: 'btn btn-primary btn-sm', onClick: () => setShowUpload(true) }, i18n.t('workspace.upload'))
+                    ),
+                    React.createElement(FileTable, { files: filteredFiles, onDelete: deleteFile, onDownload: downloadFile, onOpen: openInApp, onLoadInApp: loadFileInApp, onShare: (id) => { setShowShare(id); loadShareLinks(id); }, typeBadge, formatSize, formatDate })
+                )
+            );
+        } else {
+            const title = view === 'projects' ? i18n.t('workspace.projects') : view === 'schemas' ? i18n.t('workspace.schemas') : i18n.t('workspace.my_files');
+            mainContent = React.createElement('div', null,
+                React.createElement('div', { className: 'card' },
+                    React.createElement('div', { className: 'card-header' },
+                        React.createElement('div', { style: { display: 'flex', alignItems: 'center', gap: '12px' } },
+                            React.createElement('div', { className: 'card-title' }, title),
+                            React.createElement('input', {
+                                className: 'search-box', placeholder: i18n.t('common.search') + '...',
+                                style: { width: '220px' }, value: searchQuery,
+                                onChange: e => setSearchQuery(e.target.value)
+                            })
+                        ),
+                        React.createElement('div', { style: { display: 'flex', gap: '6px' } },
+                            React.createElement('select', {
+                                className: 'form-input', style: { width: '140px' },
+                                value: fileFilter, onChange: e => { setFileFilter(e.target.value); }
+                            },
+                                React.createElement('option', { value: '' }, i18n.t('workspace.all_types')),
+                                ['schema', 'project', 'csv', 'example'].map(t =>
+                                    React.createElement('option', { key: t, value: t }, t)
+                                )
+                            ),
+                            React.createElement('button', { className: 'btn btn-primary btn-sm', onClick: () => setShowUpload(true) }, i18n.t('workspace.upload'))
+                        )
+                    ),
+                    React.createElement(FileTable, { files: filteredFiles, onDelete: deleteFile, onDownload: downloadFile, onOpen: openInApp, onLoadInApp: loadFileInApp, onShare: (id) => { setShowShare(id); loadShareLinks(id); }, typeBadge, formatSize, formatDate })
+                )
+            );
+        }
+
+        return React.createElement('div', null,
+            topbar,
+            React.createElement('div', { className: 'layout' },
+                sidebar,
+                React.createElement('div', { className: 'main' }, mainContent)
+            ),
+            uploadModal,
+            newGroupModal,
+            shareModal,
+            toast && React.createElement(Toast, { ...toast, onClose: () => setToast(null) })
+        );
+    }
+
+    // ================================================================
+    // FILE TABLE COMPONENT
+    // ================================================================
+    function FileTable({ files, onDelete, onDownload, onOpen, onLoadInApp, onShare, typeBadge, formatSize, formatDate }) {
+        if (!files.length) return React.createElement('div', { className: 'empty' }, i18n.t('workspace.no_files'));
+        return React.createElement('table', null,
+            React.createElement('thead', null,
+                React.createElement('tr', null,
+                    React.createElement('th', null, i18n.t('workspace.name')),
+                    React.createElement('th', null, i18n.t('workspace.type')),
+                    React.createElement('th', null, i18n.t('workspace.size')),
+                    React.createElement('th', null, i18n.t('workspace.created')),
+                    React.createElement('th', null, i18n.t('workspace.actions'))
+                )
+            ),
+            React.createElement('tbody', null,
+                files.map(f => React.createElement('tr', { key: f.id },
+                    React.createElement('td', null, f.name || f.original_name || '—'),
+                    React.createElement('td', null, typeBadge(f.file_type)),
+                    React.createElement('td', null, formatSize(f.file_size)),
+                    React.createElement('td', null, formatDate(f.created_at)),
+                    React.createElement('td', null,
+                        React.createElement('div', { className: 'file-actions' },
+                            f.file_type === 'project' && React.createElement('button', { className: 'btn btn-success btn-sm', onClick: () => onOpen(f.id), title: 'Apri nel Mapper' }, '🗺️'),
+                            (f.file_type === 'csv' || f.file_type === 'example' || f.file_type === 'schema') && React.createElement('button', {
+                                className: 'btn btn-success btn-sm', onClick: () => onLoadInApp(f.id, 'input'),
+                                title: 'Carica come Input Schema', style: { fontSize: '11px' }
+                            }, '📥 Input Schema'),
+                            (f.file_type === 'csv' || f.file_type === 'example' || f.file_type === 'schema') && React.createElement('button', {
+                                className: 'btn btn-success btn-sm', onClick: () => onLoadInApp(f.id, 'output'),
+                                title: 'Carica come Output Schema', style: { fontSize: '11px' }
+                            }, '📤 Output Schema'),
+                            React.createElement('button', { className: 'btn btn-primary btn-sm', onClick: () => onDownload(f.id, f.name), title: 'Download' }, '⬇️'),
+                            React.createElement('button', { className: 'btn btn-ghost btn-sm', onClick: () => onShare(f.id), title: i18n.t('workspace.share_file') }, '🔗'),
+                            React.createElement('button', { className: 'btn btn-danger btn-sm', onClick: () => onDelete(f.id, f.name), title: i18n.t('common.delete') }, '🗑️')
+                        )
+                    )
+                ))
+            )
+        );
+    }
+
+    // ================================================================
+    // UPLOAD FORM
+    // ================================================================
+    function UploadForm({ onUpload, onClose, groups }) {
+        const [file, setFile] = useState(null);
+        const [fileType, setFileType] = useState('schema');
+        const [groupId, setGroupId] = useState('');
+        const handleSubmit = () => {
+            if (!file) return alert(i18n.t('common.required'));
+            onUpload(file, fileType, groupId || undefined);
+        };
+        return React.createElement('div', null,
+            React.createElement('div', { className: 'form-group' },
+                React.createElement('label', { className: 'form-label' }, 'File'),
+                React.createElement('input', { type: 'file', className: 'form-input', style: { padding: '6px' }, onChange: e => setFile(e.target.files[0]) })
+            ),
+            React.createElement('div', { className: 'form-group' },
+                React.createElement('label', { className: 'form-label' }, i18n.t('workspace.type')),
+                React.createElement('select', { className: 'form-input', value: fileType, onChange: e => setFileType(e.target.value) },
+                    ['schema', 'project', 'csv', 'example'].map(t =>
+                        React.createElement('option', { key: t, value: t }, t)
+                    )
+                )
+            ),
+            React.createElement('div', { className: 'form-group' },
+                React.createElement('label', { className: 'form-label' }, i18n.t('workspace.group_optional')),
+                React.createElement('select', { className: 'form-input', value: groupId, onChange: e => setGroupId(e.target.value) },
+                    React.createElement('option', { value: '' }, i18n.t('workspace.personal')),
+                    groups.map(g => React.createElement('option', { key: g.id, value: g.id }, g.name))
+                )
+            ),
+            React.createElement('div', { style: { display: 'flex', gap: '8px', justifyContent: 'flex-end', marginTop: '16px' } },
+                React.createElement('button', { className: 'btn btn-ghost', onClick: onClose }, i18n.t('common.cancel')),
+                React.createElement('button', { className: 'btn btn-primary', onClick: handleSubmit }, i18n.t('workspace.upload'))
+            )
+        );
+    }
+
+    // ================================================================
+    // NEW GROUP FORM
+    // ================================================================
+    function NewGroupForm({ onCreate, onClose }) {
+        const [name, setName] = useState('');
+        const [desc, setDesc] = useState('');
+        return React.createElement('div', null,
+            React.createElement('div', { className: 'form-group' },
+                React.createElement('label', { className: 'form-label' }, i18n.t('workspace.group_name')),
+                React.createElement('input', { className: 'form-input', value: name, onChange: e => setName(e.target.value), placeholder: '' })
+            ),
+            React.createElement('div', { className: 'form-group' },
+                React.createElement('label', { className: 'form-label' }, i18n.t('workspace.description')),
+                React.createElement('input', { className: 'form-input', value: desc, onChange: e => setDesc(e.target.value), placeholder: '' })
+            ),
+            React.createElement('div', { style: { display: 'flex', gap: '8px', justifyContent: 'flex-end', marginTop: '16px' } },
+                React.createElement('button', { className: 'btn btn-ghost', onClick: onClose }, i18n.t('common.cancel')),
+                React.createElement('button', { className: 'btn btn-primary', onClick: () => { if (name.trim()) onCreate(name, desc); } }, i18n.t('workspace.create'))
+            )
+        );
+    }
+
+    // ================================================================
+    // MEMBERS LIST
+    // ================================================================
+    function MembersList({ members, groupId, onAdd, onRemove }) {
+        const [email, setEmail] = useState('');
+        const [role, setRole] = useState('member');
+        return React.createElement('div', null,
+            members.map(m => React.createElement('div', { key: m.user_id, className: 'member-row' },
+                React.createElement('span', { style: { flex: 1, fontSize: '13px' } }, m.email || m.user_id),
+                React.createElement('span', { className: 'badge badge-schema', style: { fontSize: '10px' } }, m.role),
+                React.createElement('button', { className: 'btn btn-danger btn-sm', onClick: () => onRemove(groupId, m.user_id) }, '✕')
+            )),
+            React.createElement('div', { style: { display: 'flex', gap: '6px', marginTop: '12px', alignItems: 'center' } },
+                React.createElement('input', { className: 'form-input', style: { flex: 1 }, placeholder: 'Email', value: email, onChange: e => setEmail(e.target.value) }),
+                React.createElement('select', { className: 'form-input', style: { width: '100px' }, value: role, onChange: e => setRole(e.target.value) },
+                    React.createElement('option', { value: 'viewer' }, 'Viewer'),
+                    React.createElement('option', { value: 'member' }, 'Member'),
+                    React.createElement('option', { value: 'admin' }, 'Admin')
+                ),
+                React.createElement('button', { className: 'btn btn-primary btn-sm', onClick: () => { if (email.trim()) { onAdd(groupId, email, role); setEmail(''); } } }, i18n.t('workspace.add'))
+            )
+        );
+    }
+
+    // ================================================================
+    // SHARE PANEL
+    // ================================================================
+    function SharePanel({ fileId, links, onCreateLink, onClose }) {
+        const [perm, setPerm] = useState('view');
+        const [hours, setHours] = useState('');
+        return React.createElement('div', null,
+            React.createElement('div', { className: 'form-group' },
+                React.createElement('label', { className: 'form-label' }, i18n.t('workspace.permission')),
+                React.createElement('select', { className: 'form-input', value: perm, onChange: e => setPerm(e.target.value) },
+                    React.createElement('option', { value: 'view' }, i18n.t('workspace.readonly')),
+                    React.createElement('option', { value: 'edit' }, i18n.t('workspace.edit'))
+                )
+            ),
+            React.createElement('div', { className: 'form-group' },
+                React.createElement('label', { className: 'form-label' }, i18n.t('workspace.expiry_hours')),
+                React.createElement('input', { className: 'form-input', type: 'number', value: hours, onChange: e => setHours(e.target.value), placeholder: '24' })
+            ),
+            React.createElement('button', { className: 'btn btn-primary', onClick: () => onCreateLink(fileId, perm, hours) }, i18n.t('workspace.generate_link')),
+            links.length > 0 && React.createElement('div', { style: { marginTop: '16px' } },
+                React.createElement('div', { className: 'form-label' }, i18n.t('workspace.active_links')),
+                links.map((l, i) => React.createElement('div', { key: i, className: 'share-link' },
+                    l.url || l.share_url || l.link_id || JSON.stringify(l)
+                ))
+            ),
+            React.createElement('div', { style: { display: 'flex', justifyContent: 'flex-end', marginTop: '16px' } },
+                React.createElement('button', { className: 'btn btn-ghost', onClick: onClose }, i18n.t('common.close'))
+            )
+        );
+    }
+
+    // ================================================================
+    // RENDER
+    // ================================================================
+    // Init i18n before render
+    i18n.init().then(() => {
+        ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));
+        // Create lang switcher in topbar after React renders
+        setTimeout(() => {
+            // [009] lang-switcher handled by topbar.js
+        }, 50);
+    });
+    </script>
+<script src="/assets/topbar.js"></script>
+<script src="/assets/theme.js"></script>
+</body>
+</html>

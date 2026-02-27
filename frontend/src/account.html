@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account — Buddyliko</title>
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png">
+    <script src="/lang/i18n.js"></script>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        :root{--bg:#f8fafc;--card:#fff;--border:#e2e8f0;--blue:#2196f3;--blue2:#1565c0;--green:#10b981;--purple:#7c3aed;--red:#ef4444;--orange:#f59e0b;--text:#1e293b;--text2:#64748b;--text3:#94a3b8}
+        body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+        a{color:var(--blue);text-decoration:none}
+        .topbar{background:#fff;border-bottom:1px solid var(--border);padding:0 32px;height:56px;display:flex;align-items:center;justify-content:space-between}
+        .topbar img{height:36px}
+        .topbar-links{display:flex;gap:20px;align-items:center;font-size:14px}
+        .topbar-links a{color:var(--text2);font-weight:500}.topbar-links a:hover{color:var(--text)}
+        .topbar-links .active{color:var(--blue);font-weight:600}
+        .container{max-width:900px;margin:0 auto;padding:32px 24px}
+        h1{font-size:28px;font-weight:700;margin-bottom:8px}
+        .page-sub{color:var(--text2);margin-bottom:32px;font-size:15px}
+        .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:28px;margin-bottom:20px}
+        .card h2{font-size:18px;font-weight:700;margin-bottom:16px}
+        .card-label{font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+        .card-value{font-size:20px;font-weight:700;margin-bottom:16px}
+        .badge{display:inline-block;padding:3px 12px;border-radius:12px;font-size:12px;font-weight:600}
+        .badge-free{background:#f1f5f9;color:var(--text2)}
+        .badge-pro{background:#eff6ff;color:var(--blue2)}
+        .badge-enterprise{background:#f5f3ff;color:var(--purple)}
+        .badge-active{background:#ecfdf5;color:var(--green)}
+        .badge-pending{background:#fff7ed;color:var(--orange)}
+        .btn{display:inline-block;padding:10px 24px;border-radius:8px;font-weight:600;font-size:14px;cursor:pointer;border:none;transition:all .2s}
+        .btn-primary{background:var(--blue);color:#fff}.btn-primary:hover{background:var(--blue2)}
+        .btn-success{background:var(--green);color:#fff}.btn-success:hover{filter:brightness(.9)}
+        .btn-outline{border:1px solid var(--border);color:var(--text);background:#fff}.btn-outline:hover{border-color:var(--blue)}
+        .btn-danger{background:var(--red);color:#fff}.btn-danger:hover{filter:brightness(.9)}
+        .btn:disabled{opacity:.5;cursor:not-allowed}
+        .plans-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-bottom:20px}
+        .plan-option{border:2px solid var(--border);border-radius:12px;padding:20px;cursor:pointer;transition:all .2s;position:relative}
+        .plan-option:hover{border-color:var(--blue)}
+        .plan-option.current{border-color:var(--green);background:#f0fdf4}
+        .plan-option.selected{border-color:var(--blue);background:#eff6ff;box-shadow:0 0 0 3px rgba(33,150,243,.15)}
+        .plan-option h3{font-size:16px;margin-bottom:4px}
+        .plan-option .plan-price{font-size:28px;font-weight:800;margin:8px 0 4px}
+        .plan-option .plan-price span{font-size:13px;font-weight:400;color:var(--text2)}
+        .plan-option .plan-features{font-size:12px;color:var(--text2);line-height:1.8}
+        .plan-option .current-badge{position:absolute;top:-10px;right:12px;background:var(--green);color:#fff;font-size:10px;font-weight:700;padding:2px 10px;border-radius:8px}
+        .period-toggle{display:flex;gap:0;background:#f1f5f9;border-radius:8px;padding:3px;margin-bottom:20px;width:fit-content}
+        .period-toggle button{padding:8px 20px;border:none;background:transparent;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;color:var(--text2)}
+        .period-toggle button.active{background:#fff;color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.1)}
+        .usage-bar{height:8px;background:#f1f5f9;border-radius:4px;overflow:hidden;margin:6px 0 4px}
+        .usage-bar-fill{height:100%;border-radius:4px;transition:width .3s}
+        .usage-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #f1f5f9}
+        .usage-row:last-child{border:none}
+        .info-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f1f5f9;font-size:14px}
+        .info-row:last-child{border:none}
+        .info-row .label{color:var(--text2)}
+        .alert{padding:14px 18px;border-radius:8px;margin-bottom:16px;font-size:14px;display:none}
+        .alert-success{background:#ecfdf5;color:#065f46;border:1px solid #a7f3d0;display:block}
+        .alert-error{background:#fef2f2;color:#991b1b;border:1px solid #fecaca;display:block}
+        .alert-warning{background:#fff7ed;color:#9a3412;border:1px solid #fed7aa;display:block}
+        @media(max-width:768px){.container{padding:20px 16px}.topbar{padding:0 16px}.topbar-links{gap:10px;font-size:13px}.plans-grid{grid-template-columns:1fr}}
+    </style>
+</head>
+<body>
+
+<div class="topbar">
+    <a href="app.html"><img src="/assets/logo-new.png" alt="Buddyliko"></a>
+    <div class="topbar-links">
+        <a href="app.html" data-i18n="nav.mapper">Mapper</a>
+        <a href="workspace.html" data-i18n="nav.workspace">Workspace</a>
+        <a href="account.html" class="active" data-i18n="nav.account">Account</a>
+        <span id="lang-switcher"></span>
+        <a href="#" onclick="logout()" style="color:var(--red)" data-i18n="nav.logout">Esci</a>
+    </div>
+</div>
+
+<div class="container">
+    <h1 data-i18n="account.title">Il tuo account</h1>
+    <p class="page-sub" data-i18n="account.subtitle">Gestisci il tuo piano, metodo di pagamento e utilizzo.</p>
+
+    <div id="alertBox" class="alert"></div>
+
+    <div class="card">
+        <h2 data-i18n="account.profile">👤 Profilo</h2>
+        <div class="info-row"><span class="label" data-i18n="account.name">Nome</span><span id="userName">—</span></div>
+        <div class="info-row"><span class="label" data-i18n="account.email">Email</span><span id="userEmail">—</span></div>
+        <div class="info-row"><span class="label" data-i18n="account.role">Ruolo</span><span id="userRole">—</span></div>
+        <div class="info-row"><span class="label" data-i18n="account.status">Stato</span><span id="userStatus">—</span></div>
+    </div>
+
+    <div class="card">
+        <h2 data-i18n="account.current_plan">📋 Piano attuale</h2>
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+            <span id="planName" class="card-value" style="margin:0">—</span>
+            <span id="planBadge" class="badge badge-free">FREE</span>
+        </div>
+        <div id="subscriptionInfo"></div>
+        <div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-primary" onclick="openPortal()" id="btnPortal" style="display:none" data-i18n="account.manage_payments">💳 Gestisci pagamenti</button>
+            <button class="btn btn-outline" onclick="scrollToPlans()" data-i18n="account.change_plan">🔄 Cambia piano</button>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2 data-i18n="account.usage_title">📊 Utilizzo del mese</h2>
+        <div id="usageBody">
+            <div style="color:var(--text3);padding:16px 0" data-i18n="common.loading">Caricamento...</div>
+        </div>
+    </div>
+
+    <div class="card" id="plansSection">
+        <h2 data-i18n="account.choose_plan">🚀 Scegli il tuo piano</h2>
+        <div class="period-toggle">
+            <button class="active" onclick="setPeriod('monthly',this)" data-i18n="account.monthly">Mensile</button>
+            <button onclick="setPeriod('yearly',this)"><span data-i18n="account.yearly">Annuale</span> <span style="color:var(--green);font-size:11px">-17%</span></button>
+        </div>
+        <div class="plans-grid" id="plansGrid">
+            <div style="text-align:center;color:var(--text3);padding:20px;grid-column:1/-1" data-i18n="account.loading_plans">Caricamento piani...</div>
+        </div>
+        <div id="couponSection" style="margin-bottom:16px;display:none">
+            <label style="font-size:12px;font-weight:600;color:var(--text2)" data-i18n="account.coupon_code">Codice sconto</label>
+            <div style="display:flex;gap:8px;margin-top:4px">
+                <input id="couponInput" type="text" placeholder="CODICE" style="flex:1;padding:8px 12px;border:1px solid var(--border);border-radius:6px;font-size:14px">
+                <button class="btn btn-outline" onclick="validateCoupon()" data-i18n="account.apply">Applica</button>
+            </div>
+            <div id="couponResult" style="font-size:12px;margin-top:4px"></div>
+        </div>
+        <button class="btn btn-success" id="btnCheckout" onclick="startCheckout()" disabled style="width:100%;padding:14px;font-size:16px" data-i18n="account.select_plan">
+            Seleziona un piano per procedere
+        </button>
+    </div>
+
+    <div class="card" style="border-color:#fecaca">
+        <h2 style="color:var(--red)" data-i18n="account.danger_zone">⚠️ Zona pericolosa</h2>
+        <p style="font-size:13px;color:var(--text2);margin-bottom:12px" data-i18n="account.cancel_warning">Cancellare l'abbonamento non elimina l'account. Tornerai al piano Free alla fine del periodo.</p>
+        <button class="btn btn-danger" onclick="cancelSubscription()" id="btnCancel" style="display:none" data-i18n="account.cancel_sub">Cancella abbonamento</button>
+    </div>
+</div>
+
+<script>
+const API = window.location.origin + '/api';
+const token = localStorage.getItem('buddyliko_token');
+if (!token) window.location.href = 'login.html';
+
+let currentPlan = 'FREE';
+let selectedPlan = null;
+let billingPeriod = 'monthly';
+let billingStatus = null;
+const T = (k, r) => i18n.t(k, r);
+
+async function api(path, opts = {}) {
+    const r = await fetch(API + path, {
+        ...opts,
+        headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json', ...(opts.headers||{}) }
+    });
+    if (r.status === 401) { localStorage.removeItem('buddyliko_token'); window.location.href = 'login.html'; }
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.detail || T('common.error'));
+    return d;
+}
+
+function showAlert(msg, type='success') {
+    const el = document.getElementById('alertBox');
+    el.className = 'alert alert-' + type;
+    el.textContent = msg;
+    el.style.display = 'block';
+    setTimeout(() => el.style.display = 'none', 6000);
+}
+
+function logout() { localStorage.removeItem('buddyliko_token'); window.location.href = 'login.html'; }
+function scrollToPlans() { document.getElementById('plansSection').scrollIntoView({behavior:'smooth'}); }
+
+async function loadProfile() {
+    try {
+        const res = await api('/auth/me');
+        const u = res.user || res;
+        document.getElementById('userName').textContent = u.name || '—';
+        document.getElementById('userEmail').textContent = u.email || '—';
+        document.getElementById('userRole').innerHTML = '<span class="badge" style="background:#f1f5f9">' + (u.role || 'USER') + '</span>';
+        const statusColors = { APPROVED: 'badge-active', PENDING: 'badge-pending' };
+        document.getElementById('userStatus').innerHTML = '<span class="badge ' + (statusColors[u.status]||'') + '">' + (u.status || '—') + '</span>';
+    } catch(e) { console.error(e); }
+}
+
+async function loadBilling() {
+    try {
+        billingStatus = await api('/billing/status');
+        currentPlan = billingStatus.plan || 'FREE';
+        document.getElementById('planName').textContent = currentPlan;
+        const badgeClass = { FREE:'badge-free', PRO:'badge-pro', ENTERPRISE:'badge-enterprise' }[currentPlan] || 'badge-free';
+        document.getElementById('planBadge').className = 'badge ' + badgeClass;
+        document.getElementById('planBadge').textContent = currentPlan;
+
+        const info = document.getElementById('subscriptionInfo');
+        if (billingStatus.subscription) {
+            const s = billingStatus.subscription;
+            let html = '<div class="info-row"><span class="label">' + T('account.status') + '</span><span class="badge badge-active">' + (s.status || 'active') + '</span></div>';
+            if (s.current_period_end) html += '<div class="info-row"><span class="label">' + T('account.next_renewal') + '</span><span>' + new Date(s.current_period_end).toLocaleDateString(i18n.getLang() === 'it' ? 'it-IT' : 'en-GB') + '</span></div>';
+            if (s.cancel_at_period_end) html += '<div class="info-row"><span class="label">⚠️</span><span style="color:var(--orange)">' + T('account.cancelling') + '</span></div>';
+            info.innerHTML = html;
+            document.getElementById('btnPortal').style.display = 'inline-block';
+            document.getElementById('btnCancel').style.display = s.cancel_at_period_end ? 'none' : 'inline-block';
+        } else {
+            info.innerHTML = '<div style="color:var(--text3);font-size:13px">' + T('account.no_subscription') + '</div>';
+        }
+
+        const usage = billingStatus.usage || {};
+        const limits = billingStatus.limits || {};
+        const usageBody = document.getElementById('usageBody');
+        const transformsMax = limits.transforms_per_month || 100;
+        const transformsUsed = usage.transforms_count || 0;
+        const pct = transformsMax > 0 ? Math.min(100, transformsUsed / transformsMax * 100) : 0;
+        const barColor = pct > 90 ? 'var(--red)' : pct > 70 ? 'var(--orange)' : 'var(--green)';
+
+        usageBody.innerHTML =
+            '<div class="usage-row"><div style="flex:1"><div style="font-size:14px;font-weight:600">' + T('account.transforms') + '</div>' +
+            '<div class="usage-bar"><div class="usage-bar-fill" style="width:' + (limits.transforms_per_month===-1?5:pct) + '%;background:' + barColor + '"></div></div>' +
+            '<div style="font-size:12px;color:var(--text2)">' + transformsUsed + ' / ' + (transformsMax===-1?'∞':transformsMax) + '</div></div></div>' +
+            '<div class="usage-row"><span style="color:var(--text2)">' + T('account.code_gen') + '</span><span>' + (usage.codegen_count||0) + '</span></div>' +
+            '<div class="usage-row"><span style="color:var(--text2)">' + T('account.bytes_processed') + '</span><span>' + ((usage.bytes_processed||0)/1048576).toFixed(1) + ' MB</span></div>' +
+            '<div class="usage-row"><span style="color:var(--text2)">' + T('account.api_calls') + '</span><span>' + (usage.api_calls_count||0) + '</span></div>';
+
+        document.querySelectorAll('.plan-option').forEach(el => {
+            el.classList.remove('current');
+            el.querySelector('.current-badge')?.remove();
+            if (el.dataset.plan === currentPlan) {
+                el.classList.add('current');
+                const b = document.createElement('div'); b.className = 'current-badge'; b.textContent = T('account.current'); el.appendChild(b);
+            }
+        });
+    } catch(e) {
+        console.error(e);
+        document.getElementById('usageBody').innerHTML = '<div style="color:var(--text3)">' + T('account.billing_unavailable') + '</div>';
+    }
+}
+
+let planPrices = { FREE:{monthly:0,yearly:0}, PRO:{monthly:49,yearly:490}, ENTERPRISE:{monthly:299,yearly:2990} };
+let planLimits = {};
+
+async function loadPlanPrices() {
+    try {
+        const r = await fetch(API + '/billing/config');
+        const d = await r.json();
+        if (d.plans) {
+            for (const [k, v] of Object.entries(d.plans)) {
+                planPrices[k] = v.prices || planPrices[k] || {};
+                planLimits[k] = v.limits || {};
+            }
+        }
+    } catch(e) {}
+    renderPlans();
+}
+
+function renderPlans() {
+    const grid = document.getElementById('plansGrid');
+    const p = billingPeriod;
+    const fl = planLimits.FREE || {};
+    const pl = planLimits.PRO || {};
+    const el = planLimits.ENTERPRISE || {};
+    const yr = T('pricing.year');
+    const mo = T('pricing.month');
+    grid.innerHTML =
+        '<div class="plan-option" data-plan="FREE" onclick="selectPlan(\'FREE\')"><h3>Free</h3>' +
+        '<div class="plan-price">€' + (planPrices.FREE?.[p] ?? 0) + (p==='yearly'?'<span>'+yr+'</span>':'') + '</div>' +
+        '<div class="plan-features">' + (fl.transforms_per_month||100) + ' ' + T('pricing.transforms_month') + '<br>' + T('pricing.files_up_to') + ' ' + (fl.max_file_size_mb||1) + ' MB<br>' + T('account.csv_json_xml') + '</div></div>' +
+        '<div class="plan-option" data-plan="PRO" onclick="selectPlan(\'PRO\')"><h3>Pro</h3>' +
+        '<div class="plan-price">€' + (planPrices.PRO?.[p] ?? (p==='yearly'?490:49)) + '<span>' + (p==='yearly'?yr:mo) + '</span></div>' +
+        '<div class="plan-features">' + T('pricing.unlimited_transforms') + '<br>' + T('pricing.files_up_to') + ' ' + (pl.max_file_size_mb||50) + ' MB<br>' + T('account.code_gen_edi') + '</div></div>' +
+        '<div class="plan-option" data-plan="ENTERPRISE" onclick="selectPlan(\'ENTERPRISE\')"><h3>Enterprise</h3>' +
+        '<div class="plan-price">€' + (planPrices.ENTERPRISE?.[p] ?? (p==='yearly'?2990:299)) + '<span>' + (p==='yearly'?yr:mo) + '</span></div>' +
+        '<div class="plan-features">' + T('pricing.all_pro') + ' +<br>DB Connector, API access<br>' + T('account.unlimited_sla', {sla: el.sla||'99.9%'}) + '</div></div>';
+    document.querySelectorAll('.plan-option').forEach(el => {
+        if (el.dataset.plan === currentPlan) {
+            el.classList.add('current');
+            if (!el.querySelector('.current-badge')) {
+                const b = document.createElement('div'); b.className = 'current-badge'; b.textContent = T('account.current'); el.appendChild(b);
+            }
+        }
+    });
+}
+
+function setPeriod(p, btn) {
+    billingPeriod = p;
+    document.querySelectorAll('.period-toggle button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderPlans();
+}
+
+function selectPlan(plan) {
+    selectedPlan = plan;
+    document.querySelectorAll('.plan-option').forEach(el => el.classList.remove('selected'));
+    document.querySelector('[data-plan="' + plan + '"]').classList.add('selected');
+    const btn = document.getElementById('btnCheckout');
+    const couponSec = document.getElementById('couponSection');
+    if (plan === currentPlan) {
+        btn.textContent = T('account.already_plan');
+        btn.disabled = true;
+        couponSec.style.display = 'none';
+    } else if (plan === 'FREE') {
+        btn.textContent = T('account.downgrade_free');
+        btn.disabled = false;
+        couponSec.style.display = 'none';
+    } else {
+        btn.textContent = plan + ' — ' + T('account.checkout_redirect').split('.')[0];
+        btn.disabled = false;
+        couponSec.style.display = 'block';
+    }
+}
+
+async function startCheckout() {
+    if (!selectedPlan || selectedPlan === currentPlan) return;
+    if (selectedPlan === 'FREE') {
+        if (!confirm(T('account.cancel_confirm'))) return;
+        try { await cancelSubscription(); } catch(e) { showAlert(e.message, 'error'); }
+        return;
+    }
+    try {
+        const coupon = document.getElementById('couponInput')?.value?.trim() || undefined;
+        const res = await api('/billing/checkout', { method: 'POST', body: JSON.stringify({ plan: selectedPlan, billing_period: billingPeriod, coupon }) });
+        if (res.checkout_url) window.location.href = res.checkout_url;
+        else if (res.url) window.location.href = res.url;
+        else showAlert(T('account.checkout_redirect'), 'success');
+    } catch(e) { showAlert(e.message, 'error'); }
+}
+
+async function openPortal() {
+    try {
+        const res = await api('/billing/portal', { method: 'POST' });
+        if (res.portal_url) window.location.href = res.portal_url;
+    } catch(e) { showAlert(e.message, 'error'); }
+}
+
+async function cancelSubscription() {
+    if (!confirm(T('account.cancel_confirm'))) return;
+    try {
+        await api('/billing/cancel', { method: 'POST' });
+        showAlert(T('account.cancelled_success'), 'warning');
+        loadBilling();
+    } catch(e) { showAlert(e.message, 'error'); }
+}
+
+async function validateCoupon() {
+    const code = document.getElementById('couponInput').value.trim();
+    if (!code) return;
+    try {
+        const res = await fetch(API + '/finance/pricing/discounts/validate', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ code, plan: selectedPlan })
+        });
+        const d = await res.json();
+        const el = document.getElementById('couponResult');
+        if (d.valid) el.innerHTML = '<span style="color:var(--green)">✓ ' + (d.description || T('account.coupon_valid')) + '</span>';
+        else el.innerHTML = '<span style="color:var(--red)">✗ ' + (d.reason || T('account.coupon_invalid')) + '</span>';
+    } catch(e) {
+        document.getElementById('couponResult').innerHTML = '<span style="color:var(--red)">' + T('account.validation_error') + '</span>';
+    }
+}
+
+const params = new URLSearchParams(window.location.search);
+if (params.get('success') === 'true') {
+    setTimeout(() => showAlert(T('account.payment_complete'), 'success'), 500);
+    window.history.replaceState({}, '', 'account.html');
+}
+if (params.get('canceled') === 'true') {
+    setTimeout(() => showAlert(T('account.checkout_cancelled'), 'warning'), 500);
+    window.history.replaceState({}, '', 'account.html');
+}
+
+// INIT
+(async function() {
+    await i18n.init();
+    i18n.createSwitcher('lang-switcher');
+    window.addEventListener('langchange', () => { renderPlans(); loadBilling(); });
+    loadProfile();
+    loadBilling();
+    loadPlanPrices();
+})();
+</script>
+<script src="/assets/theme.js"></script>
+</body>
+</html>

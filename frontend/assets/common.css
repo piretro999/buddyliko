@@ -1,0 +1,183 @@
+/* ═══════════════════════════════════════════════════════════════════
+   Buddyliko Design System — common.css v2
+   ONLY: CSS vars, unified topbar, landing-nav, transitions, scrollbar.
+   Does NOT touch buttons, tables, cards, forms — those stay page-specific.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── CSS Variables: Dark (default) ─────────────────────────────── */
+:root {
+    --bg:       #0a0e1a;
+    --bg2:      #0f172a;
+    --surface:  #111827;
+    --card:     #1e293b;
+    --border:   #334155;
+    --border2:  #475569;
+    --text:     #e2e8f0;
+    --text2:    #cbd5e1;
+    --muted:    #94a3b8;
+    --muted2:   #64748b;
+    --primary:  #3b82f6;
+    --primary-h:#2563eb;
+    --cyan:     #00BCD4;
+    --green:    #10b981;
+    --green-bg: #064e3b;
+    --amber:    #f59e0b;
+    --amber-bg: #451a03;
+    --red:      #ef4444;
+    --red-bg:   #450a0a;
+    --purple:   #7c3aed;
+    --shadow:   0 2px 8px rgba(0,0,0,.25);
+    --shadow-lg:0 8px 32px rgba(0,0,0,.35);
+    --topbar-h: 56px;
+}
+
+/* ── CSS Variables: Light ──────────────────────────────────────── */
+[data-theme="light"] {
+    --bg:       #f8fafc;
+    --bg2:      #f1f5f9;
+    --surface:  #ffffff;
+    --card:     #ffffff;
+    --border:   #e2e8f0;
+    --border2:  #cbd5e1;
+    --text:     #1e293b;
+    --text2:    #334155;
+    --muted:    #64748b;
+    --muted2:   #94a3b8;
+    --green-bg: #d1fae5;
+    --amber-bg: #fef3c7;
+    --red-bg:   #fee2e2;
+    --shadow:   0 1px 3px rgba(0,0,0,.06);
+    --shadow-lg:0 8px 32px rgba(0,0,0,.08);
+}
+
+/* ── Unified Topbar ────────────────────────────────────────────── */
+.topbar {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    height: var(--topbar-h);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    gap: 16px;
+}
+.topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+}
+.topbar-left img {
+    height: 32px;
+    object-fit: contain;
+}
+[data-theme="light"] .topbar-left img { filter: brightness(0.15); }
+.topbar-brand {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+    text-decoration: none;
+}
+.topbar-brand span { color: var(--cyan); }
+.topbar-sub {
+    font-size: 12px;
+    color: var(--muted);
+}
+.topbar-nav {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+}
+.topbar-nav a {
+    padding: 6px 14px;
+    border-radius: 6px;
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all .15s;
+    white-space: nowrap;
+}
+.topbar-nav a:hover { color: var(--text); background: rgba(128,128,128,.08); }
+.topbar-nav a.active { color: var(--primary); background: rgba(59,130,246,.1); }
+.topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+}
+.topbar-right .user-name, .topbar-right .user-info {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+}
+.topbar-right .user-email { font-size: 11px; color: var(--muted); }
+
+/* ── Landing Nav (index, privacy, terms, 404) ──────────────────── */
+nav.landing-nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(10,14,26,.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 64px;
+}
+[data-theme="light"] nav.landing-nav {
+    background: rgba(255,255,255,.92);
+    box-shadow: 0 1px 3px rgba(0,0,0,.05);
+}
+nav.landing-nav img { height: 36px; }
+[data-theme="light"] nav.landing-nav img { filter: brightness(0.15); }
+nav.landing-nav .nav-links { display: flex; gap: 20px; align-items: center; }
+nav.landing-nav .nav-links a {
+    color: var(--muted); text-decoration: none; font-size: 14px; font-weight: 500; transition: color .2s;
+}
+nav.landing-nav .nav-links a:hover { color: var(--text); }
+
+/* ── Shared btn-ghost for topbar ───────────────────────────────── */
+.btn.btn-ghost, .btn-ghost {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 6px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all .15s;
+}
+.btn-ghost:hover { color: var(--text); border-color: var(--border2); }
+.btn.btn-outline {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    transition: all .15s;
+}
+.btn-outline:hover { border-color: var(--primary); color: var(--primary); }
+
+/* ── Scrollbar ─────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--border2); }
+
+/* ── Smooth transitions ────────────────────────────────────────── */
+body, .topbar, nav.landing-nav, .sidebar, .sidebar-footer, .sidebar-content {
+    transition: background-color .2s, border-color .2s, color .15s;
+}
+
+/* ── Topbar responsive ─────────────────────────────────────────── */
+@media (max-width: 768px) {
+    .topbar { padding: 0 12px; height: 48px; gap: 8px; }
+    .topbar-left img { height: 26px; }
+    .topbar-nav a { font-size: 11px; padding: 4px 8px; }
+    .topbar-right .user-name, .topbar-right .user-info { display: none; }
+    nav.landing-nav { padding: 0 16px; height: 52px; }
+}
+@media (max-width: 480px) {
+    .topbar-nav { display: none; }
+}
