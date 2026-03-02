@@ -122,6 +122,27 @@ class MarketplaceService:
     # HELPERS
     # ──────────────────────────────────────────────────────────────
 
+    def _ensure_conn(self):
+        """Reset connection if in failed transaction state."""
+        try:
+            if self.conn.closed:
+                import psycopg2
+                dsn = self.conn.dsn
+                self.conn = psycopg2.connect(dsn)
+                self.conn.autocommit = True
+                return
+            status = self.conn.get_transaction_status()
+            # 4 = TRANSACTION_STATUS_INERROR
+            if status == 4:
+                self.conn.rollback()
+        except Exception:
+            pass
+
+    def _safe_cursor(self):
+        """Get a cursor after ensuring connection is healthy."""
+        self._ensure_conn()
+        return self.conn.cursor(cursor_factory=self.RDC)
+
     def _ser(self, v):
         if isinstance(v, Decimal): return str(v)
         if isinstance(v, datetime): return v.isoformat()
@@ -189,7 +210,7 @@ class MarketplaceService:
 
         offset = (max(1, int(page)) - 1) * per_page
 
-        cur = self.conn.cursor(cursor_factory=self.RDC)
+        cur = self._safe_cursor()
 
         # Count
         cur.execute(f"SELECT COUNT(*) as total FROM mapping_templates mt WHERE {' AND '.join(where)}", params)
@@ -224,8 +245,8 @@ class MarketplaceService:
             if tpl_ids:
                 cur.execute("""
                     SELECT template_id FROM template_purchases
-                    WHERE buyer_org_id = %s AND template_id = ANY(%s) AND status = 'active'
-                """, (org_id, tpl_ids))
+                    WHERE buyer_org_id = %s::uuid AND template_id = ANY(%s::uuid[]) AND status = 'active'
+                """, (str(org_id), [str(t) for t in tpl_ids]))
                 purchased = {str(r['template_id']) for r in cur.fetchall()}
                 for r in rows:
                     r['is_purchased'] = str(r['id']) in purchased
@@ -244,7 +265,7 @@ class MarketplaceService:
 
     def get_template(self, template_id, org_id=None, include_mapping=False):
         """Get full template detail."""
-        cur = self.conn.cursor(cursor_factory=self.RDC)
+        cur = self._safe_cursor()
         fields = """mt.id, mt.name, mt.slug, mt.description, mt.long_description,
                    mt.category, mt.icon, mt.input_standard, mt.output_standard,
                    mt.input_format, mt.output_format,
@@ -303,7 +324,7 @@ class MarketplaceService:
 
         slug = data.get('slug') or self._slugify(name)
         # Ensure unique slug
-        cur = self.conn.cursor(cursor_factory=self.RDC)
+        cur = self._safe_cursor()
         cur.execute("SELECT id FROM mapping_templates WHERE slug=%s", (slug,))
         if cur.fetchone():
             slug = slug + '-' + str(uuid.uuid4())[:6]
@@ -362,7 +383,7 @@ class MarketplaceService:
 
     def update_template(self, template_id, org_id, user_id, data, is_admin=False):
         """Update a template. Only author or admin can update."""
-        cur = self.conn.cursor(cursor_factory=self.RDC)
+        cur = self._safe_cursor()
         cur.execute("SELECT author_org_id FROM mapping_templates WHERE id=%s", (template_id,))
         tpl = cur.fetchone()
         if not tpl:
@@ -400,7 +421,7 @@ class MarketplaceService:
 
     def purchase_template(self, template_id, org_id, user_id):
         """Purchase or install a template."""
-        cur = self.conn.cursor(cursor_factory=self.RDC)
+        cur = self._safe_cursor()
         cur.execute("SELECT * FROM mapping_templates WHERE id=%s AND status='published'", (template_id,))
         tpl = cur.fetchone()
         if not tpl:
@@ -453,7 +474,7 @@ class MarketplaceService:
         if not (1 <= int(rating) <= 5):
             raise ValueError("Rating deve essere tra 1 e 5")
 
-        cur = self.conn.cursor(cursor_factory=self.RDC)
+        cur = self._safe_cursor()
         # Verify template exists
         cur.execute("SELECT id, author_org_id FROM mapping_templates WHERE id=%s", (template_id,))
         tpl = cur.fetchone()
@@ -486,7 +507,7 @@ class MarketplaceService:
 
     def get_reviews(self, template_id, page=1, per_page=20):
         """Get reviews for a template."""
-        cur = self.conn.cursor(cursor_factory=self.RDC)
+        cur = self._safe_cursor()
         offset = (max(1, int(page)) - 1) * per_page
         cur.execute("""
             SELECT tr.*, o.name as reviewer_name, u.name as reviewer_user_name
@@ -505,7 +526,7 @@ class MarketplaceService:
 
     def get_my_templates(self, org_id, status=None):
         """Templates published by this org."""
-        cur = self.conn.cursor(cursor_factory=self.RDC)
+        cur = self._safe_cursor()
         where = "mt.author_org_id = %s"
         params = [org_id]
         if status:
@@ -524,7 +545,7 @@ class MarketplaceService:
 
     def get_my_purchases(self, org_id):
         """Templates purchased/installed by this org."""
-        cur = self.conn.cursor(cursor_factory=self.RDC)
+        cur = self._safe_cursor()
         cur.execute("""
             SELECT tp.id as purchase_id, tp.price_paid_eur, tp.installed_at, tp.status as purchase_status,
                    mt.id as template_id, mt.name, mt.slug, mt.description, mt.category, mt.icon,
@@ -573,7 +594,7 @@ class MarketplaceService:
 
     def get_categories(self):
         """Get category list with counts."""
-        cur = self.conn.cursor(cursor_factory=self.RDC)
+        cur = self._safe_cursor()
         cur.execute("""
             SELECT category, COUNT(*) as count,
                    AVG(rating_avg) as avg_rating,
@@ -586,7 +607,7 @@ class MarketplaceService:
 
     def get_featured(self, limit=8):
         """Get featured / top templates."""
-        cur = self.conn.cursor(cursor_factory=self.RDC)
+        cur = self._safe_cursor()
         cur.execute("""
             SELECT mt.id, mt.name, mt.slug, mt.description, mt.category, mt.icon,
                    mt.input_format, mt.output_format, mt.availability, mt.price_eur,
@@ -602,7 +623,7 @@ class MarketplaceService:
 
     def get_marketplace_stats(self):
         """Platform-level marketplace stats."""
-        cur = self.conn.cursor(cursor_factory=self.RDC)
+        cur = self._safe_cursor()
         cur.execute("""
             SELECT
                 COUNT(*) as total_templates,
@@ -636,7 +657,7 @@ class MarketplaceService:
 
     def seed_builtin(self):
         """Seed built-in templates if none exist."""
-        cur = self.conn.cursor(cursor_factory=self.RDC)
+        cur = self._safe_cursor()
         cur.execute("SELECT COUNT(*) as cnt FROM mapping_templates WHERE availability='builtin'")
         if cur.fetchone()['cnt'] > 0:
             return 0
@@ -698,8 +719,10 @@ class MarketplaceService:
                       b['input_format'], b['output_format'], b.get('icon', '📄')))
                 count += 1
             except Exception as e:
-                pass  # slug conflict, skip
+                try: self.conn.rollback()
+                except: pass
 
-        self.conn.commit()
+        try: self.conn.commit()
+        except: pass
         print(f"   ✅ Seeded {count} builtin templates")
         return count

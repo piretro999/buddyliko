@@ -149,3 +149,37 @@ def send_new_user_notification(admin_emails, user_email, user_name):
             <a href="{FRONTEND_URL}/admin.html" style="{_BTN_ADMIN}">Pannello Admin</a></div>""")
     for ae in admin_emails:
         send_email(ae, f"Nuova registrazione: {user_name}", html)
+
+
+def send_invite_email(email, name, inviter_name, org_name, invite_url, role='operator'):
+    """Manda email di invito con link per completare registrazione / unirsi a org."""
+    role_label = {
+        'owner': 'Proprietario', 'admin': 'Amministratore',
+        'operator': 'Operatore', 'viewer': 'Visualizzatore'
+    }.get(role, role)
+
+    html = _tpl("Sei stato invitato!", f"""
+        <p style="color:#475569">Ciao{(' <strong>' + name + '</strong>') if name else ''},</p>
+        <p style="color:#475569"><strong>{inviter_name}</strong> ti ha invitato a unirti
+        all'organizzazione <strong>{org_name}</strong> su Buddyliko come <strong>{role_label}</strong>.</p>
+        <div style="text-align:center;margin:28px 0">
+            <a href="{invite_url}" style="{_BTN_SUCCESS}">Accetta invito</a></div>
+        <p style="color:#94a3b8;font-size:13px">Il link scade tra 72 ore. Se non conosci chi ti ha invitato, ignora questa email.</p>""")
+    send_email(email, f"Invito a {org_name} — Buddyliko", html)
+
+
+def send_user_added_to_org(email, name, org_name, role='operator'):
+    """Notifica un utente esistente che è stato aggiunto a un'org."""
+    role_label = {
+        'owner': 'Proprietario', 'admin': 'Amministratore',
+        'operator': 'Operatore', 'viewer': 'Visualizzatore'
+    }.get(role, role)
+
+    html = _tpl("Aggiunto a un'organizzazione", f"""
+        <p style="color:#475569">Ciao <strong>{name}</strong>,</p>
+        <p style="color:#475569">Sei stato aggiunto all'organizzazione <strong>{org_name}</strong>
+        con il ruolo di <strong>{role_label}</strong>.</p>
+        <p style="color:#475569">Puoi passare al contesto aziendale dal menu in alto nella piattaforma.</p>
+        <div style="text-align:center;margin:28px 0">
+            <a href="{FRONTEND_URL}/app.html" style="{_BTN_PRIMARY}">Vai a Buddyliko</a></div>""")
+    send_email(email, f"Aggiunto a {org_name} — Buddyliko", html)

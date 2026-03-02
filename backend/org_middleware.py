@@ -1,20 +1,25 @@
 #!/usr/bin/env python3
 """
-Buddyliko — Organization Auth Middleware (v2 — Phase 1)
+Buddyliko — Organization Auth Middleware (v3 — Phase 5: RBAC Granulare)
 Gestisce autenticazione duale: JWT utenti + API token (blk_...).
+Aggiunge: permission resolution via PermissionService.
 
-Sostituisce la versione Phase 0 (che ritornava 501 sui token).
+Cambiamenti vs v2:
+- OrgContext.permissions: set di permessi risolti (lazy)
+- has_permission(scope, action): check granulare
+- require_permission(scope, action): dependency FastAPI
+- Backward compat: has_min_role() funziona ancora
 """
 
 from dataclasses import dataclass, field
-from typing import Optional, List
+from typing import Optional, List, Set
 from fastapi import Depends, HTTPException, Request
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
 
 @dataclass
 class OrgContext:
-    """Contesto di autenticazione con org info."""
+    """Contesto di autenticazione con org info + permessi granulari."""
     auth_type: str = 'user'
     user_id: Optional[int] = None
     email: Optional[str] = None
@@ -28,11 +33,30 @@ class OrgContext:
     org_plan: Optional[str] = None
     org_status: Optional[str] = None
     environment: str = 'live'
+    context: str = 'personal'       # 'personal' | 'org'
     token_id: Optional[str] = None
     token_name: Optional[str] = None
     scopes: List[str] = field(default_factory=list)
     partner_id: Optional[str] = None
     tags: dict = field(default_factory=dict)
+    # Phase 5: permessi granulari (risolti lazy da PermissionService)
+    _permissions: Optional[Set[str]] = field(default=None, repr=False)
+    _permission_service: object = field(default=None, repr=False)
+
+    @property
+    def permissions(self) -> Set[str]:
+        """Lazy-load permessi granulari."""
+        if self._permissions is not None:
+            return self._permissions
+        if self._permission_service and self.user_id and self.org_id:
+            self._permissions = self._permission_service.get_user_permissions(
+                self.user_id, self.org_id
+            )
+        elif self.is_platform_admin:
+            self._permissions = set()  # platform admin bypassa tutto
+        else:
+            self._permissions = set()
+        return self._permissions
 
     @property
     def is_org_admin(self) -> bool:
@@ -51,21 +75,39 @@ class OrgContext:
         return self.environment == 'sandbox'
 
     def has_scope(self, scope: str) -> bool:
+        """Check scope per API token."""
         if self.auth_type == 'user':
             return True
         return scope in self.scopes
 
     def has_min_role(self, min_role: str) -> bool:
+        """Backward compat: check ruolo gerarchico."""
         from org_service import ORG_ROLE_HIERARCHY
         user_level = ORG_ROLE_HIERARCHY.get(self.org_role, 0)
         min_level = ORG_ROLE_HIERARCHY.get(min_role, 0)
         return user_level >= min_level
 
+    def has_permission(self, scope: str, action: str) -> bool:
+        """Check permesso granulare. Platform admin bypassa."""
+        if self.is_platform_admin:
+            return True
+        if self.org_role == 'owner':
+            return True  # owner ha tutto
+        return f"{scope}:{action}" in self.permissions
 
-def create_auth_dependencies(auth_manager, storage, org_service, token_service=None):
+    def has_any_permission(self, checks: List[str]) -> bool:
+        """Check se ha almeno uno dei permessi (OR). checks: ["scope:action", ...]"""
+        if self.is_platform_admin or self.org_role == 'owner':
+            return True
+        return any(c in self.permissions for c in checks)
+
+
+def create_auth_dependencies(auth_manager, storage, org_service,
+                             token_service=None, permission_service=None):
     """
     Crea le dependencies FastAPI per autenticazione con org context.
     Se token_service è fornito, supporta anche autenticazione via API token.
+    Se permission_service è fornito, risolve permessi granulari.
     """
     import json
 
@@ -152,36 +194,51 @@ def create_auth_dependencies(auth_manager, storage, org_service, token_service=N
         if db_user.get('status') in ('SUSPENDED', 'BLOCKED'):
             raise HTTPException(403, "Account sospeso o bloccato")
 
+        # ── Contesto personale vs org (Fase 1 multi-tenant) ──
+        requested_context = None
+        if request:
+            requested_context = request.headers.get('x-context', '').lower().strip() or None
+        if not requested_context:
+            requested_context = payload.get('context')
+
         org_id = None
         org_role = None
         org_data = {}
+        context = 'personal'
 
-        jwt_org_id = payload.get('org_id')
-        if jwt_org_id:
-            org_id = jwt_org_id
-        if not org_id:
-            org_id = db_user.get('default_org_id')
-        if not org_id:
-            user_orgs = org_service.get_user_orgs(user_id)
-            if user_orgs:
-                org_id = str(user_orgs[0]['id'])
+        if requested_context == 'personal':
+            org_id = None
+            context = 'personal'
+        else:
+            jwt_org_id = payload.get('org_id')
+            if jwt_org_id:
+                org_id = jwt_org_id
+            if not org_id:
+                org_id = db_user.get('default_org_id')
+            if not org_id:
+                if requested_context != 'org':
+                    user_orgs = org_service.get_user_orgs(user_id)
+                    if user_orgs:
+                        org_id = str(user_orgs[0]['id'])
 
-        if org_id:
-            org_id = str(org_id)
-            org_data = org_service.get_org(org_id) or {}
-            member = org_service.get_member(org_id, user_id)
-            if member:
-                org_role = member.get('role', 'viewer')
-            else:
-                user_orgs = org_service.get_user_orgs(user_id)
-                if user_orgs:
-                    org_id = str(user_orgs[0]['id'])
-                    org_data = org_service.get_org(org_id) or {}
-                    org_role = user_orgs[0].get('my_role', 'viewer')
+            if org_id:
+                org_id = str(org_id)
+                org_data = org_service.get_org(org_id) or {}
+                member = org_service.get_member(org_id, user_id)
+                if member:
+                    org_role = member.get('role', 'viewer')
+                    context = 'org'
                 else:
-                    org_id = None
-                    org_data = {}
-                    org_role = None
+                    user_orgs = org_service.get_user_orgs(user_id)
+                    if user_orgs:
+                        org_id = str(user_orgs[0]['id'])
+                        org_data = org_service.get_org(org_id) or {}
+                        org_role = user_orgs[0].get('my_role', 'viewer')
+                        context = 'org'
+                    else:
+                        org_id = None
+                        org_data = {}
+                        org_role = None
 
         return OrgContext(
             auth_type='user',
@@ -197,14 +254,17 @@ def create_auth_dependencies(auth_manager, storage, org_service, token_service=N
             org_plan=org_data.get('plan', 'FREE'),
             org_status=org_data.get('status', 'active'),
             environment=payload.get('environment', 'live'),
+            context=context,
+            _permission_service=permission_service,
         )
 
     def require_org_role(min_role: str):
+        """Backward compat: require ruolo gerarchico minimo."""
         def _check(ctx: OrgContext = Depends(get_auth_context)) -> OrgContext:
-            if not ctx.org_id:
-                raise HTTPException(403, "Nessuna organizzazione attiva")
             if ctx.is_platform_admin:
                 return ctx
+            if not ctx.org_id:
+                raise HTTPException(403, "Nessuna organizzazione attiva. Creane una o accetta un invito.")
             if not ctx.has_min_role(min_role):
                 raise HTTPException(
                     403, f"Ruolo minimo richiesto: {min_role}, il tuo: {ctx.org_role}"
@@ -213,9 +273,30 @@ def create_auth_dependencies(auth_manager, storage, org_service, token_service=N
         return _check
 
     def require_scope(scope: str):
+        """Require API token scope."""
         def _check(ctx: OrgContext = Depends(get_auth_context)) -> OrgContext:
             if not ctx.has_scope(scope):
                 raise HTTPException(403, f"Scope richiesto: {scope}")
+            return ctx
+        return _check
+
+    def require_permission(scope: str, action: str):
+        """
+        Phase 5: require permesso granulare.
+        Usa PermissionService per risolvere role_template + custom overrides.
+        Fallback: se PermissionService non disponibile, usa require_org_role.
+        """
+        def _check(ctx: OrgContext = Depends(get_auth_context)) -> OrgContext:
+            if ctx.is_platform_admin:
+                return ctx
+            if not ctx.org_id:
+                raise HTTPException(403, "Nessuna organizzazione attiva.")
+            if not ctx.has_permission(scope, action):
+                raise HTTPException(
+                    403,
+                    f"Permesso richiesto: {scope}:{action}. "
+                    f"Il tuo ruolo ({ctx.org_role}) non include questo permesso."
+                )
             return ctx
         return _check
 
@@ -236,11 +317,11 @@ def create_auth_dependencies(auth_manager, storage, org_service, token_service=N
             'org_plan': ctx.org_plan,
             'org_type': ctx.org_type,
             'environment': ctx.environment,
+            'context': ctx.context,
             '_auth_type': ctx.auth_type,
             '_partner_id': ctx.partner_id,
             '_tags': ctx.tags,
             '_token_id': ctx.token_id,
-            'org_plan': ctx.org_plan,
         }
 
-    return get_auth_context, require_org_role, require_scope, get_current_user_compat
+    return get_auth_context, require_org_role, require_scope, get_current_user_compat, require_permission

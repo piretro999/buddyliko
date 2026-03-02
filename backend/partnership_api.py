@@ -20,6 +20,7 @@ class SubOrgCreateModel(BaseModel):
     vat_number: Optional[str] = None
     country: Optional[str] = None
     billing_email: Optional[str] = None
+    parent_org_id: Optional[str] = None  # Platform admin: create under a specific org
 
 class SubOrgUpdateModel(BaseModel):
     name: Optional[str] = None
@@ -41,14 +42,14 @@ def register_partnership_endpoints(app, get_auth_context, require_org_role,
     from fastapi import Depends, HTTPException, Query
 
     def _require_partner(ctx):
-        """Verifica che l'org corrente sia di tipo partner."""
+        """Verifica che l'org corrente sia di tipo partner (o platform admin)."""
+        # Platform admin può sempre accedere a tutto
+        if ctx.is_platform_admin:
+            return ctx
         if not ctx.org_id:
             raise HTTPException(403, "Nessuna org attiva")
         if not ctx.has_min_role('admin'):
             raise HTTPException(403, "Ruolo minimo: admin")
-        # Platform admin può sempre
-        if ctx.is_platform_admin:
-            return ctx
         if ctx.org_type != 'partner':
             raise HTTPException(403, "Questa funzionalità è riservata alle organizzazioni partner")
         return ctx
@@ -75,6 +76,18 @@ def register_partnership_endpoints(app, get_auth_context, require_org_role,
     def create_sub_org(data: SubOrgCreateModel, ctx=Depends(get_auth_context)):
         ctx = _require_partner(ctx)
 
+        # Platform admin can create under any org in the hierarchy
+        target_parent = ctx.org_id
+        if data.parent_org_id and ctx.is_platform_admin:
+            target_parent = data.parent_org_id
+        elif data.parent_org_id and not ctx.is_platform_admin:
+            # Non-admin: parent_org_id must be themselves or a descendant
+            if data.parent_org_id != ctx.org_id:
+                from org_service import OrganizationService
+                if not partnership_service.org_service.verify_org_access(ctx.org_id, data.parent_org_id):
+                    raise HTTPException(403, "Non puoi creare sotto questa organizzazione")
+                target_parent = data.parent_org_id
+
         owner_id = ctx.user_id
         if data.owner_email:
             user = storage.get_user_by_email(data.owner_email)
@@ -85,15 +98,37 @@ def register_partnership_endpoints(app, get_auth_context, require_org_role,
 
         try:
             org = partnership_service.create_sub_org(
-                ctx.org_id, name=data.name, owner_user_id=owner_id,
+                target_parent, name=data.name, owner_user_id=owner_id,
                 slug=data.slug, org_type=data.org_type, plan=data.plan,
                 partnership_model=data.partnership_model,
                 revenue_share_pct=data.revenue_share_pct,
                 vat_number=data.vat_number, country=data.country,
-                billing_email=data.billing_email)
+                billing_email=data.billing_email,
+                force=ctx.is_platform_admin)
             return {"success": True, "org": org}
         except ValueError as e:
             raise HTTPException(400, str(e))
+
+    # ── 3b. List children of a specific node ──
+    @app.get("/api/partnership/sub-orgs/{org_id}/children")
+    def list_org_children(org_id: str, ctx=Depends(get_auth_context)):
+        """Lista i figli diretti di una specifica org nel tree."""
+        ctx = _require_partner(ctx)
+        # Verify access: must be in our hierarchy (or platform admin)
+        if not ctx.is_platform_admin:
+            if not partnership_service.org_service.verify_org_access(ctx.org_id, org_id):
+                raise HTTPException(403, "Org non nel tuo albero")
+        children = partnership_service.list_sub_orgs(org_id, direct_only=True)
+        # Also get info about the org itself for breadcrumb
+        from psycopg2.extras import RealDictCursor
+        cur = partnership_service.conn.cursor(cursor_factory=RealDictCursor)
+        cur.execute("SELECT id, name, slug, org_type, plan, status, depth, parent_org_id FROM organizations WHERE id=%s", (org_id,))
+        org_info = cur.fetchone()
+        return {
+            "org": partnership_service._ser_row(dict(org_info)) if org_info else {},
+            "children": children,
+            "count": len(children),
+        }
 
     # ── 4. Sub-org detail ──
     @app.get("/api/partnership/sub-orgs/{sub_org_id}")
@@ -141,6 +176,16 @@ def register_partnership_endpoints(app, get_auth_context, require_org_role,
         except ValueError as e:
             raise HTTPException(400, str(e))
 
+    # ── 7b. Cancel (delete) sub-org ──
+    @app.delete("/api/partnership/sub-orgs/{sub_org_id}")
+    def cancel_sub_org(sub_org_id: str, ctx=Depends(get_auth_context)):
+        ctx = _require_partner(ctx)
+        try:
+            affected = partnership_service.cancel_sub_org(ctx.org_id, sub_org_id)
+            return {"success": True, "affected_orgs": affected}
+        except ValueError as e:
+            raise HTTPException(400, str(e))
+
     # ── 8. Transfer ownership ──
     @app.post("/api/partnership/sub-orgs/{sub_org_id}/transfer")
     def transfer_sub_org(sub_org_id: str, data: TransferModel, ctx=Depends(get_auth_context)):
@@ -171,6 +216,26 @@ def register_partnership_endpoints(app, get_auth_context, require_org_role,
     def hierarchy_tree(month: str = Query(None), ctx=Depends(get_auth_context)):
         ctx = _require_partner(ctx)
         return partnership_service.get_hierarchy_tree(ctx.org_id, month)
+
+    # ── 11b. Ancestors (breadcrumb) for any node ──
+    @app.get("/api/partnership/ancestors/{org_id}")
+    def get_ancestors(org_id: str, ctx=Depends(get_auth_context)):
+        """Ritorna la catena di ancestor fino al root (per breadcrumb)."""
+        ctx = _require_partner(ctx)
+        if not ctx.is_platform_admin:
+            if not partnership_service.org_service.verify_org_access(ctx.org_id, org_id):
+                raise HTTPException(403, "Org non nel tuo albero")
+        ancestors = partnership_service.org_service.get_ancestors(org_id)
+        return {
+            "org_id": org_id,
+            "ancestors": [
+                partnership_service._ser_row({
+                    'id': a['id'], 'name': a['name'], 'slug': a.get('slug'),
+                    'org_type': a.get('org_type'), 'depth': a.get('depth'),
+                })
+                for a in ancestors
+            ]
+        }
 
     # ── 12. Partner info (check if current org is partner) ──
     @app.get("/api/partnership/info")
@@ -231,4 +296,4 @@ def register_partnership_endpoints(app, get_auth_context, require_org_role,
         except ValueError as e:
             raise HTTPException(400, str(e))
 
-    print("   ✅ Partnership API: 14 endpoints registered")
+    print("   ✅ Partnership API: 17 endpoints registered")

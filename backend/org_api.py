@@ -2,6 +2,7 @@
 """
 Buddyliko — Organization API Endpoints
 Fase 0: REST API per gestione organizations.
+Fase 1: Context switch (personal ↔ org) per multi-tenant.
 
 Registrare in api.py con:
     from org_api import register_org_api
@@ -17,6 +18,8 @@ Endpoint:
     GET    /api/orgs                    — Le mie org (per switch)
     POST   /api/orgs                    — Crea nuova org
     POST   /api/auth/switch-org         — Switch org attiva
+    POST   /api/auth/switch-context     — Switch personal ↔ org (Fase 1)
+    GET    /api/auth/contexts           — Lista contesti disponibili (Fase 1)
     GET    /api/org/children            — Sub-org (per partner)
     POST   /api/org/children            — Crea sub-org
     GET    /api/platform/orgs           — [platform admin] tutte le org
@@ -73,6 +76,31 @@ class SubOrgCreate(BaseModel):
 class SwitchOrg(BaseModel):
     org_id: str
     environment: str = 'live'
+
+class SwitchContext(BaseModel):
+    context: str = 'personal'    # 'personal' | 'org'
+    org_id: Optional[str] = None # se context='org' e si vuole specificare quale
+    environment: str = 'live'
+
+class InviteUser(BaseModel):
+    email: str
+    name: Optional[str] = None
+    org_id: Optional[str] = None
+    role: str = 'operator'
+    plan: str = 'FREE'
+
+class MoveUserToOrg(BaseModel):
+    org_id: str
+    role: str = 'operator'
+
+class CreateUserDirect(BaseModel):
+    email: str
+    name: str
+    role: str = 'USER'
+    plan: str = 'FREE'
+    org_id: Optional[str] = None
+    org_role: str = 'operator'
+    password: Optional[str] = None
 
 
 # ===========================================================================
@@ -317,6 +345,116 @@ def register_org_api(app, org_service, get_auth_context, require_org_role,
             "org": switch_result,
         }
 
+    # ── SWITCH CONTEXT (personal ↔ org) — Fase 1 multi-tenant ────────
+
+    @app.post("/api/auth/switch-context")
+    async def switch_context(data: SwitchContext, ctx: OrgContext = Depends(get_auth_context)):
+        """
+        Switch tra contesto personale e org.
+        - context='personal' → JWT senza org_id, utente lavora nel suo spazio
+        - context='org' → JWT con org_id, utente lavora nello spazio org
+        """
+        import jwt as pyjwt
+        from datetime import datetime, timedelta
+
+        if data.context == 'personal':
+            # Contesto personale: nessun org_id nel JWT
+            new_payload = {
+                'id': str(ctx.user_id),
+                'user_id': str(ctx.user_id),
+                'email': ctx.email,
+                'name': ctx.name,
+                'role': ctx.platform_role,
+                'status': 'APPROVED',
+                'plan': ctx.org_plan or 'FREE',
+                'context': 'personal',
+                'environment': data.environment,
+                'exp': datetime.utcnow() + timedelta(hours=auth_manager.token_expiry_hours),
+                'iat': datetime.utcnow(),
+            }
+            # Prendi il piano personale dell'utente
+            db_user = storage.get_user(str(ctx.user_id)) if storage else None
+            if db_user:
+                new_payload['plan'] = db_user.get('plan', 'FREE')
+
+            new_token = pyjwt.encode(new_payload, auth_manager.secret_key, algorithm='HS256')
+            return {
+                "success": True,
+                "token": new_token,
+                "context": "personal",
+                "org": None,
+            }
+
+        elif data.context == 'org':
+            # Determina quale org
+            target_org_id = data.org_id or ctx.org_id
+            if not target_org_id:
+                # Prova la prima org dell'utente
+                user_orgs = org_service.get_user_orgs(ctx.user_id)
+                if not user_orgs:
+                    raise HTTPException(400, "Non sei membro di nessuna organizzazione.")
+                target_org_id = str(user_orgs[0]['id'])
+
+            try:
+                switch_result = org_service.switch_org(ctx.user_id, target_org_id)
+            except ValueError as e:
+                raise HTTPException(403, str(e))
+
+            new_payload = {
+                'id': str(ctx.user_id),
+                'user_id': str(ctx.user_id),
+                'email': ctx.email,
+                'name': ctx.name,
+                'role': ctx.platform_role,
+                'status': 'APPROVED',
+                'plan': switch_result['org_plan'],
+                'org_id': target_org_id,
+                'org_role': switch_result['org_role'],
+                'context': 'org',
+                'environment': data.environment,
+                'exp': datetime.utcnow() + timedelta(hours=auth_manager.token_expiry_hours),
+                'iat': datetime.utcnow(),
+            }
+            new_token = pyjwt.encode(new_payload, auth_manager.secret_key, algorithm='HS256')
+            return {
+                "success": True,
+                "token": new_token,
+                "context": "org",
+                "org": switch_result,
+            }
+        else:
+            raise HTTPException(400, f"Contesto non valido: {data.context}. Usa 'personal' o 'org'.")
+
+    @app.get("/api/auth/contexts")
+    async def list_contexts(ctx: OrgContext = Depends(get_auth_context)):
+        """
+        Lista contesti disponibili per l'utente corrente.
+        Ritorna spazio personale + eventuali org di cui è membro.
+        """
+        contexts = [{
+            "type": "personal",
+            "name": "Spazio personale",
+            "active": ctx.context == 'personal',
+        }]
+
+        user_orgs = org_service.get_user_orgs(ctx.user_id)
+        for org in user_orgs:
+            contexts.append({
+                "type": "org",
+                "org_id": str(org['id']),
+                "name": org.get('name', ''),
+                "slug": org.get('slug', ''),
+                "plan": org.get('plan', 'FREE'),
+                "role": org.get('my_role', 'viewer'),
+                "active": ctx.context == 'org' and str(org['id']) == ctx.org_id,
+            })
+
+        return {
+            "current_context": ctx.context,
+            "current_org_id": ctx.org_id,
+            "contexts": contexts,
+        }
+
     # ── CREATE ORG ────────────────────────────────────────────────────
 
     @app.post("/api/orgs")
@@ -380,6 +518,9 @@ def register_org_api(app, org_service, get_auth_context, require_org_role,
         Crea una sub-organizzazione.
         L'org corrente diventa parent.
         """
+        if not ctx.org_id:
+            raise HTTPException(400, "Seleziona prima un'organizzazione (POST /api/orgs per crearne una)")
+
         # Solo org partner possono creare sub-org (o platform admin)
         current_org = org_service.get_org(ctx.org_id)
         if not current_org:
@@ -555,3 +696,240 @@ def register_org_api(app, org_service, get_auth_context, require_org_role,
             raise HTTPException(400, str(e))
 
     print("   ✅ Organization API endpoints registered (17 endpoints)")
+
+    # ==================================================================
+    # FASE 2 — Admin User Management (inviti, spostamento, dettaglio)
+    # ==================================================================
+
+    @app.post("/api/admin/users/invite")
+    async def invite_user(data: InviteUser, ctx: OrgContext = Depends(get_auth_context)):
+        """
+        Invita un utente via email. Se già registrato, lo aggiunge all'org.
+        Se nuovo, crea un invito con token e manda email.
+        """
+        if not ctx.is_platform_admin and not ctx.is_org_admin:
+            raise HTTPException(403, "Solo admin possono invitare utenti")
+
+        import secrets
+        from datetime import datetime, timedelta
+
+        target_org_id = data.org_id or ctx.org_id
+        target_org_name = ''
+        if target_org_id:
+            org_data = org_service.get_org(target_org_id)
+            if org_data:
+                target_org_name = org_data.get('name', '')
+
+        # Controlla se l'utente esiste già
+        cur = org_service.conn.cursor(cursor_factory=org_service.RDC)
+        cur.execute("SELECT id, name, email FROM users WHERE email = %s", (data.email,))
+        existing_user = cur.fetchone()
+
+        if existing_user and target_org_id:
+            # Utente esiste → aggiungilo all'org direttamente
+            user_id = existing_user['id']
+            try:
+                org_service.add_member(target_org_id, user_id, data.role)
+            except Exception as e:
+                if 'already' in str(e).lower() or 'duplicate' in str(e).lower():
+                    return {"success": True, "action": "already_member",
+                            "message": f"{data.email} è già membro dell'organizzazione"}
+                raise HTTPException(400, str(e))
+
+            # Notifica via email
+            try:
+                import email_service
+                email_service.send_user_added_to_org(
+                    data.email, existing_user.get('name', ''), target_org_name, data.role)
+            except Exception as e:
+                print(f"[INVITE] Errore invio email notifica: {e}")
+
+            return {"success": True, "action": "added_to_org",
+                    "user_id": user_id, "org_id": target_org_id,
+                    "message": f"{data.email} aggiunto a {target_org_name}"}
+
+        # Utente non esiste → crea invito
+        invite_token = secrets.token_urlsafe(32)
+        expires_at = datetime.utcnow() + timedelta(hours=72)
+
+        cur = org_service.conn.cursor()
+        cur.execute("""
+            INSERT INTO user_invitations (email, name, org_id, role, plan, invite_token,
+                                          invited_by, expires_at)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            RETURNING id
+        """, (data.email, data.name, target_org_id, data.role, data.plan,
+              invite_token, ctx.user_id, expires_at))
+        invite_id = cur.fetchone()[0]
+        org_service.conn.commit()
+
+        # Manda email
+        invite_url = f"https://buddyliko.com/login.html?invite={invite_token}"
+        try:
+            import email_service
+            email_service.send_invite_email(
+                data.email, data.name or '', ctx.name or 'Admin',
+                target_org_name or 'Buddyliko', invite_url, data.role)
+        except Exception as e:
+            print(f"[INVITE] Errore invio email invito: {e}")
+
+        return {"success": True, "action": "invited",
+                "invite_id": str(invite_id), "invite_token": invite_token,
+                "message": f"Invito inviato a {data.email}"}
+
+    @app.get("/api/admin/users/{user_id}/detail")
+    async def get_user_detail(user_id: str, ctx: OrgContext = Depends(get_auth_context)):
+        """Dettaglio completo di un utente: org, usage, ruoli."""
+        if not ctx.is_platform_admin:
+            raise HTTPException(403, "Solo platform admin")
+
+        from datetime import datetime, timezone
+
+        db_user = storage.get_user(user_id) if storage else None
+        if not db_user:
+            raise HTTPException(404, "Utente non trovato")
+
+        # Org dell'utente
+        user_orgs = org_service.get_user_orgs(int(user_id))
+
+        # Usage del mese corrente
+        month = datetime.now(timezone.utc).strftime('%Y-%m')
+        cur = org_service.conn.cursor(cursor_factory=org_service.RDC)
+        cur.execute("""
+            SELECT transforms_count, api_calls_count, bytes_processed, codegen_count, org_id
+            FROM usage_counters WHERE user_id = %s AND month = %s
+        """, (user_id, month))
+        usage_rows = [dict(r) for r in cur.fetchall()]
+
+        personal_usage = next((r for r in usage_rows if not r.get('org_id')),
+                              {"transforms_count": 0, "api_calls_count": 0, "bytes_processed": 0})
+        org_usage = [r for r in usage_rows if r.get('org_id')]
+
+        return {
+            "user": {
+                "id": str(db_user.get('id')),
+                "email": db_user.get('email'),
+                "name": db_user.get('name'),
+                "role": db_user.get('role'),
+                "status": db_user.get('status'),
+                "plan": db_user.get('plan'),
+                "created_at": str(db_user.get('created_at', '')),
+                "active_org_id": db_user.get('active_org_id'),
+            },
+            "organizations": [
+                {"id": str(o['id']), "name": o['name'], "role": o['my_role'],
+                 "plan": o.get('plan'), "status": o.get('status')}
+                for o in user_orgs
+            ],
+            "usage": {
+                "month": month,
+                "personal": personal_usage,
+                "org": org_usage,
+            },
+        }
+
+    @app.put("/api/admin/users/{user_id}/org")
+    async def move_user_to_org(
+        user_id: str, data: MoveUserToOrg,
+        ctx: OrgContext = Depends(get_auth_context)
+    ):
+        """Sposta un utente in un'org (rimuove da quella vecchia se c'era)."""
+        if not ctx.is_platform_admin:
+            raise HTTPException(403, "Solo platform admin")
+
+        uid = int(user_id)
+
+        # Rimuovi da eventuali org precedenti
+        current_orgs = org_service.get_user_orgs(uid)
+        for old_org in current_orgs:
+            try:
+                org_service.remove_member(str(old_org['id']), uid)
+            except Exception:
+                pass
+
+        # Aggiungi alla nuova org
+        try:
+            org_service.add_member(data.org_id, uid, data.role)
+        except Exception as e:
+            raise HTTPException(400, str(e))
+
+        # Aggiorna active_org_id
+        cur = org_service.conn.cursor()
+        cur.execute("UPDATE users SET active_org_id = %s WHERE id = %s", (data.org_id, uid))
+        org_service.conn.commit()
+
+        org_data = org_service.get_org(data.org_id)
+        return {"success": True,
+                "message": f"Utente spostato in {org_data.get('name', data.org_id)}"}
+
+    @app.delete("/api/admin/users/{user_id}/org")
+    async def remove_user_from_org(user_id: str, ctx: OrgContext = Depends(get_auth_context)):
+        """Rimuovi un utente dalla sua org (torna standalone)."""
+        if not ctx.is_platform_admin:
+            raise HTTPException(403, "Solo platform admin")
+
+        uid = int(user_id)
+        current_orgs = org_service.get_user_orgs(uid)
+
+        for org in current_orgs:
+            try:
+                org_service.remove_member(str(org['id']), uid)
+            except Exception:
+                pass
+
+        cur = org_service.conn.cursor()
+        cur.execute("UPDATE users SET active_org_id = NULL WHERE id = %s", (uid,))
+        org_service.conn.commit()
+
+        return {"success": True, "message": "Utente rimosso dall'organizzazione"}
+
+    @app.get("/api/admin/invitations")
+    async def list_invitations(ctx: OrgContext = Depends(get_auth_context)):
+        """Lista inviti pendenti."""
+        if not ctx.is_platform_admin and not ctx.is_org_admin:
+            raise HTTPException(403, "Solo admin")
+
+        cur = org_service.conn.cursor(cursor_factory=org_service.RDC)
+        query = """
+            SELECT i.*, o.name as org_name, u.name as inviter_name
+            FROM user_invitations i
+            LEFT JOIN organizations o ON o.id = i.org_id
+            LEFT JOIN users u ON u.id = i.invited_by
+            WHERE i.status = 'pending'
+            ORDER BY i.created_at DESC
+        """
+        cur.execute(query)
+        invitations = [dict(r) for r in cur.fetchall()]
+
+        return {"invitations": [
+            {
+                "id": str(inv['id']),
+                "email": inv['email'],
+                "name": inv.get('name'),
+                "org_name": inv.get('org_name'),
+                "role": inv['role'],
+                "inviter_name": inv.get('inviter_name'),
+                "status": inv['status'],
+                "created_at": inv['created_at'].isoformat() if inv.get('created_at') else None,
+                "expires_at": inv['expires_at'].isoformat() if inv.get('expires_at') else None,
+            }
+            for inv in invitations
+        ]}
+
+    @app.delete("/api/admin/invitations/{invite_id}")
+    async def cancel_invitation(invite_id: str, ctx: OrgContext = Depends(get_auth_context)):
+        """Cancella un invito pendente."""
+        if not ctx.is_platform_admin and not ctx.is_org_admin:
+            raise HTTPException(403, "Solo admin")
+
+        cur = org_service.conn.cursor()
+        cur.execute("""
+            UPDATE user_invitations SET status = 'cancelled'
+            WHERE id = %s AND status = 'pending'
+        """, (invite_id,))
+        org_service.conn.commit()
+        if cur.rowcount == 0:
+            raise HTTPException(404, "Invito non trovato o già processato")
+        return {"success": True}
+
+    print("   ✅ Phase 2 — Admin user management endpoints registered")

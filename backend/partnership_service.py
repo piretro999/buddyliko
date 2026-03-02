@@ -161,19 +161,24 @@ class PartnershipService:
                        slug=None, org_type='company', plan='FREE',
                        partnership_model=None, revenue_share_pct=None,
                        vat_number=None, country=None, billing_email=None,
-                       settings=None):
-        """Crea una sub-org sotto parent. Verifica limiti gerarchia."""
+                       settings=None, force=False):
+        """Crea una sub-org sotto parent. Verifica limiti gerarchia.
+        force=True bypassa il check org_type=='partner' (per platform admin).
+        """
         cur = self.conn.cursor(cursor_factory=self.RDC)
 
-        # Verifica parent esiste ed è partner
+        # Verifica parent esiste
         cur.execute("SELECT * FROM organizations WHERE id = %s", (parent_org_id,))
         parent = cur.fetchone()
         if not parent:
             raise ValueError("Parent org non trovata")
         parent = dict(parent)
 
-        if parent['org_type'] != 'partner' and parent['depth'] == 0:
-            raise ValueError("Solo org di tipo 'partner' possono creare sub-org")
+        # Solo org partner (o depth > 0) possono creare sub-org
+        # force=True per platform admin che devono poter fare tutto
+        if not force and parent['org_type'] != 'partner' and parent['depth'] == 0:
+            raise ValueError("Solo org di tipo 'partner' possono creare sub-org. "
+                             "Cambia il tipo dell'org in 'partner' oppure contatta l'admin.")
 
         # Verifica depth limit
         new_depth = parent['depth'] + 1
@@ -342,6 +347,35 @@ class PartnershipService:
         affected = cur.rowcount
         self.conn.commit()
         return affected > 0
+
+    def cancel_sub_org(self, parent_org_id, sub_org_id):
+        """Cancella definitivamente una sub-org e tutti i discendenti (status → cancelled)."""
+        self._verify_parent_child(parent_org_id, sub_org_id)
+        cur = self.conn.cursor()
+        # Cancella la sub-org
+        cur.execute("""
+            UPDATE organizations SET status='cancelled', suspended_at=NOW(),
+                   suspended_reason='Cancellata dal partner', updated_at=NOW()
+            WHERE id=%s AND status != 'cancelled'
+        """, (sub_org_id,))
+        affected = cur.rowcount
+        # Cancella anche i discendenti
+        cur.execute("""
+            UPDATE organizations SET status='cancelled', suspended_at=NOW(),
+                   suspended_reason='Parent cancellato', updated_at=NOW()
+            WHERE hierarchy_path LIKE %s AND id != %s AND status != 'cancelled'
+        """, (f"%/{sub_org_id}/%", sub_org_id))
+        affected += cur.rowcount
+        # Revoca tutti i token attivi
+        try:
+            cur.execute("""
+                UPDATE api_tokens SET status='revoked', revoked_at=NOW(),
+                       revoke_reason='Org cancellata'
+                WHERE org_id=%s AND status='active'
+            """, (sub_org_id,))
+        except: pass
+        self.conn.commit()
+        return affected
 
     def transfer_sub_org(self, parent_org_id, sub_org_id, new_owner_user_id):
         """Trasferisce ownership di una sub-org a un nuovo utente."""

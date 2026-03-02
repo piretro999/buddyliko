@@ -42,6 +42,7 @@ class StandardsService:
                 schematron_url  TEXT,
                 sample_url      TEXT,
                 github_url      TEXT,
+                mapper_csv_url  TEXT,
                 helger_lib      VARCHAR(120),
                 helger_maven    VARCHAR(200),
                 related_standards JSONB DEFAULT '[]',
@@ -56,6 +57,12 @@ class StandardsService:
             CREATE INDEX IF NOT EXISTS idx_sr_domain ON standards_registry(domain, is_active);
             CREATE INDEX IF NOT EXISTS idx_sr_region ON standards_registry(region);
             CREATE INDEX IF NOT EXISTS idx_sr_slug ON standards_registry(slug);
+
+            -- Add mapper_csv_url column if missing (for existing DBs)
+            DO $$ BEGIN
+                ALTER TABLE standards_registry ADD COLUMN IF NOT EXISTS mapper_csv_url TEXT;
+            EXCEPTION WHEN duplicate_column THEN NULL;
+            END $$;
             """)
             self.conn.commit()
             print("   ✅ Standards registry table ready")
@@ -178,8 +185,9 @@ class StandardsService:
                          domain, region, format_type, version, org_body,
                          spec_url, schema_url, schematron_url, sample_url,
                          github_url, helger_lib, helger_maven,
-                         related_standards, transaction_types, tags, icon, popularity)
-                    VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                         related_standards, transaction_types, tags, icon, popularity,
+                         mapper_csv_url)
+                    VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
                 """, (
                     str(uuid.uuid4()), s['name'], s['slug'], s.get('short_name',''),
                     s.get('description',''), s.get('long_description',''),
@@ -191,14 +199,59 @@ class StandardsService:
                     json.dumps(s.get('related_standards',[])),
                     json.dumps(s.get('transaction_types',[])),
                     json.dumps(s.get('tags',[])),
-                    s.get('icon','📄'), s.get('popularity',50)
+                    s.get('icon','📄'), s.get('popularity',50),
+                    s.get('mapper_csv_url','')
                 ))
                 count += 1
             except Exception as e:
-                pass
-        self.conn.commit()
+                try: self.conn.rollback()
+                except: pass
+        try: self.conn.commit()
+        except: pass
         print(f"   ✅ Seeded {count} standards")
         return count
+
+    def populate_mapper_csv_urls(self):
+        """Scan schemas/input/ dir and auto-populate mapper_csv_url for standards."""
+        import os, re
+        schema_dir = "/opt/buddyliko/backend/schemas/input"
+        if not os.path.isdir(schema_dir):
+            return 0
+        csv_files = [f for f in os.listdir(schema_dir) if f.endswith('_schema.csv') or f.endswith('.csv')]
+        if not csv_files:
+            return 0
+
+        cur = self.conn.cursor(cursor_factory=self.RDC)
+        cur.execute("SELECT id, slug, name, short_name FROM standards_registry WHERE is_active=TRUE")
+        standards = cur.fetchall()
+        updated = 0
+        cur2 = self.conn.cursor()
+        for s in standards:
+            # Try to find matching CSV by slug or name
+            slug = s['slug']
+            name = (s.get('short_name') or s.get('name') or '').replace(' ','_').replace('.','_')
+            matched_csv = None
+            for f in csv_files:
+                fn = f.lower().replace('-','_')
+                if slug.replace('-','_') in fn or name.lower().replace('-','_') in fn:
+                    matched_csv = f
+                    break
+            if matched_csv:
+                url = f"/api/standards/schema-file/input/{matched_csv}"
+                try:
+                    cur2.execute(
+                        "UPDATE standards_registry SET mapper_csv_url=%s WHERE id=%s AND (mapper_csv_url IS NULL OR mapper_csv_url='')",
+                        (url, s['id']))
+                    if cur2.rowcount > 0:
+                        updated += 1
+                except Exception:
+                    try: self.conn.rollback()
+                    except: pass
+        try: self.conn.commit()
+        except: pass
+        if updated > 0:
+            print(f"   ✅ Updated mapper_csv_url for {updated} standards")
+        return updated
 
     def _get_seed_data(self):
         return [
@@ -211,6 +264,7 @@ class StandardsService:
              'schema_url':'https://docs.oasis-open.org/ubl/os-UBL-2.1/xsd/',
              'github_url':'https://github.com/phax/ph-ubl',
              'helger_lib':'ph-ubl','helger_maven':'com.helger.ubl:ph-ubl21',
+             'mapper_csv_url':'/api/standards/schema-file/input/UBL_Invoice_Input_Schema.csv',
              'related_standards':['peppol-bis-3','cii-d16b','fatturapa-1-2'],
              'transaction_types':['Invoice','CreditNote','Order','OrderResponse','DespatchAdvice','Catalogue','Tender'],
              'tags':['peppol','oasis','xml','eu','invoice','order'],'popularity':100},
@@ -231,6 +285,7 @@ class StandardsService:
              'schematron_url':'https://github.com/OpenPEPPOL/peppol-bis-invoice-3/tree/master/rules',
              'github_url':'https://github.com/phax/phive-rules','helger_lib':'phive-rules-peppol',
              'helger_maven':'com.helger.phive.rules:phive-rules-peppol',
+             'mapper_csv_url':'/api/standards/schema-file/input/UBL_PEPPOL_Input_Schema.csv',
              'related_standards':['ubl-2-1','cii-d16b','en-16931'],
              'transaction_types':['Invoice','CreditNote'],'tags':['peppol','eu','schematron','validation'],'popularity':98},
 
@@ -252,6 +307,7 @@ class StandardsService:
              'schema_url':'https://www.fatturapa.gov.it/export/documenti/fatturapa/v1.2.2/Schema_del_file_xml_FatturaPA_v1.2.2.xsd',
              'github_url':'https://github.com/phax/ph-fatturapa',
              'helger_lib':'ph-fatturapa','helger_maven':'com.helger:ph-fatturapa',
+             'mapper_csv_url':'/api/standards/schema-file/input/FatturaPA_Input_Schema.csv',
              'related_standards':['ubl-2-1','peppol-bis-3','en-16931','sdi-notification'],
              'transaction_types':['FatturaElettronica','NotaDiCredito'],'tags':['italy','sdi','xml','b2b','b2g'],'popularity':95},
 

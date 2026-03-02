@@ -324,6 +324,19 @@ try:
 except Exception as _ale:
     print(f"⚠️  Audit log init failed: {_ale}")
 
+# Request Logger (HTTP request/response tracing)
+request_log = None
+try:
+    from request_logger import RequestLogManager, RequestLoggerMiddleware
+    if hasattr(storage, 'conn') and hasattr(storage, 'RealDictCursor'):
+        request_log = RequestLogManager(storage.conn, storage.RealDictCursor, retention_days=30)
+        app.add_middleware(RequestLoggerMiddleware, log_manager=request_log)
+        print("✅ Request logger initialized (all HTTP requests traced)")
+    else:
+        print("⚠️  Request logger requires PostgreSQL - skipping")
+except Exception as _rle:
+    print(f"⚠️  Request logger init failed: {_rle}")
+
 # Job Engine
 job_engine = None
 try:
@@ -482,6 +495,29 @@ except Exception as _hl7_e:
     def to_buddyliko_schema_hl7(p, n=None): raise RuntimeError("HL7 parser not available")
     def build_hl7v2(d, t='ADT^A01'): raise RuntimeError("HL7 parser not available")
     def detect_hl7_format(c): return 'UNKNOWN'
+
+# ── JSON PARSER ──────────────────────────────────────────────────────────────
+json_parser_available = False
+try:
+    from json_parser import (
+        parse_json, to_buddyliko_schema as json_to_schema,
+        json_to_flat, build_json, detect_json_format, validate_json,
+        detect_schema_from_sample as json_detect_schema,
+        parse_json_schema_file, JSONSchemaValidator, JSONBusinessRulesValidator,
+        JSONPathNavigator
+    )
+    json_parser_available = True
+    print("✅ JSON Parser initialized")
+except Exception as _json_e:
+    print(f"⚠️  JSON Parser init failed: {_json_e}")
+    def parse_json(c): raise RuntimeError("JSON parser not available")
+    def json_to_schema(p, n=None): raise RuntimeError("JSON parser not available")
+    def json_to_flat(p): raise RuntimeError("JSON parser not available")
+    def build_json(d, **kw): raise RuntimeError("JSON parser not available")
+    def detect_json_format(c): return 'UNKNOWN'
+    def validate_json(c, **kw): return False, ["JSON parser not available"]
+    def json_detect_schema(c): raise RuntimeError("JSON parser not available")
+    def parse_json_schema_file(p): raise RuntimeError("JSON parser not available")
 
 # ── ALERTS & ANALYTICS ──────────────────────────────────────────────────────
 alerts_engine       = None
@@ -1674,6 +1710,267 @@ async def detect_hl7_endpoint(file: UploadFile = File(...), user = Depends(get_c
     return {"format": fmt, "filename": file.filename, "hl7_available": hl7_available}
 
 
+
+
+# =============================================================================
+# JSON ENDPOINTS
+# =============================================================================
+
+@app.post("/api/json/parse")
+async def parse_json_file(
+    file: UploadFile = File(...),
+    user = Depends(get_current_user)
+):
+    """Parsa file JSON. Ritorna struttura navigabile + schema Buddyliko."""
+    if not json_parser_available:
+        raise HTTPException(400, "JSON Parser non disponibile")
+    content = (await file.read()).decode("utf-8", errors="replace")
+    try:
+        parsed = parse_json(content)
+        schema = json_to_schema(parsed, file.filename.rsplit(".", 1)[0])
+        flat = json_to_flat(parsed)
+        if audit_log:
+            try:
+                audit_log.log(AuditAction.FILE_UPLOAD, user=user,
+                              resource_type="json",
+                              file_name=file.filename,
+                              metadata={"format": parsed.get("format"),
+                                        "summary": parsed.get("_summary")})
+            except Exception:
+                pass
+        return {
+            "success": True,
+            "format": parsed.get("format"),
+            "summary": parsed.get("_summary"),
+            "parsed": parsed,
+            "schema": schema,
+            "flat_records": flat[:10],
+            "total_records": len(flat),
+        }
+    except Exception as e:
+        raise HTTPException(400, str(e))
+
+
+@app.post("/api/json/schema-from-file")
+async def json_schema_from_file(
+    file: UploadFile = File(...),
+    schema_name: str = Form(None),
+    user = Depends(get_current_user)
+):
+    """Genera schema Buddyliko da file JSON — pronto per il mapper."""
+    if not json_parser_available:
+        raise HTTPException(400, "JSON Parser non disponibile")
+    content = (await file.read()).decode("utf-8", errors="replace")
+    try:
+        parsed = parse_json(content)
+        name = schema_name or file.filename.rsplit(".", 1)[0]
+        schema = json_to_schema(parsed, name)
+        return schema
+    except Exception as e:
+        raise HTTPException(400, str(e))
+
+
+@app.post("/api/json/schema-from-json-schema")
+async def json_schema_from_json_schema(
+    file: UploadFile = File(...),
+    user = Depends(get_current_user)
+):
+    """Genera schema Buddyliko da file JSON Schema (.json con $schema/properties).
+    Equivalente di /api/schema/parse per XSD."""
+    if not json_parser_available:
+        raise HTTPException(400, "JSON Parser non disponibile")
+    import tempfile, os
+    content = await file.read()
+    with tempfile.NamedTemporaryFile(suffix=".json", delete=False) as tmp:
+        tmp.write(content)
+        tmp_path = tmp.name
+    try:
+        schema = parse_json_schema_file(tmp_path)
+        return schema
+    except Exception as e:
+        raise HTTPException(400, str(e))
+    finally:
+        os.unlink(tmp_path)
+
+
+@app.post("/api/json/detect-schema")
+async def json_detect_schema_endpoint(
+    file: UploadFile = File(...),
+    user = Depends(get_current_user)
+):
+    """Inferisce JSON Schema da un file JSON di esempio."""
+    if not json_parser_available:
+        raise HTTPException(400, "JSON Parser non disponibile")
+    content = (await file.read()).decode("utf-8", errors="replace")
+    try:
+        inferred_schema = json_detect_schema(content)
+        return {
+            "success": True,
+            "schema": inferred_schema,
+            "filename": file.filename,
+        }
+    except Exception as e:
+        raise HTTPException(400, str(e))
+
+
+@app.post("/api/json/build")
+async def build_json_endpoint(request: Request, user = Depends(get_current_user)):
+    """Genera JSON da dict strutturato.
+    Body: {data: {...}, indent: 2, compact: false, sort_keys: false, ndjson: false}"""
+    if not json_parser_available:
+        raise HTTPException(400, "JSON Parser non disponibile")
+    body = await request.json()
+    data = body.get("data", {})
+    indent = body.get("indent", 2)
+    compact = body.get("compact", False)
+    sort_keys = body.get("sort_keys", False)
+    ndjson = body.get("ndjson", False)
+    try:
+        json_content = build_json(data, indent=indent, compact=compact,
+                                   sort_keys=sort_keys, ndjson=ndjson)
+        return Response(
+            content=json_content,
+            media_type="application/json",
+            headers={"Content-Disposition": 'attachment; filename="output.json"'}
+        )
+    except Exception as e:
+        raise HTTPException(400, str(e))
+
+
+@app.post("/api/json/detect")
+async def detect_json_endpoint(
+    file: UploadFile = File(...),
+    user = Depends(get_current_user)
+):
+    """Rileva formato JSON (JSON, JSON_SCHEMA, FHIR, GEOJSON, OPENAPI, etc)."""
+    content = (await file.read())[:4096].decode("utf-8", errors="replace")
+    fmt = detect_json_format(content) if json_parser_available else 'UNKNOWN'
+    return {"format": fmt, "filename": file.filename, "json_parser_available": json_parser_available}
+
+
+@app.post("/api/json/validate")
+async def validate_json_endpoint(
+    file: UploadFile = File(...),
+    schema_file: UploadFile = File(None),
+    user = Depends(get_current_user)
+):
+    """Valida JSON contro JSON Schema (opzionale).
+    Se schema_file non fornito, valida solo sintassi."""
+    if not json_parser_available:
+        raise HTTPException(400, "JSON Parser non disponibile")
+    content = (await file.read()).decode("utf-8", errors="replace")
+
+    schema = None
+    if schema_file and schema_file.filename:
+        try:
+            schema_content = (await schema_file.read()).decode("utf-8", errors="replace")
+            import json as _json
+            schema = _json.loads(schema_content)
+        except Exception as e:
+            raise HTTPException(400, f"Schema file non valido: {e}")
+
+    try:
+        valid, errors = validate_json(content, schema=schema)
+        return {
+            "success": True,
+            "valid": valid,
+            "errors": errors,
+            "filename": file.filename,
+            "schema_used": schema_file.filename if schema_file and schema_file.filename else None,
+        }
+    except Exception as e:
+        raise HTTPException(400, str(e))
+
+
+@app.post("/api/json/validate-with-rules")
+async def validate_json_with_rules_endpoint(
+    request: Request,
+    user = Depends(get_current_user)
+):
+    """Valida JSON con schema + regole business dichiarative.
+    Body: {
+        content: {...} | "json string",
+        schema: {...} | null,
+        rules: [
+            {"type": "required_path", "path": "$.invoice.id", "description": "..."},
+            {"type": "value", "path": "$.amount", "condition": "gt", "value": 0}
+        ]
+    }"""
+    if not json_parser_available:
+        raise HTTPException(400, "JSON Parser non disponibile")
+    body = await request.json()
+    content = body.get("content")
+    schema = body.get("schema")
+    rules_defs = body.get("rules", [])
+
+    br = JSONBusinessRulesValidator()
+    for rule_def in rules_defs:
+        rtype = rule_def.get("type", "")
+        if rtype == "required_path":
+            br.add_required_path(rule_def["path"], rule_def.get("description"))
+        elif rtype == "value":
+            br.add_value_rule(
+                rule_def["path"], rule_def["condition"],
+                rule_def["value"], rule_def.get("description")
+            )
+
+    try:
+        valid, errors = validate_json(content, schema=schema, business_rules=br)
+        return {
+            "success": True,
+            "valid": valid,
+            "errors": errors,
+            "rules_count": len(rules_defs),
+            "schema_provided": schema is not None,
+        }
+    except Exception as e:
+        raise HTTPException(400, str(e))
+
+
+@app.post("/api/json/flatten")
+async def flatten_json_endpoint(
+    file: UploadFile = File(...),
+    user = Depends(get_current_user)
+):
+    """Appiattisce JSON in lista di record flat {path: value}."""
+    if not json_parser_available:
+        raise HTTPException(400, "JSON Parser non disponibile")
+    content = (await file.read()).decode("utf-8", errors="replace")
+    try:
+        parsed = parse_json(content)
+        flat = json_to_flat(parsed)
+        return {
+            "success": True,
+            "records": flat[:100],
+            "total_records": len(flat),
+            "format": parsed.get("format"),
+        }
+    except Exception as e:
+        raise HTTPException(400, str(e))
+
+
+@app.post("/api/json/paths")
+async def json_paths_endpoint(
+    file: UploadFile = File(...),
+    user = Depends(get_current_user)
+):
+    """Elenca tutti i JSONPath foglia in un file JSON."""
+    if not json_parser_available:
+        raise HTTPException(400, "JSON Parser non disponibile")
+    content = (await file.read()).decode("utf-8", errors="replace")
+    try:
+        import json as _json
+        data = _json.loads(content)
+        paths = JSONPathNavigator.list_paths(data)
+        return {
+            "success": True,
+            "paths": paths,
+            "total_paths": len(paths),
+        }
+    except Exception as e:
+        raise HTTPException(400, str(e))
+
+
 # =============================================================================
 # BILLING USAGE HISTORY & EXPORT
 # =============================================================================
@@ -1774,20 +2071,18 @@ async def admin_usage_all(
     target_month = month or datetime.now(timezone.utc).strftime('%Y-%m')
     cur = billing_manager.conn.cursor(cursor_factory=billing_manager.RealDictCursor)
     cur.execute("""
-        SELECT u.user_id, us.email, us.name, us.plan,
-               u.transforms_count, u.api_calls_count,
-               u.bytes_processed, u.codegen_count
-        FROM usage_counters u
-        LEFT JOIN users us ON us.id::text = u.user_id
-        WHERE u.month = %s
-        ORDER BY u.transforms_count DESC
+        SELECT us.id::text as user_id, us.email, us.name, us.plan,
+               COALESCE(u.transforms_count, 0) as transforms_count,
+               COALESCE(u.api_calls_count, 0) as api_calls_count,
+               COALESCE(u.bytes_processed, 0) as bytes_processed,
+               COALESCE(u.codegen_count, 0) as codegen_count
+        FROM users us
+        LEFT JOIN usage_counters u ON u.user_id = us.id::text AND u.month = %s
+        WHERE us.status NOT IN ('BLOCKED', 'DELETED')
+        ORDER BY COALESCE(u.transforms_count, 0) DESC, us.name
     """, (target_month,))
     rows = [dict(r) for r in cur.fetchall()]
     return {"month": target_month, "usage": rows, "total_users": len(rows)}
-
-
-
-@app.post("/api/auth/change-password")
 async def change_password(request: Request, user = Depends(get_current_user)):
     """
     Cambia o imposta la password dell'account.
@@ -3383,6 +3678,143 @@ async def ai_auto_map_stream(request: AIAutoMapRequest):
 
 
 # ===========================================================================
+# AI CHAT (Help AI assistant with procedure retrieval)
+# ===========================================================================
+
+# Import procedure retriever
+try:
+    from procedure_retriever import retrieve as _proc_retrieve, list_categories as _proc_categories, list_procedures as _proc_list, get_procedure_content as _proc_content
+    _procedures_available = True
+    print("✅ Procedure retriever loaded")
+except Exception as _e:
+    _procedures_available = False
+    print(f"⚠️ Procedure retriever not available: {_e}")
+
+
+@app.post("/api/ai/chat")
+async def ai_chat(request: Request):
+    """
+    Help AI assistant with dynamic procedure retrieval.
+    1. Receives user question + conversation history
+    2. Retrieves relevant procedures from the knowledge base
+    3. Injects procedure content into system prompt
+    4. Calls Anthropic API and returns response
+    """
+    if not ANTHROPIC_API_KEY:
+        raise HTTPException(503, "AI not configured — missing API key")
+    try:
+        body = await request.json()
+        system_prompt = body.get("system", "")
+        messages = body.get("messages", [])
+        max_tokens = min(body.get("max_tokens", 2000), 4000)
+        model = "claude-haiku-4-5-20251001"
+
+        # ── Retrieve relevant procedures ──
+        procedures_context = ""
+        procedures_used = []
+        if _procedures_available and messages:
+            # Use the last user message for retrieval
+            last_user_msg = ""
+            for m in reversed(messages):
+                if m.get("role") == "user":
+                    last_user_msg = m.get("content", "")
+                    break
+            if last_user_msg:
+                try:
+                    results = _proc_retrieve(last_user_msg, top_k=5, include_content=True)
+                    if results:
+                        proc_texts = []
+                        for r in results:
+                            if r.content and r.score >= 2.0:
+                                proc_texts.append(f"### {r.title} ({r.id})\n{r.content}")
+                                procedures_used.append(r.id)
+                        if proc_texts:
+                            procedures_context = (
+                                "\n\n━━━ RELEVANT PROCEDURES ━━━\n"
+                                "Use the following procedures to give accurate, step-by-step answers. "
+                                "Do NOT invent steps not present in these procedures.\n\n"
+                                + "\n\n---\n\n".join(proc_texts[:3])  # Max 3 full procedures
+                            )
+                except Exception as pe:
+                    print(f"⚠️ Procedure retrieval error: {pe}")
+
+        # ── Compose enriched system prompt ──
+        enriched_system = system_prompt
+        if procedures_context:
+            enriched_system += procedures_context
+
+        async with httpx.AsyncClient() as client:
+            r = await client.post(
+                'https://api.anthropic.com/v1/messages',
+                headers={
+                    'Content-Type': 'application/json',
+                    'x-api-key': ANTHROPIC_API_KEY,
+                    'anthropic-version': '2023-06-01'
+                },
+                json={
+                    'model': model,
+                    'max_tokens': max_tokens,
+                    'system': enriched_system,
+                    'messages': messages[-20:],
+                },
+                timeout=90.0
+            )
+            if r.status_code == 200:
+                resp_json = r.json()
+                # Add procedures_used to response metadata
+                resp_json["_procedures_used"] = procedures_used
+                # Track tokens
+                if ai_token_tracker:
+                    _usage = extract_anthropic_usage(resp_json)
+                    if _usage:
+                        ai_token_tracker.track(
+                            provider="anthropic", model=model,
+                            operation="ai_chat",
+                            input_tokens=_usage.get("input_tokens", 0),
+                            output_tokens=_usage.get("output_tokens", 0),
+                            http_status=200,
+                        )
+                return resp_json
+            else:
+                raise HTTPException(r.status_code, f"Anthropic API error: {r.status_code}")
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(500, f"AI chat error: {str(e)}")
+
+
+@app.get("/api/ai/procedures")
+async def list_ai_procedures(category: str = None):
+    """List available procedures, optionally filtered by category."""
+    if not _procedures_available:
+        raise HTTPException(503, "Procedures not available")
+    return {"procedures": _proc_list(category), "categories": _proc_categories()}
+
+
+@app.get("/api/ai/procedures/{proc_id}")
+async def get_ai_procedure(proc_id: str):
+    """Get full content of a procedure by ID."""
+    if not _procedures_available:
+        raise HTTPException(503, "Procedures not available")
+    content = _proc_content(proc_id)
+    if content is None:
+        raise HTTPException(404, f"Procedure {proc_id} not found")
+    return {"id": proc_id, "content": content}
+
+
+@app.post("/api/ai/procedures/search")
+async def search_ai_procedures(request: Request):
+    """Search procedures by query text."""
+    if not _procedures_available:
+        raise HTTPException(503, "Procedures not available")
+    body = await request.json()
+    query = body.get("query", "")
+    top_k = min(body.get("top_k", 5), 20)
+    results = _proc_retrieve(query, top_k=top_k, include_content=False)
+    return {"results": [r.to_dict() for r in results]}
+
+
+# ===========================================================================
 # MAPPING DIAGRAM EXPORT (SVG)
 # ===========================================================================
 
@@ -4289,9 +4721,15 @@ if _org_get_auth_ctx and hasattr(storage, 'conn'):
 marketplace_service_instance = None
 if _org_get_auth_ctx and hasattr(storage, 'conn'):
     try:
+        import psycopg2 as _mp_pg
+        from psycopg2.extras import RealDictCursor as _mp_RDC
         from marketplace_service import MarketplaceService
+        # Use separate connection with autocommit to avoid transaction interference
+        _mp_conn = _mp_pg.connect(host='localhost', port=5432, database='buddyliko',
+                                   user='buddyliko_user', password='c9e71ad92c92797c9f408219de1236cc')
+        _mp_conn.autocommit = True
         marketplace_service_instance = MarketplaceService(
-            storage.conn, storage.RealDictCursor,
+            _mp_conn, _mp_RDC,
             org_service_instance, cost_service)
         register_marketplace_endpoints(
             app, _org_get_auth_ctx, _org_require_role,
@@ -4300,6 +4738,8 @@ if _org_get_auth_ctx and hasattr(storage, 'conn'):
         marketplace_service_instance.seed_builtin()
     except Exception as _me7:
         print(f"⚠️  Marketplace API registration failed: {_me7}")
+        try: _mp_conn.rollback()
+        except: pass
 
 # ── Register Partnership API (Phase 6) ────────────────────────
 partnership_service_instance = None
@@ -4330,6 +4770,32 @@ if cost_service and _org_get_auth_ctx:
         register_cost_endpoints(app, _org_get_auth_ctx, _org_require_role, cost_service)
     except Exception as _ce4:
         print(f"⚠️  Cost API registration failed: {_ce4}")
+
+@app.get("/api/standards/schema-file/{filepath:path}")
+async def serve_schema_file(filepath: str):
+    import os
+    from fastapi.responses import FileResponse
+    base = "/opt/buddyliko/backend/schemas"
+    full_path = os.path.join(base, filepath)
+    full_path = os.path.normpath(full_path)
+    if not full_path.startswith(base):
+        raise HTTPException(403, "Forbidden")
+    if not os.path.exists(full_path):
+        raise HTTPException(404, f"File not found: {filepath}")
+    return FileResponse(full_path)
+
+# ── Register Standards API ────────────────────────────────────
+try:
+    import psycopg2
+    from psycopg2.extras import RealDictCursor
+    _std_conn = psycopg2.connect(host='localhost', port=5432, database='buddyliko', user='buddyliko_user', password='c9e71ad92c92797c9f408219de1236cc')
+    standards_service_instance = StandardsService(_std_conn, RealDictCursor)
+    standards_service_instance.seed_standards()
+    standards_service_instance.populate_mapper_csv_urls()
+    register_standards_endpoints(app, get_current_user, standards_service_instance)
+    print("✅ Standards API registered")
+except Exception as _se:
+    print(f"⚠️  Standards API registration failed: {_se}")
 
 
 
@@ -5281,7 +5747,7 @@ async def get_document_types(schema_id: str):
 # ============================================================
 
 @app.post("/api/schemas/upload")
-async def upload_schema(file: UploadFile = File(...)):
+async def upload_schema(request: Request, file: UploadFile = File(...)):
     """
     Upload schema file (ZIP with XSD or CSV)
     
@@ -5291,10 +5757,47 @@ async def upload_schema(file: UploadFile = File(...)):
     
     Auto-detects file type and processes accordingly.
     """
+    _upload_t0 = _time_mod.time()
+    _upload_ip = request.client.host if request.client else None
+    _upload_ua = (request.headers.get('user-agent') or '')[:256]
+    _upload_ct = request.headers.get('content-type', '')
+    _upload_cl = int(request.headers.get('content-length', 0) or 0)
+
+    def _audit_upload(outcome, schema_name=None, file_count=0, error_msg=None, extra_meta=None):
+        """Log upload to audit trail."""
+        if not audit_log:
+            return
+        try:
+            meta = {
+                'file_ext': file_ext if 'file_ext' in dir() else '?',
+                'content_type': _upload_ct,
+                'content_length': _upload_cl,
+            }
+            if extra_meta:
+                meta.update(extra_meta)
+            audit_log.log(
+                AuditAction.SCHEMA_UPLOAD,
+                outcome=outcome,
+                resource_type="schema",
+                resource_id=schema_name,
+                ip_address=_upload_ip,
+                user_agent=_upload_ua,
+                duration_ms=int((_time_mod.time() - _upload_t0) * 1000),
+                file_name=file.filename,
+                file_size_bytes=_upload_cl,
+                input_format=file_ext if 'file_ext' in dir() else None,
+                error_message=error_msg,
+                metadata=meta,
+            )
+        except Exception:
+            pass
+
     try:
         import zipfile
         import tempfile
         import shutil
+        
+        print(f"📤 Schema upload: {file.filename} ({_upload_cl} bytes) from {_upload_ip}")
         
         # Check file extension
         file_ext = os.path.splitext(file.filename)[1].lower()
@@ -5332,6 +5835,8 @@ async def upload_schema(file: UploadFile = File(...)):
                 print(f"🔗 Namespace: {namespace}")
                 
                 # Return schema data (already has all metadata)
+                _audit_upload(AuditOutcome.SUCCESS, schema_name=schema_name,
+                              extra_meta={'type': 'csv', 'field_count': schema_data['field_count']})
                 return {
                     "success": True,
                     "message": f"CSV schema '{schema_name}' parsed successfully",
@@ -5345,203 +5850,271 @@ async def upload_schema(file: UploadFile = File(...)):
                 os.unlink(temp_csv_path)
         
         # ============================================================
-        # ZIP FILE UPLOAD (existing code)
+        # JSON FILE UPLOAD
         # ============================================================
+        if file_ext == '.json':
+            print(f"📋 JSON schema upload: {file.filename}")
+            content = (await file.read()).decode("utf-8", errors="replace")
+
+            import json as _json
+            try:
+                data = _json.loads(content)
+            except _json.JSONDecodeError as je:
+                raise HTTPException(400, f"JSON non valido: {je}")
+
+            # Detect: è un JSON Schema o un JSON sample?
+            is_schema = '$schema' in data or ('type' in data and 'properties' in data)
+
+            if json_parser_available:
+                if is_schema:
+                    # JSON Schema → parse come schema definition
+                    with tempfile.NamedTemporaryFile(suffix=".json", delete=False, mode='w') as tmp:
+                        tmp.write(content)
+                        tmp_path = tmp.name
+                    try:
+                        schema_data = parse_json_schema_file(tmp_path)
+                    finally:
+                        os.unlink(tmp_path)
+                else:
+                    # JSON sample → detect schema + to_buddyliko_schema
+                    parsed = parse_json(content)
+                    schema_data = json_to_schema(parsed, file.filename.rsplit(".", 1)[0])
+
+                # Assicura field_count (il frontend lo cerca in result.schema.field_count)
+                if 'field_count' not in schema_data:
+                    schema_data['field_count'] = len(schema_data.get('fields', []))
+
+                _json_type = "json_schema" if is_schema else "json_sample"
+                _audit_upload(AuditOutcome.SUCCESS, schema_name=schema_data.get('name', 'json'),
+                              extra_meta={'type': _json_type, 'field_count': len(schema_data.get('fields', []))})
+                return {
+                    "success": True,
+                    "message": f"JSON schema '{schema_data.get('name', 'json')}' parsed successfully",
+                    "schema": schema_data,
+                    "type": _json_type,
+                    "fields_count": len(schema_data.get('fields', []))
+                }
+            else:
+                raise HTTPException(400, "JSON Parser non disponibile")
+
+        # ============================================================
+        # SINGLE XSD FILE UPLOAD
+        # ============================================================
+        if file_ext == '.xsd':
+            print(f"📄 Single XSD upload: {file.filename}")
+            content = await file.read()
+
+            with tempfile.NamedTemporaryFile(suffix=".xsd", delete=False) as tmp:
+                tmp.write(content)
+                tmp_path = tmp.name
+
+            try:
+                schema_name = file.filename.rsplit(".", 1)[0]
+                parser = SchemaParser()
+                schema_data = parser.parse_xsd(tmp_path)
+
+                _audit_upload(AuditOutcome.SUCCESS, schema_name=schema_name,
+                              extra_meta={'type': 'xsd', 'field_count': schema_data.get('field_count', 0)})
+                return {
+                    "success": True,
+                    "message": f"XSD schema '{schema_name}' parsed successfully",
+                    "schema": schema_data,
+                    "type": "xsd",
+                    "fields_count": schema_data.get('field_count', len(schema_data.get('fields', [])))
+                }
+            except Exception as e:
+                raise HTTPException(400, f"XSD parse error: {e}")
+            finally:
+                os.unlink(tmp_path)
+
+        # ============================================================
+        # ZIP FILE UPLOAD
+        # ============================================================
+        if file_ext not in ('.zip',):
+            raise HTTPException(400,
+                f"Formato file non supportato: '{file_ext}'. "
+                f"Formati accettati: .csv, .json, .xsd, .zip")
+
         import zipfile
         import tempfile
         import shutil
-        
-        # File extensions to remove (documentation, images, etc.)
-        UNWANTED_EXTENSIONS = {
-            '.html', '.htm', '.pdf', '.png', '.jpg', '.jpeg', '.gif', 
-            '.svg', '.css', '.js', '.txt', '.md', '.xml',  # Remove .txt and .md docs
-            '.doc', '.docx', '.odt', '.rtf',  # Office docs
-            '.zip', '.tar', '.gz'  # Archives
-        }
-        
-        # Keep only these file types
-        WANTED_EXTENSIONS = {'.xsd', '.sch'}
-        
-        def should_keep_file(filename):
-            """Decide if file should be kept"""
-            name_lower = filename.lower()
-            ext = os.path.splitext(name_lower)[1]
-            
-            # Keep XSD and Schematron
-            if ext in WANTED_EXTENSIONS:
-                return True
-            
-            # Remove unwanted
-            if ext in UNWANTED_EXTENSIONS:
-                return False
-            
-            # Keep files without extension or unknown extensions
-            return True
-        
-        def clean_directory(directory):
-            """Remove unwanted files from directory recursively"""
-            removed_count = 0
-            for root, dirs, files in os.walk(directory, topdown=False):
-                for filename in files:
-                    if not should_keep_file(filename):
-                        file_path = os.path.join(root, filename)
-                        os.remove(file_path)
-                        removed_count += 1
-                
-                # Remove empty directories
-                for dirname in dirs:
-                    dir_path = os.path.join(root, dirname)
-                    if os.path.exists(dir_path) and not os.listdir(dir_path):
-                        os.rmdir(dir_path)
-            
-            return removed_count
-        
+
+        # ── Schema Sanitizer (gatekeeper) ──
+        from schema_sanitizer import sanitize_zip_streaming, SCHEMA_EXTENSIONS
+
         def find_schema_xsd(directory):
             """Find schema.xsd or main XSD file recursively"""
+            # Priority names
+            priority_names = [
+                'schema.xsd', 'invoice.xsd', 'ubl-invoice-2.1.xsd',
+                'ubl-invoice-2.0.xsd', 'maindoc/ubl-invoice-2.1.xsd',
+            ]
             for root, dirs, files in os.walk(directory):
                 for filename in files:
-                    if filename.lower() in ['schema.xsd', 'invoice.xsd', 'ubl-invoice-2.1.xsd']:
+                    if filename.lower() in priority_names:
                         return os.path.join(root, filename)
-            
-            # Fallback: any .xsd file
+            # Fallback: first .xsd found
             for root, dirs, files in os.walk(directory):
                 for filename in files:
-                    if filename.endswith('.xsd'):
+                    if filename.lower().endswith('.xsd'):
                         return os.path.join(root, filename)
-            
             return None
-        
+
         def get_schema_name_from_zip(extract_dir):
             """Intelligently determine schema name"""
-            items = os.listdir(extract_dir)
-            
-            # Case 1: Single root directory (simple structure)
+            items = [i for i in os.listdir(extract_dir) if not i.startswith('.')]
             if len(items) == 1 and os.path.isdir(os.path.join(extract_dir, items[0])):
                 return items[0], os.path.join(extract_dir, items[0])
-            
-            # Case 2: Multiple items or files at root (complex structure like UBL)
-            # Use extract_dir itself as schema root
             return 'extracted_schema', extract_dir
-        
-        # Create temp directory
+
+        def count_files_recursive(directory):
+            """Count files in directory tree"""
+            total = 0
+            for _root, _dirs, _files in os.walk(directory):
+                total += len(_files)
+            return total
+
+        # ── Whitelist tuple for wrapper copy (same extensions as sanitizer) ──
+        _schema_ext_tuple = tuple(SCHEMA_EXTENSIONS)
+
         with tempfile.TemporaryDirectory() as temp_dir:
-            # Save uploaded ZIP
+            # ── Save uploaded ZIP: STREAMING (chunk by chunk, no full RAM load) ──
             zip_path = os.path.join(temp_dir, 'upload.zip')
+            bytes_written = 0
             with open(zip_path, 'wb') as f:
-                content = await file.read()
-                f.write(content)
-            
-            # Extract ZIP
+                while True:
+                    chunk = await file.read(64 * 1024)  # 64 KB chunks
+                    if not chunk:
+                        break
+                    f.write(chunk)
+                    bytes_written += len(chunk)
+            print(f"📥 Saved ZIP: {bytes_written / (1024*1024):.1f} MB")
+
+            # ── SANITIZER: streaming extract (only schema files touch disk) ──
             extract_dir = os.path.join(temp_dir, 'extracted')
-            with zipfile.ZipFile(zip_path, 'r') as zip_ref:
-                zip_ref.extractall(extract_dir)
-            
+            try:
+                extract_dir, sanitize_stats = sanitize_zip_streaming(
+                    zip_path, extract_dir, delete_zip=True
+                )
+            except zipfile.BadZipFile:
+                raise HTTPException(400, "Il file non è un archivio ZIP valido")
+            except Exception as ze:
+                raise HTTPException(400, f"Errore durante l'estrazione dello ZIP: {ze}")
+            print(sanitize_stats.summary())
+
+            if sanitize_stats.files_kept == 0:
+                detail_msg = (
+                    f"Nessun file schema trovato nello ZIP. "
+                    f"Rimossi {sanitize_stats.files_removed} file non-schema"
+                )
+                if sanitize_stats.removed_extensions:
+                    top_removed = sorted(sanitize_stats.removed_extensions.items(),
+                                         key=lambda x: -x[1])[:5]
+                    detail_msg += f" (tipi rimossi: {', '.join(f'{e}({n})' for e,n in top_removed)})"
+                detail_msg += ". Estensioni accettate: .xsd .sch .xml .json .xsl .dtd .rng .csv .wsdl .edi"
+                raise HTTPException(status_code=400, detail=detail_msg)
+
             print(f"📦 Extracted ZIP to: {extract_dir}")
-            print(f"📂 Contents: {os.listdir(extract_dir)}")
-            
+
             # Determine schema name and root
             schema_name, schema_root = get_schema_name_from_zip(extract_dir)
-            print(f"📋 Schema name: {schema_name}")
-            print(f"📁 Schema root: {schema_root}")
-            
-            # Clean unwanted files
-            removed = clean_directory(schema_root)
-            print(f"🧹 Removed {removed} unwanted files")
-            
+            print(f"📋 Schema name: {schema_name} | root: {schema_root}")
+
             # Find main XSD file
             main_xsd = find_schema_xsd(schema_root)
             if not main_xsd:
                 raise HTTPException(
                     status_code=400,
-                    detail="No .xsd file found in ZIP"
+                    detail="Nessun file .xsd trovato nello ZIP dopo sanitizzazione"
                 )
-            
             print(f"✅ Found main XSD: {main_xsd}")
-            
-            # Check if we need to wrap (complex structure)
-            need_wrapper = False
-            
-            # If main XSD is NOT directly in schema_root, we need wrapper
+
+            # Check if we need to wrap (complex structure: main XSD in subdirectory)
             main_xsd_dir = os.path.dirname(main_xsd)
-            if main_xsd_dir != schema_root:
-                need_wrapper = True
-                print(f"🔄 Complex structure detected, will create wrapper")
-            
-            # Prepare final schema directory
+            need_wrapper = (main_xsd_dir != schema_root)
+
             if need_wrapper:
-                # Create wrapper directory
+                print(f"🔄 Complex structure detected, creating wrapper")
                 wrapper_dir = os.path.join(temp_dir, 'wrapped')
                 os.makedirs(wrapper_dir, exist_ok=True)
-                
+
                 # Copy main XSD to root as schema.xsd
                 shutil.copy2(main_xsd, os.path.join(wrapper_dir, 'schema.xsd'))
-                
-                # Copy ALL subdirectories maintaining structure
-                # This preserves xsd/common/, xsd/maindoc/, etc.
+
                 for item in os.listdir(schema_root):
                     src_path = os.path.join(schema_root, item)
                     dest_path = os.path.join(wrapper_dir, item)
-                    
-                    # Skip the main XSD file itself (already copied as schema.xsd)
+
                     if src_path == main_xsd:
                         continue
-                    
-                    # Copy directories recursively
+
                     if os.path.isdir(src_path):
                         shutil.copytree(src_path, dest_path)
-                        print(f"📁 Copied directory: {item}")
-                    # Copy other files (like .sch, other .xsd)
-                    elif src_path.endswith(('.xsd', '.sch')):
+                        print(f"  📁 {item}/")
+                    elif src_path.lower().endswith(_schema_ext_tuple):
+                        # ← FIX: copia TUTTE le estensioni whitelist, non solo .xsd/.sch
                         shutil.copy2(src_path, dest_path)
-                        print(f"📄 Copied file: {item}")
-                
+                        print(f"  📄 {item}")
+
                 final_source = wrapper_dir
             else:
-                # Simple structure, use as-is
                 final_source = schema_root
-            
-            print(f"📦 Final source: {final_source}")
-            print(f"📂 Final contents: {os.listdir(final_source)}")
-            
-            # Determine final schema name (use filename from original ZIP if possible)
+
+            print(f"📦 Final: {count_files_recursive(final_source)} files")
+
+            # Determine final schema name from original filename
             if file.filename:
-                # Remove .zip extension
                 suggested_name = file.filename.replace('.zip', '').replace('.ZIP', '')
-                # Clean name (remove special chars)
                 suggested_name = ''.join(c for c in suggested_name if c.isalnum() or c in ['-', '_'])
                 if suggested_name and suggested_name != 'upload':
                     schema_name = suggested_name
-            
+
             # Copy to schemas/input and schemas/output
             schemas_base = os.path.join(os.path.dirname(__file__), 'schemas')
-            
+
             for dest_type in ['input', 'output']:
-                dest_dir = os.path.join(schemas_base, dest_type, schema_name)
-                
-                # Remove existing if present
+                type_dir = os.path.join(schemas_base, dest_type)
+                os.makedirs(type_dir, exist_ok=True)  # ← ensure parent exists
+                dest_dir = os.path.join(type_dir, schema_name)
+
                 if os.path.exists(dest_dir):
                     shutil.rmtree(dest_dir)
-                
-                # Copy schema directory
+
                 shutil.copytree(final_source, dest_dir)
                 print(f"✅ Copied to {dest_type}/{schema_name}")
-            
-            # Count files
-            file_count = sum(1 for _ in os.walk(final_source) for _ in _[2])
-            
+
+            file_count = count_files_recursive(final_source)
+
+            _audit_upload(AuditOutcome.SUCCESS, schema_name=schema_name,
+                          file_count=file_count,
+                          extra_meta={
+                              'type': 'zip',
+                              'files_kept': sanitize_stats.files_kept,
+                              'files_removed': sanitize_stats.files_removed,
+                              'kept_extensions': sanitize_stats.kept_extensions,
+                              'removed_extensions': sanitize_stats.removed_extensions,
+                              'had_wrapper': need_wrapper,
+                              'bytes_before': sanitize_stats.bytes_before,
+                              'bytes_after': sanitize_stats.bytes_after,
+                          })
+
             return {
                 'success': True,
                 'schemaName': schema_name,
                 'fileCount': file_count,
-                'removedFiles': removed,
+                'removedFiles': sanitize_stats.files_removed,
+                'removedExtensions': sanitize_stats.removed_extensions,
+                'keptExtensions': sanitize_stats.kept_extensions,
                 'hadWrapper': need_wrapper
             }
     
-    except HTTPException:
+    except HTTPException as he:
+        _audit_upload(AuditOutcome.FAILURE, error_msg=he.detail)
         raise
     except Exception as e:
         import traceback
         traceback.print_exc()
+        _audit_upload(AuditOutcome.FAILURE, error_msg=str(e))
         raise HTTPException(status_code=500, detail=f"Upload failed: {str(e)}")
 
 
@@ -5586,6 +6159,14 @@ async def on_startup():
     if job_engine:
         asyncio.create_task(job_engine.start_cleanup_loop(interval_hours=24))
         print("✅ Job cleanup loop started")
+    # Cleanup old request logs at startup
+    if request_log:
+        try:
+            deleted = request_log.cleanup()
+            if deleted > 0:
+                print(f"🧹 Cleaned up {deleted} old request logs (>{request_log.retention_days} days)")
+        except Exception as e:
+            print(f"⚠️ Request log cleanup failed: {e}")
 
 
 # ===========================================================================
@@ -5868,6 +6449,70 @@ async def set_audit_level(req: AuditLevelRequest, user = Depends(get_current_use
                       resource_type="audit_level",
                       metadata={"new_level": level.value})
     return {"success": True, "level": level.value}
+
+
+# ===========================================================================
+# REQUEST LOG ENDPOINTS (HTTP request tracing)
+# ===========================================================================
+
+@app.get("/api/admin/request-log")
+async def get_request_logs(
+    method: Optional[str] = None,
+    path_contains: Optional[str] = None,
+    status_code: Optional[int] = None,
+    status_gte: Optional[int] = None,
+    date_from: Optional[str] = None,
+    date_to: Optional[str] = None,
+    ip_address: Optional[str] = None,
+    limit: int = 100,
+    offset: int = 0,
+    user = Depends(get_current_user)
+):
+    """
+    Query request logs. Solo admin/master.
+
+    Filtri utili:
+    - status_gte=400 → mostra solo errori
+    - path_contains=schemas/upload → filtra per upload schema
+    - method=POST → solo POST
+    """
+    if not request_log:
+        raise HTTPException(503, "Request logger not available (requires PostgreSQL)")
+    if user.get("role") not in ("MASTER", "ADMIN"):
+        raise HTTPException(403, "Admin required")
+    return request_log.query(
+        method=method, path_contains=path_contains,
+        status_code=status_code, status_gte=status_gte,
+        date_from=date_from, date_to=date_to,
+        ip_address=ip_address, limit=limit, offset=offset,
+    )
+
+
+@app.get("/api/admin/request-log/stats")
+async def get_request_log_stats(
+    hours: int = 24,
+    user = Depends(get_current_user)
+):
+    """Statistiche richieste: errori, endpoint lenti, volumi."""
+    if not request_log:
+        raise HTTPException(503, "Request logger not available")
+    if user.get("role") not in ("MASTER", "ADMIN"):
+        raise HTTPException(403, "Admin required")
+    return request_log.get_stats(hours=hours)
+
+
+@app.delete("/api/admin/request-log/cleanup")
+async def cleanup_request_logs(
+    days: int = 30,
+    user = Depends(get_current_user)
+):
+    """Elimina request logs più vecchi di N giorni."""
+    if not request_log:
+        raise HTTPException(503, "Request logger not available")
+    if user.get("role") not in ("MASTER", "ADMIN"):
+        raise HTTPException(403, "Admin required")
+    deleted = request_log.cleanup(older_than_days=days)
+    return {"success": True, "deleted": deleted, "older_than_days": days}
 
 
 # ===========================================================================
@@ -6929,30 +7574,6 @@ async def export_usage_csv(
     )
 
 
-@app.get("/api/billing/admin/usage-all")
-async def admin_usage_all(
-    month: str = None,
-    user = Depends(get_current_user)
-):
-    """Admin: usage di tutti gli utenti per un mese."""
-    if user.get("role") not in ("MASTER", "ADMIN"):
-        raise HTTPException(403, "Solo admin")
-    if not billing_manager:
-        return {"usage": []}
-    from datetime import datetime, timezone
-    target_month = month or datetime.now(timezone.utc).strftime('%Y-%m')
-    cur = billing_manager.conn.cursor(cursor_factory=billing_manager.RealDictCursor)
-    cur.execute("""
-        SELECT u.user_id, us.email, us.name, us.plan,
-               u.transforms_count, u.api_calls_count,
-               u.bytes_processed, u.codegen_count
-        FROM usage_counters u
-        LEFT JOIN users us ON us.id::text = u.user_id
-        WHERE u.month = %s
-        ORDER BY u.transforms_count DESC
-    """, (target_month,))
-    rows = [dict(r) for r in cur.fetchall()]
-    return {"month": target_month, "usage": rows, "total_users": len(rows)}
 
 
 if __name__ == "__main__":

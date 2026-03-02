@@ -692,28 +692,47 @@ class BillingManager:
     # ------------------------------------------------------------------
 
     def get_revenue_stats(self) -> Dict:
-        """Statistiche subscription per dashboard admin."""
+        """Statistiche revenue per dashboard admin."""
         cur = self.conn.cursor(cursor_factory=self.RealDictCursor)
+
+        # Conta da USERS (non da subscriptions, che ha solo chi ha pagato)
         cur.execute("""
             SELECT
-                plan,
+                COALESCE(plan, 'FREE') as plan,
                 COUNT(*) as count,
                 COUNT(*) FILTER (WHERE status = 'active') as active,
-                COUNT(*) FILTER (WHERE status = 'past_due') as past_due,
-                COUNT(*) FILTER (WHERE status = 'canceled') as canceled,
-                COUNT(*) FILTER (WHERE override_by_admin IS NOT NULL) as custom_overrides
-            FROM subscriptions
-            GROUP BY plan
+                COUNT(*) FILTER (WHERE status IN ('suspended', 'blocked')) as past_due,
+                COUNT(*) FILTER (WHERE status IN ('cancelled', 'deleted')) as canceled,
+                0 as custom_overrides
+            FROM users
+            WHERE status NOT IN ('DELETED')
+            GROUP BY COALESCE(plan, 'FREE')
             ORDER BY plan
         """)
         by_plan = [dict(r) for r in cur.fetchall()]
 
-        # MRR (Monthly Recurring Revenue) stimato
+        # Integra overrides da subscriptions (chi ha subscription con override)
+        try:
+            cur.execute("""
+                SELECT COUNT(*) as cnt FROM subscriptions
+                WHERE override_by_admin IS NOT NULL AND status = 'active'
+            """)
+            override_count = cur.fetchone()['cnt']
+            for row in by_plan:
+                if row['plan'] == 'CUSTOM':
+                    row['custom_overrides'] = override_count
+        except:
+            pass
+
+        # MRR stimato (basato su utenti attivi per piano)
         mrr = 0
         for row in by_plan:
             plan = row['plan']
             active = row['active']
-            price = PLAN_PRICES_EUR.get(Plan(plan) if plan in Plan._value2member_map_ else Plan.FREE, {}).get('monthly', 0)
+            try:
+                price = PLAN_PRICES_EUR.get(Plan(plan), {}).get('monthly', 0)
+            except (ValueError, KeyError):
+                price = 0
             mrr += active * price
 
         cur.execute("""
