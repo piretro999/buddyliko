@@ -1,0 +1,8 @@
+{
+  "type": "postgresql",
+  "host": "localhost",
+  "port": "5432",
+  "database": "buddyliko",
+  "user": "buddyliko_user",
+  "password": "c9e71ad92c92797c9f408219de1236cc"
+}
