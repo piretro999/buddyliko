@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Impostazioni Org — Buddyliko</title>
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+    <script src="/lang/i18n.js"></script>
+    <style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: system-ui, -apple-system, sans-serif; background: #0a0e1a; color: #e2e8f0; }
+.container { max-width: 1200px; margin: 0 auto; padding: 24px 20px; }
+.page-header { margin-bottom: 24px; }
+.page-header h1 { font-size: 22px; font-weight: 700; }
+.page-header p { color: #94a3b8; font-size: 13px; margin-top: 4px; }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 24px; }
+.stat-card { background: #141b2d; padding: 18px; border-radius: 12px; border: 1px solid #2e3250; }
+.stat-value { font-size: 28px; font-weight: bold; color: #60a5fa; }
+.stat-value.green { color: #4ade80; }
+.stat-value.orange { color: #fb923c; }
+.stat-value.purple { color: #c084fc; }
+.stat-value.red { color: #f87171; }
+.stat-label { color: #94a3b8; font-size: 12px; margin-top: 4px; }
+.section { background: #141b2d; border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 1px solid #2e3250; }
+.section-title { font-size: 15px; font-weight: 600; margin-bottom: 14px; color: #e2e8f0; display: flex; align-items: center; gap: 8px; }
+.section-title .count { background: #1e3a5f; color: #60a5fa; padding: 2px 8px; border-radius: 10px; font-size: 11px; }
+table { width: 100%; border-collapse: collapse; }
+th { background: #0d1220; padding: 10px 12px; text-align: left; font-weight: 600; font-size: 11px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid #2e3250; }
+td { padding: 10px 12px; border-bottom: 1px solid #1e2235; font-size: 13px; color: #e2e8f0; }
+tr:hover td { background: #0f172a; }
+.badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+.badge-owner { background: rgba(136,14,79,.25); color: #f472b6; }
+.badge-admin { background: rgba(46,125,50,.25); color: #4ade80; }
+.badge-finance { background: rgba(230,81,0,.25); color: #fb923c; }
+.badge-developer { background: rgba(21,101,192,.25); color: #60a5fa; }
+.badge-operator { background: rgba(74,20,140,.25); color: #c084fc; }
+.badge-viewer { background: rgba(69,90,100,.25); color: #94a3b8; }
+.badge-active { background: rgba(46,125,50,.2); color: #4ade80; }
+.badge-trial { background: rgba(230,81,0,.2); color: #fb923c; }
+.badge-suspended { background: rgba(198,40,40,.2); color: #f87171; }
+.badge-revoked { background: rgba(198,40,40,.2); color: #f87171; }
+.badge-expired { background: rgba(69,90,100,.25); color: #94a3b8; }
+.badge-live { background: rgba(46,125,50,.2); color: #4ade80; }
+.badge-sandbox { background: rgba(230,81,0,.2); color: #fb923c; }
+.badge-FREE { background: rgba(69,90,100,.25); color: #94a3b8; }
+.badge-PRO { background: rgba(21,101,192,.25); color: #60a5fa; }
+.badge-ENTERPRISE { background: rgba(136,14,79,.25); color: #f472b6; }
+.badge-PARTNER { background: rgba(46,125,50,.25); color: #4ade80; }
+.btn { padding: 7px 14px; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; transition: all 0.15s; display: inline-flex; align-items: center; gap: 6px; }
+.btn:hover { opacity: 0.85; transform: translateY(-1px); }
+.btn-primary { background: #2563eb; color: white; }
+.btn-success { background: #059669; color: white; }
+.btn-danger { background: #dc2626; color: white; }
+.btn-warning { background: #d97706; color: white; }
+.btn-outline { background: transparent; border: 1px solid #2e3250; color: #94a3b8; }
+.btn-outline:hover { border-color: #60a5fa; color: #60a5fa; }
+.btn-sm { padding: 4px 10px; font-size: 11px; }
+.alert { padding: 12px 16px; border-radius: 8px; margin-bottom: 14px; font-size: 13px; animation: fadeIn 0.3s; }
+.alert-success { background: rgba(46,125,50,.15); color: #4ade80; border-left: 4px solid #059669; }
+.alert-error { background: rgba(198,40,40,.15); color: #f87171; border-left: 4px solid #dc2626; }
+.alert-info { background: rgba(21,101,192,.15); color: #60a5fa; border-left: 4px solid #2563eb; }
+.alert-warning { background: rgba(230,81,0,.15); color: #fb923c; border-left: 4px solid #d97706; }
+.form-group { margin-bottom: 14px; }
+.form-group label { display: block; color: #94a3b8; font-size: 12px; font-weight: 600; margin-bottom: 4px; }
+.form-group input, .form-group select, .form-group textarea { width: 100%; background: #0a0e1a; border: 1px solid #2e3250; color: #e2e8f0; border-radius: 6px; padding: 8px 12px; font-size: 13px; font-family: inherit; }
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: #2563eb; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.progress-bar { background: #0d1220; border-radius: 6px; height: 8px; overflow: hidden; margin-top: 6px; }
+.progress-fill { height: 100%; border-radius: 6px; background: linear-gradient(90deg, #2563eb, #3b82f6); transition: width 0.5s; }
+.progress-fill.warn { background: linear-gradient(90deg, #d97706, #f59e0b); }
+.progress-fill.danger { background: linear-gradient(90deg, #dc2626, #ef4444); }
+.empty { padding: 30px; text-align: center; color: #64748b; font-size: 13px; }
+.loading { padding: 20px; text-align: center; color: #64748b; }
+.chart-container { height: 200px; position: relative; margin-top: 12px; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.tab-bar { display: flex; gap: 4px; margin-bottom: 20px; border-bottom: 2px solid #2e3250; }
+.tab { padding: 10px 18px; cursor: pointer; border-radius: 8px 8px 0 0; font-size: 13px; font-weight: 500; color: #94a3b8; background: none; border: none; transition: all 0.15s; }
+.tab.active { color: #60a5fa; border-bottom: 2px solid #60a5fa; margin-bottom: -2px; background: rgba(37,99,235,.1); }
+.tab:hover:not(.active) { background: #0f172a; }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+.subnav { display: flex; gap: 8px; margin-bottom: 20px; }
+.subnav a { padding: 8px 16px; border-radius: 8px; text-decoration: none; font-size: 13px; font-weight: 500; color: #94a3b8; background: #0d1220; border: 1px solid #2e3250; transition: all .15s; }
+.subnav a:hover { border-color: #60a5fa; color: #60a5fa; }
+.subnav a.active { background: #1e3a5f; color: #93c5fd; border-color: #1e3a5f; }
+.modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,.6); z-index: 200; justify-content: center; align-items: center; }
+.modal-overlay.show { display: flex; }
+.modal { background: #141b2d; border-radius: 12px; padding: 24px; border: 1px solid #2e3250; width: 100%; max-width: 560px; max-height: 90vh; overflow-y: auto; }
+.modal h3 { font-size: 16px; margin-bottom: 16px; }
+.modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 16px; }
+.readonly-field { background: #0d1220 !important; color: #64748b !important; cursor: not-allowed; }
+.limit-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+.limit-item { background: #0d1220; padding: 12px; border-radius: 8px; border: 1px solid #2e3250; }
+.limit-label { font-size: 11px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; }
+.limit-value { font-size: 20px; font-weight: 700; color: #60a5fa; margin-top: 4px; }
+.danger-zone { border-color: #dc2626; background: rgba(220,38,38,.05); }
+.danger-zone .section-title { color: #f87171; }
+
+/* Token-specific styles */
+.token-display { background: #0d1220; border: 2px dashed #d97706; border-radius: 8px; padding: 16px; margin: 12px 0; position: relative; }
+.token-value { font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace; font-size: 13px; color: #fbbf24; word-break: break-all; line-height: 1.5; padding-right: 40px; }
+.token-copy-btn { position: absolute; top: 12px; right: 12px; background: #1e3a5f; border: none; color: #60a5fa; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 12px; transition: all .15s; }
+.token-copy-btn:hover { background: #2563eb; color: white; }
+.token-copy-btn.copied { background: #059669; color: white; }
+.scope-tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 600; margin: 2px; background: rgba(37,99,235,.15); color: #93c5fd; font-family: monospace; }
+.token-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+.token-prefix { font-family: 'SF Mono', 'Fira Code', monospace; font-size: 12px; color: #94a3b8; }
+.checkbox-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.checkbox-item { display: flex; align-items: center; gap: 8px; padding: 6px 10px; background: #0d1220; border-radius: 6px; border: 1px solid #2e3250; cursor: pointer; transition: all .15s; }
+.checkbox-item:hover { border-color: #60a5fa; }
+.checkbox-item.checked { border-color: #2563eb; background: rgba(37,99,235,.1); }
+.checkbox-item input[type="checkbox"] { accent-color: #2563eb; }
+.checkbox-item label { font-size: 12px; cursor: pointer; font-family: monospace; color: #e2e8f0; }
+.expiring-badge { display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 10px; background: rgba(230,81,0,.2); color: #fb923c; margin-left: 6px; }
+.audit-entry { padding: 8px 12px; border-bottom: 1px solid #1e2235; font-size: 12px; display: flex; gap: 12px; align-items: center; }
+.audit-entry:last-child { border-bottom: none; }
+.audit-event { font-weight: 600; min-width: 80px; }
+.audit-event.created { color: #4ade80; }
+.audit-event.revoked { color: #f87171; }
+.audit-event.rotated { color: #fb923c; }
+.audit-event.updated { color: #60a5fa; }
+.audit-event.rate_limited { color: #f87171; }
+.audit-event.rejected { color: #f87171; }
+.audit-event.expired { color: #94a3b8; }
+.audit-event.ip_rejected { color: #f87171; }
+.audit-time { color: #64748b; min-width: 120px; }
+.audit-details { color: #94a3b8; flex: 1; }
+.token-warning { background: rgba(230,81,0,.1); border: 1px solid #d97706; border-radius: 8px; padding: 12px 16px; margin-bottom: 16px; font-size: 13px; color: #fbbf24; display: flex; align-items: flex-start; gap: 10px; }
+.token-warning .icon { font-size: 18px; flex-shrink: 0; }
+.no-select { user-select: none; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes pulse-border { 0%, 100% { border-color: #d97706; } 50% { border-color: #fbbf24; } }
+.token-display { animation: pulse-border 2s ease-in-out 3; }
+@media (max-width: 768px) {
+    .form-row, .grid-2 { grid-template-columns: 1fr; }
+    .stats { grid-template-columns: 1fr 1fr; }
+    .checkbox-grid { grid-template-columns: 1fr; }
+    .token-actions { flex-direction: column; }
+}
+    </style>
+</head>
+<body>
+<div id="buddy-topbar"></div>
+<div class="container">
+    <div class="subnav">
+        <a href="org-dashboard.html">📊 Dashboard</a>
+        <a href="org-users.html">👥 Utenti</a>
+        <a href="org-billing.html">💰 Billing</a>
+        <a href="org-partners.html">🤝 Partner</a>
+        <a href="org-reports.html">📈 Report</a>
+        <a href="partner-dashboard.html">🤝 Partnership</a>
+        <a href="org-settings.html" class="active">⚙️ Impostazioni</a>
+    </div>
+    <div id="alerts"></div>
+    <div class="page-header"><h1>⚙️ Impostazioni organizzazione</h1><p id="settings-sub">Caricamento...</p></div>
+
+    <!-- TABS -->
+    <div class="tab-bar">
+        <button class="tab active" onclick="switchTab('general')">⚙️ Generale</button>
+        <button class="tab" onclick="switchTab('tokens')">🔑 API Keys</button>
+        <button class="tab" onclick="switchTab('audit')">📋 Audit Token</button>
+    </div>
+
+    <!-- ═══ TAB: GENERALE ═══ -->
+    <div id="tab-general" class="tab-content active">
+        <!-- Info base -->
+        <div class="section">
+            <div class="section-title">🏢 Informazioni generali</div>
+            <div class="form-row">
+                <div class="form-group"><label>Nome organizzazione</label><input type="text" id="f-name"></div>
+                <div class="form-group"><label>Slug (URL)</label><input type="text" id="f-slug" class="readonly-field" readonly></div>
+            </div>
+            <div class="form-row">
+                <div class="form-group"><label>Settore</label><input type="text" id="f-industry" placeholder="es. Manufacturing, Finance..."></div>
+                <div class="form-group"><label>Sito web</label><input type="text" id="f-website" placeholder="https://"></div>
+            </div>
+            <div class="form-row">
+                <div class="form-group"><label>Paese</label>
+                    <select id="f-country"><option value="">—</option><option value="IT">Italia</option><option value="DE">Germania</option><option value="FR">Francia</option><option value="ES">Spagna</option><option value="UK">UK</option><option value="US">USA</option><option value="CH">Svizzera</option></select>
+                </div>
+                <div class="form-group"><label>Valuta</label>
+                    <select id="f-currency"><option value="EUR">EUR €</option><option value="USD">USD $</option><option value="GBP">GBP £</option><option value="CHF">CHF</option></select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dati fiscali -->
+        <div class="section" id="fiscal-section">
+            <div class="section-title">🧾 Dati fiscali e fatturazione</div>
+            <div class="form-row">
+                <div class="form-group"><label>Partita IVA</label><input type="text" id="f-vat" placeholder="IT01234567890"></div>
+                <div class="form-group"><label>Codice Fiscale</label><input type="text" id="f-fiscal"></div>
+            </div>
+            <div class="form-row">
+                <div class="form-group"><label>Codice SDI</label><input type="text" id="f-sdi" placeholder="0000000" maxlength="7"></div>
+                <div class="form-group"><label>PEC</label><input type="email" id="f-pec" placeholder="fatture@pec.azienda.it"></div>
+            </div>
+            <div class="form-group"><label>Email fatturazione</label><input type="email" id="f-billing-email" placeholder="billing@azienda.it"></div>
+        </div>
+
+        <!-- Salva -->
+        <div style="margin-bottom:20px;display:flex;gap:10px">
+            <button class="btn btn-primary" onclick="saveSettings()">💾 Salva modifiche</button>
+            <button class="btn btn-outline" onclick="loadSettings()">↻ Ricarica</button>
+        </div>
+
+        <!-- Limiti piano -->
+        <div class="section">
+            <div class="section-title">📏 Limiti piano</div>
+            <div class="limit-grid" id="limits-grid"><div class="loading">Caricamento...</div></div>
+        </div>
+
+        <!-- Info org -->
+        <div class="section">
+            <div class="section-title">ℹ️ Informazioni sistema</div>
+            <div id="sys-info"></div>
+        </div>
+    </div>
+
+    <!-- ═══ TAB: API KEYS ═══ -->
+    <div id="tab-tokens" class="tab-content">
+        <!-- Stats -->
+        <div class="stats" id="token-stats">
+            <div class="stat-card"><div class="stat-value green" id="ts-active">—</div><div class="stat-label">Token attivi</div></div>
+            <div class="stat-card"><div class="stat-value" id="ts-total-uses">—</div><div class="stat-label">Chiamate totali</div></div>
+            <div class="stat-card"><div class="stat-value orange" id="ts-expiring">—</div><div class="stat-label">In scadenza (7gg)</div></div>
+            <div class="stat-card"><div class="stat-value red" id="ts-revoked">—</div><div class="stat-label">Revocati</div></div>
+        </div>
+
+        <!-- Actions bar -->
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+            <div style="display:flex;gap:8px;align-items:center">
+                <button class="btn btn-primary" onclick="openCreateTokenModal()">➕ Nuovo API Key</button>
+                <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:#94a3b8;cursor:pointer">
+                    <input type="checkbox" id="show-revoked" onchange="loadTokens()" style="accent-color:#2563eb">
+                    Mostra revocati
+                </label>
+            </div>
+            <div style="font-size:12px;color:#64748b" id="token-count-label"></div>
+        </div>
+
+        <!-- Token list -->
+        <div class="section" style="padding:0;overflow-x:auto">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Prefix</th>
+                        <th>Ambiente</th>
+                        <th>Scope</th>
+                        <th>Status</th>
+                        <th>Ultimo uso</th>
+                        <th>Chiamate</th>
+                        <th>Azioni</th>
+                    </tr>
+                </thead>
+                <tbody id="tokens-tbody">
+                    <tr><td colspan="8" class="loading">Caricamento token...</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Expiring soon -->
+        <div class="section" id="expiring-section" style="display:none">
+            <div class="section-title">⚠️ Token in scadenza <span class="count" id="expiring-count">0</span></div>
+            <div id="expiring-list"></div>
+        </div>
+    </div>
+
+    <!-- ═══ TAB: AUDIT TOKEN ═══ -->
+    <div id="tab-audit" class="tab-content">
+        <div class="section">
+            <div class="section-title">📋 Audit log API token <span class="count" id="audit-count">0</span></div>
+            <div id="audit-log-container">
+                <div class="loading">Caricamento audit log...</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ MODAL: CREA TOKEN ═══ -->
+<div class="modal-overlay" id="modal-create">
+    <div class="modal" style="max-width:600px">
+        <h3>➕ Crea nuovo API Key</h3>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Nome *</label>
+                <input type="text" id="ct-name" placeholder="es. Production API, Webhook Integration...">
+            </div>
+            <div class="form-group">
+                <label>Ambiente</label>
+                <select id="ct-env">
+                    <option value="live">🟢 Live (Produzione)</option>
+                    <option value="sandbox">🟡 Sandbox (Test)</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Descrizione</label>
+            <textarea id="ct-desc" rows="2" placeholder="A cosa serve questo token (opzionale)"></textarea>
+        </div>
+        <div class="form-group">
+            <label>Permessi (scope)</label>
+            <div class="checkbox-grid" id="ct-scopes"></div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Rate limit (req/minuto)</label>
+                <input type="number" id="ct-rpm" placeholder="60 (default)">
+            </div>
+            <div class="form-group">
+                <label>Rate limit (req/ora)</label>
+                <input type="number" id="ct-rph" placeholder="1000 (default)">
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Rate limit (req/giorno)</label>
+                <input type="number" id="ct-rpd" placeholder="10000 (default)">
+            </div>
+            <div class="form-group">
+                <label>Scadenza (giorni)</label>
+                <input type="number" id="ct-expires" placeholder="Nessuna scadenza">
+            </div>
+        </div>
+        <div class="form-group">
+            <label>IP consentiti (uno per riga, vuoto = tutti)</label>
+            <textarea id="ct-ips" rows="2" placeholder="192.168.1.1&#10;10.0.0.0/24"></textarea>
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-outline" onclick="closeModal('modal-create')">Annulla</button>
+            <button class="btn btn-primary" onclick="createToken()">🔑 Genera API Key</button>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ MODAL: TOKEN GENERATO (one-time) ═══ -->
+<div class="modal-overlay" id="modal-token-created">
+    <div class="modal" style="max-width:600px">
+        <h3>🔑 API Key generata</h3>
+        <div class="token-warning">
+            <span class="icon">⚠️</span>
+            <div>
+                <strong>Copia subito questo token!</strong><br>
+                Non potrai vederlo di nuovo. Se lo perdi, dovrai generarne uno nuovo (rotazione).
+            </div>
+        </div>
+        <div class="token-display">
+            <div class="token-value no-select" id="created-token-value"></div>
+            <button class="token-copy-btn" onclick="copyCreatedToken()">📋 Copia</button>
+        </div>
+        <div style="margin-top:12px;font-size:12px;color:#94a3b8">
+            <strong>Nome:</strong> <span id="created-token-name"></span> · 
+            <strong>Ambiente:</strong> <span id="created-token-env"></span>
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-primary" onclick="confirmTokenCopied()">✅ Ho copiato il token</button>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ MODAL: DETTAGLIO TOKEN ═══ -->
+<div class="modal-overlay" id="modal-detail">
+    <div class="modal" style="max-width:640px">
+        <h3 id="detail-title">Dettaglio token</h3>
+        <div id="detail-body"><div class="loading">Caricamento...</div></div>
+        <div class="modal-actions">
+            <button class="btn btn-outline" onclick="closeModal('modal-detail')">Chiudi</button>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ MODAL: CONFERMA REVOCA ═══ -->
+<div class="modal-overlay" id="modal-revoke">
+    <div class="modal">
+        <h3>⚠️ Revoca API Key</h3>
+        <p style="font-size:13px;color:#94a3b8;margin-bottom:14px">
+            Stai per revocare <strong id="revoke-token-name"></strong>. Il token smetterà di funzionare immediatamente. Questa azione è irreversibile.
+        </p>
+        <div class="form-group">
+            <label>Motivo (opzionale)</label>
+            <input type="text" id="revoke-reason" placeholder="es. Compromesso, non più necessario...">
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-outline" onclick="closeModal('modal-revoke')">Annulla</button>
+            <button class="btn btn-danger" onclick="confirmRevoke()">🗑️ Revoca definitivamente</button>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ MODAL: CONFERMA ROTAZIONE ═══ -->
+<div class="modal-overlay" id="modal-rotate">
+    <div class="modal">
+        <h3>🔄 Ruota API Key</h3>
+        <p style="font-size:13px;color:#94a3b8;margin-bottom:14px">
+            Stai per ruotare <strong id="rotate-token-name"></strong>. Il vecchio token verrà revocato e ne verrà generato uno nuovo con le stesse configurazioni.
+        </p>
+        <div class="token-warning">
+            <span class="icon">⚠️</span>
+            <div>Aggiorna la chiave in tutti i sistemi che usano questo token prima di procedere, oppure fallo subito dopo aver copiato il nuovo token.</div>
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-outline" onclick="closeModal('modal-rotate')">Annulla</button>
+            <button class="btn btn-warning" onclick="confirmRotate()">🔄 Ruota e genera nuovo</button>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ MODAL: MODIFICA TOKEN ═══ -->
+<div class="modal-overlay" id="modal-edit">
+    <div class="modal" style="max-width:600px">
+        <h3>✏️ Modifica API Key</h3>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Nome</label>
+                <input type="text" id="et-name">
+            </div>
+            <div class="form-group">
+                <label>Prefix</label>
+                <input type="text" id="et-prefix" class="readonly-field" readonly>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Descrizione</label>
+            <textarea id="et-desc" rows="2"></textarea>
+        </div>
+        <div class="form-group">
+            <label>Permessi (scope)</label>
+            <div class="checkbox-grid" id="et-scopes"></div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Rate limit (req/minuto)</label>
+                <input type="number" id="et-rpm">
+            </div>
+            <div class="form-group">
+                <label>Rate limit (req/ora)</label>
+                <input type="number" id="et-rph">
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Rate limit (req/giorno)</label>
+            <input type="number" id="et-rpd">
+        </div>
+        <div class="form-group">
+            <label>IP consentiti (uno per riga)</label>
+            <textarea id="et-ips" rows="2"></textarea>
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-outline" onclick="closeModal('modal-edit')">Annulla</button>
+            <button class="btn btn-primary" onclick="saveTokenEdit()">💾 Salva modifiche</button>
+        </div>
+    </div>
+</div>
+
+
+<script>
+// ═══ CORE ═══════════════════════════════════════════════════════════════
+
+const API = '/api';
+const token = localStorage.getItem('buddyliko_token');
+if (!token) window.location.href = 'login.html';
+
+const VALID_SCOPES = [
+    'transform:execute', 'transform:read',
+    'mapping:read', 'mapping:write',
+    'partner:read', 'partner:write',
+    'file:read', 'file:write',
+    'ai:generate',
+    'report:read',
+];
+
+const SCOPE_LABELS = {
+    'transform:execute': '▶️ Esegui trasformazioni',
+    'transform:read': '📄 Leggi trasformazioni',
+    'mapping:read': '🗺️ Leggi mapping',
+    'mapping:write': '✏️ Scrivi mapping',
+    'partner:read': '🤝 Leggi partner',
+    'partner:write': '✏️ Scrivi partner',
+    'file:read': '📁 Leggi file',
+    'file:write': '📝 Scrivi file',
+    'ai:generate': '🤖 Genera con AI',
+    'report:read': '📊 Leggi report',
+};
+
+let orgData = null;
+let tokensData = [];
+let tokenStats = null;
+let pendingAction = { id: null, name: null };
+let editingTokenId = null;
+let createdTokenValue = null;
+
+function showAlert(msg, type='success') {
+    const d = document.createElement('div');
+    d.className = 'alert alert-' + type;
+    d.textContent = msg;
+    const el = document.getElementById('alerts');
+    el.insertBefore(d, el.firstChild);
+    setTimeout(() => d.remove(), 5000);
+}
+
+async function apiFetch(path, opts={}) {
+    const r = await fetch(API + path, {
+        ...opts,
+        headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json', ...(opts.headers||{}) }
+    });
+    if (!r.ok) {
+        let e; try { e = await r.json(); } catch { e = { detail: 'HTTP ' + r.status }; }
+        throw new Error(e.detail || e.message || 'Errore');
+    }
+    return r.json();
+}
+
+function fmtBytes(b) {
+    if (!b || b === 0) return '0 B';
+    const u = ['B','KB','MB','GB','TB'];
+    const i = Math.floor(Math.log(Math.abs(b)) / Math.log(1024));
+    return (b / Math.pow(1024, i)).toFixed(i > 0 ? 1 : 0) + ' ' + u[i];
+}
+function fmtEur(v) { return '€' + parseFloat(v || 0).toFixed(2); }
+function fmtDate(d) { if (!d) return '—'; return new Date(d).toLocaleDateString('it-IT'); }
+function fmtDateTime(d) { if (!d) return '—'; return new Date(d).toLocaleString('it-IT', {day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}); }
+function fmtNum(n) { return (n||0).toLocaleString('it-IT'); }
+function pct(used, total) { if (!total || total <= 0) return 0; return Math.min(100, Math.round((used / total) * 100)); }
+function pctClass(p) { return p >= 90 ? 'danger' : p >= 70 ? 'warn' : ''; }
+function escHtml(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+function timeAgo(dateStr) {
+    if (!dateStr) return 'Mai';
+    const d = new Date(dateStr);
+    const now = new Date();
+    const diff = Math.floor((now - d) / 1000);
+    if (diff < 60) return 'Ora';
+    if (diff < 3600) return Math.floor(diff / 60) + ' min fa';
+    if (diff < 86400) return Math.floor(diff / 3600) + ' ore fa';
+    if (diff < 604800) return Math.floor(diff / 86400) + ' gg fa';
+    return fmtDate(dateStr);
+}
+
+// ═══ TAB SWITCHING ══════════════════════════════════════════════════════
+
+function switchTab(tabName) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    
+    const tabs = document.querySelectorAll('.tab');
+    const tabMap = { general: 0, tokens: 1, audit: 2 };
+    if (tabMap[tabName] !== undefined) tabs[tabMap[tabName]].classList.add('active');
+    
+    const content = document.getElementById('tab-' + tabName);
+    if (content) content.classList.add('active');
+
+    if (tabName === 'tokens') { loadTokens(); loadTokenStats(); }
+    if (tabName === 'audit') loadAuditLog();
+}
+
+// ═══ MODAL HELPERS ══════════════════════════════════════════════════════
+
+function openModal(id) { document.getElementById(id).classList.add('show'); }
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+// Close modals on overlay click
+document.querySelectorAll('.modal-overlay').forEach(ov => {
+    ov.addEventListener('click', e => { if (e.target === ov) ov.classList.remove('show'); });
+});
+
+// ═══ GENERAL TAB (same as before) ═══════════════════════════════════════
+
+async function loadSettings() {
+    try {
+        const [org, plans] = await Promise.all([
+            apiFetch('/org'),
+            apiFetch('/pricing/plans').catch(() => ({plans:[]})),
+        ]);
+        orgData = org;
+        document.getElementById('settings-sub').innerHTML =
+            '<span class="badge badge-' + org.plan + '">' + org.plan + '</span> · ' +
+            '<span class="badge badge-' + org.status + '">' + org.status + '</span>';
+
+        document.getElementById('f-name').value = org.name || '';
+        document.getElementById('f-slug').value = org.slug || '';
+        document.getElementById('f-industry').value = org.industry || '';
+        document.getElementById('f-website').value = org.website || '';
+        document.getElementById('f-country').value = org.country || '';
+        document.getElementById('f-currency').value = org.currency || 'EUR';
+        document.getElementById('f-vat').value = org.vat_number || '';
+        document.getElementById('f-fiscal').value = org.fiscal_code || '';
+        document.getElementById('f-sdi').value = org.sdi_code || '';
+        document.getElementById('f-pec').value = org.pec_email || '';
+        document.getElementById('f-billing-email').value = org.billing_email || '';
+
+        const isFinance = ['owner','admin','finance'].includes(org.my_role);
+        document.getElementById('fiscal-section').style.display = isFinance ? '' : 'none';
+
+        const plan = (plans.plans || []).find(p => p.plan === org.plan);
+        renderLimits(plan);
+
+        document.getElementById('sys-info').innerHTML = `
+            <div style="font-size:13px;color:#94a3b8;line-height:2">
+                <strong>ID:</strong> ${org.id}<br>
+                <strong>Tipo:</strong> ${org.org_type}<br>
+                <strong>Creato:</strong> ${fmtDate(org.created_at)}<br>
+                ${org.parent_org_id ? '<strong>Parent org:</strong> ' + org.parent_org_id + '<br>' : ''}
+                ${org.partnership_model ? '<strong>Modello partnership:</strong> ' + org.partnership_model + '<br>' : ''}
+                ${org.revenue_share_pct ? '<strong>Revenue share:</strong> ' + org.revenue_share_pct + '%<br>' : ''}
+            </div>`;
+    } catch(e) { showAlert(e.message, 'error'); }
+}
+
+function renderLimits(plan) {
+    if (!plan) { document.getElementById('limits-grid').innerHTML = '<div class="empty">Piano non trovato</div>'; return; }
+    const lims = [
+        { label: 'Max trasformazioni/mese', value: plan.max_transforms_month || '∞' },
+        { label: 'Max AI calls/mese', value: plan.max_ai_calls_month || '∞' },
+        { label: 'Max utenti', value: plan.max_users || '∞' },
+        { label: 'Max API token', value: plan.max_api_tokens || '∞' },
+        { label: 'Max partner', value: plan.max_partners || '∞' },
+        { label: 'Max file size', value: plan.max_file_size_mb + ' MB' },
+        { label: 'Max storage', value: plan.max_storage_mb ? (plan.max_storage_mb/1024).toFixed(0) + ' GB' : '∞' },
+        { label: 'Max sub-org', value: plan.max_sub_orgs || '∞' },
+    ];
+    document.getElementById('limits-grid').innerHTML = lims.map(l =>
+        `<div class="limit-item"><div class="limit-label">${l.label}</div><div class="limit-value">${l.value}</div></div>`
+    ).join('');
+}
+
+async function saveSettings() {
+    const data = {};
+    const fields = {
+        name: 'f-name', industry: 'f-industry', website: 'f-website',
+        country: 'f-country', currency: 'f-currency',
+        vat_number: 'f-vat', fiscal_code: 'f-fiscal', sdi_code: 'f-sdi',
+        pec_email: 'f-pec', billing_email: 'f-billing-email',
+    };
+    for (const [key, id] of Object.entries(fields)) {
+        const v = document.getElementById(id).value.trim();
+        if (v !== (orgData[key] || '')) data[key] = v || null;
+    }
+    if (!Object.keys(data).length) return showAlert('Nessuna modifica', 'info');
+    try {
+        await apiFetch('/org', { method: 'PUT', body: JSON.stringify(data) });
+        showAlert('Impostazioni salvate!');
+        loadSettings();
+    } catch(e) { showAlert(e.message, 'error'); }
+}
+
+// ═══ TOKEN STATS ════════════════════════════════════════════════════════
+
+async function loadTokenStats() {
+    try {
+        const stats = await apiFetch('/tokens/stats');
+        tokenStats = stats;
+        const c = stats.counts || {};
+        document.getElementById('ts-active').textContent = fmtNum(c.active || 0);
+        document.getElementById('ts-total-uses').textContent = fmtNum(c.total_uses || 0);
+        document.getElementById('ts-expiring').textContent = (stats.expiring_soon || []).length;
+        document.getElementById('ts-revoked').textContent = fmtNum(c.revoked || 0);
+
+        // Expiring soon section
+        const expiring = stats.expiring_soon || [];
+        const expSec = document.getElementById('expiring-section');
+        if (expiring.length > 0) {
+            expSec.style.display = '';
+            document.getElementById('expiring-count').textContent = expiring.length;
+            document.getElementById('expiring-list').innerHTML = expiring.map(t => `
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #1e2235">
+                    <div>
+                        <strong>${escHtml(t.name)}</strong>
+                        <span class="token-prefix">${t.token_prefix}</span>
+                    </div>
+                    <div>
+                        <span class="expiring-badge">Scade ${fmtDate(t.expires_at)}</span>
+                        <button class="btn btn-sm btn-warning" onclick="openRotateModal('${t.id}', '${escHtml(t.name)}')">🔄 Ruota</button>
+                    </div>
+                </div>
+            `).join('');
+        } else {
+            expSec.style.display = 'none';
+        }
+    } catch(e) {
+        console.error('Token stats error:', e);
+    }
+}
+
+// ═══ TOKEN LIST ═════════════════════════════════════════════════════════
+
+async function loadTokens() {
+    const includeRevoked = document.getElementById('show-revoked')?.checked || false;
+    try {
+        const data = await apiFetch('/tokens?include_revoked=' + includeRevoked);
+        tokensData = data.tokens || [];
+        renderTokenTable();
+    } catch(e) {
+        document.getElementById('tokens-tbody').innerHTML = `<tr><td colspan="8" class="empty">Errore: ${escHtml(e.message)}</td></tr>`;
+    }
+}
+
+function renderTokenTable() {
+    const tbody = document.getElementById('tokens-tbody');
+    document.getElementById('token-count-label').textContent = tokensData.length + ' token trovati';
+
+    if (!tokensData.length) {
+        tbody.innerHTML = `<tr><td colspan="8" class="empty">
+            Nessun API key creato.<br>
+            <button class="btn btn-primary" style="margin-top:10px" onclick="openCreateTokenModal()">➕ Crea il primo API Key</button>
+        </td></tr>`;
+        return;
+    }
+
+    tbody.innerHTML = tokensData.map(t => {
+        const scopes = Array.isArray(t.scopes) ? t.scopes : (typeof t.scopes === 'string' ? JSON.parse(t.scopes) : []);
+        const scopeHtml = scopes.slice(0, 3).map(s => `<span class="scope-tag">${s}</span>`).join('') +
+            (scopes.length > 3 ? `<span class="scope-tag">+${scopes.length - 3}</span>` : '');
+
+        const isActive = t.status === 'active';
+        const expiresWarning = t.expires_at && isActive && new Date(t.expires_at) < new Date(Date.now() + 7 * 86400000)
+            ? '<span class="expiring-badge">In scadenza</span>' : '';
+
+        return `<tr>
+            <td>
+                <div style="font-weight:600">${escHtml(t.name)}</div>
+                ${t.description ? `<div style="font-size:11px;color:#64748b;margin-top:2px">${escHtml(t.description).substring(0,50)}</div>` : ''}
+            </td>
+            <td><span class="token-prefix">${t.token_prefix}</span></td>
+            <td><span class="badge badge-${t.environment}">${t.environment}</span></td>
+            <td>${scopeHtml}</td>
+            <td><span class="badge badge-${t.status}">${t.status}</span>${expiresWarning}</td>
+            <td style="font-size:12px;color:#94a3b8">${timeAgo(t.last_used_at)}</td>
+            <td style="font-size:12px">${fmtNum(t.use_count)}</td>
+            <td>
+                <div class="token-actions">
+                    <button class="btn btn-sm btn-outline" onclick="openTokenDetail('${t.id}')" title="Dettaglio">🔍</button>
+                    ${isActive ? `
+                        <button class="btn btn-sm btn-outline" onclick="openEditModal('${t.id}')" title="Modifica">✏️</button>
+                        <button class="btn btn-sm btn-outline" onclick="openRotateModal('${t.id}', '${escHtml(t.name)}')" title="Ruota">🔄</button>
+                        <button class="btn btn-sm btn-danger" onclick="openRevokeModal('${t.id}', '${escHtml(t.name)}')" title="Revoca">🗑️</button>
+                    ` : ''}
+                </div>
+            </td>
+        </tr>`;
+    }).join('');
+}
+
+// ═══ CREATE TOKEN ═══════════════════════════════════════════════════════
+
+function openCreateTokenModal() {
+    // Reset form
+    document.getElementById('ct-name').value = '';
+    document.getElementById('ct-desc').value = '';
+    document.getElementById('ct-env').value = 'live';
+    document.getElementById('ct-rpm').value = '';
+    document.getElementById('ct-rph').value = '';
+    document.getElementById('ct-rpd').value = '';
+    document.getElementById('ct-expires').value = '';
+    document.getElementById('ct-ips').value = '';
+
+    // Render scope checkboxes
+    const grid = document.getElementById('ct-scopes');
+    grid.innerHTML = VALID_SCOPES.map(s => `
+        <div class="checkbox-item" onclick="this.classList.toggle('checked'); this.querySelector('input').checked = !this.querySelector('input').checked">
+            <input type="checkbox" value="${s}" ${s === 'transform:execute' ? 'checked' : ''}>
+            <label>${SCOPE_LABELS[s] || s}</label>
+        </div>
+    `).join('');
+    // Set default checked state
+    grid.querySelector('.checkbox-item')?.classList.add('checked');
+
+    openModal('modal-create');
+}
+
+async function createToken() {
+    const name = document.getElementById('ct-name').value.trim();
+    if (!name) return showAlert('Il nome è obbligatorio', 'error');
+
+    const scopes = [...document.querySelectorAll('#ct-scopes input:checked')].map(c => c.value);
+    if (!scopes.length) return showAlert('Seleziona almeno uno scope', 'error');
+
+    const ipsRaw = document.getElementById('ct-ips').value.trim();
+    const ips = ipsRaw ? ipsRaw.split('\n').map(s => s.trim()).filter(Boolean) : null;
+
+    const body = {
+        name,
+        description: document.getElementById('ct-desc').value.trim() || null,
+        environment: document.getElementById('ct-env').value,
+        scopes,
+        rate_limit_rpm: parseInt(document.getElementById('ct-rpm').value) || null,
+        rate_limit_rph: parseInt(document.getElementById('ct-rph').value) || null,
+        rate_limit_rpd: parseInt(document.getElementById('ct-rpd').value) || null,
+        expires_in_days: parseInt(document.getElementById('ct-expires').value) || null,
+        allowed_ips: ips,
+    };
+
+    try {
+        const res = await apiFetch('/tokens', { method: 'POST', body: JSON.stringify(body) });
+        closeModal('modal-create');
+
+        // Show token one-time
+        createdTokenValue = res.token_value;
+        document.getElementById('created-token-value').textContent = res.token_value;
+        document.getElementById('created-token-name').textContent = name;
+        document.getElementById('created-token-env').textContent = body.environment;
+        openModal('modal-token-created');
+
+        loadTokens();
+        loadTokenStats();
+    } catch(e) {
+        showAlert(e.message, 'error');
+    }
+}
+
+function copyCreatedToken() {
+    if (!createdTokenValue) return;
+    navigator.clipboard.writeText(createdTokenValue).then(() => {
+        const btn = document.querySelector('#modal-token-created .token-copy-btn');
+        btn.textContent = '✅ Copiato!';
+        btn.classList.add('copied');
+        setTimeout(() => { btn.textContent = '📋 Copia'; btn.classList.remove('copied'); }, 2000);
+    }).catch(() => {
+        // Fallback: select text
+        const el = document.getElementById('created-token-value');
+        const range = document.createRange();
+        range.selectNodeContents(el);
+        window.getSelection().removeAllRanges();
+        window.getSelection().addRange(range);
+        showAlert('Seleziona e copia manualmente (Ctrl+C)', 'info');
+    });
+}
+
+function confirmTokenCopied() {
+    createdTokenValue = null;
+    closeModal('modal-token-created');
+    showAlert('API Key creata con successo!');
+}
+
+// ═══ TOKEN DETAIL ═══════════════════════════════════════════════════════
+
+async function openTokenDetail(tokenId) {
+    document.getElementById('detail-body').innerHTML = '<div class="loading">Caricamento...</div>';
+    openModal('modal-detail');
+
+    try {
+        const [detail, auditData] = await Promise.all([
+            apiFetch('/tokens/' + tokenId),
+            apiFetch('/tokens/' + tokenId + '/audit?limit=20'),
+        ]);
+        const t = detail.token;
+        const scopes = Array.isArray(t.scopes) ? t.scopes : JSON.parse(t.scopes || '[]');
+        const ips = t.allowed_ips ? (Array.isArray(t.allowed_ips) ? t.allowed_ips : JSON.parse(t.allowed_ips)) : [];
+
+        document.getElementById('detail-title').textContent = '🔑 ' + t.name;
+
+        let html = `
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+                <div><span style="color:#64748b;font-size:11px">STATO</span><br><span class="badge badge-${t.status}">${t.status}</span></div>
+                <div><span style="color:#64748b;font-size:11px">AMBIENTE</span><br><span class="badge badge-${t.environment}">${t.environment}</span></div>
+                <div><span style="color:#64748b;font-size:11px">PREFIX</span><br><span class="token-prefix">${t.token_prefix}</span></div>
+                <div><span style="color:#64748b;font-size:11px">CHIAMATE</span><br><strong>${fmtNum(t.use_count)}</strong></div>
+                <div><span style="color:#64748b;font-size:11px">CREATO</span><br>${fmtDateTime(t.created_at)}</div>
+                <div><span style="color:#64748b;font-size:11px">ULTIMO USO</span><br>${timeAgo(t.last_used_at)}</div>
+                ${t.expires_at ? `<div><span style="color:#64748b;font-size:11px">SCADENZA</span><br>${fmtDate(t.expires_at)}</div>` : ''}
+                ${t.last_used_ip ? `<div><span style="color:#64748b;font-size:11px">ULTIMO IP</span><br><span style="font-family:monospace;font-size:12px">${t.last_used_ip}</span></div>` : ''}
+                ${t.created_by_email ? `<div><span style="color:#64748b;font-size:11px">CREATO DA</span><br>${escHtml(t.created_by_email)}</div>` : ''}
+            </div>
+            ${t.description ? `<div style="margin-bottom:12px"><span style="color:#64748b;font-size:11px">DESCRIZIONE</span><br><span style="font-size:13px">${escHtml(t.description)}</span></div>` : ''}
+            <div style="margin-bottom:12px">
+                <span style="color:#64748b;font-size:11px">PERMESSI</span><br>
+                ${scopes.map(s => `<span class="scope-tag">${s}</span>`).join(' ')}
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px">
+                <div style="background:#0d1220;padding:8px;border-radius:6px;text-align:center">
+                    <div style="font-size:11px;color:#64748b">RPM</div>
+                    <div style="font-weight:600">${t.rate_limit_rpm || 60}</div>
+                </div>
+                <div style="background:#0d1220;padding:8px;border-radius:6px;text-align:center">
+                    <div style="font-size:11px;color:#64748b">RPH</div>
+                    <div style="font-weight:600">${t.rate_limit_rph || 1000}</div>
+                </div>
+                <div style="background:#0d1220;padding:8px;border-radius:6px;text-align:center">
+                    <div style="font-size:11px;color:#64748b">RPD</div>
+                    <div style="font-weight:600">${t.rate_limit_rpd || 10000}</div>
+                </div>
+            </div>
+            ${ips.length ? `<div style="margin-bottom:12px"><span style="color:#64748b;font-size:11px">IP CONSENTITI</span><br><span style="font-family:monospace;font-size:12px">${ips.join(', ')}</span></div>` : ''}
+            ${t.revoked_at ? `<div style="margin-bottom:12px;padding:10px;background:rgba(198,40,40,.1);border-radius:6px"><span style="color:#f87171;font-weight:600">Revocato</span> il ${fmtDateTime(t.revoked_at)}${t.revoke_reason ? ' — ' + escHtml(t.revoke_reason) : ''}</div>` : ''}
+        `;
+
+        // Audit log
+        const logs = auditData.audit_log || [];
+        if (logs.length > 0) {
+            html += `<div style="margin-top:16px"><span style="color:#64748b;font-size:11px">ATTIVITÀ RECENTE</span></div>`;
+            html += `<div style="background:#0d1220;border-radius:8px;margin-top:8px;max-height:200px;overflow-y:auto">`;
+            html += logs.map(l => `
+                <div class="audit-entry">
+                    <span class="audit-event ${l.event_type}">${l.event_type}</span>
+                    <span class="audit-time">${fmtDateTime(l.created_at)}</span>
+                    <span class="audit-details">${l.ip_address || ''} ${l.endpoint || ''}</span>
+                </div>
+            `).join('');
+            html += `</div>`;
+        }
+
+        document.getElementById('detail-body').innerHTML = html;
+    } catch(e) {
+        document.getElementById('detail-body').innerHTML = `<div class="alert alert-error">${escHtml(e.message)}</div>`;
+    }
+}
+
+// ═══ EDIT TOKEN ═════════════════════════════════════════════════════════
+
+async function openEditModal(tokenId) {
+    editingTokenId = tokenId;
+    try {
+        const data = await apiFetch('/tokens/' + tokenId);
+        const t = data.token;
+        const scopes = Array.isArray(t.scopes) ? t.scopes : JSON.parse(t.scopes || '[]');
+        const ips = t.allowed_ips ? (Array.isArray(t.allowed_ips) ? t.allowed_ips : JSON.parse(t.allowed_ips)) : [];
+
+        document.getElementById('et-name').value = t.name || '';
+        document.getElementById('et-prefix').value = t.token_prefix || '';
+        document.getElementById('et-desc').value = t.description || '';
+        document.getElementById('et-rpm').value = t.rate_limit_rpm || '';
+        document.getElementById('et-rph').value = t.rate_limit_rph || '';
+        document.getElementById('et-rpd').value = t.rate_limit_rpd || '';
+        document.getElementById('et-ips').value = ips.join('\n');
+
+        // Render scope checkboxes
+        const grid = document.getElementById('et-scopes');
+        grid.innerHTML = VALID_SCOPES.map(s => {
+            const checked = scopes.includes(s);
+            return `<div class="checkbox-item ${checked ? 'checked' : ''}" onclick="this.classList.toggle('checked'); this.querySelector('input').checked = !this.querySelector('input').checked">
+                <input type="checkbox" value="${s}" ${checked ? 'checked' : ''}>
+                <label>${SCOPE_LABELS[s] || s}</label>
+            </div>`;
+        }).join('');
+
+        openModal('modal-edit');
+    } catch(e) {
+        showAlert(e.message, 'error');
+    }
+}
+
+async function saveTokenEdit() {
+    if (!editingTokenId) return;
+
+    const scopes = [...document.querySelectorAll('#et-scopes input:checked')].map(c => c.value);
+    if (!scopes.length) return showAlert('Seleziona almeno uno scope', 'error');
+
+    const ipsRaw = document.getElementById('et-ips').value.trim();
+    const ips = ipsRaw ? ipsRaw.split('\n').map(s => s.trim()).filter(Boolean) : null;
+
+    const body = {
+        name: document.getElementById('et-name').value.trim() || undefined,
+        description: document.getElementById('et-desc').value.trim() || undefined,
+        scopes,
+        rate_limit_rpm: parseInt(document.getElementById('et-rpm').value) || undefined,
+        rate_limit_rph: parseInt(document.getElementById('et-rph').value) || undefined,
+        rate_limit_rpd: parseInt(document.getElementById('et-rpd').value) || undefined,
+        allowed_ips: ips,
+    };
+
+    // Remove undefined
+    Object.keys(body).forEach(k => body[k] === undefined && delete body[k]);
+
+    try {
+        await apiFetch('/tokens/' + editingTokenId, { method: 'PUT', body: JSON.stringify(body) });
+        closeModal('modal-edit');
+        showAlert('Token aggiornato!');
+        loadTokens();
+    } catch(e) {
+        showAlert(e.message, 'error');
+    }
+}
+
+// ═══ REVOKE TOKEN ═══════════════════════════════════════════════════════
+
+function openRevokeModal(tokenId, name) {
+    pendingAction = { id: tokenId, name };
+    document.getElementById('revoke-token-name').textContent = name;
+    document.getElementById('revoke-reason').value = '';
+    openModal('modal-revoke');
+}
+
+async function confirmRevoke() {
+    if (!pendingAction.id) return;
+    const reason = document.getElementById('revoke-reason').value.trim();
+    try {
+        await apiFetch('/tokens/' + pendingAction.id, {
+            method: 'DELETE',
+            body: JSON.stringify({ reason: reason || null }),
+        });
+        closeModal('modal-revoke');
+        showAlert('Token "' + pendingAction.name + '" revocato!');
+        pendingAction = { id: null, name: null };
+        loadTokens();
+        loadTokenStats();
+    } catch(e) {
+        showAlert(e.message, 'error');
+    }
+}
+
+// ═══ ROTATE TOKEN ═══════════════════════════════════════════════════════
+
+function openRotateModal(tokenId, name) {
+    pendingAction = { id: tokenId, name };
+    document.getElementById('rotate-token-name').textContent = name;
+    openModal('modal-rotate');
+}
+
+async function confirmRotate() {
+    if (!pendingAction.id) return;
+    try {
+        const res = await apiFetch('/tokens/' + pendingAction.id + '/rotate', { method: 'POST' });
+        closeModal('modal-rotate');
+
+        // Show new token one-time
+        createdTokenValue = res.token_value;
+        document.getElementById('created-token-value').textContent = res.token_value;
+        document.getElementById('created-token-name').textContent = pendingAction.name + ' (ruotato)';
+        document.getElementById('created-token-env').textContent = res.token?.environment || 'live';
+        openModal('modal-token-created');
+
+        pendingAction = { id: null, name: null };
+        loadTokens();
+        loadTokenStats();
+    } catch(e) {
+        showAlert(e.message, 'error');
+    }
+}
+
+// ═══ AUDIT LOG ══════════════════════════════════════════════════════════
+
+async function loadAuditLog() {
+    const container = document.getElementById('audit-log-container');
+    container.innerHTML = '<div class="loading">Caricamento audit log...</div>';
+    try {
+        const data = await apiFetch('/tokens/audit?limit=100');
+        const logs = data.audit_log || [];
+        document.getElementById('audit-count').textContent = logs.length;
+
+        if (!logs.length) {
+            container.innerHTML = '<div class="empty">Nessuna attività registrata</div>';
+            return;
+        }
+
+        container.innerHTML = `<div style="max-height:500px;overflow-y:auto">` +
+            logs.map(l => {
+                const details = l.details || {};
+                let detailStr = '';
+                if (details.reason) detailStr = 'Motivo: ' + details.reason;
+                else if (details.name) detailStr = details.name;
+                else if (details.fields) detailStr = 'Campi: ' + details.fields.join(', ');
+                else if (details.old_token_id) detailStr = 'Da: ' + details.old_token_id.substring(0, 8) + '...';
+
+                return `<div class="audit-entry">
+                    <span class="audit-event ${l.event_type}">${l.event_type}</span>
+                    <span class="audit-time">${fmtDateTime(l.created_at)}</span>
+                    <span style="font-family:monospace;font-size:11px;color:#64748b;min-width:80px">${(l.token_id || '').substring(0, 8)}...</span>
+                    <span class="audit-details">${l.ip_address || ''} ${detailStr}</span>
+                </div>`;
+            }).join('') +
+            `</div>`;
+    } catch(e) {
+        container.innerHTML = `<div class="alert alert-error">${escHtml(e.message)}</div>`;
+    }
+}
+
+// ═══ INIT ═══════════════════════════════════════════════════════════════
+
+loadSettings();
+
+// Check URL hash for tab
+const hash = window.location.hash.replace('#', '');
+if (['tokens', 'audit'].includes(hash)) {
+    switchTab(hash);
+}
+
+</script>
+<script src="/assets/topbar.js"></script>
+</body>
+</html>

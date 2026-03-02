@@ -1192,58 +1192,8 @@
     <script>
         const { useState, useEffect, useRef } = React;
         const API_URL = '/api';
-
-        // ── Context-aware fetch: aggiunge X-Context header a tutte le /api/ calls ──
-        (function() {
-            const _origFetch = window.fetch;
-            window.fetch = function(url, opts) {
-                opts = opts || {};
-                // Solo per chiamate API locali
-                if (typeof url === 'string' && (url.startsWith('/api') || url.startsWith(API_URL))) {
-                    opts.headers = opts.headers || {};
-                    // Inietta X-Context dal localStorage
-                    try {
-                        const ud = JSON.parse(localStorage.getItem('buddyliko_user') || '{}');
-                        if (ud.context) {
-                            opts.headers['X-Context'] = ud.context;
-                        }
-                    } catch(e) {}
-                }
-                return _origFetch.call(this, url, opts);
-            };
-        })();
-
-        // ── Listener per context switch dal topbar ──
-        window.addEventListener('buddyliko:context-changed', function(e) {
-            const detail = e.detail || {};
-            console.log('[App] Contesto cambiato:', detail.context, detail.org?.org_name || 'personale');
-            // Ricarica la pagina per riflettere il nuovo contesto
-            // (schemas, projects, usage saranno filtrati dal backend)
-            window.location.reload();
-        });
-
-        // ── Safe JSON response parser (handles nginx HTML error pages) ──
-        async function safeJsonResponse(res) {
-            const contentType = res.headers.get('content-type') || '';
-            if (contentType.includes('application/json')) {
-                return await res.json();
-            }
-            // Non-JSON response (nginx error page, proxy error, etc.)
-            const text = await res.text();
-            // Try to extract title from HTML error page
-            const titleMatch = text.match(/<title>(.*?)<\/title>/i);
-            const errorTitle = titleMatch ? titleMatch[1] : `HTTP ${res.status}`;
-            // Map common nginx errors to user-friendly messages
-            const hints = {
-                413: 'File troppo grande per il server. Controlla nginx client_max_body_size.',
-                502: 'Backend non raggiungibile. Il servizio potrebbe essere in riavvio.',
-                504: 'Timeout del server. Il file potrebbe essere troppo grande.',
-                405: 'Metodo non permesso. Possibile errore di routing nginx.',
-            };
-            const hint = hints[res.status] || '';
-            const msg = hint ? `${errorTitle} — ${hint}` : errorTitle;
-            throw new Error(msg);
-        }
+        
+        // Hover Popup Component
         function HoverPopup({ popup, setPopupPinned, setHoverPopup }) {
             if (!popup) return null;
             
@@ -2233,7 +2183,7 @@
                                         method: 'POST',
                                         body: formData
                                     });
-                                    const schema = await safeJsonResponse(uploadRes);
+                                    const schema = await uploadRes.json();
                                     onSchemaSelect(schema, 'input', { schema: schemaTree, schemaId });
                                     onClose();
                                 } catch (err) {
@@ -2259,7 +2209,7 @@
                                         method: 'POST',
                                         body: formData
                                     });
-                                    const schema = await safeJsonResponse(uploadRes);
+                                    const schema = await uploadRes.json();
                                     onSchemaSelect(schema, 'output', { schema: schemaTree, schemaId });
                                     onClose();
                                 } catch (err) {
@@ -2795,14 +2745,6 @@
             const canvasRef = useRef(null);
             const hoverTimeoutRef = useRef(null);
             
-            // Force React re-render on language change
-            const [langKey, setLangKey] = useState(0);
-            useEffect(() => {
-                const h = () => setLangKey(k => k + 1);
-                window.addEventListener('langchange', h);
-                return () => window.removeEventListener('langchange', h);
-            }, []);
-            
             const showStatus = (message, type) => {
                 setStatusMessage({ message, type });
                 setTimeout(() => setStatusMessage(null), 5000);
@@ -2982,11 +2924,7 @@
                         body: formData
                     });
                     
-                    const result = await safeJsonResponse(response);
-                    
-                    if (!response.ok) {
-                        throw new Error(result.detail || 'Upload failed');
-                    }
+                    const result = await response.json();
                     
                     if (result.success) {
                         if (direction === 'input') {
@@ -3527,29 +3465,6 @@
 
             // Controlla se c'è un file da aprire dal Workspace (impostato da openInMapper)
             React.useEffect(() => {
-                // Gestione apertura da Standards Library
-                const openStandard = sessionStorage.getItem('buddyliko_open_standard');
-                if (openStandard) {
-                    sessionStorage.removeItem('buddyliko_open_standard');
-                    try {
-                        const ref = JSON.parse(openStandard);
-                        showStatus('⏳ Caricamento schema ' + ref.name + '...', 'info');
-                        const token = localStorage.getItem('buddyliko_token');
-                        fetch('/api/standards/' + ref.slug, {headers:{'Authorization':'Bearer '+token}})
-                        .then(r=>r.json()).then(s=>{
-                            const csvUrl = s.mapper_csv_url || '';
-                            if (csvUrl && (csvUrl.endsWith('.csv') || csvUrl.includes('csv'))) {
-                                fetch(csvUrl).then(r=>r.blob()).then(blob=>{
-                                    const file = new File([blob], ref.slug + '_schema.csv', {type:'text/csv'});
-                                    uploadSchema(file, ref.direction, 'auto');
-                                }).catch(()=>showStatus('⚠️ Schema URL non raggiungibile. Carica il file manualmente.', 'warning'));
-                            } else {
-                                showStatus('ℹ️ Standard ' + ref.name + ' caricato. Schema CSV non disponibile direttamente — caricalo dal Workspace.', 'info');
-                            }
-                        });
-                    } catch(e) { console.error('open_standard error', e); }
-                }
-
                 const openFile = sessionStorage.getItem('buddyliko_open_file');
                 if (openFile) {
                     sessionStorage.removeItem('buddyliko_open_file');
@@ -3798,44 +3713,30 @@
                     if (!file) return;
                     const token = localStorage.getItem('buddyliko_token');
 
-                    // Route by extension first, then by format detection
-                    const ext = file.name.split('.').pop().toLowerCase();
-                    let endpoint = null;
-                    let statusLabel = 'EDI';
+                    // Detect format
+                    const detectRes = await fetch(`${API_URL}/edi/detect`, {
+                        method: 'POST',
+                        headers: token ? { 'Authorization': `Bearer ${token}` } : {},
+                        body: (() => { const f = new FormData(); f.append('file', file); return f; })()
+                    });
+                    const detectData = detectRes.ok ? await detectRes.json() : {};
+                    const fmt = detectData.format || 'UNKNOWN';
 
-                    if (ext === 'json') {
-                        endpoint = '/json/schema-from-file';
-                        statusLabel = 'JSON';
-                    } else {
-                        // Detect format
-                        const detectRes = await fetch(`${API_URL}/edi/detect`, {
+                    // Route to correct parser
+                    let endpoint = '/edi/schema-from-file';
+                    if (fmt === 'HL7v2' || fmt === 'FHIR_JSON' || fmt === 'FHIR_XML') {
+                        endpoint = '/hl7/schema-from-file';
+                    } else if (fmt === 'UNKNOWN') {
+                        // Try HL7 detect
+                        const hlDetect = await fetch(`${API_URL}/hl7/detect`, {
                             method: 'POST',
                             headers: token ? { 'Authorization': `Bearer ${token}` } : {},
                             body: (() => { const f = new FormData(); f.append('file', file); return f; })()
                         });
-                        const detectData = detectRes.ok ? await detectRes.json() : {};
-                        const fmt = detectData.format || 'UNKNOWN';
-
-                        // Route to correct parser
-                        if (fmt !== 'UNKNOWN') {
-                            if (fmt === 'HL7v2' || fmt === 'FHIR_JSON' || fmt === 'FHIR_XML') {
-                                endpoint = '/hl7/schema-from-file';
-                            } else {
-                                endpoint = '/edi/schema-from-file';
-                            }
-                        } else {
-                            // Try HL7 detect
-                            const hlDetect = await fetch(`${API_URL}/hl7/detect`, {
-                                method: 'POST',
-                                headers: token ? { 'Authorization': `Bearer ${token}` } : {},
-                                body: (() => { const f = new FormData(); f.append('file', file); return f; })()
-                            });
-                            if (hlDetect.ok) {
-                                const hlData = await hlDetect.json();
-                                if (hlData.format !== 'UNKNOWN') endpoint = '/hl7/schema-from-file';
-                            }
+                        if (hlDetect.ok) {
+                            const hlData = await hlDetect.json();
+                            if (hlData.format !== 'UNKNOWN') endpoint = '/hl7/schema-from-file';
                         }
-                        if (!endpoint) endpoint = '/edi/schema-from-file';
                     }
 
                     const formData = new FormData();
@@ -5417,6 +5318,16 @@
         
         function Sidebar({ inputSchema, outputSchema, connections, activeTab, setActiveTab, setShowUploadModal, setUploadDirection, downloadSampleCSV, exportFieldsCSV, statusMessage, setDraggedField, selectedConnection, setSelectedConnection, uploadExampleFile, inputExample, outputExample, loadAvailableSchemas, showStatus, availableInputSchemas, availableOutputSchemas, inputSchemaId, setInputSchemaId, outputSchemaId, setOutputSchemaId, exportDiagram, setShowAccountModal }) {
             return React.createElement('div', { className: 'sidebar' },
+                React.createElement('div', { className: 'sidebar-header' },
+                    React.createElement('img', {
+                        src: '/assets/logo-new.png',
+                        alt: 'Buddyliko',
+                        style: {
+                            width: '100%',
+                            display: 'block'
+                        }
+                    })
+                ),
                 React.createElement('div', { className: 'sidebar-content' },
                     statusMessage && React.createElement('div', { 
                         className: `status-message status-${statusMessage.type}` 
@@ -5553,16 +5464,16 @@
                     activeTab === 'schemas' && React.createElement('div', { style: { padding: '10px' } },
                         React.createElement('h3', { style: { marginBottom: '15px', fontSize: '16px' } }, '📋 Schema Management'),
                         React.createElement('p', { style: { fontSize: '13px', color: '#666', marginBottom: '15px' } }, 
-                            'Upload schema files: ZIP (with XSD + rules.sch), single XSD, JSON Schema, or JSON sample.'
+                            'Upload a ZIP file containing schema.xsd and rules.sch. The schema will be added to both input/ and output/ directories.'
                         ),
                         React.createElement('label', {
                             className: 'btn btn-primary btn-full',
                             style: { cursor: 'pointer', marginBottom: '10px' }
                         }, 
-                            '📦 Upload Schema',
+                            '📦 Upload Schema ZIP',
                             React.createElement('input', {
                                 type: 'file',
-                                accept: '.zip,.xsd,.json',
+                                accept: '.zip',
                                 style: { display: 'none' },
                                 onChange: async (e) => {
                                     const file = e.target.files[0];
@@ -5579,12 +5490,12 @@
                                             body: formData
                                         });
                                         
-                                        const data = await safeJsonResponse(res);
-                                        
                                         if (!res.ok) {
-                                            throw new Error(data.detail || 'Upload failed');
+                                            const error = await res.json();
+                                            throw new Error(error.detail || 'Upload failed');
                                         }
                                         
+                                        const data = await res.json();
                                         showStatus(`✅ Schema "${data.schemaName}" uploaded successfully!`, 'success');
                                         
                                         // Reload schemas list
@@ -5600,9 +5511,9 @@
                             })
                         ),
                         React.createElement('div', { style: { marginTop: '20px', padding: '10px', background: '#f0f0f0', borderRadius: '6px', fontSize: '12px' } },
-                            React.createElement('strong', null, 'Supported Formats:'),
+                            React.createElement('strong', null, 'ZIP Structure:'),
                             React.createElement('pre', { style: { margin: '5px 0', fontFamily: 'monospace', fontSize: '11px' } },
-                                `ZIP → schema_name/\n  ├── schema.xsd (required)\n  └── rules.sch (optional)\nXSD → single .xsd file\nJSON → sample or JSON Schema`
+                                `schema_name/\n  ├── schema.xsd (required)\n  └── rules.sch (optional)`
                             )
                         ),
                         React.createElement('button', {
@@ -7564,8 +7475,6 @@
                             onChange: (e) => setType(e.target.value)
                         },
                             React.createElement('option', { value: 'csv' }, '📊 CSV (Recommended)'),
-                            React.createElement('option', { value: 'json' }, '📋 JSON Sample'),
-                            React.createElement('option', { value: 'json_schema' }, '📐 JSON Schema'),
                             React.createElement('option', { value: 'xsd' }, '📄 XSD'),
                             React.createElement('option', { value: 'idoc' }, '📊 IDOC')
                         )

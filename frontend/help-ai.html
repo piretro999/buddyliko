@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="it"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Help AI — Buddyliko</title>
+<link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+<script src="/lang/i18n.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui,-apple-system,sans-serif;background:#0a0e1a;color:#e2e8f0;height:100vh;display:flex;flex-direction:column}
+.chat-container{flex:1;display:flex;flex-direction:column;max-width:860px;margin:0 auto;width:100%;padding:0 16px}
+.chat-header{padding:16px 0;text-align:center;border-bottom:1px solid #1e2235}
+.chat-header h1{font-size:20px;font-weight:700}.chat-header p{color:#94a3b8;font-size:12px;margin-top:4px}
+.messages{flex:1;overflow-y:auto;padding:16px 0;display:flex;flex-direction:column;gap:12px}
+.msg{max-width:85%;padding:12px 16px;border-radius:12px;font-size:14px;line-height:1.6;word-break:break-word}
+.msg-user{background:#1e3a5f;align-self:flex-end;border-bottom-right-radius:4px}
+.msg-ai{background:#141b2d;border:1px solid #2e3250;align-self:flex-start;border-bottom-left-radius:4px}
+.msg-ai pre{background:#0a0e1a;padding:10px;border-radius:6px;overflow-x:auto;font-size:12px;margin:8px 0}
+.msg-ai code{font-family:'Fira Code',monospace;font-size:12px}
+.msg-ai p{margin-bottom:8px}.msg-ai p:last-child{margin-bottom:0}
+.msg-ai ul,.msg-ai ol{margin:8px 0 8px 20px}.msg-ai li{margin-bottom:4px}
+.msg-ai strong{color:#93c5fd}
+.msg-thinking{color:#64748b;font-style:italic;font-size:13px}
+.proc-badge{display:inline-block;background:#1e3a5f;color:#60a5fa;font-size:10px;padding:2px 8px;border-radius:10px;margin:2px 2px 0 0}
+.proc-info{margin-top:6px;padding-top:6px;border-top:1px solid #2e3250}
+.input-area{padding:12px 0 20px;display:flex;gap:8px;align-items:flex-end}
+.input-area textarea{flex:1;background:#141b2d;border:1px solid #2e3250;color:#e2e8f0;border-radius:10px;padding:10px 14px;font-size:14px;font-family:inherit;resize:none;min-height:44px;max-height:120px;outline:none;transition:border .2s}
+.input-area textarea:focus{border-color:#3b82f6}
+.send-btn{background:#2563eb;color:#fff;border:none;border-radius:10px;width:44px;height:44px;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;transition:opacity .2s;flex-shrink:0}
+.send-btn:hover{opacity:.85}.send-btn:disabled{opacity:.4;cursor:not-allowed}
+.suggestions{display:flex;gap:8px;flex-wrap:wrap;padding:8px 0}
+.suggestion{background:#141b2d;border:1px solid #2e3250;color:#94a3b8;padding:6px 12px;border-radius:16px;font-size:12px;cursor:pointer;transition:all .15s}
+.suggestion:hover{border-color:#3b82f6;color:#e2e8f0}
+@media(max-width:600px){.msg{max-width:92%}}
+</style></head>
+<body>
+<div id="buddy-topbar"></div>
+<div class="chat-container">
+    <div class="chat-header">
+        <h1 id="h-title">🤖 Help AI</h1>
+        <p id="h-sub"></p>
+    </div>
+    <div class="messages" id="messages"></div>
+    <div class="input-area">
+        <textarea id="input" rows="1"
+            onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMessage()}"
+            oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,120)+'px'"></textarea>
+        <button class="send-btn" id="send-btn" onclick="sendMessage()">➤</button>
+    </div>
+</div>
+<script>
+const token=localStorage.getItem('buddyliko_token');if(!token)window.location.href='login.html';
+const lang=(localStorage.getItem('buddyliko_lang')||navigator.language?.slice(0,2)||'it');
+const isEN=lang==='en';
+
+// i18n helper
+function L(it,en){return isEN?en:it}
+
+// Fill page text
+document.getElementById('h-title').textContent='🤖 '+L('Help AI — Assistente Buddyliko','Help AI — Buddyliko Assistant');
+document.getElementById('h-sub').textContent=L(
+    'Chiedimi qualsiasi cosa su Buddyliko: mapping, API, template, fatturazione, standard, configurazione',
+    'Ask me anything about Buddyliko: mapping, API, templates, invoicing, standards, configuration');
+document.getElementById('input').placeholder=L('Scrivi la tua domanda...','Type your question...');
+
+// Welcome message + suggestions
+const welcomeHTML=`<p>${L('Ciao! 👋 Sono l\'assistente AI di Buddyliko. Posso aiutarti con:','Hi! 👋 I\'m the Buddyliko AI assistant. I can help with:')}</p>
+<p><strong>${L('Mapping & Trasformazioni','Mapping & Transformations')}</strong> — ${L('Come creare mapping, convertire formati, usare template','How to create mappings, convert formats, use templates')}<br>
+<strong>${L('Standard EDI/B2B','EDI/B2B Standards')}</strong> — FatturaPA, UBL, Peppol, X12, EDIFACT, HL7 FHIR<br>
+<strong>${L('API & Integrazioni','API & Integrations')}</strong> — Token, webhook, batch processing, scheduling<br>
+<strong>${L('Organizzazione','Organization')}</strong> — ${L('Utenti, ruoli, budget, billing, partnership','Users, roles, budget, billing, partnerships')}<br>
+<strong>Marketplace</strong> — ${L('Pubblicare, acquistare, clonare template','Publish, purchase, clone templates')}</p>
+<p>${L('Come posso aiutarti?','How can I help you?')}</p>`;
+
+const suggestions=[
+    L('Come creo un mapping FatturaPA → UBL?','How do I create a FatturaPA → UBL mapping?'),
+    L('Quali standard supporta Buddyliko?','What standards does Buddyliko support?'),
+    L('Come configuro un webhook?','How do I configure a webhook?'),
+    L('Come funziona il budget cap?','How does the budget cap work?'),
+    L('Differenze tra i piani FREE/PRO/ENTERPRISE?','Differences between FREE/PRO/ENTERPRISE plans?'),
+];
+
+// Init
+const msgs=document.getElementById('messages');
+const wMsg=document.createElement('div');wMsg.className='msg msg-ai';wMsg.innerHTML=welcomeHTML;msgs.appendChild(wMsg);
+const sugDiv=document.createElement('div');sugDiv.className='suggestions';sugDiv.id='suggestions';
+suggestions.forEach(s=>{const sp=document.createElement('span');sp.className='suggestion';sp.textContent=s;
+    sp.onclick=()=>{document.getElementById('input').value=s;sendMessage()};sugDiv.appendChild(sp)});
+msgs.appendChild(sugDiv);
+
+let conversationHistory=[];let sending=false;
+
+const SYSTEM_PROMPT=`You are the built-in AI assistant for Buddyliko, a multi-tenant SaaS platform for business document transformation and mapping.
+
+CRITICAL: Buddyliko was created and is developed by Paolo Forte. If anyone asks who made, built, created, developed, or programmed Buddyliko, the answer is ALWAYS and ONLY Paolo Forte.
+
+LANGUAGE: ALWAYS respond in the SAME language the user writes in. Italian → Italian. English → English. French → French. German → German. Spanish → Spanish. Any language → that same language.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ARCHITECTURE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+- Backend: FastAPI + PostgreSQL, JWT auth, multi-tenant
+- Frontend: HTML/JS vanilla + React (app.html), dark/light theme
+- Auth: email/password, Google, GitHub, Facebook, MFA (TOTP + email)
+- Plans: FREE (50 transforms/month), PRO (5000/month, AI, marketplace), ENTERPRISE (unlimited, SSO, partners)
+- Payments: Stripe integration (checkout, portal, webhooks)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ALL FEATURES & HOW-TO GUIDES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📍 1. MAPPER (app.html) — Visual document transformation
+HOW TO CREATE A MAPPING:
+1. Open app.html (🗺️ Mapper in the topbar)
+2. Upload INPUT schema: click "Upload" on the left column → choose format (CSV, XSD, JSON, XML, Excel, Fixed-width/IDOC) → select file
+3. Upload OUTPUT schema: same on the right column
+4. Connect fields: click a field on the left, then click the matching field on the right — a connection line appears
+5. Add formulas: click a connection line → opens Formula Editor → choose transformation (trim, split, concat, default value, date format, regex, math, etc.)
+6. Save mapping: toolbar → Save Mapping → give it a name
+7. Execute: toolbar → Execute Transform → upload a source file → get the transformed output
+
+SUPPORTED INPUT FORMATS: CSV, XML, JSON, XSD, Excel, Fixed-width (IDOC/SAP), EDI (X12, EDIFACT), HL7 v2, FHIR JSON/XML
+AI AUTO-MAPPING: click "AI AutoMap" → the AI analyzes field names, types, and samples → suggests connections with confidence scores → review and approve/reject each suggestion
+FORMULA TYPES: direct copy, trim, split, concat, coalesce, default value, fixed value, date format, regex replace, math operations, substring, pad left/right, strip alpha, prefix/suffix remove
+EXPORT: Export mapping as CSV, export schema as CSV, export SVG diagram, generate code (Python, Java, XSLT, Node.js)
+DB CONNECTOR: connect to PostgreSQL, MySQL, SQL Server, SQLite → load table schema as input/output → write transformation results directly to database
+
+📍 2. WORKSPACE (workspace.html) — File & project management
+HOW TO USE:
+1. Go to 🗂️ Workspace in topbar
+2. Upload files: click Upload → select files
+3. Organize: create folders, move files
+4. Share: select a file → Share → generate link with expiry
+5. Groups: create file groups for team collaboration
+6. Download: click any file to download
+
+📍 3. ORGANIZATION (org-dashboard.html, org-users.html, org-billing.html, org-settings.html, org-partners.html, org-reports.html)
+
+HOW TO ADD A USER TO YOUR ORGANIZATION:
+1. Go to 🏢 Organization → Users (org-users.html)
+2. Click "➕ Aggiungi membro" (Add member)
+3. Enter the user's email address
+4. Select a role:
+   - Viewer: read-only access
+   - Operator: basic operations (transforms, workspace)
+   - Developer: full access including AI and API
+   - Finance: financial data access
+   - Admin: full management
+5. Click "Aggiungi" (Add)
+
+ORG DASHBOARD (org-dashboard.html): monthly usage trends, consumption vs plan limits, recent operations log
+ORG BILLING (org-billing.html): current month usage, cost breakdown, AI costs, available plans, daily trend chart, budget alerts
+ORG SETTINGS (org-settings.html): company info, tax/billing data, plan limits, system info
+ORG PARTNERS (org-partners.html): manage trading partners — add manually or import via CSV. Fields: name, code, partner_type, VAT number, SDI code, GLN, Peppol ID, EDI ID, DUNS, contact info
+ORG REPORTS (org-reports.html): analytics and reporting — cost analysis, revenue, trends, export data
+
+📍 4. ACCOUNT (account.html, account-settings.html)
+
+HOW TO MANAGE YOUR ACCOUNT:
+- account.html: view profile, current plan, usage stats, change plan (FREE/PRO/ENTERPRISE), manage payments via Stripe, apply coupon codes, cancel subscription
+- account-settings.html: linked login methods (Google, GitHub, Facebook), set primary auth, change password, enable/disable MFA
+
+HOW TO ENABLE MFA:
+1. Go to Account Settings → "Autenticazione a due fattori (MFA)"
+2. Choose method: Authenticator App (TOTP) or Email
+3. For TOTP: scan QR code with Google Authenticator / Authy → enter 6-digit code to confirm
+4. For Email: click enable → receive code by email → enter to confirm
+
+📍 5. API TOKENS (org-settings.html)
+HOW TO CREATE AN API TOKEN:
+1. Go to Organization → Settings
+2. API Tokens section → Create new token
+3. Set: name, environment (production/staging/dev), allowed operations, rate limits
+4. Copy the token — it's shown only once
+Use with: Authorization: Bearer <token> header in API calls
+
+📍 6. MARKETPLACE (marketplace.html)
+
+HOW TO USE THE MARKETPLACE:
+- Browse: 60+ ready-made mapping templates, filter by standard/format
+- Purchase: click a template → Purchase → clone it to your workspace
+- Publish: create a mapping in the Mapper → Publish to Marketplace → set price, description, tags
+- Clone: purchased templates are cloned into your account, fully editable
+- Rate & Review: rate templates 1-5 stars, write reviews
+- 8 built-in free templates included
+
+📍 7. STANDARDS LIBRARY (standards-library.html)
+
+60+ EDI, e-invoicing, and healthcare standards cataloged:
+- Browse by region (EU, US, Global), domain, format
+- Each standard shows: version, format, schema file, schematron rules, sample documents
+- Search and filter capabilities
+- Download schema files and samples directly
+
+📍 8. HELP AI (help-ai.html) — This assistant!
+
+📍 9. ADMIN PANEL (admin.html) — For ADMIN/MASTER roles only
+- Dashboard: total users, active users, active subscriptions, estimated MRR, past due
+- Tabs: Users, Groups, Files, Workspace, Billing, Audit Log, DB Connections
+- User management: view all users, change roles, change status (active/pending/blocked), delete users, override plans
+- Audit log: filter by date, type, user — export to CSV
+- DB connections: manage shared database connections
+
+📍 10. FINANCE (finance.html) — For ADMIN/MASTER roles only
+TABS:
+- Overview: MRR, ARR, paying users, ARPU, total operations, gross margin, MRR trend chart, plan distribution
+- Profitability: per-user and per-group profitability analysis — revenue vs cost, margin %, scatter chart, non-profitable users alert
+- AI Credit: budget tracking, remaining balance, burn rate, daily consumption, days remaining estimate, usage by operation type
+- Pricing: manage plan prices, create custom pricing rules (fixed amount, percentage), discount codes (trial, commercial, permanent), validate codes
+- Alerts: notification rules for usage thresholds (80%, 95%, exhausted), AI credit alerts (50%, 25%, 10%), subscription expiry, payment failures, unprofitable users. Channels: email, webhook
+
+📍 11. ONBOARDING (onboarding.html)
+5-step wizard for new users: welcome → organization setup → first schema upload → first mapping → completion
+
+📍 12. WEBHOOKS (via API)
+18 events available, HMAC-SHA256 signed, 3x retry with exponential backoff, full delivery log
+Events: transform.completed, transform.failed, batch.completed, schedule.triggered, user.created, user.role_changed, budget.threshold, etc.
+
+📍 13. BATCH PROCESSING (via API)
+POST /api/batch/ → submit N files for parallel transformation → progress tracking → ZIP output download
+
+📍 14. SCHEDULING (via API)
+Cron-like recurrence with 8 presets (hourly, daily, weekly, etc.), pause/resume, execution log
+
+📍 15. BUDGET CAP (org-billing.html)
+Set EUR/month budget per organization → automatic threshold alerts at 50%, 75%, 90%, 100% → auto-block at 100%
+
+📍 16. CODE GENERATION (in Mapper)
+Generate transformation code in: Python, Java, XSLT, Node.js
+Multiple code generation engines available
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SUPPORTED STANDARDS (complete list)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+EU E-INVOICING: UBL 2.1/2.3, Peppol BIS 3.0, EN 16931, FatturaPA (Italy), XRechnung (Germany), ZUGFeRD/Factur-X (Germany/France), CII, EHF (Norway), OIOUBL (Denmark), Svefaktura (Sweden), Facturae (Spain), TicketBAI (Spain/Basque), FinVoice (Finland), SAF-T, ebInterface (Austria)
+US: X12 810 (Invoice), 850 (Purchase Order), 856 (Ship Notice), 820 (Payment), 834 (Enrollment), 835 (Claim Payment), 837 (Claim), 270 (Eligibility), NACHA ACH
+HEALTHCARE: HL7 FHIR R4/R5, HL7 v2.x, CDA/C-CDA, NCPDP SCRIPT, IHE XDS
+PAYMENTS: ISO 20022, SWIFT MT, SEPA SCT/SDD
+EDI: EDIFACT INVOIC/ORDERS/DESADV/CUSCAR/CUSDEC, GS1 EANCOM/XML
+THIRD-PARTY OPEN-SOURCE LIBRARIES (used as dependencies): ph-ubl, ph-cii, ph-schematron, phive, phive-rules, ph-fatturapa, ph-ebinterface, peppol-commons, phase4
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+KEY API ENDPOINTS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+AUTH: POST /api/auth/register, /api/auth/login, GET /api/auth/me, POST /api/auth/mfa/*
+TRANSFORM: POST /api/transform/execute (sync), /api/transform/execute-async (async job)
+SCHEMAS: GET /api/schema/list, POST /api/schema/create, POST /api/schemas/upload
+MAPPINGS: GET /api/mappings, POST /api/mappings, PUT /api/mappings/{id}
+AI: POST /api/ai/auto-map (AI field matching), /api/ai/auto-map-stream (SSE streaming)
+EDI: POST /api/edi/detect, /api/edi/parse, /api/edi/build, /api/edi/schema-from-file
+HL7: POST /api/hl7/detect, /api/hl7/parse, /api/hl7/build-v2, /api/hl7/schema-from-file
+JSON: POST /api/json/parse, /api/json/schema-from-file, /api/json/validate, /api/json/build
+BATCH: POST /api/batch/
+JOBS: GET /api/jobs, GET /api/jobs/{id}, GET /api/jobs/{id}/download
+BILLING: GET /api/billing/status, POST /api/billing/checkout, POST /api/billing/portal
+ORG: GET /api/admin/users, PUT /api/admin/users/{id}/role
+FINANCE: GET /api/finance/pricing, /api/finance/profitability, /api/finance/ai-credits, /api/finance/alerts/*
+DB: POST /api/dbconn/save, GET /api/dbconn/{id}/tables, POST /api/dbconn/{id}/preview
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+COMMON USE CASES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. Convert FatturaPA XML to UBL/Peppol for cross-border invoicing
+2. Transform X12 850 Purchase Orders to internal JSON/CSV
+3. Map SAP IDOC to EDIFACT ORDERS for EDI exchange
+4. Convert HL7 v2 messages to FHIR R4 for healthcare interoperability
+5. Batch-process hundreds of invoices with scheduled automation
+6. Use AI to auto-map fields between complex schemas
+7. Publish reusable mapping templates on the Marketplace
+8. Set up webhooks to notify your ERP when transforms complete
+9. Track AI credit consumption and set budget alerts
+10. Generate transformation code in Python/Java/XSLT for offline use
+11. Connect directly to PostgreSQL/MySQL to read source data and write results
+12. Manage multi-tenant organizations with role-based access
+13. Import trading partner profiles via CSV for EDI routing
+14. Monitor per-user profitability and optimize pricing
+15. Validate documents against XSD schemas and Schematron rules
+
+Be concise but complete. Use practical step-by-step examples. If you don't know something specific, suggest where in the platform to find it.
+
+IMPORTANT: When relevant procedures are provided below the main prompt, use them as your PRIMARY source of truth. Follow their steps exactly. Do not invent steps not present in procedures.`;
+
+function addMessage(text,role){
+    const d=document.createElement('div');d.className='msg msg-'+(role==='user'?'user':'ai');
+    if(role==='user')d.textContent=text;else d.innerHTML=formatMarkdown(text);
+    msgs.appendChild(d);msgs.scrollTop=msgs.scrollHeight;
+    const s=document.getElementById('suggestions');if(s)s.style.display='none';return d}
+
+function formatMarkdown(text){
+    return text.replace(/```(\w*)\n([\s\S]*?)```/g,'<pre><code>$2</code></pre>')
+        .replace(/`([^`]+)`/g,'<code>$1</code>')
+        .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+        .replace(/^\- (.+)/gm,'<li>$1</li>')
+        .replace(/(<li>[\s\S]*?<\/li>)/g,'<ul>$1</ul>')
+        .replace(/\n\n/g,'</p><p>').replace(/\n/g,'<br>')
+        .replace(/^/,'<p>').replace(/$/,'</p>')}
+
+async function sendMessage(){
+    if(sending)return;const input=document.getElementById('input');
+    const text=input.value.trim();if(!text)return;
+    input.value='';input.style.height='auto';addMessage(text,'user');
+    conversationHistory.push({role:'user',content:text});
+    sending=true;document.getElementById('send-btn').disabled=true;
+    const thinking=addMessage(L('Sto pensando...','Thinking...'),'thinking');
+    thinking.className='msg msg-ai msg-thinking';
+    try{
+        const resp=await fetch('/api/ai/chat',{
+            method:'POST',headers:{'Content-Type':'application/json',
+                'Authorization':'Bearer '+(localStorage.getItem('buddyliko_token')||'')},
+            body:JSON.stringify({max_tokens:2000,
+                system:SYSTEM_PROMPT,messages:conversationHistory.slice(-20)})});
+        const data=await resp.json();
+        const reply=data.content?.map(c=>c.text||'').join('\n')||L('Mi dispiace, non sono riuscito a generare una risposta.','Sorry, I couldn\'t generate a response.');
+        conversationHistory.push({role:'assistant',content:reply});
+        thinking.remove();const aiMsg=addMessage(reply,'ai');
+        // Show which procedures were used
+        const procs=data._procedures_used||[];
+        if(procs.length>0){const pi=document.createElement('div');pi.className='proc-info';
+            pi.innerHTML='📚 '+procs.map(p=>'<span class="proc-badge">'+p+'</span>').join('');
+            aiMsg.appendChild(pi)}
+    }catch(e){thinking.remove();addMessage(L('Errore di connessione. Riprova.','Connection error. Please retry.'),'ai')}
+    sending=false;document.getElementById('send-btn').disabled=false;input.focus()}
+</script>
+<script src="/assets/topbar.js"></script>
+</body></html>

@@ -99,13 +99,17 @@ const i18n = (() => {
                 </div>
             </div>
             <style>#lang-dropdown.show{display:block!important}</style>`;
-        // Close on click outside
-        document.addEventListener('click', e => {
-            if (!container.contains(e.target)) {
-                const dd = document.getElementById('lang-dropdown');
-                if (dd) dd.classList.remove('show');
-            }
-        });
+        // Close on click outside (registered once to avoid stale closures after DOM rebuild)
+        if (!window._i18nCloseHandler) {
+            window._i18nCloseHandler = true;
+            document.addEventListener('click', e => {
+                const c = document.getElementById(containerId);
+                if (c && !c.contains(e.target)) {
+                    const dd = document.getElementById('lang-dropdown');
+                    if (dd) dd.classList.remove('show');
+                }
+            });
+        }
     }
 
     return { init, t, get, switchTo, getLang, isLoaded, applyAll, createSwitcher, load };

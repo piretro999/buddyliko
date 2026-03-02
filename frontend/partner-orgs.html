@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sub-Organizzazioni — Buddyliko</title>
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+    <script src="/lang/i18n.js"></script>
+    <style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: system-ui, -apple-system, sans-serif; background: #0a0e1a; color: #e2e8f0; }
+.container { max-width: 1400px; margin: 0 auto; padding: 24px 20px; }
+.section { background: #141b2d; border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 1px solid #2e3250; }
+.section-title { font-size: 15px; font-weight: 600; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; justify-content: space-between; }
+.badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+.badge-active { background: rgba(46,125,50,.2); color: #4ade80; }
+.badge-suspended { background: rgba(198,40,40,.2); color: #f87171; }
+.badge-trial { background: rgba(230,81,0,.2); color: #fb923c; }
+.badge-cancelled { background: rgba(69,90,100,.25); color: #64748b; }
+.badge-FREE { background: rgba(69,90,100,.25); color: #94a3b8; }
+.badge-PRO { background: rgba(21,101,192,.25); color: #60a5fa; }
+.badge-ENTERPRISE { background: rgba(136,14,79,.25); color: #f472b6; }
+.badge-company { background: rgba(69,90,100,.15); color: #94a3b8; }
+.badge-partner { background: rgba(136,14,79,.15); color: #c084fc; }
+.btn { padding: 7px 14px; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; transition: all 0.15s; display: inline-flex; align-items: center; gap: 6px; }
+.btn:hover { opacity: 0.85; } .btn-primary { background: #2563eb; color: white; } .btn-success { background: #059669; color: white; }
+.btn-danger { background: #dc2626; color: white; } .btn-outline { background: transparent; border: 1px solid #2e3250; color: #94a3b8; }
+.btn-outline:hover { border-color: #60a5fa; color: #60a5fa; } .btn-sm { padding: 4px 10px; font-size: 11px; }
+.btn-ghost { background: transparent; border: none; color: #94a3b8; padding: 4px 8px; cursor: pointer; }
+.btn-ghost:hover { color: #f87171; }
+.subnav { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+.subnav a { padding: 8px 16px; border-radius: 8px; text-decoration: none; font-size: 13px; font-weight: 500; color: #94a3b8; background: #0d1220; border: 1px solid #2e3250; transition: all .15s; }
+.subnav a:hover { border-color: #60a5fa; color: #60a5fa; }
+.subnav a.active { background: #1e3a5f; color: #93c5fd; border-color: #1e3a5f; }
+.alert { padding: 12px 16px; border-radius: 8px; margin-bottom: 14px; font-size: 13px; }
+.alert-success { background: rgba(46,125,50,.15); color: #4ade80; border-left: 4px solid #059669; }
+.alert-error { background: rgba(198,40,40,.15); color: #f87171; border-left: 4px solid #dc2626; }
+.modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,.6); z-index: 200; justify-content: center; align-items: center; }
+.modal-overlay.show { display: flex; }
+.modal { background: #141b2d; border-radius: 12px; padding: 24px; border: 1px solid #2e3250; width: 100%; max-width: 520px; max-height: 90vh; overflow-y: auto; }
+.modal h3 { font-size: 16px; margin-bottom: 16px; }
+.modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 16px; }
+.form-group { margin-bottom: 14px; }
+.form-group label { display: block; color: #94a3b8; font-size: 12px; font-weight: 600; margin-bottom: 4px; }
+.form-group input, .form-group select { width: 100%; background: #0a0e1a; border: 1px solid #2e3250; color: #e2e8f0; border-radius: 6px; padding: 8px 12px; font-size: 13px; font-family: inherit; }
+.form-group input:focus, .form-group select:focus { outline: none; border-color: #2563eb; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.empty { padding: 30px; text-align: center; color: #64748b; font-size: 13px; }
+.loading { padding: 20px; text-align: center; color: #64748b; }
+.detail-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin-bottom: 16px; }
+.detail-item { padding: 10px; background: #0d1220; border-radius: 8px; }
+.detail-label { font-size: 11px; color: #64748b; margin-bottom: 2px; }
+.detail-value { font-size: 14px; font-weight: 600; }
+
+/* Breadcrumb */
+.breadcrumb { display: flex; align-items: center; gap: 4px; margin-bottom: 16px; flex-wrap: wrap; font-size: 13px; }
+.breadcrumb-item { color: #60a5fa; cursor: pointer; padding: 3px 8px; border-radius: 4px; transition: background .15s; }
+.breadcrumb-item:hover { background: #1e3a5f; }
+.breadcrumb-item.current { color: #e2e8f0; font-weight: 600; cursor: default; }
+.breadcrumb-item.current:hover { background: transparent; }
+.breadcrumb-sep { color: #475569; font-size: 11px; }
+
+/* Context bar */
+.context-bar { background: #0d1220; border: 1px solid #2e3250; border-radius: 10px; padding: 14px 18px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+.context-info { display: flex; align-items: center; gap: 12px; }
+.context-icon { font-size: 24px; }
+.context-name { font-size: 16px; font-weight: 700; }
+.context-meta { font-size: 12px; color: #94a3b8; margin-top: 2px; }
+
+/* Child cards */
+.child-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px; }
+.child-card { background: #0d1220; border: 1px solid #2e3250; border-radius: 10px; padding: 16px; transition: all .15s; position: relative; }
+.child-card:hover { border-color: #3b5998; transform: translateY(-1px); }
+.child-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.child-card-name { font-weight: 600; font-size: 14px; cursor: pointer; }
+.child-card-name:hover { color: #60a5fa; }
+.child-card-badges { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 8px; }
+.child-card-stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+.child-card-stat { text-align: center; }
+.child-card-stat-val { font-size: 14px; font-weight: 700; }
+.child-card-stat-label { font-size: 10px; color: #64748b; text-transform: uppercase; }
+.child-card-actions { display: flex; gap: 6px; margin-top: 12px; padding-top: 10px; border-top: 1px solid #1e2235; align-items: center; }
+.has-children { position: absolute; top: 8px; right: 10px; font-size: 11px; color: #64748b; }
+
+@media (max-width: 768px) { .form-row, .detail-grid { grid-template-columns: 1fr; } .child-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+<div id="buddy-topbar"></div>
+<div class="container">
+    <div class="subnav">
+        <a href="partner-dashboard.html">📊 Partner Dashboard</a>
+        <a href="partner-orgs.html" class="active">🏢 Sub-Org</a>
+    </div>
+    <div id="alerts"></div>
+
+    <!-- Breadcrumb navigation -->
+    <div class="breadcrumb" id="breadcrumb"></div>
+
+    <!-- Context bar: which org are we browsing -->
+    <div class="context-bar" id="context-bar">
+        <div class="context-info">
+            <div class="context-icon" id="ctx-icon">🏢</div>
+            <div>
+                <div class="context-name" id="ctx-name">Caricamento...</div>
+                <div class="context-meta" id="ctx-meta"></div>
+            </div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+            <button class="btn btn-primary btn-sm" onclick="showCreateModal()">+ Nuova sotto-org qui</button>
+            <button class="btn btn-outline btn-sm" onclick="showFullTree()">🌳 Albero completo</button>
+        </div>
+    </div>
+
+    <!-- Children list -->
+    <div class="section" id="children-section">
+        <div class="section-title">
+            <span id="children-title">Sotto-organizzazioni dirette</span>
+            <select id="filter-status" class="btn btn-outline btn-sm" style="background:#0a0e1a" onchange="loadChildren()">
+                <option value="">Tutti</option><option value="active">Attive</option><option value="suspended">Sospese</option>
+            </select>
+        </div>
+        <div class="child-grid" id="children-grid"><div class="loading">Caricamento...</div></div>
+    </div>
+
+    <!-- Detail panel -->
+    <div class="section" id="detail-panel" style="display:none">
+        <div class="section-title" id="detail-title">Dettaglio</div>
+        <div id="detail-content"></div>
+    </div>
+</div>
+
+<!-- Create Modal -->
+<div class="modal-overlay" id="create-modal"><div class="modal">
+    <h3>➕ Nuova Sub-Organizzazione</h3>
+    <p id="create-parent-hint" style="font-size:12px;color:#94a3b8;margin-bottom:14px"></p>
+    <div class="form-group"><label>Nome *</label><input id="new-name" placeholder="Es: ClienteXYZ S.r.l."></div>
+    <div class="form-row">
+        <div class="form-group"><label>Tipo</label><select id="new-type"><option value="company">Company (cliente)</option><option value="partner">Partner (sub-partner)</option></select></div>
+        <div class="form-group"><label>Piano</label><select id="new-plan"><option value="FREE">Free</option><option value="PRO" selected>Pro</option><option value="ENTERPRISE">Enterprise</option></select></div>
+    </div>
+    <div class="form-row">
+        <div class="form-group"><label>Revenue Share %</label><input id="new-revshare" type="number" value="20" min="0" max="100" step="0.5"></div>
+        <div class="form-group"><label>Email owner (opz.)</label><input id="new-owner" placeholder="owner@cliente.it"></div>
+    </div>
+    <div class="form-row">
+        <div class="form-group"><label>P.IVA</label><input id="new-vat" placeholder="IT12345678901"></div>
+        <div class="form-group"><label>Paese</label><input id="new-country" placeholder="IT" maxlength="3"></div>
+    </div>
+    <div class="form-group"><label>Email billing</label><input id="new-billing" placeholder="billing@cliente.it"></div>
+    <div class="modal-actions">
+        <button class="btn btn-outline" onclick="closeModal('create-modal')">Annulla</button>
+        <button class="btn btn-primary" onclick="createSubOrg()">Crea Sub-Org</button>
+    </div>
+</div></div>
+
+<!-- Edit Modal -->
+<div class="modal-overlay" id="edit-modal"><div class="modal">
+    <h3>✏️ Modifica Sub-Organizzazione</h3>
+    <input type="hidden" id="edit-id">
+    <div class="form-group"><label>Nome *</label><input id="edit-name"></div>
+    <div class="form-row">
+        <div class="form-group"><label>Piano</label><select id="edit-plan"><option value="FREE">Free</option><option value="PRO">Pro</option><option value="ENTERPRISE">Enterprise</option></select></div>
+        <div class="form-group"><label>Revenue Share %</label><input id="edit-revshare" type="number" min="0" max="100" step="0.5"></div>
+    </div>
+    <div class="form-row">
+        <div class="form-group"><label>P.IVA</label><input id="edit-vat"></div>
+        <div class="form-group"><label>Paese</label><input id="edit-country" maxlength="3"></div>
+    </div>
+    <div class="form-row">
+        <div class="form-group"><label>Email billing</label><input id="edit-billing"></div>
+        <div class="form-group"><label>Max utenti</label><input id="edit-max-users" type="number" min="0"></div>
+    </div>
+    <div class="form-row">
+        <div class="form-group"><label>Max API token</label><input id="edit-max-tokens" type="number" min="0"></div>
+        <div class="form-group"><label>Max trasf./mese</label><input id="edit-max-transforms" type="number" min="0"></div>
+    </div>
+    <div class="modal-actions">
+        <button class="btn btn-outline" onclick="closeModal('edit-modal')">Annulla</button>
+        <button class="btn btn-primary" onclick="saveEdit()">💾 Salva</button>
+    </div>
+</div></div>
+
+<!-- Delete Modal -->
+<div class="modal-overlay" id="delete-modal"><div class="modal" style="max-width:420px">
+    <h3>🗑️ Cancella Sub-Organizzazione</h3>
+    <input type="hidden" id="delete-id">
+    <p style="color:#f87171;margin-bottom:12px;font-size:13px">⚠️ <strong>Irreversibile.</strong> La sub-org, tutte le sotto-org e i token API saranno cancellati.</p>
+    <p style="font-size:13px;margin-bottom:8px">Digita il nome per confermare:</p>
+    <div class="form-group"><input id="delete-confirm-name" placeholder="Nome esatto"></div>
+    <p id="delete-org-hint" style="font-size:11px;color:#64748b;margin-bottom:8px"></p>
+    <div class="modal-actions">
+        <button class="btn btn-outline" onclick="closeModal('delete-modal')">Annulla</button>
+        <button class="btn btn-danger" id="delete-confirm-btn" onclick="confirmDelete()" disabled>🗑️ Cancella</button>
+    </div>
+</div></div>
+
+<!-- Full Tree Modal -->
+<div class="modal-overlay" id="tree-modal"><div class="modal" style="max-width:700px">
+    <h3>🌳 Albero Completo</h3>
+    <div id="full-tree-content"><div class="loading">Caricamento...</div></div>
+    <div class="modal-actions"><button class="btn btn-outline" onclick="closeModal('tree-modal')">Chiudi</button></div>
+</div></div>
+
+<script>
+const API = '/api';
+const token = localStorage.getItem('buddyliko_token');
+if (!token) window.location.href = 'login.html';
+
+// ── State ──
+let currentOrgId = null, rootOrgId = null, ancestorsCache = [], detailCache = null;
+
+// ── Helpers ──
+function showAlert(m, t='success') {
+    const d = document.createElement('div'); d.className = 'alert alert-' + t; d.textContent = m;
+    const a = document.getElementById('alerts'); a.insertBefore(d, a.firstChild);
+    setTimeout(() => d.remove(), 4000);
+}
+async function apiFetch(p, o={}) {
+    const r = await fetch(API + p, { ...o, headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json', ...(o.headers||{}) } });
+    if (!r.ok) { let e; try { e = await r.json(); } catch { e = { detail: 'HTTP ' + r.status }; } throw new Error(e.detail || 'Errore'); }
+    return r.json();
+}
+function fmtEur(v) { return '\u20ac' + parseFloat(v||0).toFixed(2); }
+function fmtNum(n) { return (n||0).toLocaleString('it-IT'); }
+function showModal(id) { document.getElementById(id).classList.add('show'); }
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+// ── Init ──
+async function init() {
+    try {
+        const info = await apiFetch('/partnership/info');
+        rootOrgId = info.org_id;
+        currentOrgId = rootOrgId;
+        await navigateTo(rootOrgId);
+    } catch(e) { showAlert('Errore: ' + e.message, 'error'); }
+}
+
+// ── Navigate into an org ──
+async function navigateTo(orgId) {
+    currentOrgId = orgId;
+    document.getElementById('detail-panel').style.display = 'none';
+    detailCache = null;
+    // Load ancestors for breadcrumb
+    try {
+        const res = await apiFetch('/partnership/ancestors/' + orgId);
+        ancestorsCache = res.ancestors || [];
+    } catch { ancestorsCache = []; }
+    renderBreadcrumb();
+    await Promise.all([loadContextBar(), loadChildren()]);
+}
+
+// ── Breadcrumb ──
+function renderBreadcrumb() {
+    const el = document.getElementById('breadcrumb');
+    el.innerHTML = ancestorsCache.map((a, i) => {
+        const isLast = String(a.id) === String(currentOrgId);
+        const sep = i > 0 ? '<span class="breadcrumb-sep">›</span>' : '';
+        const icon = a.depth === 0 ? '👑 ' : '';
+        return isLast
+            ? `${sep}<span class="breadcrumb-item current">${icon}${a.name}</span>`
+            : `${sep}<span class="breadcrumb-item" onclick="navigateTo('${a.id}')">${icon}${a.name}</span>`;
+    }).join('');
+}
+
+// ── Context bar ──
+async function loadContextBar() {
+    try {
+        const res = await apiFetch('/partnership/sub-orgs/' + currentOrgId + '/children');
+        const org = res.org || {};
+        const isRoot = String(currentOrgId) === String(rootOrgId);
+        document.getElementById('ctx-icon').textContent = isRoot ? '👑' : (org.org_type === 'partner' ? '🤝' : '🏢');
+        document.getElementById('ctx-name').textContent = org.name || '...';
+        document.getElementById('ctx-meta').innerHTML =
+            `<span class="badge badge-${org.plan||'FREE'}">${org.plan||'FREE'}</span> ` +
+            `<span class="badge badge-${org.status||'active'}">${org.status||'active'}</span> ` +
+            `<span class="badge badge-${org.org_type||'company'}">${org.org_type||'company'}</span> ` +
+            `&nbsp;· ${res.count} sotto-org dirette`;
+    } catch(e) { document.getElementById('ctx-name').textContent = 'Errore: ' + e.message; }
+}
+
+// ── Children grid ──
+async function loadChildren() {
+    const grid = document.getElementById('children-grid');
+    grid.innerHTML = '<div class="loading">Caricamento...</div>';
+    const statusF = document.getElementById('filter-status').value;
+    try {
+        const res = await apiFetch('/partnership/sub-orgs/' + currentOrgId + '/children');
+        let children = res.children || [];
+        if (statusF) children = children.filter(c => c.status === statusF);
+        document.getElementById('children-title').textContent =
+            `Sotto-organizzazioni dirette (${children.length})`;
+        if (!children.length) {
+            grid.innerHTML = '<div class="empty">Nessuna sotto-org. Clicca "+ Nuova sotto-org qui" per crearne una.</div>';
+            return;
+        }
+        grid.innerHTML = children.map(c => {
+            const cc = c.children_count || 0;
+            const isPart = c.org_type === 'partner';
+            return `<div class="child-card">
+                ${cc > 0 ? `<div class="has-children">📂 ${cc} sotto-org</div>` : ''}
+                <div class="child-card-header">
+                    <div class="child-card-name" onclick="navigateTo('${c.id}')">${isPart ? '🤝 ' : '🏢 '}${c.name}</div>
+                </div>
+                <div class="child-card-badges">
+                    <span class="badge badge-${c.plan}">${c.plan}</span>
+                    <span class="badge badge-${c.status}">${c.status}</span>
+                    <span class="badge badge-${c.org_type}">${c.org_type}</span>
+                    ${c.revenue_share_pct ? '<span style="font-size:11px;color:#fb923c">↩ '+c.revenue_share_pct+'%</span>' : ''}
+                </div>
+                <div class="child-card-stats">
+                    <div class="child-card-stat"><div class="child-card-stat-val">${c.member_count||0}</div><div class="child-card-stat-label">Membri</div></div>
+                    <div class="child-card-stat"><div class="child-card-stat-val">${fmtNum(c.operations||0)}</div><div class="child-card-stat-label">Operazioni</div></div>
+                    <div class="child-card-stat"><div class="child-card-stat-val">${fmtEur(c.billable_eur)}</div><div class="child-card-stat-label">Fatturato</div></div>
+                </div>
+                <div class="child-card-actions">
+                    ${cc > 0 || isPart ? `<button class="btn btn-outline btn-sm" onclick="navigateTo('${c.id}')">📂 Entra</button>` : ''}
+                    <button class="btn btn-outline btn-sm" onclick="loadDetail('${c.id}')">📋 Dettagli</button>
+                    <button class="btn btn-outline btn-sm" onclick="openEditModal('${c.id}')">✏️</button>
+                    <button class="btn btn-ghost btn-sm" onclick="openDeleteModal('${c.id}')" style="color:#f87171;margin-left:auto">🗑️</button>
+                </div>
+            </div>`;
+        }).join('');
+    } catch(e) { grid.innerHTML = `<div class="empty" style="color:#f87171">${e.message}</div>`; }
+}
+
+// ── Detail panel ──
+async function loadDetail(orgId) {
+    try {
+        const d = await apiFetch('/partnership/sub-orgs/' + orgId);
+        detailCache = d;
+        const dp = document.getElementById('detail-panel');
+        dp.style.display = 'block';
+        document.getElementById('detail-title').innerHTML =
+            `📋 ${d.name} <span class="badge badge-${d.plan}">${d.plan}</span> <span class="badge badge-${d.status}">${d.status}</span>`;
+        document.getElementById('detail-content').innerHTML = `
+        <div class="detail-grid">
+            <div class="detail-item"><div class="detail-label">Membri</div><div class="detail-value">${d.member_count||0}</div></div>
+            <div class="detail-item"><div class="detail-label">Sub-org</div><div class="detail-value">${d.children_count||0}</div></div>
+            <div class="detail-item"><div class="detail-label">API Token</div><div class="detail-value">${d.tokens_count||0}</div></div>
+            <div class="detail-item"><div class="detail-label">Canone</div><div class="detail-value" style="color:#4ade80">${fmtEur(d.monthly_fee_eur)}</div></div>
+            <div class="detail-item"><div class="detail-label">Rev. Share</div><div class="detail-value" style="color:#fb923c">${d.revenue_share_pct||0}%</div></div>
+            <div class="detail-item"><div class="detail-label">Paese</div><div class="detail-value">${d.country||'\u2014'}</div></div>
+        </div>
+        ${d.members && d.members.length ? '<div style="margin-bottom:12px"><strong style="font-size:12px;color:#94a3b8">MEMBRI:</strong><br>'+d.members.map(m=>'<span style="font-size:12px;margin-right:12px">'+m.email+' <span class="badge" style="background:#1e3a5f;color:#93c5fd">'+m.role+'</span></span>').join('')+'</div>' : ''}
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-primary btn-sm" onclick="openEditModal('${orgId}')">✏️ Modifica</button>
+            ${d.children_count > 0 || d.org_type === 'partner' ? `<button class="btn btn-outline btn-sm" onclick="navigateTo('${orgId}')">📂 Entra</button>` : ''}
+            ${d.status==='active'?`<button class="btn btn-danger btn-sm" onclick="suspendOrg('${orgId}')">⏸️ Sospendi</button>`:''}
+            ${d.status==='suspended'?`<button class="btn btn-success btn-sm" onclick="reactivateOrg('${orgId}')">▶️ Riattiva</button>`:''}
+            <button class="btn btn-outline btn-sm" onclick="upgradeOrg('${orgId}','PRO')">⬆ PRO</button>
+            <button class="btn btn-outline btn-sm" onclick="upgradeOrg('${orgId}','ENTERPRISE')">⬆ ENT</button>
+            <button class="btn btn-danger btn-sm" onclick="openDeleteModal('${orgId}')" style="margin-left:auto">🗑️ Cancella</button>
+        </div>`;
+        dp.scrollIntoView({ behavior: 'smooth' });
+    } catch(e) { showAlert(e.message, 'error'); }
+}
+
+// ── Create (under currentOrgId) ──
+function showCreateModal() {
+    document.getElementById('create-parent-hint').textContent =
+        'Verrà creata sotto: ' + document.getElementById('ctx-name').textContent;
+    ['new-name','new-owner','new-vat','new-country','new-billing'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('new-type').value = 'company';
+    document.getElementById('new-plan').value = 'PRO';
+    document.getElementById('new-revshare').value = '20';
+    showModal('create-modal');
+}
+async function createSubOrg() {
+    const name = document.getElementById('new-name').value.trim();
+    if (!name) { showAlert('Nome obbligatorio', 'error'); return; }
+    try {
+        await apiFetch('/partnership/sub-orgs', { method: 'POST', body: JSON.stringify({
+            name, org_type: document.getElementById('new-type').value,
+            plan: document.getElementById('new-plan').value,
+            revenue_share_pct: parseFloat(document.getElementById('new-revshare').value) || 0,
+            owner_email: document.getElementById('new-owner').value.trim() || null,
+            vat_number: document.getElementById('new-vat').value.trim() || null,
+            country: document.getElementById('new-country').value.trim() || null,
+            billing_email: document.getElementById('new-billing').value.trim() || null,
+            parent_org_id: currentOrgId !== rootOrgId ? currentOrgId : null,
+        })});
+        closeModal('create-modal');
+        showAlert('Sub-org creata!');
+        await Promise.all([loadContextBar(), loadChildren()]);
+    } catch(e) { showAlert(e.message, 'error'); }
+}
+
+// ── Edit ──
+async function openEditModal(orgId) {
+    let d = detailCache;
+    if (!d || String(d.id) !== String(orgId)) {
+        try { d = await apiFetch('/partnership/sub-orgs/' + orgId); } catch(e) { showAlert(e.message, 'error'); return; }
+    }
+    detailCache = d;
+    document.getElementById('edit-id').value = orgId;
+    document.getElementById('edit-name').value = d.name || '';
+    document.getElementById('edit-plan').value = d.plan || 'FREE';
+    document.getElementById('edit-revshare').value = d.revenue_share_pct || 0;
+    document.getElementById('edit-vat').value = d.vat_number || '';
+    document.getElementById('edit-country').value = d.country || '';
+    document.getElementById('edit-billing').value = d.billing_email || '';
+    document.getElementById('edit-max-users').value = d.max_users || '';
+    document.getElementById('edit-max-tokens').value = d.max_api_tokens || '';
+    document.getElementById('edit-max-transforms').value = d.max_transforms_month || '';
+    showModal('edit-modal');
+}
+async function saveEdit() {
+    const orgId = document.getElementById('edit-id').value;
+    const body = {};
+    const n = document.getElementById('edit-name').value.trim(); if (n) body.name = n;
+    body.plan = document.getElementById('edit-plan').value;
+    const rs = parseFloat(document.getElementById('edit-revshare').value); if (!isNaN(rs)) body.revenue_share_pct = rs;
+    ['vat','country','billing'].forEach(f => { const v = document.getElementById('edit-' + f).value.trim(); if (v) body[f === 'vat' ? 'vat_number' : f === 'billing' ? 'billing_email' : f] = v; });
+    ['max-users','max-tokens','max-transforms'].forEach(f => {
+        const v = parseInt(document.getElementById('edit-' + f).value);
+        if (!isNaN(v) && v > 0) body[f.replace('-','_').replace('tokens','api_tokens').replace('transforms','transforms_month')] = v;
+    });
+    try {
+        await apiFetch('/partnership/sub-orgs/' + orgId, { method: 'PUT', body: JSON.stringify(body) });
+        closeModal('edit-modal'); showAlert('Aggiornata!'); loadChildren();
+    } catch(e) { showAlert(e.message, 'error'); }
+}
+
+// ── Delete ──
+async function openDeleteModal(orgId) {
+    let d = detailCache;
+    if (!d || String(d.id) !== String(orgId)) {
+        try { d = await apiFetch('/partnership/sub-orgs/' + orgId); } catch(e) { showAlert(e.message, 'error'); return; }
+    }
+    detailCache = d;
+    document.getElementById('delete-id').value = orgId;
+    document.getElementById('delete-confirm-name').value = '';
+    document.getElementById('delete-confirm-btn').disabled = true;
+    document.getElementById('delete-org-hint').textContent = 'Scrivi: ' + d.name;
+    document.getElementById('delete-confirm-name').oninput = function() {
+        document.getElementById('delete-confirm-btn').disabled =
+            this.value.trim().toLowerCase() !== d.name.trim().toLowerCase();
+    };
+    showModal('delete-modal');
+}
+async function confirmDelete() {
+    const orgId = document.getElementById('delete-id').value;
+    try {
+        await apiFetch('/partnership/sub-orgs/' + orgId, { method: 'DELETE' });
+        closeModal('delete-modal');
+        document.getElementById('detail-panel').style.display = 'none';
+        showAlert('Cancellata!');
+        await Promise.all([loadContextBar(), loadChildren()]);
+    } catch(e) { showAlert(e.message, 'error'); }
+}
+
+// ── Suspend / Reactivate / Upgrade ──
+async function suspendOrg(id) {
+    if (!confirm('Sospendere questa sub-org e tutte le sotto-org?')) return;
+    try { await apiFetch('/partnership/sub-orgs/'+id+'/suspend',{method:'POST'}); showAlert('Sospesa'); loadChildren(); } catch(e) { showAlert(e.message,'error'); }
+}
+async function reactivateOrg(id) {
+    try { await apiFetch('/partnership/sub-orgs/'+id+'/reactivate',{method:'POST'}); showAlert('Riattivata'); loadChildren(); } catch(e) { showAlert(e.message,'error'); }
+}
+async function upgradeOrg(id, plan) {
+    try { await apiFetch('/partnership/sub-orgs/'+id+'/upgrade?plan='+plan,{method:'POST'}); showAlert('Piano: '+plan); loadChildren(); } catch(e) { showAlert(e.message,'error'); }
+}
+
+// ── Full tree modal ──
+async function showFullTree() {
+    showModal('tree-modal');
+    const el = document.getElementById('full-tree-content');
+    el.innerHTML = '<div class="loading">Caricamento...</div>';
+    try {
+        const tree = await apiFetch('/partnership/hierarchy');
+        const nodes = tree.nodes || [];
+        if (!nodes.length) { el.innerHTML = '<div class="empty">Vuoto</div>'; return; }
+        const colors = ['#4ade80','#60a5fa','#c084fc','#fb923c','#f87171'];
+        el.innerHTML = nodes.map(n => {
+            const d = Math.min(n.depth||0, 4);
+            const icon = n.is_root ? '👑' : (n.org_type==='partner' ? '🤝' : '🏢');
+            return `<div style="padding:6px 10px 6px ${10+d*24}px;border-left:3px solid ${colors[d]};margin-bottom:2px;border-radius:0 4px 4px 0;cursor:pointer;font-size:13px;transition:background .1s"
+                onmouseover="this.style.background='#0f172a'" onmouseout="this.style.background=''"
+                onclick="closeModal('tree-modal');navigateTo('${n.id}')">
+                <span style="font-weight:${n.is_root?'700':'500'}">${icon} ${n.name}</span>
+                <span class="badge badge-${n.plan}" style="margin-left:6px;font-size:10px">${n.plan}</span>
+                <span class="badge badge-${n.status}" style="margin-left:3px;font-size:10px">${n.status}</span>
+                <span style="float:right;font-size:11px;color:#64748b">${fmtNum(n.operations)} ops · ${fmtEur(n.billable_eur)}</span>
+            </div>`;
+        }).join('');
+    } catch(e) { el.innerHTML = `<div class="empty" style="color:#f87171">${e.message}</div>`; }
+}
+
+init();
+</script>
+<script src="/assets/topbar.js"></script>
+</body></html>

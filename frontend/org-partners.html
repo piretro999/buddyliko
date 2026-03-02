@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trading Partners — Buddyliko</title>
+<link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+<script src="/lang/i18n.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: system-ui, -apple-system, sans-serif; background: #0a0e1a; color: #e2e8f0; }
+.container { max-width: 1300px; margin: 0 auto; padding: 24px 20px; }
+.page-header { margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+.page-header h1 { font-size: 22px; font-weight: 700; }
+.page-header p { color: #94a3b8; font-size: 13px; margin-top: 4px; }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 20px; }
+.stat-card { background: #141b2d; padding: 16px; border-radius: 12px; border: 1px solid #2e3250; }
+.stat-value { font-size: 26px; font-weight: bold; color: #60a5fa; }
+.stat-value.green { color: #4ade80; }
+.stat-label { color: #94a3b8; font-size: 12px; margin-top: 4px; }
+.section { background: #141b2d; border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 1px solid #2e3250; }
+.section-title { font-size: 15px; font-weight: 600; margin-bottom: 14px; color: #e2e8f0; display: flex; align-items: center; gap: 8px; }
+.section-title .count { background: #1e3a5f; color: #60a5fa; padding: 2px 8px; border-radius: 10px; font-size: 11px; }
+table { width: 100%; border-collapse: collapse; }
+th { background: #0d1220; padding: 10px 12px; text-align: left; font-weight: 600; font-size: 11px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid #2e3250; }
+td { padding: 10px 12px; border-bottom: 1px solid #1e2235; font-size: 13px; color: #e2e8f0; }
+tr:hover td { background: #0f172a; }
+.badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+.badge-supplier { background: rgba(21,101,192,.25); color: #60a5fa; }
+.badge-customer { background: rgba(46,125,50,.25); color: #4ade80; }
+.badge-carrier { background: rgba(230,81,0,.25); color: #fb923c; }
+.badge-bank { background: rgba(136,14,79,.25); color: #f472b6; }
+.badge-government { background: rgba(74,20,140,.25); color: #c084fc; }
+.badge-clearinghouse { background: rgba(0,121,107,.25); color: #2dd4bf; }
+.badge-other { background: rgba(69,90,100,.25); color: #94a3b8; }
+.badge-active { background: rgba(46,125,50,.2); color: #4ade80; }
+.badge-inactive { background: rgba(198,40,40,.2); color: #f87171; }
+.btn { padding: 7px 14px; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; transition: all 0.15s; display: inline-flex; align-items: center; gap: 6px; }
+.btn:hover { opacity: 0.85; transform: translateY(-1px); }
+.btn-primary { background: #2563eb; color: white; }
+.btn-success { background: #059669; color: white; }
+.btn-danger { background: #dc2626; color: white; }
+.btn-outline { background: transparent; border: 1px solid #2e3250; color: #94a3b8; }
+.btn-outline:hover { border-color: #60a5fa; color: #60a5fa; }
+.btn-sm { padding: 4px 10px; font-size: 11px; }
+.alert { padding: 12px 16px; border-radius: 8px; margin-bottom: 14px; font-size: 13px; animation: fadeIn 0.3s; }
+.alert-success { background: rgba(46,125,50,.15); color: #4ade80; border-left: 4px solid #059669; }
+.alert-error { background: rgba(198,40,40,.15); color: #f87171; border-left: 4px solid #dc2626; }
+.alert-info { background: rgba(21,101,192,.15); color: #60a5fa; border-left: 4px solid #2563eb; }
+.form-group { margin-bottom: 14px; }
+.form-group label { display: block; color: #94a3b8; font-size: 12px; font-weight: 600; margin-bottom: 4px; }
+.form-group input, .form-group select, .form-group textarea { width: 100%; background: #0a0e1a; border: 1px solid #2e3250; color: #e2e8f0; border-radius: 6px; padding: 8px 12px; font-size: 13px; font-family: inherit; }
+.form-group input:focus, .form-group select:focus { outline: none; border-color: #2563eb; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.subnav { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+.subnav a { padding: 8px 16px; border-radius: 8px; text-decoration: none; font-size: 13px; font-weight: 500; color: #94a3b8; background: #0d1220; border: 1px solid #2e3250; transition: all .15s; }
+.subnav a:hover { border-color: #60a5fa; color: #60a5fa; }
+.subnav a.active { background: #1e3a5f; color: #93c5fd; border-color: #1e3a5f; }
+.modal-overlay { display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,.6); z-index:200; justify-content:center; align-items:center; }
+.modal-overlay.show { display:flex; }
+.modal { background:#141b2d; border-radius:12px; padding:24px; border:1px solid #2e3250; width:100%; max-width:560px; max-height:85vh; overflow-y:auto; }
+.modal h3 { font-size:16px; margin-bottom:16px; }
+.modal-actions { display:flex; gap:10px; justify-content:flex-end; margin-top:16px; }
+.toolbar { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
+.toolbar input { background: #0a0e1a; border: 1px solid #2e3250; color: #e2e8f0; border-radius: 6px; padding: 7px 12px; font-size: 13px; min-width: 220px; }
+.toolbar select { background: #0a0e1a; border: 1px solid #2e3250; color: #e2e8f0; border-radius: 6px; padding: 7px 12px; font-size: 13px; }
+.empty { padding: 30px; text-align: center; color: #64748b; font-size: 13px; }
+@keyframes fadeIn { from { opacity:0; transform:translateY(-4px); } to { opacity:1; transform:translateY(0); } }
+@media (max-width:768px) { .form-row { grid-template-columns:1fr; } .toolbar { flex-direction: column; } }
+</style>
+</head>
+<body>
+<div id="buddy-topbar"></div>
+<div class="container">
+
+    <div class="subnav">
+        <a href="org-dashboard.html">📊 Dashboard</a>
+        <a href="org-users.html">👥 Utenti</a>
+        <a href="org-billing.html">💰 Billing</a>
+        <a href="org-partners.html" class="active">🤝 Partner</a>
+        <a href="org-reports.html">📈 Report</a>
+        <a href="partner-dashboard.html">🤝 Partnership</a>
+        <a href="org-settings.html">⚙️ Impostazioni</a>
+    </div>
+    <div id="alerts"></div>
+    <div class="page-header">
+        <div><h1>🤝 Trading Partners</h1><p id="page-sub">Caricamento...</p></div>
+        <div style="display:flex;gap:8px">
+            <button class="btn btn-outline" onclick="showImportModal()">📥 Import CSV</button>
+            <button class="btn btn-primary" onclick="showCreateModal()">+ Nuovo partner</button>
+        </div>
+    </div>
+    <div class="stats" id="stats-grid"><div class="loading" style="padding:16px;color:#64748b">Caricamento...</div></div>
+    <div class="section">
+        <div class="toolbar">
+            <input type="text" id="search" placeholder="🔍 Cerca nome, codice, P.IVA..." oninput="debounceSearch()">
+            <select id="filter-type" onchange="loadPartners()">
+                <option value="">Tutti i tipi</option>
+                <option value="supplier">Supplier</option><option value="customer">Customer</option>
+                <option value="carrier">Carrier</option><option value="bank">Bank</option>
+                <option value="government">Government</option><option value="clearinghouse">Clearinghouse</option>
+                <option value="other">Other</option>
+            </select>
+            <select id="filter-status" onchange="loadPartners()">
+                <option value="">Tutti gli stati</option>
+                <option value="active">Active</option><option value="inactive">Inactive</option>
+            </select>
+        </div>
+        <table>
+            <thead><tr><th>Nome</th><th>Codice</th><th>Tipo</th><th>P.IVA</th><th>Contatto</th><th>Stato</th><th>Azioni</th></tr></thead>
+            <tbody id="partners-body"><tr><td colspan="7" class="empty">Caricamento...</td></tr></tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal Crea/Modifica -->
+<div class="modal-overlay" id="editModal">
+    <div class="modal">
+        <h3 id="modal-title">Nuovo partner</h3>
+        <input type="hidden" id="edit-id">
+        <div class="form-row">
+            <div class="form-group"><label>Nome *</label><input type="text" id="f-name"></div>
+            <div class="form-group"><label>Codice</label><input type="text" id="f-code" placeholder="es. SUP001"></div>
+        </div>
+        <div class="form-row">
+            <div class="form-group"><label>Tipo *</label>
+                <select id="f-type"><option value="supplier">Supplier</option><option value="customer">Customer</option>
+                <option value="carrier">Carrier</option><option value="bank">Bank</option>
+                <option value="government">Government</option><option value="clearinghouse">Clearinghouse</option>
+                <option value="other">Other</option></select>
+            </div>
+            <div class="form-group"><label>Stato</label>
+                <select id="f-status"><option value="active">Active</option><option value="inactive">Inactive</option></select>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group"><label>P.IVA</label><input type="text" id="f-vat"></div>
+            <div class="form-group"><label>Codice SDI</label><input type="text" id="f-sdi" maxlength="7"></div>
+        </div>
+        <div class="form-row">
+            <div class="form-group"><label>GLN</label><input type="text" id="f-gln"></div>
+            <div class="form-group"><label>PEPPOL ID</label><input type="text" id="f-peppol"></div>
+        </div>
+        <div class="form-row">
+            <div class="form-group"><label>EDI ID</label><input type="text" id="f-edi"></div>
+            <div class="form-group"><label>DUNS</label><input type="text" id="f-duns"></div>
+        </div>
+        <div class="form-row">
+            <div class="form-group"><label>Nome contatto</label><input type="text" id="f-cname"></div>
+            <div class="form-group"><label>Email contatto</label><input type="email" id="f-cemail"></div>
+        </div>
+        <div class="form-group"><label>Telefono</label><input type="text" id="f-cphone"></div>
+        <div class="form-group"><label>Note</label><textarea id="f-notes" rows="2"></textarea></div>
+        <div class="modal-actions">
+            <button class="btn btn-outline" onclick="hideModal('editModal')">Annulla</button>
+            <button class="btn btn-primary" onclick="savePartner()">💾 Salva</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Import CSV -->
+<div class="modal-overlay" id="importModal">
+    <div class="modal">
+        <h3>📥 Import CSV</h3>
+        <p style="font-size:12px;color:#94a3b8;margin-bottom:12px">Colonne supportate: name, code, partner_type, vat_number, sdi_code, gln, peppol_id, edi_id, duns, contact_name, contact_email, contact_phone, notes</p>
+        <div class="form-group"><label>File CSV</label><input type="file" id="csv-file" accept=".csv,.txt" style="padding:8px"></div>
+        <div id="import-result" style="margin-top:10px"></div>
+        <div class="modal-actions">
+            <button class="btn btn-outline" onclick="hideModal('importModal')">Chiudi</button>
+            <button class="btn btn-success" onclick="doImport()">🚀 Importa</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const API = '/api';
+const token = localStorage.getItem('buddyliko_token');
+if (!token) window.location.href = 'login.html';
+
+function showAlert(msg, type='success') { const d=document.createElement('div'); d.className='alert alert-'+type; d.textContent=msg; const el=document.getElementById('alerts'); el.insertBefore(d,el.firstChild); setTimeout(()=>d.remove(),4000); }
+async function apiFetch(path, opts={}) {
+    const r = await fetch(API+path, {...opts, headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json',...(opts.headers||{})}});
+    if(!r.ok){let e;try{e=await r.json();}catch{e={detail:'HTTP '+r.status};}throw new Error(e.detail||e.message||'Errore');}
+    return r.json();
+}
+function fmtDate(d){if(!d)return'—';return new Date(d).toLocaleDateString('it-IT');}
+
+let searchTimer;
+function debounceSearch(){clearTimeout(searchTimer);searchTimer=setTimeout(loadPartners,300);}
+function showModal(id){document.getElementById(id).classList.add('show');}
+function hideModal(id){document.getElementById(id).classList.remove('show');}
+
+async function loadStats(){
+    try{
+        const s=await apiFetch('/partners/stats');
+        document.getElementById('page-sub').textContent=s.total+' partner totali · '+s.active+' attivi';
+        let h=`<div class="stat-card"><div class="stat-value">${s.total}</div><div class="stat-label">Totali</div></div>
+            <div class="stat-card"><div class="stat-value green">${s.active}</div><div class="stat-label">Attivi</div></div>`;
+        (s.by_type||[]).forEach(t=>{h+=`<div class="stat-card"><div class="stat-value">${t.count}</div><div class="stat-label">${t.partner_type}</div></div>`;});
+        document.getElementById('stats-grid').innerHTML=h;
+    }catch(e){showAlert(e.message,'error');}
+}
+
+async function loadPartners(){
+    try{
+        const q=document.getElementById('search').value.trim();
+        const t=document.getElementById('filter-type').value;
+        const s=document.getElementById('filter-status').value;
+        let url='/partners?limit=200';
+        if(q)url+='&search='+encodeURIComponent(q);
+        if(t)url+='&partner_type='+t;
+        if(s)url+='&status='+s;
+        const data=await apiFetch(url);
+        renderPartners(data.data||[]);
+    }catch(e){showAlert(e.message,'error');}
+}
+
+function renderPartners(list){
+    if(!list.length){document.getElementById('partners-body').innerHTML='<tr><td colspan="7" class="empty">Nessun partner trovato</td></tr>';return;}
+    document.getElementById('partners-body').innerHTML=list.map(p=>`<tr>
+        <td><strong>${p.name}</strong></td>
+        <td style="font-family:monospace;font-size:12px">${p.code||'—'}</td>
+        <td><span class="badge badge-${p.partner_type}">${p.partner_type}</span></td>
+        <td style="font-size:12px">${p.vat_number||'—'}</td>
+        <td style="font-size:12px">${p.contact_email||p.contact_name||'—'}</td>
+        <td><span class="badge badge-${p.status}">${p.status}</span></td>
+        <td>
+            <button class="btn btn-outline btn-sm" onclick='editPartner(${JSON.stringify(p).replace(/'/g,"&#39;")})'>✏️</button>
+            <button class="btn btn-danger btn-sm" onclick="deletePartner('${p.id}','${p.name.replace(/'/g,"")}')">🗑</button>
+        </td>
+    </tr>`).join('');
+}
+
+function showCreateModal(){
+    document.getElementById('modal-title').textContent='Nuovo partner';
+    document.getElementById('edit-id').value='';
+    ['f-name','f-code','f-vat','f-sdi','f-gln','f-peppol','f-edi','f-duns','f-cname','f-cemail','f-cphone','f-notes'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('f-type').value='supplier';
+    document.getElementById('f-status').value='active';
+    showModal('editModal');
+}
+
+function editPartner(p){
+    document.getElementById('modal-title').textContent='Modifica: '+p.name;
+    document.getElementById('edit-id').value=p.id;
+    document.getElementById('f-name').value=p.name||'';
+    document.getElementById('f-code').value=p.code||'';
+    document.getElementById('f-type').value=p.partner_type||'other';
+    document.getElementById('f-status').value=p.status||'active';
+    document.getElementById('f-vat').value=p.vat_number||'';
+    document.getElementById('f-sdi').value=p.sdi_code||'';
+    document.getElementById('f-gln').value=p.gln||'';
+    document.getElementById('f-peppol').value=p.peppol_id||'';
+    document.getElementById('f-edi').value=p.edi_id||'';
+    document.getElementById('f-duns').value=p.duns||'';
+    document.getElementById('f-cname').value=p.contact_name||'';
+    document.getElementById('f-cemail').value=p.contact_email||'';
+    document.getElementById('f-cphone').value=p.contact_phone||'';
+    document.getElementById('f-notes').value=p.notes||'';
+    showModal('editModal');
+}
+
+async function savePartner(){
+    const id=document.getElementById('edit-id').value;
+    const data={
+        name:document.getElementById('f-name').value.trim(),
+        code:document.getElementById('f-code').value.trim()||null,
+        partner_type:document.getElementById('f-type').value,
+        status:document.getElementById('f-status').value,
+        vat_number:document.getElementById('f-vat').value.trim()||null,
+        sdi_code:document.getElementById('f-sdi').value.trim()||null,
+        gln:document.getElementById('f-gln').value.trim()||null,
+        peppol_id:document.getElementById('f-peppol').value.trim()||null,
+        edi_id:document.getElementById('f-edi').value.trim()||null,
+        duns:document.getElementById('f-duns').value.trim()||null,
+        contact_name:document.getElementById('f-cname').value.trim()||null,
+        contact_email:document.getElementById('f-cemail').value.trim()||null,
+        contact_phone:document.getElementById('f-cphone').value.trim()||null,
+        notes:document.getElementById('f-notes').value.trim()||null,
+    };
+    if(!data.name)return showAlert('Nome obbligatorio','error');
+    try{
+        if(id){await apiFetch('/partners/'+id,{method:'PUT',body:JSON.stringify(data)});showAlert('Partner aggiornato');}
+        else{await apiFetch('/partners',{method:'POST',body:JSON.stringify(data)});showAlert('Partner creato');}
+        hideModal('editModal');loadPartners();loadStats();
+    }catch(e){showAlert(e.message,'error');}
+}
+
+async function deletePartner(id,name){
+    if(!confirm('Eliminare il partner "'+name+'"? I token collegati verranno scollegati.'))return;
+    try{await apiFetch('/partners/'+id,{method:'DELETE'});showAlert('Partner eliminato');loadPartners();loadStats();}
+    catch(e){showAlert(e.message,'error');}
+}
+
+function showImportModal(){document.getElementById('import-result').innerHTML='';showModal('importModal');}
+
+async function doImport(){
+    const f=document.getElementById('csv-file').files[0];
+    if(!f)return showAlert('Seleziona un file CSV','error');
+    const fd=new FormData();fd.append('file',f);
+    try{
+        const r=await fetch(API+'/partners/import-csv',{method:'POST',headers:{'Authorization':'Bearer '+token},body:fd});
+        const j=await r.json();
+        if(!r.ok)throw new Error(j.detail||'Errore');
+        let html='<div class="alert alert-success">✅ '+j.created+' partner importati</div>';
+        if(j.errors&&j.errors.length)html+='<div class="alert alert-error">⚠️ '+j.errors.length+' errori:<br>'+j.errors.slice(0,10).join('<br>')+'</div>';
+        document.getElementById('import-result').innerHTML=html;
+        loadPartners();loadStats();
+    }catch(e){document.getElementById('import-result').innerHTML='<div class="alert alert-error">'+e.message+'</div>';}
+}
+
+loadStats();
+loadPartners();
+</script>
+<script src="/assets/topbar.js"></script>
+</body></html>

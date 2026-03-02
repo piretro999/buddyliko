@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report — Buddyliko</title>
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+    <script src="/lang/i18n.js"></script>
+    <style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: system-ui, -apple-system, sans-serif; background: #0a0e1a; color: #e2e8f0; }
+.container { max-width: 1400px; margin: 0 auto; padding: 24px 20px; }
+.page-header { margin-bottom: 24px; display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px; }
+.page-header h1 { font-size: 22px; font-weight: 700; }
+.page-header p { color: #94a3b8; font-size: 13px; margin-top: 4px; }
+.header-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 20px; }
+.stat-card { background: #141b2d; padding: 16px; border-radius: 12px; border: 1px solid #2e3250; }
+.stat-value { font-size: 26px; font-weight: bold; color: #60a5fa; }
+.stat-value.green { color: #4ade80; }
+.stat-value.orange { color: #fb923c; }
+.stat-value.purple { color: #c084fc; }
+.stat-value.red { color: #f87171; }
+.stat-label { color: #94a3b8; font-size: 11px; margin-top: 4px; }
+.stat-delta { font-size: 11px; margin-top: 2px; }
+.stat-delta.up { color: #4ade80; }
+.stat-delta.down { color: #f87171; }
+.stat-delta.neutral { color: #64748b; }
+.section { background: #141b2d; border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 1px solid #2e3250; }
+.section-title { font-size: 15px; font-weight: 600; margin-bottom: 14px; color: #e2e8f0; display: flex; align-items: center; gap: 8px; justify-content: space-between; }
+.section-title .count { background: #1e3a5f; color: #60a5fa; padding: 2px 8px; border-radius: 10px; font-size: 11px; }
+table { width: 100%; border-collapse: collapse; }
+th { background: #0d1220; padding: 10px 12px; text-align: left; font-weight: 600; font-size: 11px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid #2e3250; position: sticky; top: 0; }
+td { padding: 10px 12px; border-bottom: 1px solid #1e2235; font-size: 13px; color: #e2e8f0; }
+tr:hover td { background: #0f172a; }
+.badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+.badge-user { background: rgba(21,101,192,.25); color: #60a5fa; }
+.badge-api_token { background: rgba(74,20,140,.25); color: #c084fc; }
+.badge-transform { background: rgba(46,125,50,.25); color: #4ade80; }
+.badge-ai_mapping { background: rgba(230,81,0,.25); color: #fb923c; }
+.badge-ai_codegen { background: rgba(136,14,79,.25); color: #f472b6; }
+.badge-validate { background: rgba(21,101,192,.2); color: #93c5fd; }
+.badge-error { background: rgba(198,40,40,.2); color: #f87171; }
+.badge-completed { background: rgba(46,125,50,.2); color: #4ade80; }
+.badge-active { background: rgba(46,125,50,.2); color: #4ade80; }
+.badge-FREE { background: rgba(69,90,100,.25); color: #94a3b8; }
+.badge-PRO { background: rgba(21,101,192,.25); color: #60a5fa; }
+.badge-ENTERPRISE { background: rgba(136,14,79,.25); color: #f472b6; }
+.badge-PARTNER { background: rgba(46,125,50,.25); color: #4ade80; }
+.btn { padding: 7px 14px; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; transition: all 0.15s; display: inline-flex; align-items: center; gap: 6px; }
+.btn:hover { opacity: 0.85; transform: translateY(-1px); }
+.btn-primary { background: #2563eb; color: white; }
+.btn-success { background: #059669; color: white; }
+.btn-outline { background: transparent; border: 1px solid #2e3250; color: #94a3b8; }
+.btn-outline:hover { border-color: #60a5fa; color: #60a5fa; }
+.btn-sm { padding: 4px 10px; font-size: 11px; }
+.btn-csv { background: #065f46; color: #d1fae5; }
+.btn-csv:hover { background: #047857; }
+.alert { padding: 12px 16px; border-radius: 8px; margin-bottom: 14px; font-size: 13px; animation: fadeIn 0.3s; }
+.alert-success { background: rgba(46,125,50,.15); color: #4ade80; border-left: 4px solid #059669; }
+.alert-error { background: rgba(198,40,40,.15); color: #f87171; border-left: 4px solid #dc2626; }
+.alert-info { background: rgba(21,101,192,.15); color: #60a5fa; border-left: 4px solid #2563eb; }
+.subnav { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+.subnav a { padding: 8px 16px; border-radius: 8px; text-decoration: none; font-size: 13px; font-weight: 500; color: #94a3b8; background: #0d1220; border: 1px solid #2e3250; transition: all .15s; }
+.subnav a:hover { border-color: #60a5fa; color: #60a5fa; }
+.subnav a.active { background: #1e3a5f; color: #93c5fd; border-color: #1e3a5f; }
+.tab-bar { display: flex; gap: 2px; margin-bottom: 20px; background: #0d1220; border-radius: 10px; padding: 4px; border: 1px solid #2e3250; overflow-x: auto; }
+.tab { padding: 8px 16px; cursor: pointer; border-radius: 8px; font-size: 13px; font-weight: 500; color: #94a3b8; background: none; border: none; transition: all 0.15s; white-space: nowrap; font-family: inherit; }
+.tab.active { color: #93c5fd; background: #1e3a5f; }
+.tab:hover:not(.active) { background: #141b2d; color: #e2e8f0; }
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+.chart-wrap { position: relative; height: 260px; }
+.form-group label { display: block; color: #94a3b8; font-size: 12px; font-weight: 600; margin-bottom: 4px; }
+.form-group select, .form-group input { background: #0a0e1a; border: 1px solid #2e3250; color: #e2e8f0; border-radius: 6px; padding: 6px 10px; font-size: 13px; font-family: inherit; }
+.form-group select:focus { outline: none; border-color: #2563eb; }
+.progress-bar { background: #0d1220; border-radius: 6px; height: 22px; overflow: hidden; position: relative; }
+.progress-fill { height: 100%; border-radius: 6px; transition: width 0.5s; display: flex; align-items: center; padding-left: 8px; font-size: 11px; font-weight: 600; color: white; min-width: 2px; }
+.progress-fill.blue { background: linear-gradient(90deg, #2563eb, #3b82f6); }
+.progress-fill.purple { background: linear-gradient(90deg, #7c3aed, #a78bfa); }
+.progress-fill.green { background: linear-gradient(90deg, #059669, #34d399); }
+.progress-fill.orange { background: linear-gradient(90deg, #d97706, #fbbf24); }
+.empty { padding: 30px; text-align: center; color: #64748b; font-size: 13px; }
+.loading { padding: 20px; text-align: center; color: #64748b; }
+.tbl-scroll { max-height: 400px; overflow-y: auto; border-radius: 8px; border: 1px solid #2e3250; }
+.mono { font-family: 'SF Mono', 'Cascadia Code', monospace; font-size: 12px; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+@media (max-width: 900px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } .stats { grid-template-columns: 1fr 1fr; } }
+    </style>
+</head>
+<body>
+<div id="buddy-topbar"></div>
+<div class="container">
+    <div class="subnav">
+        <a href="org-dashboard.html">📊 Dashboard</a>
+        <a href="org-users.html">👥 Utenti</a>
+        <a href="org-billing.html">💰 Billing</a>
+        <a href="org-partners.html">🤝 Partner</a>
+        <a href="org-reports.html" class="active">📈 Report</a>
+        <a href="partner-dashboard.html">🤝 Partnership</a>
+        <a href="org-settings.html">⚙️ Impostazioni</a>
+    </div>
+    <div id="alerts"></div>
+
+    <!-- Header con selettore mese -->
+    <div class="page-header">
+        <div>
+            <h1>📈 Report & Analisi Costi</h1>
+            <p id="report-subtitle">Caricamento...</p>
+        </div>
+        <div class="header-actions">
+            <div class="form-group" style="margin:0">
+                <select id="month-select" onchange="switchMonth()">
+                    <option value="">Mese corrente</option>
+                </select>
+            </div>
+            <button class="btn btn-outline btn-sm" onclick="refreshData()">🔄 Aggiorna</button>
+        </div>
+    </div>
+
+    <!-- KPI Cards -->
+    <div class="stats" id="kpi-cards"><div class="loading">Caricamento...</div></div>
+
+    <!-- Tab bar -->
+    <div class="tab-bar" id="tab-bar">
+        <button class="tab active" data-tab="overview" onclick="switchTab('overview')">📊 Panoramica</button>
+        <button class="tab" data-tab="auth" onclick="switchTab('auth')">👤🔑 Umani vs Token</button>
+        <button class="tab" data-tab="partners" onclick="switchTab('partners')">🤝 Partner</button>
+        <button class="tab" data-tab="ai" onclick="switchTab('ai')">🤖 AI</button>
+        <button class="tab" data-tab="tags" onclick="switchTab('tags')">🏷️ Tag / CdC</button>
+        <button class="tab" data-tab="operations" onclick="switchTab('operations')">📋 Operazioni</button>
+    </div>
+
+    <!-- ═══ TAB: PANORAMICA ═══ -->
+    <div class="tab-panel active" id="panel-overview">
+        <div class="grid-2">
+            <div class="section">
+                <div class="section-title">📈 Trend giornaliero <button class="btn btn-csv btn-sm" onclick="exportCSV('summary')">📥 CSV</button></div>
+                <div class="chart-wrap"><canvas id="trendChart"></canvas></div>
+            </div>
+            <div class="section">
+                <div class="section-title">📊 Confronto mese precedente</div>
+                <div id="comparison-bars"></div>
+            </div>
+        </div>
+        <div class="grid-2">
+            <div class="section">
+                <div class="section-title">🏆 Top operazioni per costo <button class="btn btn-csv btn-sm" onclick="exportCSV('top')">📥 CSV</button></div>
+                <div class="tbl-scroll" id="top-operations-table"></div>
+            </div>
+            <div class="section">
+                <div class="section-title">📊 Distribuzione operazioni</div>
+                <div class="chart-wrap"><canvas id="opTypesChart"></canvas></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ TAB: UMANI vs TOKEN ═══ -->
+    <div class="tab-panel" id="panel-auth">
+        <div class="grid-2">
+            <div class="section">
+                <div class="section-title">📊 Ripartizione per tipo accesso <button class="btn btn-csv btn-sm" onclick="exportCSV('auth')">📥 CSV</button></div>
+                <div class="chart-wrap"><canvas id="authPieChart"></canvas></div>
+            </div>
+            <div class="section">
+                <div class="section-title">📋 Dettaglio</div>
+                <div id="auth-detail-table"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ TAB: PARTNER ═══ -->
+    <div class="tab-panel" id="panel-partners">
+        <div class="section">
+            <div class="section-title">🤝 Costi per Trading Partner <button class="btn btn-csv btn-sm" onclick="exportCSV('partners')">📥 CSV</button></div>
+            <div class="grid-2">
+                <div class="chart-wrap"><canvas id="partnerChart"></canvas></div>
+                <div class="tbl-scroll" id="partner-detail-table"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ TAB: AI ═══ -->
+    <div class="tab-panel" id="panel-ai">
+        <div class="grid-2">
+            <div class="section">
+                <div class="section-title">🤖 Costi AI per Provider <button class="btn btn-csv btn-sm" onclick="exportCSV('ai')">📥 CSV</button></div>
+                <div class="chart-wrap"><canvas id="aiProviderChart"></canvas></div>
+            </div>
+            <div class="section">
+                <div class="section-title">📋 Dettaglio per modello</div>
+                <div class="tbl-scroll" id="ai-detail-table"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ TAB: TAG ═══ -->
+    <div class="tab-panel" id="panel-tags">
+        <div class="section">
+            <div class="section-title">🏷️ Costi per Tag / Centro di Costo <button class="btn btn-csv btn-sm" onclick="exportCSV('tags')">📥 CSV</button></div>
+            <div id="tags-content"><div class="loading">Caricamento...</div></div>
+        </div>
+    </div>
+
+    <!-- ═══ TAB: OPERAZIONI ═══ -->
+    <div class="tab-panel" id="panel-operations">
+        <div class="section">
+            <div class="section-title">📋 Log operazioni
+                <div style="display:flex;gap:6px;align-items:center">
+                    <select id="filter-auth" class="btn btn-outline btn-sm" style="background:#0a0e1a" onchange="loadOperations()">
+                        <option value="">Tutti i tipi</option>
+                        <option value="user">👤 Umani</option>
+                        <option value="api_token">🔑 Token</option>
+                    </select>
+                    <select id="filter-op" class="btn btn-outline btn-sm" style="background:#0a0e1a" onchange="loadOperations()">
+                        <option value="">Tutte le operazioni</option>
+                        <option value="transform">Transform</option>
+                        <option value="validate">Validate</option>
+                        <option value="ai_mapping">AI Mapping</option>
+                        <option value="ai_codegen">AI Codegen</option>
+                        <option value="batch_transform">Batch</option>
+                    </select>
+                    <select id="filter-status" class="btn btn-outline btn-sm" style="background:#0a0e1a" onchange="loadOperations()">
+                        <option value="">Tutti gli stati</option>
+                        <option value="completed">✅ Completed</option>
+                        <option value="error">❌ Error</option>
+                    </select>
+                    <button class="btn btn-csv btn-sm" onclick="exportCSV('operations')">📥 CSV</button>
+                </div>
+            </div>
+            <div class="tbl-scroll" style="max-height:600px" id="operations-table"><div class="loading">Caricamento...</div></div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+<script>
+// ═══════════════════════════════════════════════════════════════
+// GLOBALS
+// ═══════════════════════════════════════════════════════════════
+const API = '/api';
+const token = localStorage.getItem('buddyliko_token');
+if (!token) window.location.href = 'login.html';
+
+let currentMonth = '';
+let charts = {};
+let cachedData = {};
+
+// ═══════════════════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════════════════
+function showAlert(msg, type = 'success') {
+    const d = document.createElement('div');
+    d.className = 'alert alert-' + type;
+    d.textContent = msg;
+    const el = document.getElementById('alerts');
+    el.insertBefore(d, el.firstChild);
+    setTimeout(() => d.remove(), 4000);
+}
+
+async function apiFetch(path, opts = {}) {
+    const r = await fetch(API + path, {
+        ...opts,
+        headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json', ...(opts.headers || {}) }
+    });
+    if (!r.ok) {
+        let e; try { e = await r.json(); } catch { e = { detail: 'HTTP ' + r.status }; }
+        throw new Error(e.detail || e.message || 'Errore');
+    }
+    return r.json();
+}
+
+function fmtEur(v) { return '\u20ac' + parseFloat(v || 0).toFixed(2); }
+function fmtUsd(v) { return '$' + parseFloat(v || 0).toFixed(4); }
+function fmtNum(n) { return (n || 0).toLocaleString('it-IT'); }
+function fmtBytes(b) {
+    if (!b || b === 0) return '0 B';
+    const u = ['B', 'KB', 'MB', 'GB']; const i = Math.floor(Math.log(Math.abs(b)) / Math.log(1024));
+    return (b / Math.pow(1024, i)).toFixed(i > 0 ? 1 : 0) + ' ' + u[i];
+}
+function fmtMs(ms) { return ms > 1000 ? (ms / 1000).toFixed(1) + 's' : (ms || 0) + 'ms'; }
+function fmtDT(d) { if (!d) return '\u2014'; return new Date(d).toLocaleString('it-IT', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }); }
+function deltaHtml(d) {
+    if (!d || (!d.delta && !d.delta_pct)) return '';
+    const cls = d.delta > 0 ? 'up' : d.delta < 0 ? 'down' : 'neutral';
+    const arrow = d.delta > 0 ? '\u25b2' : d.delta < 0 ? '\u25bc' : '\u25cf';
+    return `<div class="stat-delta ${cls}">${arrow} ${d.delta_pct > 0 ? '+' : ''}${d.delta_pct}%</div>`;
+}
+function destroyChart(name) { if (charts[name]) { charts[name].destroy(); delete charts[name]; } }
+
+const COLORS = ['#3b82f6', '#8b5cf6', '#f59e0b', '#10b981', '#ef4444', '#06b6d4', '#f472b6', '#a3e635'];
+const COLORS_A = COLORS.map(c => c + '33');
+
+// ═══════════════════════════════════════════════════════════════
+// TAB SWITCHING
+// ═══════════════════════════════════════════════════════════════
+function switchTab(tab) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === 'panel-' + tab));
+    // Lazy load tab data
+    if (tab === 'auth' && !cachedData.auth) loadAuth();
+    if (tab === 'partners' && !cachedData.partners) loadPartners();
+    if (tab === 'ai' && !cachedData.ai) loadAI();
+    if (tab === 'tags' && !cachedData.tags) loadTags();
+    if (tab === 'operations' && !cachedData.operations) loadOperations();
+}
+
+function switchMonth() {
+    currentMonth = document.getElementById('month-select').value;
+    cachedData = {};
+    loadAll();
+}
+
+async function refreshData() {
+    try {
+        await apiFetch('/reports/refresh', { method: 'POST' });
+        cachedData = {};
+        showAlert('Dati aggiornati');
+        loadAll();
+    } catch (e) { showAlert(e.message, 'error'); }
+}
+
+function exportCSV(report) {
+    const params = new URLSearchParams({ report });
+    if (currentMonth) params.set('month', currentMonth);
+    if (report === 'operations') {
+        const a = document.getElementById('filter-auth').value;
+        const o = document.getElementById('filter-op').value;
+        const s = document.getElementById('filter-status').value;
+        if (a) params.set('auth_type', a);
+        if (o) params.set('operation', o);
+        if (s) params.set('status', s);
+    }
+    const url = API + '/reports/export/csv?' + params.toString();
+    const a = document.createElement('a');
+    a.href = url;
+    a.setAttribute('download', '');
+    // Add auth header via fetch
+    fetch(url, { headers: { 'Authorization': 'Bearer ' + token } })
+        .then(r => r.blob())
+        .then(blob => {
+            const u = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = u;
+            link.download = report + '_report.csv';
+            link.click();
+            URL.revokeObjectURL(u);
+        })
+        .catch(e => showAlert('Export fallito: ' + e.message, 'error'));
+}
+
+// ═══════════════════════════════════════════════════════════════
+// LOAD ALL
+// ═══════════════════════════════════════════════════════════════
+async function loadAll() {
+    const mp = currentMonth ? '?month=' + currentMonth : '';
+    try {
+        const [summary, months, trend, opTypes, top] = await Promise.all([
+            apiFetch('/reports/summary' + mp),
+            apiFetch('/reports/available-months'),
+            apiFetch('/reports/trend' + mp).catch(() => ({ current: [], previous: [] })),
+            apiFetch('/reports/operation-types' + mp).catch(() => ({ data: [] })),
+            apiFetch('/reports/top-operations' + mp + (mp ? '&' : '?') + 'limit=10').catch(() => ({ data: [] })),
+        ]);
+
+        cachedData.summary = summary;
+        cachedData.trend = trend;
+
+        // Month selector
+        populateMonths(months.months || []);
+
+        // Subtitle
+        document.getElementById('report-subtitle').innerHTML =
+            `<span class="badge badge-${summary.plan || 'FREE'}">${summary.plan || 'FREE'}</span> ${summary.org_name} \u2014 ${summary.month}`;
+
+        renderKPI(summary);
+        renderTrend(trend);
+        renderComparison(summary);
+        renderOpTypes(opTypes.data || []);
+        renderTopOperations(top.data || []);
+
+    } catch (e) { showAlert(e.message, 'error'); }
+}
+
+function populateMonths(months) {
+    const sel = document.getElementById('month-select');
+    const cur = sel.value;
+    sel.innerHTML = '<option value="">Mese corrente</option>';
+    months.forEach(m => {
+        const opt = document.createElement('option');
+        opt.value = m; opt.textContent = m;
+        if (m === cur) opt.selected = true;
+        sel.appendChild(opt);
+    });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RENDER: KPI CARDS
+// ═══════════════════════════════════════════════════════════════
+function renderKPI(s) {
+    const cards = [
+        { label: 'Trasformazioni', value: fmtNum(s.transforms?.current), cls: '', delta: s.transforms },
+        { label: 'AI Calls', value: fmtNum(s.ai_calls?.current), cls: 'purple', delta: s.ai_calls },
+        { label: 'Fatturabile', value: fmtEur(s.billable_eur?.current), cls: 'green', delta: s.billable_eur },
+        { label: 'Costo piattaforma', value: fmtEur(s.platform_cost_eur?.current), cls: 'orange', delta: s.platform_cost_eur },
+        { label: 'Margine', value: fmtEur(s.margin_eur?.current), cls: 'green', delta: s.margin_eur },
+        { label: 'Costo AI (USD)', value: fmtUsd(s.ai_cost_usd?.current), cls: 'orange', delta: s.ai_cost_usd },
+        { label: 'Utenti attivi', value: fmtNum(s.unique_users), cls: '' },
+        { label: 'Errori', value: fmtNum(s.error_count?.current), cls: 'red', delta: s.error_count },
+    ];
+    document.getElementById('kpi-cards').innerHTML = cards.map(c =>
+        `<div class="stat-card">
+            <div class="stat-value ${c.cls}">${c.value}</div>
+            <div class="stat-label">${c.label}</div>
+            ${c.delta ? deltaHtml(c.delta) : ''}
+        </div>`
+    ).join('');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RENDER: TREND CHART
+// ═══════════════════════════════════════════════════════════════
+function renderTrend(data) {
+    destroyChart('trend');
+    const canvas = document.getElementById('trendChart');
+    const cur = data.current || [];
+    const prev = data.previous || [];
+    if (!cur.length) { canvas.parentElement.innerHTML = '<div class="empty">Nessun dato trend</div>'; return; }
+
+    charts.trend = new Chart(canvas, {
+        type: 'line',
+        data: {
+            labels: cur.map(d => (d.period_key || '').slice(8)),
+            datasets: [
+                { label: 'Fatturabile \u20ac', data: cur.map(d => parseFloat(d.billable_eur_total || 0)),
+                  borderColor: '#4ade80', backgroundColor: '#4ade8022', fill: true, tension: 0.3 },
+                { label: 'Costo \u20ac', data: cur.map(d => parseFloat(d.platform_cost_eur || 0)),
+                  borderColor: '#f87171', backgroundColor: '#f8717122', fill: true, tension: 0.3 },
+                { label: 'Mese prec.', data: prev.map(d => parseFloat(d.billable_eur_total || 0)),
+                  borderColor: '#64748b', borderDash: [5, 3], fill: false, tension: 0.3, pointRadius: 0 },
+            ]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            scales: {
+                y: { beginAtZero: true, ticks: { color: '#64748b' }, grid: { color: '#1e223522' } },
+                x: { ticks: { color: '#64748b' }, grid: { display: false } }
+            },
+            plugins: { legend: { labels: { color: '#94a3b8', usePointStyle: true, pointStyle: 'line' } } }
+        }
+    });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RENDER: COMPARISON BARS
+// ═══════════════════════════════════════════════════════════════
+function renderComparison(s) {
+    const items = [
+        { label: 'Trasformazioni', d: s.transforms, color: 'blue' },
+        { label: 'AI Calls', d: s.ai_calls, color: 'purple' },
+        { label: 'Fatturabile \u20ac', d: s.billable_eur, color: 'green' },
+        { label: 'Margine \u20ac', d: s.margin_eur, color: 'green' },
+        { label: 'Errori', d: s.error_count, color: 'orange' },
+    ];
+    const maxVal = Math.max(...items.map(i => Math.max(i.d?.current || 0, i.d?.previous || 0)), 1);
+    document.getElementById('comparison-bars').innerHTML = items.map(i => {
+        const cp = Math.max(2, (i.d?.current || 0) / maxVal * 100);
+        const pp = Math.max(2, (i.d?.previous || 0) / maxVal * 100);
+        const cls = (i.d?.delta || 0) > 0 ? 'up' : (i.d?.delta || 0) < 0 ? 'down' : 'neutral';
+        const arrow = (i.d?.delta || 0) > 0 ? '\u25b2' : (i.d?.delta || 0) < 0 ? '\u25bc' : '';
+        return `<div style="margin-bottom:14px">
+            <div style="display:flex;justify-content:space-between;margin-bottom:3px">
+                <span style="font-size:12px;font-weight:600">${i.label}</span>
+                <span class="stat-delta ${cls}" style="font-size:12px">${arrow} ${i.d?.delta_pct > 0 ? '+' : ''}${i.d?.delta_pct || 0}%</span>
+            </div>
+            <div class="progress-bar" style="height:18px;margin-bottom:3px"><div class="progress-fill ${i.color}" style="width:${cp}%">${typeof i.d?.current === 'number' && i.d.current > 100 ? fmtNum(Math.round(i.d.current)) : ''}</div></div>
+            <div class="progress-bar" style="height:12px;opacity:.5"><div class="progress-fill ${i.color}" style="width:${pp}%"></div></div>
+            <div style="font-size:10px;color:#64748b;margin-top:1px">mese prec.: ${typeof i.d?.previous === 'number' ? fmtNum(Math.round(i.d.previous)) : i.d?.previous || 0}</div>
+        </div>`;
+    }).join('');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RENDER: OP TYPES PIE
+// ═══════════════════════════════════════════════════════════════
+function renderOpTypes(data) {
+    destroyChart('opTypes');
+    const canvas = document.getElementById('opTypesChart');
+    if (!data.length) { canvas.parentElement.innerHTML = '<div class="empty">Nessun dato</div>'; return; }
+    charts.opTypes = new Chart(canvas, {
+        type: 'doughnut',
+        data: {
+            labels: data.map(d => d.operation),
+            datasets: [{ data: data.map(d => d.count), backgroundColor: COLORS.slice(0, data.length), borderWidth: 0 }]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { position: 'right', labels: { color: '#94a3b8', padding: 12, font: { size: 11 } } } }
+        }
+    });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RENDER: TOP OPERATIONS
+// ═══════════════════════════════════════════════════════════════
+function renderTopOperations(data) {
+    if (!data.length) { document.getElementById('top-operations-table').innerHTML = '<div class="empty">Nessuna operazione</div>'; return; }
+    document.getElementById('top-operations-table').innerHTML = `<table><thead><tr>
+        <th>Operazione</th><th>Tipo</th><th>Fatturabile</th><th>AI USD</th><th>Durata</th><th>Data</th>
+    </tr></thead><tbody>${data.map(d => `<tr>
+        <td><span class="badge badge-${d.operation}">${d.operation}</span></td>
+        <td><span class="badge badge-${d.auth_type}">${d.auth_type === 'user' ? '\ud83d\udc64' : '\ud83d\udd11'} ${(d.auth_name || '').substring(0, 20)}</span></td>
+        <td class="mono" style="color:#4ade80">${fmtEur(d.billable_amount_eur)}</td>
+        <td class="mono">${fmtUsd(d.ai_cost_usd)}</td>
+        <td class="mono">${fmtMs(d.duration_ms)}</td>
+        <td style="font-size:11px;color:#94a3b8">${fmtDT(d.started_at)}</td>
+    </tr>`).join('')}</tbody></table>`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TAB: AUTH BREAKDOWN
+// ═══════════════════════════════════════════════════════════════
+async function loadAuth() {
+    const mp = currentMonth ? '?month=' + currentMonth : '';
+    try {
+        const data = await apiFetch('/reports/auth-breakdown' + mp);
+        cachedData.auth = data;
+        renderAuthPie(data.data || []);
+        renderAuthTable(data.data || []);
+    } catch (e) { showAlert(e.message, 'error'); }
+}
+
+function renderAuthPie(data) {
+    destroyChart('authPie');
+    const canvas = document.getElementById('authPieChart');
+    if (!data.length) { canvas.parentElement.innerHTML = '<div class="empty">Nessun dato</div>'; return; }
+    const labels = data.map(d => d.auth_type === 'user' ? '\ud83d\udc64 Utenti umani' : '\ud83d\udd11 API Token');
+    charts.authPie = new Chart(canvas, {
+        type: 'pie',
+        data: {
+            labels,
+            datasets: [{
+                data: data.map(d => d.operations),
+                backgroundColor: ['#3b82f6', '#8b5cf6'],
+                borderWidth: 0
+            }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#94a3b8', padding: 16, font: { size: 13 } } } } }
+    });
+}
+
+function renderAuthTable(data) {
+    if (!data.length) { document.getElementById('auth-detail-table').innerHTML = '<div class="empty">Nessun dato</div>'; return; }
+    document.getElementById('auth-detail-table').innerHTML = `<table><thead><tr>
+        <th>Tipo</th><th>Operazioni</th><th>%</th><th>Transforms</th><th>AI Calls</th><th>Fatturabile</th><th>Margine</th><th>Errori</th><th>Identit\u00e0</th>
+    </tr></thead><tbody>${data.map(d => `<tr>
+        <td><span class="badge badge-${d.auth_type}">${d.auth_type === 'user' ? '\ud83d\udc64 User' : '\ud83d\udd11 Token'}</span></td>
+        <td>${fmtNum(d.operations)}</td><td>${d.pct_operations}%</td>
+        <td>${fmtNum(d.transforms)}</td><td>${fmtNum(d.ai_calls)}</td>
+        <td class="mono" style="color:#4ade80">${fmtEur(d.billable_eur)}</td>
+        <td class="mono" style="color:#c084fc">${fmtEur(d.margin_eur)}</td>
+        <td>${d.errors}</td><td>${d.unique_identities}</td>
+    </tr>`).join('')}</tbody></table>`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TAB: PARTNERS
+// ═══════════════════════════════════════════════════════════════
+async function loadPartners() {
+    const mp = currentMonth ? '?month=' + currentMonth : '';
+    try {
+        const data = await apiFetch('/reports/partner-breakdown' + mp);
+        cachedData.partners = data;
+        renderPartnerChart(data.with_partner || []);
+        renderPartnerTable(data.with_partner || []);
+    } catch (e) { showAlert(e.message, 'error'); }
+}
+
+function renderPartnerChart(data) {
+    destroyChart('partner');
+    const canvas = document.getElementById('partnerChart');
+    if (!data.length) { canvas.parentElement.innerHTML = '<div class="empty">Nessun partner con operazioni</div>'; return; }
+    charts.partner = new Chart(canvas, {
+        type: 'bar',
+        data: {
+            labels: data.map(d => (d.partner_name || 'N/A').substring(0, 20)),
+            datasets: [
+                { label: 'Fatturabile \u20ac', data: data.map(d => parseFloat(d.billable_eur || 0)), backgroundColor: '#4ade8088', borderColor: '#4ade80', borderWidth: 1 },
+                { label: 'Margine \u20ac', data: data.map(d => parseFloat(d.margin_eur || 0)), backgroundColor: '#c084fc88', borderColor: '#c084fc', borderWidth: 1 },
+            ]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false, indexAxis: 'y',
+            scales: { x: { ticks: { color: '#64748b' }, grid: { color: '#1e223522' } }, y: { ticks: { color: '#94a3b8', font: { size: 11 } } } },
+            plugins: { legend: { labels: { color: '#94a3b8' } } }
+        }
+    });
+}
+
+function renderPartnerTable(data) {
+    const el = document.getElementById('partner-detail-table');
+    if (!data.length) { el.innerHTML = '<div class="empty">Nessun partner</div>'; return; }
+    el.innerHTML = `<table><thead><tr>
+        <th>Partner</th><th>Tipo</th><th>Ops</th><th>Fatturabile</th><th>Margine</th><th>Errori</th>
+    </tr></thead><tbody>${data.map(d => `<tr>
+        <td>${d.partner_name || d.partner_id || '\u2014'}</td>
+        <td style="font-size:11px">${d.partner_type || ''}</td>
+        <td>${fmtNum(d.operations)}</td>
+        <td class="mono" style="color:#4ade80">${fmtEur(d.billable_eur)}</td>
+        <td class="mono" style="color:#c084fc">${fmtEur(d.margin_eur)}</td>
+        <td>${d.errors || 0}</td>
+    </tr>`).join('')}</tbody></table>`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TAB: AI
+// ═══════════════════════════════════════════════════════════════
+async function loadAI() {
+    const mp = currentMonth ? '?month=' + currentMonth : '';
+    try {
+        const data = await apiFetch('/reports/ai-breakdown' + mp);
+        cachedData.ai = data;
+        renderAIProviderChart(data.by_provider || []);
+        renderAIDetailTable(data.detail || []);
+    } catch (e) { showAlert(e.message, 'error'); }
+}
+
+function renderAIProviderChart(data) {
+    destroyChart('aiProvider');
+    const canvas = document.getElementById('aiProviderChart');
+    if (!data.length) { canvas.parentElement.innerHTML = '<div class="empty">Nessuna chiamata AI</div>'; return; }
+    charts.aiProvider = new Chart(canvas, {
+        type: 'doughnut',
+        data: {
+            labels: data.map(d => d.ai_provider),
+            datasets: [{ data: data.map(d => parseFloat(d.cost_usd || 0)), backgroundColor: COLORS.slice(0, data.length), borderWidth: 0 }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { color: '#94a3b8' } } } }
+    });
+}
+
+function renderAIDetailTable(data) {
+    const el = document.getElementById('ai-detail-table');
+    if (!data.length) { el.innerHTML = '<div class="empty">Nessun dato AI</div>'; return; }
+    el.innerHTML = `<table><thead><tr>
+        <th>Provider</th><th>Modello</th><th>Operazione</th><th>Calls</th><th>Token</th><th>Costo USD</th><th>Fatturabile</th><th>Durata media</th>
+    </tr></thead><tbody>${data.map(d => `<tr>
+        <td>${d.ai_provider || ''}</td>
+        <td style="font-size:11px">${(d.ai_model || '').substring(0, 30)}</td>
+        <td><span class="badge badge-${d.operation}">${d.operation}</span></td>
+        <td>${fmtNum(d.calls)}</td>
+        <td class="mono">${fmtNum(d.total_tokens)}</td>
+        <td class="mono">${fmtUsd(d.cost_usd)}</td>
+        <td class="mono" style="color:#4ade80">${fmtEur(d.billable_eur)}</td>
+        <td class="mono">${fmtMs(d.avg_duration_ms)}</td>
+    </tr>`).join('')}</tbody></table>`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TAB: TAGS
+// ═══════════════════════════════════════════════════════════════
+async function loadTags() {
+    const mp = currentMonth ? '?month=' + currentMonth : '';
+    try {
+        const data = await apiFetch('/reports/tag-breakdown' + mp);
+        cachedData.tags = data;
+        renderTags(data);
+    } catch (e) { showAlert(e.message, 'error'); }
+}
+
+function renderTags(data) {
+    const el = document.getElementById('tags-content');
+    if (data.available_tags && data.available_tags.length) {
+        el.innerHTML = `<table><thead><tr>
+            <th>Tag Key</th><th>Valori unici</th><th>Operazioni</th><th>Fatturabile</th><th></th>
+        </tr></thead><tbody>${data.available_tags.map(t => `<tr>
+            <td><span class="badge" style="background:#1e3a5f;color:#93c5fd">\ud83c\udff7\ufe0f ${t.tag_key}</span></td>
+            <td>${t.unique_values || 0}</td>
+            <td>${fmtNum(t.operations)}</td>
+            <td class="mono" style="color:#4ade80">${fmtEur(t.billable_eur)}</td>
+            <td><button class="btn btn-outline btn-sm" onclick="drillTag('${t.tag_key}')">Dettaglio \u2192</button></td>
+        </tr>`).join('')}</tbody></table>`;
+    } else if (data.data && data.data.length) {
+        el.innerHTML = `<div style="margin-bottom:12px">
+            <button class="btn btn-outline btn-sm" onclick="loadTags()">\u2190 Tutti i tag</button>
+            <span style="margin-left:8px;font-weight:600">Tag: ${data.tag_key}</span>
+        </div>
+        <table><thead><tr><th>Valore</th><th>Operazioni</th><th>AI USD</th><th>Costo</th><th>Fatturabile</th><th>Margine</th></tr></thead>
+        <tbody>${data.data.map(d => `<tr>
+            <td>${d.tag_value || '\u2014'}</td><td>${fmtNum(d.operations)}</td>
+            <td class="mono">${fmtUsd(d.ai_cost_usd)}</td>
+            <td class="mono">${fmtEur(d.platform_cost_eur)}</td>
+            <td class="mono" style="color:#4ade80">${fmtEur(d.billable_eur)}</td>
+            <td class="mono" style="color:#c084fc">${fmtEur(d.margin_eur)}</td>
+        </tr>`).join('')}</tbody></table>`;
+    } else {
+        el.innerHTML = '<div class="empty">Nessun tag utilizzato questo mese. I tag vengono assegnati automaticamente ai token API.</div>';
+    }
+}
+
+async function drillTag(tagKey) {
+    const mp = currentMonth ? '&month=' + currentMonth : '';
+    try {
+        const data = await apiFetch('/reports/tag-breakdown?tag_key=' + encodeURIComponent(tagKey) + mp);
+        cachedData.tags = data;
+        renderTags(data);
+    } catch (e) { showAlert(e.message, 'error'); }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TAB: OPERATIONS
+// ═══════════════════════════════════════════════════════════════
+async function loadOperations() {
+    const mp = currentMonth ? 'month=' + currentMonth + '&' : '';
+    const auth = document.getElementById('filter-auth').value;
+    const op = document.getElementById('filter-op').value;
+    const st = document.getElementById('filter-status').value;
+    let qs = mp + 'limit=200';
+    if (auth) qs += '&auth_type=' + auth;
+    if (op) qs += '&operation=' + op;
+    if (st) qs += '&status=' + st;
+    try {
+        const data = await apiFetch('/reports/operations?' + qs);
+        cachedData.operations = data;
+        renderOperations(data.data || []);
+    } catch (e) { showAlert(e.message, 'error'); }
+}
+
+function renderOperations(data) {
+    const el = document.getElementById('operations-table');
+    if (!data.length) { el.innerHTML = '<div class="empty">Nessuna operazione trovata</div>'; return; }
+    el.innerHTML = `<table><thead><tr>
+        <th>Data</th><th>Tipo</th><th>Operazione</th><th>Formato</th><th>AI</th><th>Costo</th><th>Fatturabile</th><th>Margine</th><th>Durata</th><th>Stato</th>
+    </tr></thead><tbody>${data.map(d => `<tr>
+        <td style="font-size:11px;white-space:nowrap">${fmtDT(d.started_at)}</td>
+        <td><span class="badge badge-${d.auth_type}">${d.auth_type === 'user' ? '\ud83d\udc64' : '\ud83d\udd11'} ${(d.auth_name || '').substring(0, 15)}</span></td>
+        <td><span class="badge badge-${d.operation}">${d.operation}</span></td>
+        <td style="font-size:11px">${d.input_format || ''}\u2192${d.output_format || ''}</td>
+        <td style="font-size:11px">${d.ai_provider ? d.ai_provider + ' ' + fmtUsd(d.ai_cost_usd) : '\u2014'}</td>
+        <td class="mono">${fmtEur(d.platform_cost_eur)}</td>
+        <td class="mono" style="color:#4ade80">${fmtEur(d.billable_amount_eur)}</td>
+        <td class="mono" style="color:#c084fc">${fmtEur(d.margin_eur)}</td>
+        <td class="mono">${fmtMs(d.duration_ms)}</td>
+        <td><span class="badge badge-${d.status}">${d.status}</span></td>
+    </tr>`).join('')}</tbody></table>`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════
+loadAll();
+</script>
+<script src="/assets/topbar.js"></script>
+</body></html>

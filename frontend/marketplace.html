@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Marketplace — Buddyliko</title>
+<link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+<script src="/lang/i18n.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui,-apple-system,sans-serif;background:#0a0e1a;color:#e2e8f0}
+.container{max-width:1400px;margin:0 auto;padding:24px 20px}
+.page-header{margin-bottom:24px;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px}
+.page-header h1{font-size:22px;font-weight:700}
+.page-header p{color:#94a3b8;font-size:13px;margin-top:4px}
+.tab-bar{display:flex;gap:2px;margin-bottom:20px;background:#0d1220;border-radius:10px;padding:4px;border:1px solid #2e3250;overflow-x:auto}
+.tab{padding:8px 16px;cursor:pointer;border-radius:8px;font-size:13px;font-weight:500;color:#94a3b8;background:none;border:none;transition:all .15s;white-space:nowrap;font-family:inherit}
+.tab.active{color:#93c5fd;background:#1e3a5f}.tab:hover:not(.active){background:#141b2d;color:#e2e8f0}
+.tab-panel{display:none}.tab-panel.active{display:block}
+.filters{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;align-items:center}
+.filters select,.filters input{background:#0d1220;border:1px solid #2e3250;color:#e2e8f0;border-radius:6px;padding:6px 10px;font-size:12px;font-family:inherit}
+.filters input{width:200px}
+.filters select:focus,.filters input:focus{outline:none;border-color:#2563eb}
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-bottom:20px}
+.card{background:#141b2d;border-radius:12px;padding:18px;border:1px solid #2e3250;transition:all .2s;cursor:pointer;position:relative}
+.card:hover{border-color:#3b82f6;transform:translateY(-2px);box-shadow:0 4px 20px rgba(59,130,246,.1)}
+.card-icon{font-size:28px;margin-bottom:8px}
+.card-name{font-size:15px;font-weight:600;margin-bottom:4px}
+.card-desc{color:#94a3b8;font-size:12px;line-height:1.5;margin-bottom:10px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.card-meta{display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:11px;color:#64748b}
+.card-meta .badge{font-size:10px}
+.card-stats{display:flex;gap:12px;margin-top:8px;font-size:11px;color:#94a3b8}
+.card-price{position:absolute;top:14px;right:14px;font-weight:700;font-size:14px}
+.card-price.free{color:#4ade80}.card-price.paid{color:#fb923c}
+.badge{display:inline-block;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600}
+.badge-builtin{background:rgba(46,125,50,.2);color:#4ade80}
+.badge-marketplace{background:rgba(230,81,0,.2);color:#fb923c}
+.badge-community{background:rgba(21,101,192,.2);color:#60a5fa}
+.badge-private{background:rgba(69,90,100,.2);color:#94a3b8}
+.badge-published{background:rgba(46,125,50,.2);color:#4ade80}
+.badge-draft{background:rgba(69,90,100,.2);color:#94a3b8}
+.badge-review{background:rgba(230,81,0,.2);color:#fb923c}
+.badge-deprecated{background:rgba(198,40,40,.2);color:#f87171}
+.badge-invoice{background:rgba(21,101,192,.15);color:#60a5fa}
+.badge-order{background:rgba(136,14,79,.15);color:#f472b6}
+.badge-dispatch{background:rgba(46,125,50,.15);color:#4ade80}
+.badge-payment{background:rgba(230,81,0,.15);color:#fb923c}
+.badge-customs{background:rgba(183,28,28,.15);color:#f87171}
+.stars{color:#f59e0b;letter-spacing:1px}
+.btn{padding:7px 14px;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{opacity:.85}.btn-primary{background:#2563eb;color:#fff}.btn-success{background:#059669;color:#fff}
+.btn-outline{background:transparent;border:1px solid #2e3250;color:#94a3b8}
+.btn-outline:hover{border-color:#60a5fa;color:#60a5fa}.btn-sm{padding:4px 10px;font-size:11px}
+.section{background:#141b2d;border-radius:12px;padding:20px;margin-bottom:20px;border:1px solid #2e3250}
+.section-title{font-size:15px;font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:8px;justify-content:space-between}
+table{width:100%;border-collapse:collapse}
+th{background:#0d1220;padding:10px 12px;text-align:left;font-weight:600;font-size:11px;color:#94a3b8;text-transform:uppercase;border-bottom:1px solid #2e3250}
+td{padding:10px 12px;border-bottom:1px solid #1e2235;font-size:13px}
+tr:hover td{background:#0f172a}
+.alert{padding:12px 16px;border-radius:8px;margin-bottom:14px;font-size:13px}
+.alert-success{background:rgba(46,125,50,.15);color:#4ade80;border-left:4px solid #059669}
+.alert-error{background:rgba(198,40,40,.15);color:#f87171;border-left:4px solid #dc2626}
+.modal-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:200;justify-content:center;align-items:center}
+.modal-overlay.show{display:flex}
+.modal{background:#141b2d;border-radius:12px;padding:24px;border:1px solid #2e3250;width:100%;max-width:640px;max-height:90vh;overflow-y:auto}
+.modal h3{font-size:16px;margin-bottom:16px}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:16px}
+.form-group{margin-bottom:14px}.form-group label{display:block;color:#94a3b8;font-size:12px;font-weight:600;margin-bottom:4px}
+.form-group input,.form-group select,.form-group textarea{width:100%;background:#0a0e1a;border:1px solid #2e3250;color:#e2e8f0;border-radius:6px;padding:8px 12px;font-size:13px;font-family:inherit}
+.form-group textarea{min-height:80px;resize:vertical}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.empty{padding:30px;text-align:center;color:#64748b;font-size:13px}
+.detail-header{display:flex;gap:16px;align-items:flex-start;margin-bottom:16px}
+.detail-icon{font-size:48px}
+.detail-info h2{font-size:20px;font-weight:700;margin-bottom:4px}
+.detail-info p{color:#94a3b8;font-size:13px}
+.detail-actions{display:flex;gap:8px;margin:16px 0;flex-wrap:wrap}
+.review-item{padding:12px;border-bottom:1px solid #1e2235}
+.review-header{display:flex;justify-content:space-between;margin-bottom:4px}
+.review-body{color:#94a3b8;font-size:13px;margin-top:4px}
+.pagination{display:flex;gap:6px;justify-content:center;margin-top:16px}
+.pagination button{background:#0d1220;border:1px solid #2e3250;color:#94a3b8;padding:6px 12px;border-radius:6px;cursor:pointer;font-size:12px}
+.pagination button.active{background:#1e3a5f;color:#93c5fd;border-color:#1e3a5f}
+@media(max-width:768px){.card-grid{grid-template-columns:1fr}.form-row{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div id="buddy-topbar"></div>
+<div class="container">
+    <div id="alerts"></div>
+    <div class="page-header">
+        <div><h1>🏪 Marketplace Template</h1><p>Trova, pubblica e condividi mapping template</p></div>
+        <div><button class="btn btn-primary" onclick="showPublish()">+ Pubblica Template</button></div>
+    </div>
+    <div class="tab-bar">
+        <button class="tab active" data-tab="browse" onclick="switchTab('browse')">🏪 Esplora</button>
+        <button class="tab" data-tab="mytpl" onclick="switchTab('mytpl')">📝 I miei template</button>
+        <button class="tab" data-tab="mypurch" onclick="switchTab('mypurch')">📥 Installati</button>
+    </div>
+
+    <!-- BROWSE -->
+    <div class="tab-panel active" id="panel-browse">
+        <div class="filters">
+            <input id="search-q" placeholder="🔍 Cerca template..." onkeyup="if(event.key==='Enter')doBrowse()">
+            <select id="filter-cat" onchange="doBrowse()"><option value="">Tutte le categorie</option>
+                <option value="invoice">📄 Invoice</option><option value="order">📦 Order</option>
+                <option value="dispatch">🚚 Dispatch</option><option value="payment">💳 Payment</option>
+                <option value="healthcare">🏥 Healthcare</option><option value="customs">🛃 Customs</option>
+                <option value="logistics">📦 Logistics</option><option value="banking">🏦 Banking</option>
+                <option value="other">📋 Other</option></select>
+            <select id="filter-avail" onchange="doBrowse()"><option value="">Tutti i tipi</option>
+                <option value="builtin">✅ Builtin</option><option value="marketplace">🏪 Marketplace</option>
+                <option value="community">🌍 Community</option></select>
+            <select id="filter-infmt" onchange="doBrowse()"><option value="">Input fmt</option>
+                <option value="xml">XML</option><option value="json">JSON</option>
+                <option value="csv">CSV</option><option value="edi">EDI</option>
+                <option value="edifact">EDIFACT</option></select>
+            <select id="filter-outfmt" onchange="doBrowse()"><option value="">Output fmt</option>
+                <option value="xml">XML</option><option value="json">JSON</option>
+                <option value="csv">CSV</option></select>
+            <select id="filter-sort" onchange="doBrowse()"><option value="downloads">Più scaricati</option>
+                <option value="rating">Migliore rating</option><option value="newest">Più recenti</option>
+                <option value="price_asc">Prezzo ↑</option><option value="name">Nome</option></select>
+        </div>
+        <div id="browse-results"><div class="empty">Caricamento...</div></div>
+        <div class="pagination" id="pagination"></div>
+    </div>
+
+    <!-- MY TEMPLATES -->
+    <div class="tab-panel" id="panel-mytpl">
+        <div class="section"><div class="section-title">📝 I miei template <span class="badge" id="my-count">0</span></div>
+        <div id="my-templates-list"><div class="empty">Caricamento...</div></div></div>
+    </div>
+
+    <!-- MY PURCHASES -->
+    <div class="tab-panel" id="panel-mypurch">
+        <div class="section"><div class="section-title">📥 Template installati <span class="badge" id="purch-count">0</span></div>
+        <div id="my-purchases-list"><div class="empty">Caricamento...</div></div></div>
+    </div>
+</div>
+
+<!-- DETAIL MODAL -->
+<div class="modal-overlay" id="detail-modal">
+<div class="modal" style="max-width:700px">
+    <div id="detail-content"></div>
+    <div class="modal-actions"><button class="btn btn-outline" onclick="closeModal('detail-modal')">Chiudi</button></div>
+</div></div>
+
+<!-- PUBLISH MODAL -->
+<div class="modal-overlay" id="publish-modal">
+<div class="modal">
+    <h3>📤 Pubblica Mapping Template</h3>
+    <div class="form-group"><label>Nome *</label><input id="pub-name" placeholder="Es: FatturaPA → UBL 2.1"></div>
+    <div class="form-group"><label>Descrizione</label><textarea id="pub-desc" placeholder="Breve descrizione del template..."></textarea></div>
+    <div class="form-row">
+        <div class="form-group"><label>Categoria</label><select id="pub-cat"><option value="invoice">Invoice</option><option value="order">Order</option><option value="dispatch">Dispatch</option><option value="payment">Payment</option><option value="healthcare">Healthcare</option><option value="customs">Customs</option><option value="other">Other</option></select></div>
+        <div class="form-group"><label>Disponibilità</label><select id="pub-avail"><option value="private">🔒 Privato</option><option value="community">🌍 Community (gratis)</option><option value="marketplace">🏪 Marketplace (a pagamento)</option></select></div>
+    </div>
+    <div class="form-row">
+        <div class="form-group"><label>Standard Input</label><input id="pub-instd" placeholder="Es: FatturaPA"></div>
+        <div class="form-group"><label>Standard Output</label><input id="pub-outstd" placeholder="Es: UBL-2.1"></div>
+    </div>
+    <div class="form-row">
+        <div class="form-group"><label>Formato Input</label><select id="pub-infmt"><option value="xml">XML</option><option value="json">JSON</option><option value="csv">CSV</option><option value="edi">EDI</option><option value="edifact">EDIFACT</option><option value="fixed">Fixed-width</option></select></div>
+        <div class="form-group"><label>Formato Output</label><select id="pub-outfmt"><option value="xml">XML</option><option value="json">JSON</option><option value="csv">CSV</option></select></div>
+    </div>
+    <div class="form-row">
+        <div class="form-group"><label>Prezzo € (solo marketplace)</label><input id="pub-price" type="number" value="0" min="0" step="0.5"></div>
+        <div class="form-group"><label>Icona</label><input id="pub-icon" value="📄" maxlength="4"></div>
+    </div>
+    <div class="form-group"><label>Mapping Data (JSON)</label><textarea id="pub-mapping" placeholder='{"rules": []}'>{}</textarea></div>
+    <div class="modal-actions">
+        <button class="btn btn-outline" onclick="closeModal('publish-modal')">Annulla</button>
+        <button class="btn btn-primary" onclick="doPublish()">Pubblica</button>
+    </div>
+</div></div>
+
+<!-- REVIEW MODAL -->
+<div class="modal-overlay" id="review-modal">
+<div class="modal" style="max-width:440px">
+    <h3>⭐ Lascia una recensione</h3>
+    <input type="hidden" id="rev-tpl-id">
+    <div class="form-group"><label>Rating</label><select id="rev-rating"><option value="5">⭐⭐⭐⭐⭐ (5)</option><option value="4">⭐⭐⭐⭐ (4)</option><option value="3">⭐⭐⭐ (3)</option><option value="2">⭐⭐ (2)</option><option value="1">⭐ (1)</option></select></div>
+    <div class="form-group"><label>Titolo</label><input id="rev-title" placeholder="Titolo"></div>
+    <div class="form-group"><label>Commento</label><textarea id="rev-body" placeholder="La tua esperienza..."></textarea></div>
+    <div class="modal-actions">
+        <button class="btn btn-outline" onclick="closeModal('review-modal')">Annulla</button>
+        <button class="btn btn-primary" onclick="doReview()">Invia</button>
+    </div>
+</div></div>
+
+<script>
+const API='/api';const token=localStorage.getItem('buddyliko_token');if(!token)window.location.href='login.html';
+let currentPage=1;
+function showAlert(m,t='success'){const d=document.createElement('div');d.className='alert alert-'+t;d.textContent=m;document.getElementById('alerts').insertBefore(d,document.getElementById('alerts').firstChild);setTimeout(()=>d.remove(),4000)}
+async function apiFetch(p,o={}){const r=await fetch(API+p,{...o,headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json',...(o.headers||{})}});if(!r.ok){let e;try{e=await r.json()}catch{e={detail:'HTTP '+r.status}}throw new Error(e.detail||'Errore')}return r.json()}
+function fmtEur(v){return'\u20ac'+parseFloat(v||0).toFixed(2)}
+function starsHtml(avg,count){const full=Math.round(avg||0);return '<span class="stars">'+'\u2605'.repeat(full)+'\u2606'.repeat(5-full)+'</span> <span style="color:#64748b;font-size:11px">('+count+')</span>'}
+function showModal(id){document.getElementById(id).classList.add('show')}
+function closeModal(id){document.getElementById(id).classList.remove('show')}
+function showPublish(){showModal('publish-modal')}
+function switchTab(tab){document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===tab));document.querySelectorAll('.tab-panel').forEach(p=>p.classList.toggle('active',p.id==='panel-'+tab));if(tab==='mytpl')loadMyTemplates();if(tab==='mypurch')loadMyPurchases()}
+
+// ═══ BROWSE ═══
+async function doBrowse(page){
+    currentPage=page||1;
+    const q=document.getElementById('search-q').value;const cat=document.getElementById('filter-cat').value;
+    const avail=document.getElementById('filter-avail').value;const infmt=document.getElementById('filter-infmt').value;
+    const outfmt=document.getElementById('filter-outfmt').value;const sort=document.getElementById('filter-sort').value;
+    let qs=`page=${currentPage}&sort_by=${sort}`;
+    if(q)qs+=`&q=${encodeURIComponent(q)}`;if(cat)qs+=`&category=${cat}`;if(avail)qs+=`&availability=${avail}`;
+    if(infmt)qs+=`&input_format=${infmt}`;if(outfmt)qs+=`&output_format=${outfmt}`;
+    try{
+        const data=await apiFetch('/marketplace/browse?'+qs);
+        renderCards(data.templates||[],data.total);
+        renderPagination(data.page,data.pages,data.total);
+    }catch(e){showAlert(e.message,'error')}
+}
+function renderCards(tpls,total){
+    const el=document.getElementById('browse-results');
+    if(!tpls.length){el.innerHTML='<div class="empty">Nessun template trovato</div>';return}
+    el.innerHTML='<div class="card-grid">'+tpls.map(t=>{
+        const isFree=!t.price_eur||parseFloat(t.price_eur)===0||t.availability==='builtin'||t.availability==='community';
+        return `<div class="card" onclick="openDetail('${t.id}')">
+            <div class="card-price ${isFree?'free':'paid'}">${isFree?'GRATIS':fmtEur(t.price_eur)}</div>
+            <div class="card-icon">${t.icon||'\ud83d\udcc4'}</div>
+            <div class="card-name">${t.name}</div>
+            <div class="card-desc">${t.description||''}</div>
+            <div class="card-meta">
+                <span class="badge badge-${t.availability}">${t.availability}</span>
+                <span class="badge badge-${t.category}">${t.category}</span>
+                ${t.input_format?'<span style="font-size:10px">'+t.input_format+' \u2192 '+t.output_format+'</span>':''}
+            </div>
+            <div class="card-stats">
+                ${starsHtml(t.rating_avg,t.rating_count)}
+                <span>\u2b07 ${t.downloads_count||0}</span>
+                ${t.author_name?'<span>by '+t.author_name+'</span>':'<span>by Buddyliko</span>'}
+            </div>
+        </div>`}).join('')+'</div>'
+}
+function renderPagination(page,pages,total){
+    const el=document.getElementById('pagination');
+    if(pages<=1){el.innerHTML='';return}
+    let h='';for(let i=1;i<=Math.min(pages,10);i++)h+=`<button class="${i===page?'active':''}" onclick="doBrowse(${i})">${i}</button>`;
+    el.innerHTML=h+`<span style="color:#64748b;font-size:11px;padding:6px"> ${total} totali</span>`
+}
+
+// ═══ DETAIL ═══
+async function openDetail(id){
+    try{
+        const t=await apiFetch('/marketplace/templates/'+id);
+        const isFree=!t.price_eur||parseFloat(t.price_eur)===0||t.availability==='builtin'||t.availability==='community';
+        document.getElementById('detail-content').innerHTML=`
+        <div class="detail-header">
+            <div class="detail-icon">${t.icon||'\ud83d\udcc4'}</div>
+            <div class="detail-info">
+                <h2>${t.name}</h2>
+                <p>${t.description||''}</p>
+                <div style="margin-top:6px">
+                    <span class="badge badge-${t.availability}">${t.availability}</span>
+                    <span class="badge badge-${t.category}">${t.category}</span>
+                    <span style="font-size:12px;color:#64748b;margin-left:8px">v${t.version||'1.0'}</span>
+                    ${t.author_name?'<span style="font-size:12px;color:#64748b;margin-left:8px">by '+t.author_name+'</span>':''}
+                </div>
+            </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-bottom:16px">
+            <div style="text-align:center;padding:10px;background:#0d1220;border-radius:8px">
+                <div style="font-size:18px;font-weight:700;color:${isFree?'#4ade80':'#fb923c'}">${isFree?'GRATIS':fmtEur(t.price_eur)}</div>
+                <div style="font-size:10px;color:#64748b">${t.price_type||''}</div>
+            </div>
+            <div style="text-align:center;padding:10px;background:#0d1220;border-radius:8px">
+                <div style="font-size:18px;font-weight:700">${t.downloads_count||0}</div>
+                <div style="font-size:10px;color:#64748b">Download</div>
+            </div>
+            <div style="text-align:center;padding:10px;background:#0d1220;border-radius:8px">
+                <div>${starsHtml(t.rating_avg,t.rating_count)}</div>
+            </div>
+            <div style="text-align:center;padding:10px;background:#0d1220;border-radius:8px">
+                <div style="font-size:14px">${t.input_format||''} \u2192 ${t.output_format||''}</div>
+                <div style="font-size:10px;color:#64748b">${t.input_standard||''} \u2192 ${t.output_standard||''}</div>
+            </div>
+        </div>
+        ${t.long_description?'<div style="color:#94a3b8;font-size:13px;margin-bottom:16px;line-height:1.6">'+t.long_description+'</div>':''}
+        <div class="detail-actions">
+            ${t.is_owned?'<span class="badge badge-published">\u2705 Tuo template</span>':
+              t.is_purchased||t.can_use?'<span class="badge badge-published">\u2705 Installato</span>':
+              '<button class="btn btn-success" onclick="doPurchase(\''+t.id+'\')">'+(!isFree?'\ud83d\udcb3 Acquista '+fmtEur(t.price_eur):'\ud83d\udce5 Installa gratis')+'</button>'}
+            <button class="btn btn-outline btn-sm" onclick="doClone('${t.id}')">📋 Clona come privato</button>
+            ${!t.is_owned?'<button class="btn btn-outline btn-sm" onclick="showReviewModal(\''+t.id+'\')">⭐ Recensisci</button>':''}
+        </div>
+        ${t.reviews&&t.reviews.length?'<div style="margin-top:16px"><strong style="font-size:13px">Recensioni recenti</strong>'+t.reviews.map(r=>'<div class="review-item"><div class="review-header"><span>'+starsHtml(r.rating,0)+' '+(r.reviewer_name||'')+'</span></div>'+(r.body?'<div class="review-body">'+r.body+'</div>':'')+'</div>').join('')+'</div>':''}`;
+        showModal('detail-modal');
+    }catch(e){showAlert(e.message,'error')}
+}
+
+// ═══ ACTIONS ═══
+async function doPurchase(id){try{await apiFetch('/marketplace/templates/'+id+'/purchase',{method:'POST'});showAlert('Template installato!');closeModal('detail-modal');doBrowse(currentPage)}catch(e){showAlert(e.message,'error')}}
+async function doClone(id){try{const r=await apiFetch('/marketplace/templates/'+id+'/clone',{method:'POST',body:'{}'});showAlert('Template clonato!');closeModal('detail-modal')}catch(e){showAlert(e.message,'error')}}
+function showReviewModal(id){document.getElementById('rev-tpl-id').value=id;showModal('review-modal')}
+async function doReview(){const id=document.getElementById('rev-tpl-id').value;try{await apiFetch('/marketplace/templates/'+id+'/review',{method:'POST',body:JSON.stringify({rating:parseInt(document.getElementById('rev-rating').value),title:document.getElementById('rev-title').value,body:document.getElementById('rev-body').value})});closeModal('review-modal');showAlert('Recensione inviata!')}catch(e){showAlert(e.message,'error')}}
+
+async function doPublish(){
+    const name=document.getElementById('pub-name').value.trim();if(!name){showAlert('Nome obbligatorio','error');return}
+    let mapping={};try{mapping=JSON.parse(document.getElementById('pub-mapping').value||'{}')}catch{showAlert('JSON mapping non valido','error');return}
+    try{
+        await apiFetch('/marketplace/templates',{method:'POST',body:JSON.stringify({
+            name,description:document.getElementById('pub-desc').value,category:document.getElementById('pub-cat').value,
+            availability:document.getElementById('pub-avail').value,input_standard:document.getElementById('pub-instd').value,
+            output_standard:document.getElementById('pub-outstd').value,input_format:document.getElementById('pub-infmt').value,
+            output_format:document.getElementById('pub-outfmt').value,price_eur:parseFloat(document.getElementById('pub-price').value)||0,
+            icon:document.getElementById('pub-icon').value||'\ud83d\udcc4',mapping_data:mapping
+        })});closeModal('publish-modal');showAlert('Template pubblicato!');doBrowse()
+    }catch(e){showAlert(e.message,'error')}
+}
+
+// ═══ MY TEMPLATES ═══
+async function loadMyTemplates(){
+    try{const data=await apiFetch('/marketplace/my-templates');const tpls=data.templates||[];
+    document.getElementById('my-count').textContent=tpls.length;
+    if(!tpls.length){document.getElementById('my-templates-list').innerHTML='<div class="empty">Non hai ancora pubblicato template</div>';return}
+    document.getElementById('my-templates-list').innerHTML=`<table><thead><tr><th>Nome</th><th>Categoria</th><th>Tipo</th><th>Stato</th><th>Download</th><th>Rating</th><th></th></tr></thead><tbody>${tpls.map(t=>`<tr>
+        <td>${t.icon||''} ${t.name}</td><td><span class="badge badge-${t.category}">${t.category}</span></td>
+        <td><span class="badge badge-${t.availability}">${t.availability}</span></td>
+        <td><span class="badge badge-${t.status}">${t.status}</span></td>
+        <td>${t.downloads_count||0}</td><td>${starsHtml(t.rating_avg,t.rating_count)}</td>
+        <td><button class="btn btn-outline btn-sm" onclick="openDetail('${t.id}')">Dettaglio</button></td>
+    </tr>`).join('')}</tbody></table>`}catch(e){showAlert(e.message,'error')}
+}
+
+// ═══ MY PURCHASES ═══
+async function loadMyPurchases(){
+    try{const data=await apiFetch('/marketplace/my-purchases');const p=data.purchases||[];
+    document.getElementById('purch-count').textContent=p.length;
+    if(!p.length){document.getElementById('my-purchases-list').innerHTML='<div class="empty">Nessun template installato</div>';return}
+    document.getElementById('my-purchases-list').innerHTML=`<table><thead><tr><th>Nome</th><th>Categoria</th><th>Tipo</th><th>Autore</th><th>Pagato</th><th>Rating</th><th></th></tr></thead><tbody>${p.map(t=>`<tr>
+        <td>${t.icon||''} ${t.name}</td><td><span class="badge badge-${t.category}">${t.category}</span></td>
+        <td><span class="badge badge-${t.availability}">${t.availability}</span></td>
+        <td style="font-size:12px">${t.author_name||'Buddyliko'}</td>
+        <td>${parseFloat(t.price_paid_eur||0)>0?fmtEur(t.price_paid_eur):'Gratis'}</td>
+        <td>${starsHtml(t.rating_avg,t.rating_count)}</td>
+        <td><button class="btn btn-outline btn-sm" onclick="openDetail('${t.template_id}')">Dettaglio</button></td>
+    </tr>`).join('')}</tbody></table>`}catch(e){showAlert(e.message,'error')}
+}
+
+// INIT
+doBrowse();
+</script>
+<script>if(typeof i18n!=="undefined")i18n.init();</script>
+<script src="/assets/topbar.js"></script>
+<script src="/assets/theme.js"></script>
+</body></html>

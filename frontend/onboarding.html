@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Onboarding — Buddyliko</title>
+<link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+<script src="/lang/i18n.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui,-apple-system,sans-serif;background:#0a0e1a;color:#e2e8f0;min-height:100vh;display:flex;flex-direction:column}
+.wizard{max-width:700px;margin:40px auto;padding:0 20px;flex:1;width:100%}
+.wizard-header{text-align:center;margin-bottom:32px}
+.wizard-header h1{font-size:26px;font-weight:700;margin-bottom:8px}
+.wizard-header p{color:#94a3b8;font-size:14px}
+.progress-bar{display:flex;gap:4px;margin-bottom:32px}
+.progress-step{flex:1;height:4px;border-radius:2px;background:#1e2235;transition:background .3s}
+.progress-step.done{background:#4ade80}.progress-step.active{background:#3b82f6}
+.step-indicators{display:flex;justify-content:space-between;margin-bottom:32px}
+.step-ind{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11px;color:#64748b;cursor:pointer;transition:color .2s}
+.step-ind.active{color:#93c5fd}.step-ind.done{color:#4ade80}
+.step-circle{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;border:2px solid #2e3250;background:#141b2d;transition:all .3s}
+.step-ind.active .step-circle{border-color:#3b82f6;background:#1e3a5f}
+.step-ind.done .step-circle{border-color:#4ade80;background:rgba(46,125,50,.2)}
+.card{background:#141b2d;border-radius:16px;padding:28px;border:1px solid #2e3250;margin-bottom:20px}
+.card h2{font-size:18px;font-weight:600;margin-bottom:8px}
+.card p{color:#94a3b8;font-size:13px;line-height:1.6;margin-bottom:16px}
+.form-group{margin-bottom:16px}
+.form-group label{display:block;color:#94a3b8;font-size:12px;font-weight:600;margin-bottom:6px}
+.form-group input,.form-group select{width:100%;background:#0a0e1a;border:1px solid #2e3250;color:#e2e8f0;border-radius:8px;padding:10px 14px;font-size:14px;font-family:inherit;transition:border .2s}
+.form-group input:focus,.form-group select:focus{outline:none;border-color:#3b82f6}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.btn{padding:10px 20px;border:none;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600;transition:all .2s;display:inline-flex;align-items:center;gap:8px}
+.btn:hover{opacity:.9}.btn-primary{background:#2563eb;color:#fff}.btn-success{background:#059669;color:#fff}
+.btn-outline{background:transparent;border:1px solid #2e3250;color:#94a3b8}
+.btn-outline:hover{border-color:#60a5fa;color:#60a5fa}.btn-lg{padding:12px 28px;font-size:15px}
+.actions{display:flex;justify-content:space-between;margin-top:24px}
+.check-item{display:flex;align-items:center;gap:12px;padding:12px;background:#0d1220;border-radius:8px;margin-bottom:8px;cursor:pointer;transition:background .2s}
+.check-item:hover{background:#0f172a}
+.check-icon{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;border:2px solid #2e3250;flex-shrink:0}
+.check-item.done .check-icon{background:rgba(46,125,50,.2);border-color:#4ade80;color:#4ade80}
+.check-item.todo .check-icon{background:#141b2d;color:#64748b}
+.check-label{font-size:13px;font-weight:500}.check-desc{font-size:11px;color:#64748b;margin-top:2px}
+.alert{padding:12px 16px;border-radius:8px;margin-bottom:14px;font-size:13px}
+.alert-success{background:rgba(46,125,50,.15);color:#4ade80;border-left:4px solid #059669}
+.alert-error{background:rgba(198,40,40,.15);color:#f87171;border-left:4px solid #dc2626}
+.celebration{text-align:center;padding:40px 20px}
+.celebration h2{font-size:28px;margin-bottom:12px}
+.celebration p{color:#94a3b8;font-size:15px;margin-bottom:24px}
+.confetti{font-size:48px;margin-bottom:16px}
+.skip-link{text-align:center;margin-top:16px}
+.skip-link a{color:#64748b;font-size:12px;text-decoration:none;cursor:pointer}
+.skip-link a:hover{color:#94a3b8}
+@media(max-width:600px){.form-row{grid-template-columns:1fr}.step-indicators{gap:2px}.step-ind span:not(.step-circle){display:none}}
+</style>
+</head>
+<body>
+<div id="buddy-topbar"></div>
+<div class="wizard">
+    <div class="wizard-header">
+        <h1>👋 Benvenuto in Buddyliko!</h1>
+        <p>Configura il tuo account in pochi passi</p>
+    </div>
+    <div id="alerts"></div>
+    <div class="progress-bar" id="progress-bar"></div>
+    <div class="step-indicators" id="step-indicators"></div>
+    <div id="wizard-content"></div>
+    <div class="skip-link"><a onclick="skipAll()">Salta la configurazione →</a></div>
+</div>
+
+<script>
+const API='/api';const token=localStorage.getItem('buddyliko_token');
+if(!token)window.location.href='login.html';
+
+const STEPS=[
+    {id:'welcome',icon:'👋',label:'Benvenuto',title:'Iniziamo!',desc:'Verifichiamo lo stato del tuo account e ti guidiamo nella configurazione.'},
+    {id:'org',icon:'🏢',label:'Organizzazione',title:'La tua organizzazione',desc:'Verifica i dati base della tua organizzazione.'},
+    {id:'team',icon:'👥',label:'Team',title:'Invita il tuo team',desc:'Aggiungi i tuoi collaboratori con i ruoli appropriati.'},
+    {id:'security',icon:'🔐',label:'Sicurezza',title:'API & Sicurezza',desc:'Configura token API e webhook per le integrazioni.'},
+    {id:'done',icon:'🎉',label:'Fatto!',title:'Tutto pronto!',desc:'Il tuo account è configurato.'},
+];
+
+let currentStep=0;
+let orgData=null,members=[],tokens=[],webhooks=[];
+
+function showAlert(m,t='success'){const d=document.createElement('div');d.className='alert alert-'+t;d.textContent=m;document.getElementById('alerts').insertBefore(d,document.getElementById('alerts').firstChild);setTimeout(()=>d.remove(),4000)}
+async function apiFetch(p,o={}){const r=await fetch(API+p,{...o,headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json',...(o.headers||{})}});if(!r.ok){let e;try{e=await r.json()}catch{e={detail:'HTTP '+r.status}}throw new Error(e.detail||'Errore')}return r.json()}
+
+function renderProgress(){
+    const bar=document.getElementById('progress-bar');
+    bar.innerHTML=STEPS.map((_,i)=>`<div class="progress-step ${i<currentStep?'done':i===currentStep?'active':''}"></div>`).join('');
+    const ind=document.getElementById('step-indicators');
+    ind.innerHTML=STEPS.map((s,i)=>`<div class="step-ind ${i<currentStep?'done':i===currentStep?'active':''}" onclick="${i<=currentStep?'goStep('+i+')':''}">
+        <span class="step-circle">${i<currentStep?'✓':s.icon}</span><span>${s.label}</span></div>`).join('');
+}
+
+function goStep(i){currentStep=i;renderProgress();renderStep()}
+
+async function loadData(){
+    try{
+        [orgData,{members},{webhooks}] = await Promise.all([
+            apiFetch('/org').catch(()=>null),
+            apiFetch('/org/members').catch(()=>({members:[]})),
+            apiFetch('/webhooks').catch(()=>({webhooks:[]})),
+        ]);
+        try{const t=await apiFetch('/tokens');tokens=t.tokens||[]}catch{tokens=[]}
+    }catch(e){console.error(e)}
+}
+
+function renderStep(){
+    const el=document.getElementById('wizard-content');
+    const step=STEPS[currentStep];
+
+    if(currentStep===0) renderWelcome(el);
+    else if(currentStep===1) renderOrg(el);
+    else if(currentStep===2) renderTeam(el);
+    else if(currentStep===3) renderSecurity(el);
+    else if(currentStep===4) renderDone(el);
+}
+
+function renderWelcome(el){
+    const hasOrg=!!orgData;
+    const hasMembers=members.length>1;
+    const hasTokens=tokens.length>0;
+    const hasWebhooks=webhooks.length>0;
+    const checks=[
+        {done:true,label:'Account creato',desc:'Il tuo account è attivo'},
+        {done:hasOrg,label:'Organizzazione configurata',desc:hasOrg?orgData.name:'Ancora da configurare'},
+        {done:hasMembers,label:'Team aggiunto',desc:hasMembers?members.length+' membri':'Solo tu per ora'},
+        {done:hasTokens,label:'API Token creato',desc:hasTokens?tokens.length+' token attivi':'Nessun token'},
+        {done:hasWebhooks,label:'Webhook configurato',desc:hasWebhooks?webhooks.length+' webhook':'Nessun webhook'},
+    ];
+    el.innerHTML=`<div class="card"><h2>👋 ${STEPS[0].title}</h2><p>${STEPS[0].desc}</p>
+    ${checks.map(c=>`<div class="check-item ${c.done?'done':'todo'}">
+        <div class="check-icon">${c.done?'✓':'○'}</div>
+        <div><div class="check-label">${c.label}</div><div class="check-desc">${c.desc}</div></div>
+    </div>`).join('')}
+    <div class="actions"><div></div><button class="btn btn-primary btn-lg" onclick="nextStep()">Iniziamo →</button></div></div>`;
+}
+
+function renderOrg(el){
+    if(!orgData){el.innerHTML=`<div class="card"><h2>🏢 Nessuna organizzazione</h2><p>Non hai ancora un'organizzazione. Creane una dalla <a href="org-dashboard.html" style="color:#60a5fa">Dashboard</a>.</p>
+    <div class="actions"><button class="btn btn-outline" onclick="prevStep()">← Indietro</button><button class="btn btn-primary" onclick="nextStep()">Avanti →</button></div></div>`;return}
+    el.innerHTML=`<div class="card"><h2>🏢 ${orgData.name}</h2><p>Verifica che i dati siano corretti.</p>
+    <div class="form-row">
+        <div class="form-group"><label>Nome</label><input id="org-name" value="${orgData.name||''}"></div>
+        <div class="form-group"><label>Piano</label><input value="${orgData.plan||'FREE'}" disabled style="opacity:.6"></div>
+    </div>
+    <div class="form-row">
+        <div class="form-group"><label>Paese</label><input id="org-country" value="${orgData.country||''}" placeholder="IT" maxlength="3"></div>
+        <div class="form-group"><label>P.IVA</label><input id="org-vat" value="${orgData.vat_number||''}" placeholder="IT12345678901"></div>
+    </div>
+    <div class="form-group"><label>Email billing</label><input id="org-billing" value="${orgData.billing_email||''}" placeholder="billing@azienda.it"></div>
+    <div class="actions">
+        <button class="btn btn-outline" onclick="prevStep()">← Indietro</button>
+        <div><button class="btn btn-outline" onclick="nextStep()" style="margin-right:8px">Salta</button>
+        <button class="btn btn-primary" onclick="saveOrg()">Salva e continua →</button></div>
+    </div></div>`;
+}
+
+async function saveOrg(){
+    try{
+        await apiFetch('/org',{method:'PUT',body:JSON.stringify({
+            name:document.getElementById('org-name').value.trim()||undefined,
+            country:document.getElementById('org-country').value.trim()||undefined,
+            vat_number:document.getElementById('org-vat').value.trim()||undefined,
+            billing_email:document.getElementById('org-billing').value.trim()||undefined,
+        })});
+        showAlert('Organizzazione aggiornata');
+        orgData=await apiFetch('/org');
+        nextStep();
+    }catch(e){showAlert(e.message,'error')}
+}
+
+function renderTeam(el){
+    el.innerHTML=`<div class="card"><h2>👥 Il tuo team</h2><p>Attualmente hai ${members.length} ${members.length===1?'membro':'membri'}. Puoi invitare collaboratori.</p>
+    ${members.map(m=>`<div class="check-item done"><div class="check-icon">👤</div><div><div class="check-label">${m.email}</div><div class="check-desc">${m.role}${m.name?' — '+m.name:''}</div></div></div>`).join('')}
+    <div style="margin-top:16px;padding:16px;background:#0d1220;border-radius:8px">
+        <div class="form-row">
+            <div class="form-group"><label>Email nuovo membro</label><input id="invite-email" placeholder="collega@azienda.it"></div>
+            <div class="form-group"><label>Ruolo</label><select id="invite-role"><option value="operator">Operator</option><option value="developer">Developer</option><option value="finance">Finance</option><option value="admin">Admin</option><option value="viewer">Viewer</option></select></div>
+        </div>
+        <button class="btn btn-success btn-sm" onclick="inviteMember()">+ Invita</button>
+    </div>
+    <div class="actions">
+        <button class="btn btn-outline" onclick="prevStep()">← Indietro</button>
+        <button class="btn btn-primary" onclick="nextStep()">Avanti →</button>
+    </div></div>`;
+}
+
+async function inviteMember(){
+    const email=document.getElementById('invite-email').value.trim();
+    const role=document.getElementById('invite-role').value;
+    if(!email){showAlert('Inserisci email','error');return}
+    try{
+        await apiFetch('/org/members',{method:'POST',body:JSON.stringify({email,role})});
+        showAlert('Membro aggiunto!');
+        const d=await apiFetch('/org/members');members=d.members||[];renderStep();
+    }catch(e){showAlert(e.message,'error')}
+}
+
+function renderSecurity(el){
+    el.innerHTML=`<div class="card"><h2>🔐 API & Sicurezza</h2><p>Configura le integrazioni per il tuo sistema.</p>
+    <div class="check-item ${tokens.length?'done':'todo'}">
+        <div class="check-icon">${tokens.length?'✓':'🔑'}</div>
+        <div><div class="check-label">API Token</div><div class="check-desc">${tokens.length?tokens.length+' token attivi':'Nessun token — creane uno dalla sezione <a href="org-settings.html" style="color:#60a5fa">Impostazioni</a>'}</div></div>
+    </div>
+    <div class="check-item ${webhooks.length?'done':'todo'}">
+        <div class="check-icon">${webhooks.length?'✓':'🔔'}</div>
+        <div><div class="check-label">Webhook</div><div class="check-desc">${webhooks.length?webhooks.length+' webhook configurati':'Nessun webhook — puoi configurarli dalla sezione <a href="org-settings.html" style="color:#60a5fa">Impostazioni</a>'}</div></div>
+    </div>
+    <div class="actions">
+        <button class="btn btn-outline" onclick="prevStep()">← Indietro</button>
+        <button class="btn btn-primary btn-lg" onclick="nextStep()">Completa setup →</button>
+    </div></div>`;
+}
+
+function renderDone(el){
+    const allDone=orgData&&members.length>0;
+    el.innerHTML=`<div class="card celebration">
+        <div class="confetti">${allDone?'🎉':'👍'}</div>
+        <h2>${allDone?'Fantastico, tutto pronto!':'Setup completato!'}</h2>
+        <p>${allDone?'La tua organizzazione è configurata e pronta all\'uso.':'Puoi sempre tornare a completare i passaggi mancanti.'}</p>
+        <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+            <a href="app.html" class="btn btn-primary btn-lg">🗺️ Vai al Mapper</a>
+            <a href="org-dashboard.html" class="btn btn-outline btn-lg">🏢 Dashboard Org</a>
+            <a href="marketplace.html" class="btn btn-outline btn-lg">🏪 Marketplace</a>
+        </div>
+    </div>`;
+}
+
+function nextStep(){if(currentStep<STEPS.length-1){currentStep++;renderProgress();renderStep()}}
+function prevStep(){if(currentStep>0){currentStep--;renderProgress();renderStep()}}
+function skipAll(){window.location.href='app.html'}
+
+async function init(){
+    await loadData();
+    renderProgress();
+    renderStep();
+}
+init();
+</script>
+<script src="/assets/topbar.js"></script>
+</body></html>

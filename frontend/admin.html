@@ -102,8 +102,35 @@
         <!-- All users -->
         <div class="view" id="view-users">
             <div class="section">
-                <div class="section-title" data-i18n="admin.all_users">Tutti gli utenti</div>
+                <div class="section-title" style="display:flex;justify-content:space-between;align-items:center">
+                    <span data-i18n="admin.all_users">Tutti gli utenti</span>
+                    <div style="display:flex;gap:8px">
+                        <button class="btn btn-success" onclick="toggleInviteForm()" style="font-size:12px">✉️ Invita utente</button>
+                        <button class="btn btn-primary" onclick="loadUsers()" style="font-size:12px">🔄</button>
+                    </div>
+                </div>
+                <!-- Invite form (hidden) -->
+                <div id="inviteForm" style="display:none;background:#0f172a;border:1px solid #2e3250;border-radius:8px;padding:16px;margin:12px 0">
+                    <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:end">
+                        <div style="flex:2;min-width:180px"><label style="font-size:11px;font-weight:600;color:#94a3b8">Email *</label><input id="invEmail" class="role-select" style="width:100%;padding:6px" placeholder="utente@azienda.com"></div>
+                        <div style="flex:1;min-width:120px"><label style="font-size:11px;font-weight:600;color:#94a3b8">Nome</label><input id="invName" class="role-select" style="width:100%;padding:6px" placeholder="Mario Rossi"></div>
+                        <div style="flex:1;min-width:120px"><label style="font-size:11px;font-weight:600;color:#94a3b8">Organizzazione</label><select id="invOrg" class="role-select" style="width:100%;padding:6px"><option value="">— Nessuna —</option></select></div>
+                        <div style="flex:0;min-width:100px"><label style="font-size:11px;font-weight:600;color:#94a3b8">Ruolo org</label><select id="invRole" class="role-select" style="width:100%;padding:6px"><option value="operator">Operator</option><option value="admin">Admin</option><option value="viewer">Viewer</option></select></div>
+                        <button class="btn btn-success" onclick="sendInvite()" style="padding:6px 16px">📤 Invia invito</button>
+                    </div>
+                    <div id="inviteResult" style="margin-top:8px;font-size:12px"></div>
+                </div>
+                <!-- Pending invitations -->
+                <div id="pendingInvites" style="display:none;margin:8px 0"></div>
                 <div id="usersBody"><div class="loading">Caricamento...</div></div>
+            </div>
+        </div>
+
+        <!-- User detail modal -->
+        <div id="userDetailModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.7);z-index:10000;overflow-y:auto">
+            <div style="max-width:600px;margin:60px auto;background:#1a1f2e;border:1px solid #2e3250;border-radius:12px;padding:24px;position:relative">
+                <button onclick="closeUserDetail()" style="position:absolute;top:12px;right:12px;background:none;border:none;color:#94a3b8;font-size:20px;cursor:pointer">✕</button>
+                <div id="userDetailContent"><div class="loading">Caricamento...</div></div>
             </div>
         </div>
 
@@ -602,10 +629,25 @@
                 const res = await apiFetch('/admin/users');
                 const users = res.users || [];
                 if (!users.length) { el.innerHTML = '<div class="empty">' + T('admin.no_users') + '</div>'; return; }
+
+                // Carica org per ogni utente (batch)
+                let orgMap = {};
+                try {
+                    const orgRes = await apiFetch('/platform/orgs');
+                    const orgs = orgRes.organizations || [];
+                    // Mappa membri
+                    for (const org of orgs) {
+                        try {
+                            const mRes = await apiFetch(`/org/members?org_id=${org.id}`).catch(() => null);
+                            // fallback: niente members
+                        } catch(e) {}
+                    }
+                } catch(e) { /* platform/orgs non disponibile per non-admin */ }
+
                 el.innerHTML = `
                     <table>
                         <thead><tr>
-                            <th>Nome</th><th>Email</th><th>Ruolo</th><th>Stato</th><th>Piano</th><th>Registrato</th><th>Azioni</th>
+                            <th>Nome</th><th>Email</th><th>Ruolo</th><th>Stato</th><th>Piano</th><th>Org</th><th>Registrato</th><th>Azioni</th>
                         </tr></thead>
                         <tbody>
                             ${users.map(u => `
@@ -623,13 +665,17 @@
                                         </select>
                                     </td>
                                     <td>${u.plan || 'FREE'}</td>
+                                    <td style="font-size:11px">${u.active_org_id ? '🏢' : '<span style="color:#666">—</span>'}</td>
                                     <td>${u.created_at ? new Date(u.created_at).toLocaleDateString('it-IT') : '—'}</td>
-                                    <td>
-                                        <button class="btn btn-primary btn-sm" onclick="showUserDetail('${u.id}')">Dettagli</button>
+                                    <td style="display:flex;gap:4px">
+                                        <button class="btn btn-primary btn-sm" onclick="showUserDetail('${u.id}')">📋 Dettagli</button>
                                     </td>
                                 </tr>`).join('')}
                         </tbody>
                     </table>`;
+
+                // Carica inviti pendenti
+                loadPendingInvites();
             } catch(e) { el.innerHTML = `<div class="empty" style="color:red">${e.message}</div>`; }
         }
 
@@ -648,11 +694,174 @@
         }
 
         function showUserDetail(userId) {
-            apiFetch('/admin/users').then(res => {
-                const u = (res.users||[]).find(x => String(x.id) === String(userId));
-                if (!u) return;
-                alert(`Utente: ${u.name}\nEmail: ${u.email}\nID: ${u.id}\nRuolo: ${u.role}\nStato: ${u.status}\nPiano: ${u.plan}\nRegistrato: ${u.created_at ? new Date(u.created_at).toLocaleString('it-IT') : 'N/A'}`);
+            document.getElementById('userDetailModal').style.display = 'block';
+            const el = document.getElementById('userDetailContent');
+            el.innerHTML = '<div class="loading">Caricamento...</div>';
+
+            apiFetch(`/admin/users/${userId}/detail`).then(res => {
+                const u = res.user;
+                const orgs = res.organizations || [];
+                const usage = res.usage || {};
+                const pu = usage.personal || {};
+                const mb = pu.bytes_processed > 0 ? (pu.bytes_processed/1048576).toFixed(1)+' MB' : '0';
+
+                let orgHtml = orgs.length
+                    ? orgs.map(o => `<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #2e3250">
+                        <span>🏢 <strong>${o.name}</strong> <span class="badge badge-${o.role}">${o.role}</span></span>
+                        <button class="btn btn-danger btn-sm" onclick="removeUserFromOrg('${u.id}')" style="font-size:11px">Rimuovi</button>
+                      </div>`).join('')
+                    : '<div style="color:#666;font-size:13px">Nessuna organizzazione</div>';
+
+                el.innerHTML = `
+                    <h3 style="margin:0 0 16px;font-size:18px">👤 ${u.name || u.email}</h3>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:13px;margin-bottom:16px">
+                        <div><strong>Email:</strong> ${u.email}</div>
+                        <div><strong>ID:</strong> ${u.id}</div>
+                        <div><strong>Ruolo:</strong> <span class="badge badge-${u.role}">${u.role}</span></div>
+                        <div><strong>Stato:</strong> ${u.status}</div>
+                        <div><strong>Piano:</strong> ${u.plan || 'FREE'}</div>
+                        <div><strong>Registrato:</strong> ${u.created_at ? new Date(u.created_at).toLocaleDateString('it-IT') : '—'}</div>
+                    </div>
+
+                    <h4 style="margin:16px 0 8px;font-size:14px">📊 Utilizzo mese (${usage.month || '—'})</h4>
+                    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;font-size:13px;margin-bottom:16px">
+                        <div style="background:#0f172a;padding:10px;border-radius:6px;text-align:center">
+                            <div style="font-size:20px;font-weight:700">${pu.transforms_count || 0}</div>
+                            <div style="font-size:11px;color:#94a3b8">Trasformazioni</div>
+                        </div>
+                        <div style="background:#0f172a;padding:10px;border-radius:6px;text-align:center">
+                            <div style="font-size:20px;font-weight:700">${pu.api_calls_count || 0}</div>
+                            <div style="font-size:11px;color:#94a3b8">API Calls</div>
+                        </div>
+                        <div style="background:#0f172a;padding:10px;border-radius:6px;text-align:center">
+                            <div style="font-size:20px;font-weight:700">${mb}</div>
+                            <div style="font-size:11px;color:#94a3b8">Dati</div>
+                        </div>
+                    </div>
+
+                    <h4 style="margin:16px 0 8px;font-size:14px">🏢 Organizzazioni</h4>
+                    ${orgHtml}
+
+                    <div style="margin-top:12px;display:flex;gap:8px;align-items:end">
+                        <div style="flex:2"><label style="font-size:11px;font-weight:600;color:#94a3b8">Sposta in org:</label>
+                            <select id="moveOrgSelect" class="role-select" style="width:100%;padding:6px"></select></div>
+                        <div style="flex:1"><select id="moveOrgRole" class="role-select" style="width:100%;padding:6px">
+                            <option value="operator">Operator</option><option value="admin">Admin</option><option value="viewer">Viewer</option></select></div>
+                        <button class="btn btn-primary btn-sm" onclick="moveUserToOrg('${u.id}')" style="padding:6px 12px">➡️ Sposta</button>
+                    </div>
+                `;
+
+                // Popola select org
+                _loadOrgSelect('moveOrgSelect');
+            }).catch(e => {
+                el.innerHTML = `<div style="color:red">${e.message}</div>`;
             });
+        }
+
+        function closeUserDetail() {
+            document.getElementById('userDetailModal').style.display = 'none';
+        }
+
+        async function _loadOrgSelect(selectId) {
+            try {
+                const res = await apiFetch('/platform/orgs');
+                const sel = document.getElementById(selectId);
+                if (!sel) return;
+                sel.innerHTML = '<option value="">— Seleziona —</option>' +
+                    (res.organizations || []).map(o =>
+                        `<option value="${o.id}">${o.name} (${o.plan})</option>`
+                    ).join('');
+            } catch(e) {}
+        }
+
+        async function moveUserToOrg(userId) {
+            const orgId = document.getElementById('moveOrgSelect')?.value;
+            const role = document.getElementById('moveOrgRole')?.value || 'operator';
+            if (!orgId) { showAlert('Seleziona un\'organizzazione', 'error'); return; }
+            try {
+                const res = await apiFetch(`/admin/users/${userId}/org`, {
+                    method: 'PUT',
+                    body: JSON.stringify({ org_id: orgId, role: role })
+                });
+                showAlert(res.message || 'Utente spostato');
+                showUserDetail(userId); // refresh
+                loadUsers();
+            } catch(e) { showAlert('Errore: ' + e.message, 'error'); }
+        }
+
+        async function removeUserFromOrg(userId) {
+            if (!confirm('Rimuovere l\'utente dall\'organizzazione?')) return;
+            try {
+                await apiFetch(`/admin/users/${userId}/org`, { method: 'DELETE' });
+                showAlert('Utente rimosso dall\'organizzazione');
+                showUserDetail(userId);
+                loadUsers();
+            } catch(e) { showAlert('Errore: ' + e.message, 'error'); }
+        }
+
+        // ── Invite functions ──
+
+        function toggleInviteForm() {
+            const f = document.getElementById('inviteForm');
+            const show = f.style.display === 'none';
+            f.style.display = show ? 'block' : 'none';
+            if (show) _loadOrgSelect('invOrg');
+        }
+
+        async function sendInvite() {
+            const email = document.getElementById('invEmail')?.value?.trim();
+            if (!email) { showAlert('Inserisci un\'email', 'error'); return; }
+            const name = document.getElementById('invName')?.value?.trim() || '';
+            const orgId = document.getElementById('invOrg')?.value || null;
+            const role = document.getElementById('invRole')?.value || 'operator';
+            const resultEl = document.getElementById('inviteResult');
+
+            try {
+                const res = await apiFetch('/admin/users/invite', {
+                    method: 'POST',
+                    body: JSON.stringify({ email, name, org_id: orgId, role })
+                });
+                resultEl.innerHTML = `<span style="color:#4ade80">✅ ${res.message}</span>`;
+                document.getElementById('invEmail').value = '';
+                document.getElementById('invName').value = '';
+                loadUsers();
+                loadPendingInvites();
+            } catch(e) {
+                resultEl.innerHTML = `<span style="color:#f87171">❌ ${e.message}</span>`;
+            }
+        }
+
+        async function loadPendingInvites() {
+            const el = document.getElementById('pendingInvites');
+            if (!el) return;
+            try {
+                const res = await apiFetch('/admin/invitations');
+                const invs = res.invitations || [];
+                if (!invs.length) { el.style.display = 'none'; return; }
+                el.style.display = 'block';
+                el.innerHTML = `
+                    <div style="background:#0f172a;border:1px solid #2e3250;border-radius:8px;padding:12px;margin-bottom:8px">
+                        <div style="font-size:12px;font-weight:600;color:#94a3b8;margin-bottom:8px">✉️ Inviti pendenti (${invs.length})</div>
+                        ${invs.map(inv => `
+                            <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid #1e293b;font-size:12px">
+                                <span>${inv.email} → ${inv.org_name || 'N/A'} (${inv.role})</span>
+                                <span style="display:flex;gap:6px;align-items:center">
+                                    <span style="color:#666">${inv.created_at ? new Date(inv.created_at).toLocaleDateString('it-IT') : ''}</span>
+                                    <button onclick="cancelInvite('${inv.id}')" style="background:#dc2626;color:white;border:none;border-radius:4px;padding:2px 8px;cursor:pointer;font-size:11px">✕</button>
+                                </span>
+                            </div>
+                        `).join('')}
+                    </div>`;
+            } catch(e) { el.style.display = 'none'; }
+        }
+
+        async function cancelInvite(inviteId) {
+            if (!confirm('Annullare questo invito?')) return;
+            try {
+                await apiFetch(`/admin/invitations/${inviteId}`, { method: 'DELETE' });
+                showAlert('Invito annullato');
+                loadPendingInvites();
+            } catch(e) { showAlert('Errore: ' + e.message, 'error'); }
         }
 
         // ================================================================

@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ruoli e Approvazioni — Buddyliko</title>
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+    <script src="/lang/i18n.js"></script>
+    <style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: system-ui, -apple-system, sans-serif; background: #0a0e1a; color: #e2e8f0; }
+.container { max-width: 1200px; margin: 0 auto; padding: 24px 20px; }
+.page-header { margin-bottom: 24px; }
+.page-header h1 { font-size: 22px; font-weight: 700; }
+.page-header p { color: #94a3b8; font-size: 13px; margin-top: 4px; }
+.subnav { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+.subnav a { padding: 8px 16px; border-radius: 8px; text-decoration: none; font-size: 13px; font-weight: 500; color: #94a3b8; background: #0d1220; border: 1px solid #2e3250; transition: all .15s; }
+.subnav a:hover { border-color: #60a5fa; color: #60a5fa; }
+.subnav a.active { background: #1e3a5f; color: #93c5fd; border-color: #1e3a5f; }
+.tabs { display: flex; gap: 6px; margin-bottom: 20px; border-bottom: 1px solid #2e3250; padding-bottom: 8px; flex-wrap: wrap; }
+.tab-btn { padding: 8px 18px; border: none; border-radius: 8px 8px 0 0; cursor: pointer; font-size: 13px; font-weight: 600; background: transparent; color: #94a3b8; transition: all .15s; position: relative; }
+.tab-btn:hover { color: #e2e8f0; background: #0d1220; }
+.tab-btn.active { background: #141b2d; color: #60a5fa; }
+.tab-btn .badge-count { background: #dc2626; color: white; font-size: 10px; padding: 1px 6px; border-radius: 10px; margin-left: 6px; }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+.section { background: #141b2d; border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 1px solid #2e3250; }
+.section-title { font-size: 15px; font-weight: 600; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-bottom: 24px; }
+.stat-card { background: #141b2d; padding: 18px; border-radius: 12px; border: 1px solid #2e3250; }
+.stat-value { font-size: 28px; font-weight: bold; color: #60a5fa; }
+.stat-value.green { color: #4ade80; }
+.stat-value.orange { color: #fb923c; }
+.stat-value.red { color: #f87171; }
+.stat-value.purple { color: #c084fc; }
+.stat-label { color: #94a3b8; font-size: 12px; margin-top: 4px; }
+table { width: 100%; border-collapse: collapse; }
+th { background: #0d1220; padding: 10px 12px; text-align: left; font-weight: 600; font-size: 11px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid #2e3250; }
+td { padding: 10px 12px; border-bottom: 1px solid #1e2235; font-size: 13px; }
+tr:hover td { background: #0f172a; }
+.badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+.badge-owner { background: rgba(136,14,79,.25); color: #f472b6; }
+.badge-billing_admin { background: rgba(230,81,0,.25); color: #fb923c; }
+.badge-tech_lead { background: rgba(21,101,192,.25); color: #60a5fa; }
+.badge-operator { background: rgba(74,20,140,.25); color: #c084fc; }
+.badge-viewer { background: rgba(69,90,100,.25); color: #94a3b8; }
+.badge-custom { background: rgba(234,179,8,.25); color: #facc15; }
+.badge-system { background: rgba(30,58,138,.2); color: #93c5fd; font-size: 10px; }
+.badge-pending { background: rgba(234,179,8,.2); color: #facc15; }
+.badge-approved { background: rgba(46,125,50,.2); color: #4ade80; }
+.badge-rejected { background: rgba(198,40,40,.2); color: #f87171; }
+.badge-expired { background: rgba(69,90,100,.2); color: #94a3b8; }
+.perm-tag { display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: 500; background: rgba(37,99,235,.15); color: #93c5fd; margin: 2px; font-family: 'SF Mono', 'Fira Code', monospace; }
+.perm-tag.revoked { background: rgba(198,40,40,.15); color: #f87171; text-decoration: line-through; }
+.perm-tag.added { background: rgba(46,125,50,.15); color: #4ade80; }
+.btn { padding: 7px 14px; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; transition: all 0.15s; display: inline-flex; align-items: center; gap: 6px; }
+.btn:hover { opacity: 0.85; transform: translateY(-1px); }
+.btn-primary { background: #2563eb; color: white; }
+.btn-success { background: #059669; color: white; }
+.btn-danger { background: #dc2626; color: white; }
+.btn-outline { background: transparent; border: 1px solid #2e3250; color: #94a3b8; }
+.btn-outline:hover { border-color: #60a5fa; color: #60a5fa; }
+.btn-sm { padding: 5px 10px; font-size: 11px; }
+.btn-bar { display: flex; gap: 8px; margin-bottom: 16px; align-items: center; flex-wrap: wrap; }
+.modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,.6); z-index: 200; justify-content: center; align-items: center; }
+.modal-overlay.show { display: flex; }
+.modal { background: #141b2d; border-radius: 12px; padding: 24px; border: 1px solid #2e3250; width: 100%; max-width: 600px; max-height: 85vh; overflow-y: auto; }
+.modal h3 { font-size: 16px; margin-bottom: 16px; }
+.modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 16px; }
+.form-group { margin-bottom: 14px; }
+.form-group label { display: block; font-size: 12px; color: #94a3b8; margin-bottom: 4px; font-weight: 600; }
+.form-group input, .form-group textarea, .form-group select { width: 100%; padding: 8px 12px; border-radius: 6px; border: 1px solid #2e3250; background: #0d1220; color: #e2e8f0; font-size: 13px; font-family: inherit; }
+.form-group input:focus, .form-group textarea:focus, .form-group select:focus { outline: none; border-color: #2563eb; }
+.checkbox-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 6px; }
+.checkbox-item { display: flex; align-items: center; gap: 8px; padding: 6px 10px; border-radius: 6px; background: #0d1220; border: 1px solid #1e2235; cursor: pointer; font-size: 12px; transition: all .15s; }
+.checkbox-item:hover { border-color: #2563eb; }
+.checkbox-item.checked { background: rgba(37,99,235,.15); border-color: #2563eb; }
+.checkbox-item input[type="checkbox"] { accent-color: #2563eb; }
+.scope-group { margin-bottom: 12px; }
+.scope-group-title { font-size: 12px; font-weight: 700; color: #60a5fa; text-transform: uppercase; margin-bottom: 6px; padding: 4px 0; border-bottom: 1px solid #1e2235; }
+.approval-card { background: #0d1220; border: 1px solid #2e3250; border-radius: 10px; padding: 16px; margin-bottom: 12px; transition: all .15s; }
+.approval-card:hover { border-color: #3b82f6; }
+.approval-card .ap-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.approval-card .ap-op { font-weight: 600; font-size: 14px; }
+.approval-card .ap-meta { font-size: 12px; color: #94a3b8; }
+.approval-card .ap-payload { font-size: 12px; color: #64748b; background: #0a0e1a; padding: 8px; border-radius: 6px; margin: 8px 0; font-family: 'SF Mono', 'Fira Code', monospace; max-height: 100px; overflow-y: auto; word-break: break-all; }
+.approval-card .ap-actions { display: flex; gap: 8px; margin-top: 10px; }
+.empty-state { text-align: center; padding: 40px 20px; color: #64748b; }
+.empty-state .icon { font-size: 40px; margin-bottom: 12px; }
+.loading { text-align: center; padding: 20px; color: #64748b; }
+.role-card { background: #0d1220; border: 1px solid #2e3250; border-radius: 10px; padding: 16px; margin-bottom: 12px; transition: all .15s; }
+.role-card:hover { border-color: #3b82f6; }
+.role-card .rc-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.role-card .rc-name { font-weight: 700; font-size: 15px; }
+.role-card .rc-desc { font-size: 12px; color: #94a3b8; margin-bottom: 8px; }
+.role-card .rc-perms { display: flex; flex-wrap: wrap; gap: 4px; }
+.role-card .rc-stats { font-size: 11px; color: #64748b; margin-top: 8px; }
+.role-card .rc-actions { display: flex; gap: 6px; }
+</style>
+</head>
+<body>
+<div id="buddy-topbar"></div>
+<div class="container">
+    <div class="page-header">
+        <h1>🛡️ Ruoli e Approvazioni</h1>
+        <p>Gestisci ruoli, permessi granulari e flussi di approvazione</p>
+    </div>
+    <div class="subnav">
+        <a href="org-dashboard.html">📊 Dashboard</a>
+        <a href="org-users.html">👥 Utenti</a>
+        <a href="org-billing.html">💰 Billing</a>
+        <a href="org-partners.html">🤝 Partner</a>
+        <a href="org-reports.html">📈 Report</a>
+        <a href="org-roles.html" class="active">🛡️ Ruoli</a>
+        <a href="org-settings.html">⚙️ Impostazioni</a>
+    </div>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('roles')">🎭 Ruoli</button>
+        <button class="tab-btn" onclick="switchTab('members')">👥 Permessi Membri</button>
+        <button class="tab-btn" onclick="switchTab('approvals')" id="tab-approvals-btn">✅ Approvazioni <span class="badge-count" id="pending-badge" style="display:none">0</span></button>
+    </div>
+
+    <!-- ═══════ TAB 1: ROLE TEMPLATES ═══════ -->
+    <div class="tab-content active" id="tab-roles">
+        <div class="btn-bar">
+            <button class="btn btn-primary" onclick="openCreateRoleModal()">➕ Nuovo Ruolo Custom</button>
+            <span style="font-size:12px;color:#64748b">I ruoli di sistema non sono modificabili</span>
+        </div>
+        <div id="roles-list"><div class="loading">Caricamento ruoli...</div></div>
+    </div>
+
+    <!-- ═══════ TAB 2: MEMBER PERMISSIONS ═══════ -->
+    <div class="tab-content" id="tab-members">
+        <div class="section">
+            <div class="section-title">👥 Permessi effettivi per membro</div>
+            <p style="font-size:12px;color:#94a3b8;margin-bottom:14px">Seleziona un membro per vedere i suoi permessi risolti (ruolo + override custom)</p>
+            <div id="members-list"><div class="loading">Caricamento membri...</div></div>
+        </div>
+        <div class="section" id="member-detail-section" style="display:none">
+            <div class="section-title" id="member-detail-title">Dettaglio permessi</div>
+            <div id="member-detail-content"></div>
+        </div>
+    </div>
+
+    <!-- ═══════ TAB 3: APPROVALS ═══════ -->
+    <div class="tab-content" id="tab-approvals">
+        <div class="stats" id="approval-stats">
+            <div class="stat-card"><div class="stat-value orange" id="stat-pending">0</div><div class="stat-label">In attesa</div></div>
+            <div class="stat-card"><div class="stat-value green" id="stat-approved">0</div><div class="stat-label">Approvate</div></div>
+            <div class="stat-card"><div class="stat-value red" id="stat-rejected">0</div><div class="stat-label">Rifiutate</div></div>
+            <div class="stat-card"><div class="stat-value" id="stat-total">0</div><div class="stat-label">Totale</div></div>
+        </div>
+        <div class="section">
+            <div class="section-title">⏳ Richieste in attesa</div>
+            <div id="pending-approvals"><div class="loading">Caricamento...</div></div>
+        </div>
+        <div class="section">
+            <div class="section-title">📋 Cronologia</div>
+            <div id="all-approvals"><div class="loading">Caricamento...</div></div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════ MODAL: CREATE/EDIT ROLE ═══════ -->
+<div class="modal-overlay" id="modal-role">
+    <div class="modal" style="max-width:700px">
+        <h3 id="modal-role-title">Nuovo Ruolo Custom</h3>
+        <div class="form-group">
+            <label>Nome (identificativo, no spazi)</label>
+            <input type="text" id="role-name" placeholder="es: content_editor">
+        </div>
+        <div class="form-group">
+            <label>Etichetta</label>
+            <input type="text" id="role-label" placeholder="es: Content Editor">
+        </div>
+        <div class="form-group">
+            <label>Descrizione</label>
+            <textarea id="role-desc" rows="2" placeholder="Cosa può fare questo ruolo"></textarea>
+        </div>
+        <div class="form-group">
+            <label>Permessi</label>
+            <div id="role-perms-grid"></div>
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-outline" onclick="closeModal('modal-role')">Annulla</button>
+            <button class="btn btn-primary" id="btn-save-role" onclick="saveRole()">💾 Salva</button>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════ MODAL: ASSIGN ROLE TO MEMBER ═══════ -->
+<div class="modal-overlay" id="modal-assign">
+    <div class="modal">
+        <h3>Assegna Ruolo</h3>
+        <p style="font-size:13px;color:#94a3b8;margin-bottom:14px" id="assign-info"></p>
+        <div class="form-group">
+            <label>Ruolo</label>
+            <select id="assign-role-select"></select>
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-outline" onclick="closeModal('modal-assign')">Annulla</button>
+            <button class="btn btn-primary" onclick="confirmAssignRole()">✅ Assegna</button>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════ MODAL: REJECT APPROVAL ═══════ -->
+<div class="modal-overlay" id="modal-reject">
+    <div class="modal">
+        <h3>Rifiuta Richiesta</h3>
+        <div class="form-group">
+            <label>Motivazione (opzionale)</label>
+            <textarea id="reject-note" rows="3" placeholder="Motivo del rifiuto..."></textarea>
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-outline" onclick="closeModal('modal-reject')">Annulla</button>
+            <button class="btn btn-danger" onclick="confirmReject()">🗑️ Rifiuta</button>
+        </div>
+    </div>
+</div>
+
+<script src="/assets/topbar.js"></script>
+<script>
+const API = (window.APP_CONFIG && window.APP_CONFIG.api_base) || '/api';
+function authHeaders() {
+    const t = localStorage.getItem('buddyliko_token');
+    return { 'Authorization': 'Bearer ' + t, 'Content-Type': 'application/json' };
+}
+function escHtml(s) { const d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML; }
+function timeAgo(d) {
+    if (!d) return '—';
+    const diff = (Date.now() - new Date(d).getTime()) / 1000;
+    if (diff < 60) return 'Ora';
+    if (diff < 3600) return Math.floor(diff/60) + ' min fa';
+    if (diff < 86400) return Math.floor(diff/3600) + ' ore fa';
+    return Math.floor(diff/86400) + ' gg fa';
+}
+
+let allPermissions = [];
+let allPermissionsGrouped = {};
+let allRoles = [];
+let editingRoleId = null;
+let assigningUserId = null;
+let rejectingRequestId = null;
+
+// ═══════════════════════════════════════════
+// TAB SWITCHING
+// ═══════════════════════════════════════════
+function switchTab(tab) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + tab).classList.add('active');
+    event.target.closest('.tab-btn').classList.add('active');
+    if (tab === 'roles') loadRoles();
+    if (tab === 'members') loadMembers();
+    if (tab === 'approvals') { loadApprovalStats(); loadPendingApprovals(); loadAllApprovals(); }
+}
+
+// ═══════════════════════════════════════════
+// PERMISSIONS CATALOG
+// ═══════════════════════════════════════════
+async function loadPermissions() {
+    try {
+        const r = await fetch(API + '/permissions', { headers: authHeaders() });
+        if (!r.ok) return;
+        const data = await r.json();
+        allPermissions = data.permissions || [];
+        allPermissionsGrouped = data.grouped || {};
+    } catch(e) { console.error('loadPermissions:', e); }
+}
+
+function renderPermGrid(containerId, selectedIds = []) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    let html = '';
+    const selectedSet = new Set(selectedIds.map(String));
+    for (const [scope, perms] of Object.entries(allPermissionsGrouped)) {
+        html += `<div class="scope-group"><div class="scope-group-title">${escHtml(scope)}</div><div class="checkbox-grid">`;
+        for (const p of perms) {
+            const checked = selectedSet.has(String(p.id));
+            html += `<label class="checkbox-item ${checked ? 'checked' : ''}" onclick="this.classList.toggle('checked')">
+                <input type="checkbox" name="perm" value="${p.id}" ${checked ? 'checked' : ''}>
+                <span>${escHtml(p.action)}</span>
+                <span style="font-size:10px;color:#64748b;margin-left:auto">${escHtml(p.description || '')}</span>
+            </label>`;
+        }
+        html += '</div></div>';
+    }
+    container.innerHTML = html;
+}
+
+// ═══════════════════════════════════════════
+// ROLE TEMPLATES
+// ═══════════════════════════════════════════
+async function loadRoles() {
+    const container = document.getElementById('roles-list');
+    try {
+        const r = await fetch(API + '/roles', { headers: authHeaders() });
+        if (!r.ok) { container.innerHTML = '<div class="empty-state"><div class="icon">⚠️</div>Errore caricamento</div>'; return; }
+        const data = await r.json();
+        allRoles = data.roles || [];
+        if (!allRoles.length) { container.innerHTML = '<div class="empty-state"><div class="icon">🎭</div>Nessun ruolo configurato</div>'; return; }
+        let html = '';
+        for (const role of allRoles) {
+            const perms = Array.isArray(role.permissions) ? role.permissions : [];
+            const isSystem = role.is_system;
+            const memberCount = role.member_count || 0;
+            html += `<div class="role-card">
+                <div class="rc-header">
+                    <div>
+                        <span class="rc-name">${escHtml(role.label || role.name)}</span>
+                        ${isSystem ? '<span class="badge badge-system" style="margin-left:8px">Sistema</span>' : '<span class="badge badge-custom" style="margin-left:8px">Custom</span>'}
+                    </div>
+                    <div class="rc-actions">
+                        ${!isSystem ? `<button class="btn btn-sm btn-outline" onclick="openEditRoleModal(${role.id})">✏️</button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteRole(${role.id}, '${escHtml(role.name)}')">🗑️</button>` : ''}
+                    </div>
+                </div>
+                <div class="rc-desc">${escHtml(role.description || '')}</div>
+                <div class="rc-perms">${perms.slice(0, 15).map(p => `<span class="perm-tag">${p.scope}:${p.action}</span>`).join('')}${perms.length > 15 ? `<span class="perm-tag" style="background:rgba(100,116,139,.15);color:#94a3b8">+${perms.length - 15} altri</span>` : ''}</div>
+                <div class="rc-stats">${perms.length} permessi · ${memberCount} membr${memberCount === 1 ? 'o' : 'i'}</div>
+            </div>`;
+        }
+        container.innerHTML = html;
+    } catch(e) { container.innerHTML = '<div class="empty-state">Errore: ' + escHtml(e.message) + '</div>'; }
+}
+
+async function openCreateRoleModal() {
+    editingRoleId = null;
+    document.getElementById('modal-role-title').textContent = 'Nuovo Ruolo Custom';
+    document.getElementById('role-name').value = '';
+    document.getElementById('role-name').disabled = false;
+    document.getElementById('role-label').value = '';
+    document.getElementById('role-desc').value = '';
+    await loadPermissions();
+    renderPermGrid('role-perms-grid', []);
+    document.getElementById('modal-role').classList.add('show');
+}
+
+async function openEditRoleModal(templateId) {
+    editingRoleId = templateId;
+    document.getElementById('modal-role-title').textContent = 'Modifica Ruolo';
+    await loadPermissions();
+    try {
+        const r = await fetch(API + '/roles/' + templateId, { headers: authHeaders() });
+        const data = await r.json();
+        const role = data.role;
+        document.getElementById('role-name').value = role.name;
+        document.getElementById('role-name').disabled = true;
+        document.getElementById('role-label').value = role.label || '';
+        document.getElementById('role-desc').value = role.description || '';
+        const selectedIds = (role.permissions || []).map(p => p.id);
+        renderPermGrid('role-perms-grid', selectedIds);
+        document.getElementById('modal-role').classList.add('show');
+    } catch(e) { alert('Errore: ' + e.message); }
+}
+
+async function saveRole() {
+    const name = document.getElementById('role-name').value.trim();
+    const label = document.getElementById('role-label').value.trim();
+    const desc = document.getElementById('role-desc').value.trim();
+    const checkboxes = document.querySelectorAll('#role-perms-grid input[name="perm"]:checked');
+    const permIds = Array.from(checkboxes).map(cb => parseInt(cb.value));
+    if (!label) { alert('Inserisci un\'etichetta'); return; }
+    if (!permIds.length) { alert('Seleziona almeno un permesso'); return; }
+
+    try {
+        let r;
+        if (editingRoleId) {
+            r = await fetch(API + '/roles/' + editingRoleId, {
+                method: 'PUT', headers: authHeaders(),
+                body: JSON.stringify({ label, description: desc, permission_ids: permIds })
+            });
+        } else {
+            if (!name) { alert('Inserisci un nome identificativo'); return; }
+            r = await fetch(API + '/roles', {
+                method: 'POST', headers: authHeaders(),
+                body: JSON.stringify({ name, label, description: desc, permission_ids: permIds })
+            });
+        }
+        const data = await r.json();
+        if (!r.ok) { alert(data.detail || 'Errore'); return; }
+        closeModal('modal-role');
+        loadRoles();
+    } catch(e) { alert('Errore: ' + e.message); }
+}
+
+async function deleteRole(templateId, name) {
+    if (!confirm(`Eliminare il ruolo "${name}"? I membri verranno spostati a Viewer.`)) return;
+    try {
+        const r = await fetch(API + '/roles/' + templateId, { method: 'DELETE', headers: authHeaders() });
+        if (!r.ok) { const d = await r.json(); alert(d.detail || 'Errore'); return; }
+        loadRoles();
+    } catch(e) { alert('Errore: ' + e.message); }
+}
+
+// ═══════════════════════════════════════════
+// MEMBER PERMISSIONS
+// ═══════════════════════════════════════════
+async function loadMembers() {
+    const container = document.getElementById('members-list');
+    try {
+        const r = await fetch(API + '/org/members', { headers: authHeaders() });
+        if (!r.ok) { container.innerHTML = '<div class="empty-state">Errore caricamento</div>'; return; }
+        const data = await r.json();
+        const members = data.members || [];
+        if (!members.length) { container.innerHTML = '<div class="empty-state"><div class="icon">👥</div>Nessun membro</div>'; return; }
+        let html = '<table><thead><tr><th>Nome</th><th>Email</th><th>Ruolo</th><th>Azioni</th></tr></thead><tbody>';
+        for (const m of members) {
+            const role = m.role || 'viewer';
+            html += `<tr>
+                <td>${escHtml(m.name || '—')}</td>
+                <td>${escHtml(m.email || '—')}</td>
+                <td><span class="badge badge-${role}">${escHtml(role)}</span></td>
+                <td>
+                    <button class="btn btn-sm btn-outline" onclick="viewMemberPerms(${m.user_id})">🔍 Permessi</button>
+                    <button class="btn btn-sm btn-primary" onclick="openAssignModal(${m.user_id}, '${escHtml(m.name || m.email)}')">🎭 Cambia ruolo</button>
+                </td>
+            </tr>`;
+        }
+        html += '</tbody></table>';
+        container.innerHTML = html;
+    } catch(e) { container.innerHTML = '<div class="empty-state">Errore: ' + escHtml(e.message) + '</div>'; }
+}
+
+async function viewMemberPerms(userId) {
+    const section = document.getElementById('member-detail-section');
+    const title = document.getElementById('member-detail-title');
+    const content = document.getElementById('member-detail-content');
+    section.style.display = 'block';
+    content.innerHTML = '<div class="loading">Caricamento permessi...</div>';
+    try {
+        const r = await fetch(API + '/org/members/' + userId + '/permissions', { headers: authHeaders() });
+        if (!r.ok) { content.innerHTML = 'Errore caricamento'; return; }
+        const data = await r.json();
+        const member = data.member;
+        title.innerHTML = `🔍 Permessi di <strong>${escHtml(member.name || member.email)}</strong> — Ruolo: <span class="badge badge-${member.role}">${escHtml(member.template_label || member.role)}</span>`;
+        const perms = member.permissions || [];
+        const overrides = member.overrides || [];
+        const overrideSet = {};
+        for (const o of overrides) { overrideSet[o.scope + ':' + o.action] = o.granted; }
+        let html = '<div style="margin-bottom:12px"><strong style="font-size:12px;color:#94a3b8">' + perms.length + ' permessi effettivi</strong></div>';
+        html += '<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:16px">';
+        for (const p of perms) {
+            const isOverride = overrideSet[p] !== undefined;
+            html += `<span class="perm-tag ${isOverride ? 'added' : ''}">${escHtml(p)}</span>`;
+        }
+        html += '</div>';
+        if (overrides.length) {
+            html += '<div style="margin-top:12px"><strong style="font-size:12px;color:#fb923c">Override custom:</strong></div>';
+            html += '<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px">';
+            for (const o of overrides) {
+                html += `<span class="perm-tag ${o.granted ? 'added' : 'revoked'}">${o.granted ? '✅' : '❌'} ${escHtml(o.scope)}:${escHtml(o.action)}</span>`;
+            }
+            html += '</div>';
+        }
+        content.innerHTML = html;
+    } catch(e) { content.innerHTML = 'Errore: ' + escHtml(e.message); }
+}
+
+async function openAssignModal(userId, name) {
+    assigningUserId = userId;
+    document.getElementById('assign-info').textContent = `Assegna un ruolo a ${name}`;
+    const select = document.getElementById('assign-role-select');
+    if (!allRoles.length) {
+        try {
+            const r = await fetch(API + '/roles', { headers: authHeaders() });
+            const d = await r.json();
+            allRoles = d.roles || [];
+        } catch(e) {}
+    }
+    select.innerHTML = allRoles.map(r => `<option value="${r.id}">${escHtml(r.label || r.name)}${r.is_system ? ' (sistema)' : ' (custom)'}</option>`).join('');
+    document.getElementById('modal-assign').classList.add('show');
+}
+
+async function confirmAssignRole() {
+    const templateId = parseInt(document.getElementById('assign-role-select').value);
+    if (!templateId || !assigningUserId) return;
+    try {
+        const r = await fetch(API + '/org/members/' + assigningUserId + '/role-template', {
+            method: 'PUT', headers: authHeaders(),
+            body: JSON.stringify({ role_template_id: templateId })
+        });
+        const data = await r.json();
+        if (!r.ok) { alert(data.detail || 'Errore'); return; }
+        closeModal('modal-assign');
+        loadMembers();
+    } catch(e) { alert('Errore: ' + e.message); }
+}
+
+// ═══════════════════════════════════════════
+// APPROVALS
+// ═══════════════════════════════════════════
+async function loadApprovalStats() {
+    try {
+        const r = await fetch(API + '/approvals/stats', { headers: authHeaders() });
+        if (!r.ok) return;
+        const data = await r.json();
+        document.getElementById('stat-pending').textContent = data.pending || 0;
+        document.getElementById('stat-approved').textContent = data.approved || 0;
+        document.getElementById('stat-rejected').textContent = data.rejected || 0;
+        document.getElementById('stat-total').textContent = data.total || 0;
+    } catch(e) {}
+}
+
+async function loadPendingApprovals() {
+    const container = document.getElementById('pending-approvals');
+    try {
+        const r = await fetch(API + '/approvals?status=pending', { headers: authHeaders() });
+        if (!r.ok) { container.innerHTML = '<div class="empty-state">Errore</div>'; return; }
+        const data = await r.json();
+        const items = data.approvals || [];
+        if (!items.length) {
+            container.innerHTML = '<div class="empty-state"><div class="icon">✅</div>Nessuna richiesta in attesa</div>';
+            return;
+        }
+        container.innerHTML = items.map(a => renderApprovalCard(a, true)).join('');
+    } catch(e) { container.innerHTML = '<div class="empty-state">Errore: ' + escHtml(e.message) + '</div>'; }
+}
+
+async function loadAllApprovals() {
+    const container = document.getElementById('all-approvals');
+    try {
+        const r = await fetch(API + '/approvals?status=all', { headers: authHeaders() });
+        if (!r.ok) { container.innerHTML = '<div class="empty-state">Errore</div>'; return; }
+        const data = await r.json();
+        const items = data.approvals || [];
+        if (!items.length) { container.innerHTML = '<div class="empty-state"><div class="icon">📋</div>Nessuna richiesta</div>'; return; }
+        container.innerHTML = items.map(a => renderApprovalCard(a, false)).join('');
+    } catch(e) { container.innerHTML = '<div class="empty-state">Errore</div>'; }
+}
+
+function renderApprovalCard(a, showActions) {
+    const payloadStr = JSON.stringify(a.payload || {}, null, 2);
+    const isPending = a.status === 'pending';
+    return `<div class="approval-card">
+        <div class="ap-header">
+            <div class="ap-op">${escHtml(a.operation_label || a.operation)}</div>
+            <span class="badge badge-${a.status}">${escHtml(a.status)}</span>
+        </div>
+        <div class="ap-meta">
+            Richiesta da <strong>${escHtml(a.requester_name || a.requester_email || '?')}</strong> · ${timeAgo(a.created_at)}
+            ${a.approver_email ? ` · ${a.status === 'approved' ? 'Approvata' : 'Rifiutata'} da <strong>${escHtml(a.approver_name || a.approver_email)}</strong>` : ''}
+            ${a.rejection_note ? ` · Motivo: "${escHtml(a.rejection_note)}"` : ''}
+        </div>
+        ${payloadStr !== '{}' ? `<div class="ap-payload">${escHtml(payloadStr)}</div>` : ''}
+        ${showActions && isPending ? `<div class="ap-actions">
+            <button class="btn btn-sm btn-success" onclick="approveRequest('${a.id}')">✅ Approva</button>
+            <button class="btn btn-sm btn-danger" onclick="openRejectModal('${a.id}')">❌ Rifiuta</button>
+        </div>` : ''}
+    </div>`;
+}
+
+async function approveRequest(requestId) {
+    if (!confirm('Approvare questa richiesta?')) return;
+    try {
+        const r = await fetch(API + '/approvals/' + requestId + '/approve', {
+            method: 'POST', headers: authHeaders()
+        });
+        const data = await r.json();
+        if (!r.ok) { alert(data.detail || 'Errore'); return; }
+        loadPendingApprovals();
+        loadAllApprovals();
+        loadApprovalStats();
+        loadPendingCount();
+    } catch(e) { alert('Errore: ' + e.message); }
+}
+
+function openRejectModal(requestId) {
+    rejectingRequestId = requestId;
+    document.getElementById('reject-note').value = '';
+    document.getElementById('modal-reject').classList.add('show');
+}
+
+async function confirmReject() {
+    if (!rejectingRequestId) return;
+    const note = document.getElementById('reject-note').value.trim();
+    try {
+        const r = await fetch(API + '/approvals/' + rejectingRequestId + '/reject', {
+            method: 'POST', headers: authHeaders(),
+            body: JSON.stringify({ note: note || null })
+        });
+        const data = await r.json();
+        if (!r.ok) { alert(data.detail || 'Errore'); return; }
+        closeModal('modal-reject');
+        loadPendingApprovals();
+        loadAllApprovals();
+        loadApprovalStats();
+        loadPendingCount();
+    } catch(e) { alert('Errore: ' + e.message); }
+}
+
+// ═══════════════════════════════════════════
+// PENDING COUNT BADGE
+// ═══════════════════════════════════════════
+async function loadPendingCount() {
+    try {
+        const r = await fetch(API + '/approvals/pending-count', { headers: authHeaders() });
+        if (!r.ok) return;
+        const data = await r.json();
+        const badge = document.getElementById('pending-badge');
+        if (data.count > 0) {
+            badge.textContent = data.count;
+            badge.style.display = 'inline';
+        } else {
+            badge.style.display = 'none';
+        }
+    } catch(e) {}
+}
+
+// ═══════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+// Close modals on overlay click
+document.querySelectorAll('.modal-overlay').forEach(m => {
+    m.addEventListener('click', e => { if (e.target === m) m.classList.remove('show'); });
+});
+
+// ═══════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════
+loadRoles();
+loadPendingCount();
+</script>
+</body>
+</html>

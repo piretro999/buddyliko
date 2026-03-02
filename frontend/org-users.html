@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestione Utenti — Buddyliko</title>
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+    <script src="/lang/i18n.js"></script>
+    <style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: system-ui, -apple-system, sans-serif; background: #0a0e1a; color: #e2e8f0; }
+.container { max-width: 1200px; margin: 0 auto; padding: 24px 20px; }
+.page-header { margin-bottom: 24px; }
+.page-header h1 { font-size: 22px; font-weight: 700; }
+.page-header p { color: #94a3b8; font-size: 13px; margin-top: 4px; }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 24px; }
+.stat-card { background: #141b2d; padding: 18px; border-radius: 12px; border: 1px solid #2e3250; }
+.stat-value { font-size: 28px; font-weight: bold; color: #60a5fa; }
+.stat-value.green { color: #4ade80; }
+.stat-value.orange { color: #fb923c; }
+.stat-value.purple { color: #c084fc; }
+.stat-label { color: #94a3b8; font-size: 12px; margin-top: 4px; }
+.section { background: #141b2d; border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 1px solid #2e3250; }
+.section-title { font-size: 15px; font-weight: 600; margin-bottom: 14px; color: #e2e8f0; display: flex; align-items: center; gap: 8px; }
+.section-title .count { background: #1e3a5f; color: #60a5fa; padding: 2px 8px; border-radius: 10px; font-size: 11px; }
+table { width: 100%; border-collapse: collapse; }
+th { background: #0d1220; padding: 10px 12px; text-align: left; font-weight: 600; font-size: 11px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid #2e3250; }
+td { padding: 10px 12px; border-bottom: 1px solid #1e2235; font-size: 13px; color: #e2e8f0; }
+tr:hover td { background: #0f172a; }
+.badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+.badge-owner { background: rgba(136,14,79,.25); color: #f472b6; }
+.badge-admin { background: rgba(46,125,50,.25); color: #4ade80; }
+.badge-finance { background: rgba(230,81,0,.25); color: #fb923c; }
+.badge-developer { background: rgba(21,101,192,.25); color: #60a5fa; }
+.badge-operator { background: rgba(74,20,140,.25); color: #c084fc; }
+.badge-viewer { background: rgba(69,90,100,.25); color: #94a3b8; }
+.badge-active { background: rgba(46,125,50,.2); color: #4ade80; }
+.badge-trial { background: rgba(230,81,0,.2); color: #fb923c; }
+.badge-suspended { background: rgba(198,40,40,.2); color: #f87171; }
+.badge-FREE { background: rgba(69,90,100,.25); color: #94a3b8; }
+.badge-PRO { background: rgba(21,101,192,.25); color: #60a5fa; }
+.badge-ENTERPRISE { background: rgba(136,14,79,.25); color: #f472b6; }
+.badge-PARTNER { background: rgba(46,125,50,.25); color: #4ade80; }
+.btn { padding: 7px 14px; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; transition: all 0.15s; display: inline-flex; align-items: center; gap: 6px; }
+.btn:hover { opacity: 0.85; transform: translateY(-1px); }
+.btn-primary { background: #2563eb; color: white; }
+.btn-success { background: #059669; color: white; }
+.btn-danger { background: #dc2626; color: white; }
+.btn-outline { background: transparent; border: 1px solid #2e3250; color: #94a3b8; }
+.btn-outline:hover { border-color: #60a5fa; color: #60a5fa; }
+.btn-sm { padding: 4px 10px; font-size: 11px; }
+.alert { padding: 12px 16px; border-radius: 8px; margin-bottom: 14px; font-size: 13px; animation: fadeIn 0.3s; }
+.alert-success { background: rgba(46,125,50,.15); color: #4ade80; border-left: 4px solid #059669; }
+.alert-error { background: rgba(198,40,40,.15); color: #f87171; border-left: 4px solid #dc2626; }
+.alert-info { background: rgba(21,101,192,.15); color: #60a5fa; border-left: 4px solid #2563eb; }
+.form-group { margin-bottom: 14px; }
+.form-group label { display: block; color: #94a3b8; font-size: 12px; font-weight: 600; margin-bottom: 4px; }
+.form-group input, .form-group select, .form-group textarea { width: 100%; background: #0a0e1a; border: 1px solid #2e3250; color: #e2e8f0; border-radius: 6px; padding: 8px 12px; font-size: 13px; font-family: inherit; }
+.form-group input:focus, .form-group select:focus { outline: none; border-color: #2563eb; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.progress-bar { background: #0d1220; border-radius: 6px; height: 8px; overflow: hidden; margin-top: 6px; }
+.progress-fill { height: 100%; border-radius: 6px; background: linear-gradient(90deg, #2563eb, #3b82f6); transition: width 0.5s; }
+.progress-fill.warn { background: linear-gradient(90deg, #d97706, #f59e0b); }
+.progress-fill.danger { background: linear-gradient(90deg, #dc2626, #ef4444); }
+.empty { padding: 30px; text-align: center; color: #64748b; font-size: 13px; }
+.loading { padding: 20px; text-align: center; color: #64748b; }
+.chart-container { height: 200px; position: relative; margin-top: 12px; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.tab-bar { display: flex; gap: 4px; margin-bottom: 16px; border-bottom: 2px solid #2e3250; }
+.tab { padding: 8px 16px; cursor: pointer; border-radius: 8px 8px 0 0; font-size: 13px; font-weight: 500; color: #94a3b8; background: none; border: none; transition: all 0.15s; }
+.tab.active { color: #60a5fa; border-bottom: 2px solid #60a5fa; margin-bottom: -2px; background: rgba(37,99,235,.1); }
+.tab:hover:not(.active) { background: #0f172a; }
+.subnav { display: flex; gap: 8px; margin-bottom: 20px; }
+.subnav a { padding: 8px 16px; border-radius: 8px; text-decoration: none; font-size: 13px; font-weight: 500; color: #94a3b8; background: #0d1220; border: 1px solid #2e3250; transition: all .15s; }
+.subnav a:hover { border-color: #60a5fa; color: #60a5fa; }
+.subnav a.active { background: #1e3a5f; color: #93c5fd; border-color: #1e3a5f; }
+.modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,.6); z-index: 200; justify-content: center; align-items: center; }
+.modal-overlay.show { display: flex; }
+.modal { background: #141b2d; border-radius: 12px; padding: 24px; border: 1px solid #2e3250; width: 100%; max-width: 480px; }
+.modal h3 { font-size: 16px; margin-bottom: 16px; }
+.modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 16px; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+@media (max-width: 768px) { .form-row, .grid-2 { grid-template-columns: 1fr; } .stats { grid-template-columns: 1fr 1fr; } }
+</style>
+</head>
+<body>
+<div id="buddy-topbar"></div>
+<div class="container">
+    <div class="subnav">
+        <a href="org-dashboard.html">📊 Dashboard</a>
+        <a href="org-users.html" class="active">👥 Utenti</a>
+        <a href="org-billing.html">💰 Billing</a>
+        <a href="org-partners.html">🤝 Partner</a>
+        <a href="org-reports.html">📈 Report</a>
+        <a href="partner-dashboard.html">🤝 Partnership</a>
+        <a href="org-settings.html">⚙️ Impostazioni</a>
+    </div>
+    <div id="alerts"></div>
+    <div class="page-header" style="display:flex;justify-content:space-between;align-items:center">
+        <div><h1>👥 Membri organizzazione</h1><p id="members-subtitle">Caricamento...</p></div>
+        <button class="btn btn-primary" onclick="showAddModal()">+ Aggiungi membro</button>
+    </div>
+    <div class="section">
+        <table>
+            <thead><tr><th>Utente</th><th>Email</th><th>Ruolo org</th><th>Ruolo piattaforma</th><th>Membro dal</th><th>Azioni</th></tr></thead>
+            <tbody id="members-body"><tr><td colspan="6" class="loading">Caricamento...</td></tr></tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal Aggiungi -->
+<div class="modal-overlay" id="addModal">
+    <div class="modal">
+        <h3>➕ Aggiungi membro</h3>
+        <div class="form-group">
+            <label>Email utente</label>
+            <input type="email" id="add-email" placeholder="utente@azienda.it">
+        </div>
+        <div class="form-group">
+            <label>Ruolo</label>
+            <select id="add-role">
+                <option value="viewer">Viewer — sola lettura</option>
+                <option value="operator" selected>Operator — operazioni base</option>
+                <option value="developer">Developer — accesso AI e API</option>
+                <option value="finance">Finance — dati finanziari</option>
+                <option value="admin">Admin — gestione completa</option>
+            </select>
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-outline" onclick="hideAddModal()">Annulla</button>
+            <button class="btn btn-primary" onclick="doAddMember()">Aggiungi</button>
+        </div>
+    </div>
+</div>
+
+<script>
+
+const API = '/api';
+const token = localStorage.getItem('buddyliko_token');
+if (!token) window.location.href = 'login.html';
+
+function showAlert(msg, type='success') {
+    const d = document.createElement('div');
+    d.className = 'alert alert-' + type;
+    d.textContent = msg;
+    const el = document.getElementById('alerts');
+    el.insertBefore(d, el.firstChild);
+    setTimeout(() => d.remove(), 4000);
+}
+
+async function apiFetch(path, opts={}) {
+    const r = await fetch(API + path, {
+        ...opts,
+        headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json', ...(opts.headers||{}) }
+    });
+    if (!r.ok) {
+        let e; try { e = await r.json(); } catch { e = { detail: 'HTTP ' + r.status }; }
+        throw new Error(e.detail || e.message || 'Errore');
+    }
+    return r.json();
+}
+
+function fmtBytes(b) {
+    if (!b || b === 0) return '0 B';
+    const u = ['B','KB','MB','GB','TB'];
+    const i = Math.floor(Math.log(Math.abs(b)) / Math.log(1024));
+    return (b / Math.pow(1024, i)).toFixed(i > 0 ? 1 : 0) + ' ' + u[i];
+}
+
+function fmtEur(v) { return '€' + parseFloat(v || 0).toFixed(2); }
+function fmtDate(d) { if (!d) return '—'; return new Date(d).toLocaleDateString('it-IT'); }
+function fmtDateTime(d) { if (!d) return '—'; return new Date(d).toLocaleString('it-IT', {day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}); }
+function fmtNum(n) { return (n||0).toLocaleString('it-IT'); }
+function pct(used, total) { if (!total || total <= 0) return 0; return Math.min(100, Math.round((used / total) * 100)); }
+function pctClass(p) { return p >= 90 ? 'danger' : p >= 70 ? 'warn' : ''; }
+
+let myRole = '';
+
+async function loadMembers() {
+    try {
+        const [org, data] = await Promise.all([apiFetch('/org'), apiFetch('/org/members')]);
+        myRole = org.my_role || '';
+        const members = data.members || [];
+        document.getElementById('members-subtitle').textContent =
+            members.length + ' membri · Piano ' + org.plan + ' · Ruolo: ' + myRole;
+        renderMembers(members);
+    } catch(e) { showAlert(e.message, 'error'); }
+}
+
+function renderMembers(members) {
+    if (!members.length) { document.getElementById('members-body').innerHTML = '<tr><td colspan="6" class="empty">Nessun membro</td></tr>'; return; }
+    const canEdit = ['owner','admin'].includes(myRole);
+    document.getElementById('members-body').innerHTML = members.map(m => {
+        const roles = ['viewer','operator','developer','finance','admin','owner'];
+        const roleSelect = canEdit && m.role !== 'owner' ?
+            '<select class="btn btn-outline btn-sm" onchange="changeRole(' + m.user_id + ', this.value)">' +
+            roles.map(r => '<option value="' + r + '"' + (r === m.role ? ' selected' : '') + '>' + r + '</option>').join('') +
+            '</select>' :
+            '<span class="badge badge-' + m.role + '">' + m.role + '</span>';
+        const actions = canEdit && m.role !== 'owner' ?
+            '<button class="btn btn-danger btn-sm" onclick="removeMember(' + m.user_id + ', \'' + (m.email||'').replace(/'/g,'') + '\')">Rimuovi</button>' : '';
+        return '<tr>' +
+            '<td><strong>' + (m.name || '—') + '</strong></td>' +
+            '<td>' + (m.email || '') + '</td>' +
+            '<td>' + roleSelect + '</td>' +
+            '<td>' + (m.platform_role ? '<span class="badge badge-admin">' + m.platform_role + '</span>' : '—') + '</td>' +
+            '<td>' + fmtDate(m.joined_at) + '</td>' +
+            '<td>' + actions + '</td></tr>';
+    }).join('');
+}
+
+function showAddModal() { document.getElementById('addModal').classList.add('show'); }
+function hideAddModal() { document.getElementById('addModal').classList.remove('show'); document.getElementById('add-email').value=''; }
+
+async function doAddMember() {
+    const email = document.getElementById('add-email').value.trim();
+    const role = document.getElementById('add-role').value;
+    if (!email) return showAlert('Inserisci email', 'error');
+    try {
+        await apiFetch('/org/members', { method: 'POST', body: JSON.stringify({ email, role }) });
+        showAlert('Membro aggiunto!');
+        hideAddModal();
+        loadMembers();
+    } catch(e) { showAlert(e.message, 'error'); }
+}
+
+async function changeRole(uid, role) {
+    try {
+        await apiFetch('/org/members/' + uid + '/role', { method: 'PUT', body: JSON.stringify({ role }) });
+        showAlert('Ruolo aggiornato');
+        loadMembers();
+    } catch(e) { showAlert(e.message, 'error'); loadMembers(); }
+}
+
+async function removeMember(uid, email) {
+    if (!confirm('Rimuovere ' + email + ' dall\'organizzazione?')) return;
+    try {
+        await apiFetch('/org/members/' + uid, { method: 'DELETE' });
+        showAlert('Membro rimosso');
+        loadMembers();
+    } catch(e) { showAlert(e.message, 'error'); }
+}
+
+loadMembers();
+</script>
+<script src="/assets/topbar.js"></script>
+</body></html>

@@ -66,6 +66,8 @@
             document.body.appendChild(btn);
         }
     }
+    // Expose createBtn globally so topbar.js can re-trigger after rebuild
+    window._buddyCreateThemeBtn = createBtn;
     function injectCSS() {
         if (document.getElementById('buddy-theme-css')) return;
         const s = document.createElement('style');
@@ -383,6 +385,70 @@
 #theme-toggle-btn:hover { opacity:1; transform:scale(1.15); }
 [data-theme="dark"] #theme-toggle-btn { color:#e2e8f0 !important; border-color:#334155 !important; }
 [data-theme="light"] #theme-toggle-btn { color:#1e293b !important; border-color:#cbd5e1 !important; }
+
+/* ══ MARKETPLACE LIGHT ══ */
+[data-theme="light"] .page-header h1 { color:#1e293b !important; }
+[data-theme="light"] .page-header p { color:#64748b !important; }
+[data-theme="light"] .tab-bar { border-color:#e2e8f0 !important; }
+[data-theme="light"] .tab-bar .tab { background:#f1f5f9 !important; color:#475569 !important; border-color:#e2e8f0 !important; }
+[data-theme="light"] .tab-bar .tab.active { background:#2563eb !important; color:white !important; }
+[data-theme="light"] .filters select,[data-theme="light"] .filters input { background:#fff !important; border-color:#cbd5e1 !important; color:#1e293b !important; }
+[data-theme="light"] .card-grid .card { background:#fff !important; border-color:#e2e8f0 !important; }
+[data-theme="light"] .card-grid .card:hover { border-color:#3b82f6 !important; }
+[data-theme="light"] .card-name { color:#1e293b !important; }
+[data-theme="light"] .card-desc { color:#64748b !important; }
+[data-theme="light"] .card-price.free { background:rgba(34,197,94,.08) !important; color:#059669 !important; }
+[data-theme="light"] .card-price.paid { background:rgba(37,99,235,.08) !important; color:#2563eb !important; }
+[data-theme="light"] .modal { background:#fff !important; border-color:#e2e8f0 !important; color:#1e293b !important; }
+[data-theme="light"] .modal h2,[data-theme="light"] .modal h3 { color:#1e293b !important; }
+[data-theme="light"] .form-group label { color:#475569 !important; }
+[data-theme="light"] .btn-outline { background:transparent !important; border-color:#cbd5e1 !important; color:#475569 !important; }
+[data-theme="light"] .btn-primary { background:#2563eb !important; color:white !important; }
+[data-theme="light"] .pagination button { background:#fff !important; border-color:#e2e8f0 !important; color:#475569 !important; }
+[data-theme="light"] .pagination button.active { background:#dbeafe !important; color:#2563eb !important; }
+
+/* ══ STANDARDS LIBRARY LIGHT ══ */
+[data-theme="light"] .stats-bar .stat { background:#fff !important; border-color:#e2e8f0 !important; }
+[data-theme="light"] .stat-val { color:#2563eb !important; }
+[data-theme="light"] .stat-label { color:#64748b !important; }
+[data-theme="light"] .domain-tabs .dtab { background:#f1f5f9 !important; border-color:#e2e8f0 !important; color:#475569 !important; }
+[data-theme="light"] .domain-tabs .dtab.active,[data-theme="light"] .domain-tabs .dtab:hover { background:#dbeafe !important; color:#2563eb !important; border-color:#93c5fd !important; }
+[data-theme="light"] .card-grid .card .card-title { color:#1e293b !important; }
+[data-theme="light"] .card-grid .card .card-short { color:#94a3b8 !important; }
+[data-theme="light"] .card-tags .tag { background:#f1f5f9 !important; border-color:#e2e8f0 !important; color:#475569 !important; }
+[data-theme="light"] .tag-domain { color:#2563eb !important; border-color:rgba(37,99,235,.3) !important; }
+[data-theme="light"] .tag-region { color:#059669 !important; border-color:rgba(5,150,105,.3) !important; }
+[data-theme="light"] .tag-helger { color:#be185d !important; border-color:rgba(190,24,93,.3) !important; }
+[data-theme="light"] .detail-header .detail-name { color:#1e293b !important; }
+[data-theme="light"] .detail-item { background:#f8fafc !important; }
+[data-theme="light"] .detail-item label { color:#64748b !important; }
+[data-theme="light"] .detail-item span { color:#1e293b !important; }
+[data-theme="light"] .detail-links a { color:#2563eb !important; background:#f8fafc !important; border-color:#e2e8f0 !important; }
+[data-theme="light"] .related-item { background:#f8fafc !important; border-color:#e2e8f0 !important; color:#475569 !important; }
+
+/* ══ ORG DASHBOARD LIGHT ══ */
+[data-theme="light"] .subnav { background:#fff !important; border-color:#e2e8f0 !important; }
+[data-theme="light"] .subnav a { color:#475569 !important; }
+[data-theme="light"] .subnav a:hover { background:#f1f5f9 !important; color:#1e293b !important; }
+[data-theme="light"] .subnav a.active { background:#dbeafe !important; color:#2563eb !important; }
+[data-theme="light"] .grid-2 .section { background:#fff !important; border-color:#e2e8f0 !important; }
+[data-theme="light"] .usage-item { background:#f8fafc !important; }
+[data-theme="light"] .usage-item .label { color:#475569 !important; }
+[data-theme="light"] .usage-item .bar { background:#e2e8f0 !important; }
+[data-theme="light"] .buddy-topbar { background:linear-gradient(135deg,#f8fafc,#f1f5f9) !important; border-bottom-color:#e2e8f0 !important; }
+
+/* ══ HELP AI LIGHT ══ */
+[data-theme="light"] .chat-container { color:#1e293b !important; }
+[data-theme="light"] .chat-header { border-bottom-color:#e2e8f0 !important; }
+[data-theme="light"] .chat-header p { color:#64748b !important; }
+[data-theme="light"] .msg-ai { background:#f8fafc !important; border-color:#e2e8f0 !important; color:#1e293b !important; }
+[data-theme="light"] .msg-ai strong { color:#2563eb !important; }
+[data-theme="light"] .msg-ai pre { background:#f1f5f9 !important; }
+[data-theme="light"] .msg-user { background:#2563eb !important; color:#fff !important; }
+[data-theme="light"] .msg-thinking { color:#94a3b8 !important; }
+[data-theme="light"] .input-area textarea { background:#fff !important; border-color:#e2e8f0 !important; color:#1e293b !important; }
+[data-theme="light"] .suggestion { background:#fff !important; border-color:#e2e8f0 !important; color:#475569 !important; }
+[data-theme="light"] .suggestion:hover { border-color:#3b82f6 !important; color:#1e293b !important; }
 
 /* ══ LANG SWITCHER FIX ══ */
 .sidebar-footer #app-lang-switcher #lang-dropdown,
